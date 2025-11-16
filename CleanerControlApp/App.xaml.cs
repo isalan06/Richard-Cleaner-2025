@@ -11,6 +11,7 @@ using System.Windows;
 
 using SQLitePCL;
 using CleanerControlApp.Vision;
+using NLog.Extensions.Logging;
 
 namespace CleanerControlApp
 {
@@ -78,6 +79,7 @@ namespace CleanerControlApp
                         logging.AddDebug(); // 加入 Debug Logger
                     }
                     // logging.AddProvider(new 第三方LoggerProvider()); // 日後擴充
+                    logging.AddNLog(); // 加入 NLog
                 })
                 .ConfigureServices((hostContext, services) =>
                 {
