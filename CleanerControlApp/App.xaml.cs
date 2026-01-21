@@ -86,7 +86,7 @@ namespace CleanerControlApp
                     // 註冊設定物件
                     services.Configure<AppSettings>(hostContext.Configuration.GetSection("AppSettings"));
                     services.AddSingleton<UserManager>(); // 註冊 UserManager 為 Singleton
-                    services.AddSingleton<LoginWindow>(); // 註冊 LoginWindow 為 Singleton
+                    services.AddTransient<LoginWindow>(); // 改為 Transient
                     services.AddSingleton<MainWindow>(); // 註冊 MainWindow 為 Singleton
                 })
                 .Build();

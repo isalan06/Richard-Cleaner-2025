@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -10,6 +11,11 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 
 using Microsoft.Extensions.Logging;
+using CleanerControlApp.Vision;
+using Microsoft.Extensions.Configuration;
+using System.Reflection;
+using CleanerControlApp.Modules.UserManagement.Services;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace CleanerControlApp
 {
@@ -19,16 +25,21 @@ namespace CleanerControlApp
     public partial class MainWindow : Window
     {
         private readonly ILogger<MainWindow> _logger; // Logger 欄位
+        private readonly IConfiguration _configuration;
+        private readonly UserManager _userManager;
+        private readonly IServiceProvider _services;
 
         /// <summary>
         /// 建構式，注入 Logger
         /// </summary>
         /// <param name="logger"></param>
-        public MainWindow(ILogger<MainWindow> logger)
+        public MainWindow(ILogger<MainWindow> logger, IConfiguration configuration, UserManager userManager, IServiceProvider services)
         {
             InitializeComponent();
             _logger = logger; // 注入的 Logger
-            
+            _configuration = configuration;
+            _userManager = userManager;
+            _services = services;
         }
 
         /// <summary>
@@ -40,6 +51,88 @@ namespace CleanerControlApp
             base.OnContentRendered(e);
             //_logger.LogInformation("MainWindow Show.");
             //Console.WriteLine("MainWindow Show.");
+        }
+
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            // Set version in status bar from assembly information
+            try
+            {
+                var assembly = Assembly.GetEntryAssembly() ?? Assembly.GetExecutingAssembly();
+                var infoVer = assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion;
+                var nameVer = assembly.GetName().Version?.ToString();
+                var version = infoVer ?? nameVer ?? "1.0.0";
+                VersionTextBlock.Text = version;
+            }
+            catch
+            {
+                VersionTextBlock.Text = "1.0.0";
+            }
+
+            // Update current user display
+            UpdateCurrentUserDisplay();
+
+            // Load default Home view
+            MainContent.Content = new HomeView();
+        }
+
+        private void UpdateCurrentUserDisplay()
+        {
+            var user = _userManager?.UserInfo;
+            if (user != null)
+            {
+                CurrentUserNameText.Text = $"帳號: {user.Name}";
+                CurrentUserRoleText.Text = $"權限: {user.CurrentUserRole}";
+            }
+            else
+            {
+                CurrentUserNameText.Text = "帳號: -";
+                CurrentUserRoleText.Text = "權限: -";
+            }
+        }
+
+        private void BtnHome_Click(object sender, RoutedEventArgs e)
+        {
+            MainContent.Content = new HomeView();
+        }
+
+        private void BtnModule1_Click(object sender, RoutedEventArgs e)
+        {
+            MainContent.Content = new TextBlock { Text = "Module1", FontSize = 24, HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center };
+        }
+
+        private void BtnModule2_Click(object sender, RoutedEventArgs e)
+        {
+            MainContent.Content = new TextBlock { Text = "Module2", FontSize = 24, HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center };
+        }
+
+        private void BtnModule3_Click(object sender, RoutedEventArgs e)
+        {
+            MainContent.Content = new TextBlock { Text = "Module3", FontSize = 24, HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center };
+        }
+
+        private void BtnModule4_Click(object sender, RoutedEventArgs e)
+        {
+            MainContent.Content = new TextBlock { Text = "Module4", FontSize = 24, HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center };
+        }
+
+        private void LogoutButton_Click(object sender, RoutedEventArgs e)
+        {
+            // Hide main window while showing login
+            this.Hide();
+            var loginWindow = _services.GetRequiredService<LoginWindow>();
+            bool? result = loginWindow.ShowDialog();
+            if (result == true)
+            {
+                // Logged in again, update display and show main
+                UpdateCurrentUserDisplay();
+                this.Show();
+            }
+            else
+            {
+                // User cancelled or failed login -> exit app
+                Application.Current.Shutdown();
+            }
         }
     }
 }

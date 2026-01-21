@@ -5,8 +5,52 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CleanerControlApp"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="MainWindow" Height="720" Width="1280"
+        WindowStartupLocation="Manual" Left="0" Top="0"
+        Loaded="Window_Loaded">
     <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/> <!-- Title Bar -->
+            <RowDefinition Height="*"/> <!-- Content -->
+            <RowDefinition Height="Auto"/> <!-- Status Bar -->
+        </Grid.RowDefinitions>
+
+        <!-- Top Title Bar with user box +5 boxes/buttons -->
+        <Border Grid.Row="0" Background="#FF2D2D30" Padding="6">
+            <DockPanel LastChildFill="False">
+                <!-- User info box on the left -->
+                <Border DockPanel.Dock="Left" Background="#FF3A3A3A" Padding="6" Margin="0,0,8,0" CornerRadius="4" VerticalAlignment="Center">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <StackPanel Orientation="Vertical" Margin="0,0,8,0" VerticalAlignment="Center">
+                            <TextBlock x:Name="CurrentUserNameText" Text="帳號: -" Foreground="White" FontWeight="Bold"/>
+                            <TextBlock x:Name="CurrentUserRoleText" Text="權限: -" Foreground="White" FontSize="12"/>
+                        </StackPanel>
+                        <Button x:Name="LogoutButton" Content="登出" Margin="4,0,0,0" Padding="8,4" Click="LogoutButton_Click"/>
+                    </StackPanel>
+                </Border>
+
+                <UniformGrid Columns="5" HorizontalAlignment="Left" VerticalAlignment="Center">
+                    <Button x:Name="BtnHome" Content="Home" Margin="4" Padding="10,8" Click="BtnHome_Click" />
+                    <Button x:Name="BtnModule1" Content="Module1" Margin="4" Padding="10,8" Click="BtnModule1_Click" />
+                    <Button x:Name="BtnModule2" Content="Module2" Margin="4" Padding="10,8" Click="BtnModule2_Click" />
+                    <Button x:Name="BtnModule3" Content="Module3" Margin="4" Padding="10,8" Click="BtnModule3_Click" />
+                    <Button x:Name="BtnModule4" Content="Module4" Margin="4" Padding="10,8" Click="BtnModule4_Click" />
+                </UniformGrid>
+            </DockPanel>
+        </Border>
+
+        <!-- Main content area for switching modules -->
+        <Border Grid.Row="1" Background="#FFF" Padding="8">
+            <ContentControl x:Name="MainContent" />
+        </Border>
+
+        <!-- Status bar at bottom -->
+        <StatusBar Grid.Row="2" Background="#FFEEEEEE">
+            <StatusBarItem HorizontalAlignment="Left">
+                <TextBlock x:Name="VersionTextBlock" Text="Version"/>
+            </StatusBarItem>
+            <!-- Additional status items can be added here -->
+        </StatusBar>
 
     </Grid>
 </Window>
