@@ -29,12 +29,15 @@
                     </StackPanel>
                 </Border>
 
-                <UniformGrid Columns="5" HorizontalAlignment="Left" VerticalAlignment="Center">
+                <UniformGrid Columns="8" HorizontalAlignment="Left" VerticalAlignment="Center">
                     <Button x:Name="BtnHome" Content="Home" Margin="4" Padding="10,8" Click="BtnHome_Click" />
-                    <Button x:Name="BtnModule1" Content="Module1" Margin="4" Padding="10,8" Click="BtnModule1_Click" />
-                    <Button x:Name="BtnModule2" Content="Module2" Margin="4" Padding="10,8" Click="BtnModule2_Click" />
-                    <Button x:Name="BtnModule3" Content="Module3" Margin="4" Padding="10,8" Click="BtnModule3_Click" />
-                    <Button x:Name="BtnModule4" Content="Module4" Margin="4" Padding="10,8" Click="BtnModule4_Click" />
+                    <Button x:Name="BtnManual" Content="Manual" Margin="4" Padding="10,8" Click="BtnManual_Click" />
+                    <Button x:Name="BtnIO" Content="IO" Margin="4" Padding="10,8" Click="BtnIO_Click" />
+                    <Button x:Name="BtnAlarm" Content="Alarm" Margin="4" Padding="10,8" Click="BtnAlarm_Click" />
+                    <Button x:Name="BtnInfo" Content="Info" Margin="4" Padding="10,8" Click="BtnInfo_Click" />
+                    <Button x:Name="BtnSetting" Content="Setting" Margin="4" Padding="10,8" Click="BtnSetting_Click" />
+                    <Button x:Name="BtnUser" Content="User" Margin="4" Padding="10,8" Click="BtnUser_Click" />
+                    <Button x:Name="BtnDeveloper" Content="Developer" Margin="4" Padding="10,8" Click="BtnDeveloper_Click" />
                 </UniformGrid>
             </DockPanel>
         </Border>

@@ -96,24 +96,39 @@ namespace CleanerControlApp
             MainContent.Content = new HomeView();
         }
 
-        private void BtnModule1_Click(object sender, RoutedEventArgs e)
+        private void BtnManual_Click(object sender, RoutedEventArgs e)
         {
-            MainContent.Content = new TextBlock { Text = "Module1", FontSize = 24, HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center };
+            MainContent.Content = new ManualView();
         }
 
-        private void BtnModule2_Click(object sender, RoutedEventArgs e)
+        private void BtnIO_Click(object sender, RoutedEventArgs e)
         {
-            MainContent.Content = new TextBlock { Text = "Module2", FontSize = 24, HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center };
+            MainContent.Content = new IOView();
         }
 
-        private void BtnModule3_Click(object sender, RoutedEventArgs e)
+        private void BtnAlarm_Click(object sender, RoutedEventArgs e)
         {
-            MainContent.Content = new TextBlock { Text = "Module3", FontSize = 24, HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center };
+            MainContent.Content = new AlarmView();
         }
 
-        private void BtnModule4_Click(object sender, RoutedEventArgs e)
+        private void BtnInfo_Click(object sender, RoutedEventArgs e)
         {
-            MainContent.Content = new TextBlock { Text = "Module4", FontSize = 24, HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center };
+            MainContent.Content = new InfoView();
+        }
+
+        private void BtnSetting_Click(object sender, RoutedEventArgs e)
+        {
+            MainContent.Content = new SettingView();
+        }
+
+        private void BtnUser_Click(object sender, RoutedEventArgs e)
+        {
+            MainContent.Content = new UserView();
+        }
+
+        private void BtnDeveloper_Click(object sender, RoutedEventArgs e)
+        {
+            MainContent.Content = new DeveloperView();
         }
 
         private void LogoutButton_Click(object sender, RoutedEventArgs e)
