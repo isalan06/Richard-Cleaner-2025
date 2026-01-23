@@ -1,4 +1,4 @@
-<UserControl x:Class="CleanerControlApp.Vision.UserView"
+﻿<UserControl x:Class="CleanerControlApp.Vision.UserView"
  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -6,6 +6,92 @@
  mc:Ignorable="d"
  d:DesignHeight="600" d:DesignWidth="800">
  <Grid Background="White">
- <TextBlock Text="User Page" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="36"/>
+ <Grid.ColumnDefinitions>
+ <ColumnDefinition Width="300" />
+ <ColumnDefinition Width="*" />
+ </Grid.ColumnDefinitions>
+
+ <!-- Left: Users list -->
+ <Border Grid.Column="0" Padding="8" BorderBrush="#FFE0E0E0" BorderThickness="0,0,1,0">
+ <StackPanel>
+ <TextBlock Text="使用者列表" FontSize="18" FontWeight="Bold" Margin="0,0,0,8" />
+ <DataGrid x:Name="UsersDataGrid"
+ AutoGenerateColumns="False"
+ IsReadOnly="True"
+ SelectionMode="Single"
+ CanUserAddRows="False"
+ HeadersVisibility="Column"
+ RowHeight="28"
+ PreviewMouseRightButtonDown="UsersDataGrid_PreviewMouseRightButtonDown">
+ <DataGrid.ContextMenu>
+ <ContextMenu>
+ <MenuItem Header="編輯使用者" Click="ChangeUser_MenuItem_Click" />
+ <MenuItem Header="刪除使用者" Click="DeleteUser_MenuItem_Click" />
+ </ContextMenu>
+ </DataGrid.ContextMenu>
+ <DataGrid.Columns>
+ <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="*" />
+ <DataGridTextColumn Header="Role" Binding="{Binding CurrentUserRole}" Width="120" />
+ </DataGrid.Columns>
+ </DataGrid>
+ </StackPanel>
+ </Border>
+
+ <!-- Right: New user form -->
+ <Border Grid.Column="1" Padding="12">
+ <StackPanel Width="400">
+ <TextBlock Text="新增使用者" FontSize="24" FontWeight="Bold" Margin="0,0,0,12" />
+ 
+ <StackPanel Orientation="Horizontal" Margin="0,4">
+ <TextBlock Width="120" VerticalAlignment="Center">使用者</TextBlock>
+ <TextBox x:Name="txtNewUserName" Width="240" />
+ </StackPanel>
+
+ <!-- New password with show/hide -->
+ <StackPanel Orientation="Horizontal" Margin="0,4">
+ <TextBlock Width="120" VerticalAlignment="Center">密碼</TextBlock>
+ <Grid Width="240">
+ <Grid.ColumnDefinitions>
+ <ColumnDefinition />
+ <ColumnDefinition Width="40" />
+ </Grid.ColumnDefinitions>
+ <!-- PasswordBox (hidden text by default) -->
+ <PasswordBox x:Name="pwdNewPassword" Grid.Column="0" VerticalAlignment="Center" />
+ <!-- TextBox used to show password when toggled -->
+ <TextBox x:Name="txtNewPasswordVisible" Grid.Column="0" Visibility="Collapsed" VerticalAlignment="Center" />
+ <!-- Toggle button -->
+ <Button x:Name="btnToggleNewPassword" Grid.Column="1" Width="36" Height="22" Margin="4,0,0,0" VerticalAlignment="Center" Content="顯示" />
+ </Grid>
+ </StackPanel>
+
+ <!-- Confirm password with show/hide -->
+ <StackPanel Orientation="Horizontal" Margin="0,4">
+ <TextBlock Width="120" VerticalAlignment="Center">再次確認密碼</TextBlock>
+ <Grid Width="240">
+ <Grid.ColumnDefinitions>
+ <ColumnDefinition />
+ <ColumnDefinition Width="40" />
+ </Grid.ColumnDefinitions>
+ <PasswordBox x:Name="pwdConfirmPassword" Grid.Column="0" VerticalAlignment="Center" />
+ <TextBox x:Name="txtConfirmPasswordVisible" Grid.Column="0" Visibility="Collapsed" VerticalAlignment="Center" />
+ <Button x:Name="btnToggleConfirmPassword" Grid.Column="1" Width="36" Height="22" Margin="4,0,0,0" VerticalAlignment="Center" Content="顯示" />
+ </Grid>
+ </StackPanel>
+
+ <StackPanel Orientation="Horizontal" Margin="0,4">
+ <TextBlock Width="120" VerticalAlignment="Center">權限</TextBlock>
+ <ComboBox x:Name="cboRole" Width="240">
+ <ComboBoxItem>Administrator</ComboBoxItem>
+ <ComboBoxItem>Engineer</ComboBoxItem>
+ <ComboBoxItem>Operator</ComboBoxItem>
+ </ComboBox>
+ </StackPanel>
+
+ <StackPanel Orientation="Horizontal" Margin="0,12">
+ <Button x:Name="btnAddUser" Content="新增" Width="100" Click="BtnAddUser_Click" />
+ </StackPanel>
+
+ </StackPanel>
+ </Border>
  </Grid>
 </UserControl>

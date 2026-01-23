@@ -103,5 +103,76 @@ namespace CleanerControlApp.Modules.UserManagement.Services
             }
             return null;
         }
+
+        // 更新使用者密碼（使用者 Id）
+        public static bool UpdatePassword(int userId, string newPassword)
+        {
+            if (string.IsNullOrEmpty(newPassword)) return false;
+
+            using var conn = new SqliteConnection(_connectionString);
+            conn.Open();
+            using var cmd = conn.CreateCommand();
+            cmd.CommandText = "UPDATE Users SET Password = @password WHERE Id = @id";
+            cmd.Parameters.AddWithValue("@password", newPassword);
+            cmd.Parameters.AddWithValue("@id", userId);
+            int affected = cmd.ExecuteNonQuery();
+            return affected > 0;
+        }
+
+        // 更新使用者密碼（使用者名稱）
+        public static bool UpdatePasswordByName(string name, string newPassword)
+        {
+            if (string.IsNullOrEmpty(name) || string.IsNullOrEmpty(newPassword)) return false;
+
+            using var conn = new SqliteConnection(_connectionString);
+            conn.Open();
+            using var cmd = conn.CreateCommand();
+            cmd.CommandText = "UPDATE Users SET Password = @password WHERE Name = @name";
+            cmd.Parameters.AddWithValue("@password", newPassword);
+            cmd.Parameters.AddWithValue("@name", name);
+            int affected = cmd.ExecuteNonQuery();
+            return affected > 0;
+        }
+
+        // 同時更新使用者密碼與權限（使用者 Id）
+        public static bool UpdatePasswordAndRole(int userId, string newPassword, UserRole newRole)
+        {
+            if (string.IsNullOrEmpty(newPassword)) return false;
+
+            using var conn = new SqliteConnection(_connectionString);
+            conn.Open();
+            using var cmd = conn.CreateCommand();
+            cmd.CommandText = "UPDATE Users SET Password = @password, Role = @role WHERE Id = @id";
+            cmd.Parameters.AddWithValue("@password", newPassword);
+            cmd.Parameters.AddWithValue("@role", (int)newRole);
+            cmd.Parameters.AddWithValue("@id", userId);
+            int affected = cmd.ExecuteNonQuery();
+            return affected > 0;
+        }
+
+        // 刪除使用者（使用者 Id）
+        public static bool DeleteUser(int userId)
+        {
+            using var conn = new SqliteConnection(_connectionString);
+            conn.Open();
+            using var cmd = conn.CreateCommand();
+            cmd.CommandText = "DELETE FROM Users WHERE Id = @id";
+            cmd.Parameters.AddWithValue("@id", userId);
+            int affected = cmd.ExecuteNonQuery();
+            return affected > 0;
+        }
+
+        // 可選：刪除使用者（使用者名稱）
+        public static bool DeleteUserByName(string name)
+        {
+            if (string.IsNullOrEmpty(name)) return false;
+            using var conn = new SqliteConnection(_connectionString);
+            conn.Open();
+            using var cmd = conn.CreateCommand();
+            cmd.CommandText = "DELETE FROM Users WHERE Name = @name";
+            cmd.Parameters.AddWithValue("@name", name);
+            int affected = cmd.ExecuteNonQuery();
+            return affected > 0;
+        }
     }
 }

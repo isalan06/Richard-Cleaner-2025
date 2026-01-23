@@ -16,6 +16,7 @@ using Microsoft.Extensions.Configuration;
 using System.Reflection;
 using CleanerControlApp.Modules.UserManagement.Services;
 using Microsoft.Extensions.DependencyInjection;
+using CleanerControlApp.Modules.UserManagement.Models;
 
 namespace CleanerControlApp
 {
@@ -72,6 +73,9 @@ namespace CleanerControlApp
             // Update current user display
             UpdateCurrentUserDisplay();
 
+            // Update button visibility based on user role
+            UpdateButtonVisibility();
+
             // Load default Home view
             MainContent.Content = new HomeView();
         }
@@ -88,6 +92,46 @@ namespace CleanerControlApp
             {
                 CurrentUserNameText.Text = "帳號: -";
                 CurrentUserRoleText.Text = "權限: -";
+            }
+        }
+
+        /// <summary>
+        /// 根據目前登入使用者的權限更新按鈕可見性
+        /// - Developer 按鈕：僅 Developer 可見
+        /// - User 按鈕：Administrator 與 Developer 可見
+        /// - Setting 按鈕：Administrator、Developer、Engineer 可見
+        /// 未登入或其他則隱藏
+        /// </summary>
+        private void UpdateButtonVisibility()
+        {
+            if (BtnDeveloper != null) BtnDeveloper.Visibility = Visibility.Collapsed;
+            if (BtnUser != null) BtnUser.Visibility = Visibility.Collapsed;
+            if (BtnSetting != null) BtnSetting.Visibility = Visibility.Collapsed;
+
+            var role = _userManager?.UserInfo?.CurrentUserRole;
+            if (role == null) return;
+
+            switch (role)
+            {
+                case UserRole.Developer:
+                    if (BtnDeveloper != null) BtnDeveloper.Visibility = Visibility.Visible;
+                    if (BtnUser != null) BtnUser.Visibility = Visibility.Visible;
+                    if (BtnSetting != null) BtnSetting.Visibility = Visibility.Visible;
+                    break;
+
+                case UserRole.Administrator:
+                    if (BtnUser != null) BtnUser.Visibility = Visibility.Visible;
+                    if (BtnSetting != null) BtnSetting.Visibility = Visibility.Visible;
+                    break;
+
+                case UserRole.Engineer:
+                    if (BtnSetting != null) BtnSetting.Visibility = Visibility.Visible;
+                    break;
+
+                case UserRole.Operator:
+                default:
+                    // remain collapsed
+                    break;
             }
         }
 
@@ -141,6 +185,9 @@ namespace CleanerControlApp
             {
                 // Logged in again, update display and show main
                 UpdateCurrentUserDisplay();
+                UpdateButtonVisibility();
+                // Return to Home page after re-login
+                MainContent.Content = new HomeView();
                 this.Show();
             }
             else
