@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="utf-8"?>
+<UserControl x:Class="CleanerControlApp.Vision.Developer.ModbusTestView"
+ xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+ xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+ xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+ mc:Ignorable="d"
+ d:DesignHeight="528.261" d:DesignWidth="800">
+ <Grid Background="White">
+ <Grid.ColumnDefinitions>
+ <ColumnDefinition Width="215" />
+ <ColumnDefinition />
+ </Grid.ColumnDefinitions>
+
+ <!-- External top title (moved outside the border) -->
+ <TextBlock Grid.Column="0" Text="Modbus TCP Test" FontSize="18" FontWeight="Bold" Margin="10,10,10,0" />
+
+ <Border Grid.Column="0" Margin="10,40,10,10" BorderThickness="1" BorderBrush="Gray" CornerRadius="4" Padding="6" Background="WhiteSmoke">
+ <StackPanel>
+ <TextBlock Text="Modbus TCP Device 操作" FontSize="13" FontWeight="Bold" Margin="0,0,0,6" />
+
+ <!-- Connection status -->
+ <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,0,6">
+ <TextBlock Text="Connected:" VerticalAlignment="Center" Margin="0,0,6,0" />
+ <Ellipse x:Name="ellipseStatus" Width="14" Height="14" Fill="Gray" Stroke="Black" VerticalAlignment="Center" />
+ <TextBlock x:Name="txtStatus" Text="Unknown" Margin="6,0,0,0" VerticalAlignment="Center" />
+ </StackPanel>
+
+ <!-- Current IP / Port: values shown to the right (tight spacing) -->
+ <Grid Margin="0,2,0,0">
+ <Grid.ColumnDefinitions>
+ <ColumnDefinition Width="Auto" />
+ <ColumnDefinition Width="*" />
+ </Grid.ColumnDefinitions>
+ <Grid.RowDefinitions>
+ <RowDefinition Height="Auto" />
+ <RowDefinition Height="Auto" />
+ </Grid.RowDefinitions>
+
+ <TextBlock Grid.Row="0" Grid.Column="0" Text="Current IP:" VerticalAlignment="Bottom" Margin="0,0,0,5" />
+ <Label Grid.Row="0" Grid.Column="1" x:Name="lblIpValue" Content="-" HorizontalAlignment="Left" />
+
+ <TextBlock Grid.Row="1" Grid.Column="0" Text="Current Port:" VerticalAlignment="Top" Margin="0,5,0,0" />
+ <Label Grid.Row="1" Grid.Column="1" x:Name="lblPortValue" Content="-" HorizontalAlignment="Left" Margin="0,2,0,0" />
+ </Grid>
+
+ <!-- Input for new IP / Port and Set button inline with Port -->
+ <Grid Margin="0,8,0,0">
+ <Grid.ColumnDefinitions>
+ <ColumnDefinition Width="Auto" />
+ <!-- label column -->
+ <ColumnDefinition Width="*" />
+ <!-- inputs column -->
+ </Grid.ColumnDefinitions>
+ <Grid.RowDefinitions>
+ <RowDefinition Height="Auto" />
+ <RowDefinition Height="Auto" />
+ </Grid.RowDefinitions>
+
+ <!-- IP row -->
+ <StackPanel Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,0,4">
+ <TextBlock Text="IP:" Width="30" VerticalAlignment="Center" />
+ <TextBox x:Name="txtIp" Width="140" Height="22" />
+ </StackPanel>
+
+ <!-- Port row with Set button to the right of Port input -->
+ <StackPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal" VerticalAlignment="Center">
+ <TextBlock Text="Port:" Width="30" VerticalAlignment="Center" />
+ <TextBox x:Name="txtPort" Width="80" Height="22" />
+ <Button x:Name="btnSet" Content="Set" Width="56" Height="22" Click="BtnSet_Click" Margin="6,0,0,0" />
+ </StackPanel>
+
+ </Grid>
+
+ <!-- Connect / Disconnect -->
+ <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+ <Button x:Name="btnConnect" Content="Connect" Width="80" Height="26" Click="BtnConnect_Click" />
+ <Button x:Name="btnDisconnect" Content="Disconnect" Width="80" Height="26" Margin="6,0,0,0" Click="BtnDisconnect_Click" />
+ </StackPanel>
+
+ <!-- Slave / Start / Number inputs (defaults set) -->
+ <Grid Margin="0,8,0,0">
+ <Grid.ColumnDefinitions>
+ <ColumnDefinition Width="Auto" />
+ <ColumnDefinition Width="*" />
+ </Grid.ColumnDefinitions>
+ <Grid.RowDefinitions>
+ <RowDefinition Height="Auto" />
+ <RowDefinition Height="Auto" />
+ <RowDefinition Height="Auto" />
+ </Grid.RowDefinitions>
+
+ <TextBlock Grid.Row="0" Grid.Column="0" Text="Slave ID:" VerticalAlignment="Center" Margin="0,0,6,2" />
+ <TextBox Grid.Row="0" Grid.Column="1" x:Name="txtSlaveId" Width="80" Height="22" Text="1" />
+
+ <TextBlock Grid.Row="1" Grid.Column="0" Text="Start Address:" VerticalAlignment="Center" Margin="0,2,6,2" />
+ <TextBox Grid.Row="1" Grid.Column="1" x:Name="txtStartAddress" Width="80" Height="22" Margin="0,2,0,0" Text="0" />
+
+ <TextBlock Grid.Row="2" Grid.Column="0" Text="Number:" VerticalAlignment="Center" Margin="0,2,6,0" />
+ <TextBox Grid.Row="2" Grid.Column="1" x:Name="txtNumber" Width="80" Height="22" Margin="0,2,0,0" Text="5" />
+ </Grid>
+
+ <!-- Read buttons2x2 -->
+ <UniformGrid Columns="2" Rows="2" Margin="0,8,0,0" HorizontalAlignment="Stretch">
+ <Button x:Name="btnReadCoils" Content="Read Coils" Margin="4" Click="BtnReadCoils_Click" />
+ <Button x:Name="btnReadDiscreteInputs" Content="Read DI" Margin="4" Click="BtnReadDiscreteInputs_Click" />
+ <Button x:Name="btnReadHoldingRegisters" Content="Read HR" Margin="4" Click="BtnReadHoldingRegisters_Click" />
+ <Button x:Name="btnReadInputRegisters" Content="Read IR" Margin="4" Click="BtnReadInputRegisters_Click" />
+ </UniformGrid>
+
+ <!-- Set Value2x2 inputs -->
+ <StackPanel Margin="0,8,0,0">
+ <TextBlock Text="Set Value (maps to StartAddress +0..+3)" FontWeight="Bold" Margin="0,4,0,4" />
+ <Grid>
+ <Grid.ColumnDefinitions>
+ <ColumnDefinition Width="*" />
+ <ColumnDefinition Width="*" />
+ </Grid.ColumnDefinitions>
+ <Grid.RowDefinitions>
+ <RowDefinition Height="Auto" />
+ <RowDefinition Height="Auto" />
+ <RowDefinition Height="Auto" />
+ <RowDefinition Height="Auto" />
+ </Grid.RowDefinitions>
+
+ <TextBox Grid.Row="0" Grid.Column="0" x:Name="txtSetVal0" Height="22" Margin="2" ToolTip="For coils: true/false or1/0. For HR: numeric." Text="0" />
+ <TextBox Grid.Row="0" Grid.Column="1" x:Name="txtSetVal1" Height="22" Margin="2" ToolTip="For coils: true/false or1/0. For HR: numeric." Text="0" />
+ <TextBox Grid.Row="1" Grid.Column="0" x:Name="txtSetVal2" Height="22" Margin="2" ToolTip="For coils: true/false or1/0. For HR: numeric." Text="0" />
+ <TextBox Grid.Row="1" Grid.Column="1" x:Name="txtSetVal3" Height="22" Margin="2" ToolTip="For coils: true/false or1/0. For HR: numeric." Text="0" />
+
+ <!-- Write buttons (aligned right, reduced width) placed above error message -->
+ <StackPanel Orientation="Horizontal" Grid.Row="2" Grid.ColumnSpan="2" HorizontalAlignment="Right" Margin="0,6,0,0">
+ <Button x:Name="btnWriteCoils" Content="Write Coils" Width="70" Height="24" Click="BtnWriteCoils_Click" Margin="4,0,0,0" />
+ <Button x:Name="btnWriteHR" Content="Write HR" Width="70" Height="24" Margin="4,0,0,0" Click="BtnWriteHoldingRegisters_Click" />
+ </StackPanel>
+
+ <!-- Inline validation / instruction message BELOW the buttons -->
+ <TextBlock x:Name="txtSetValueError" Grid.Row="3" Grid.ColumnSpan="2" Foreground="Red" Visibility="Visible" Margin="2,4,2,0" TextWrapping="Wrap" TextTrimming="CharacterEllipsis" HorizontalAlignment="Stretch">請先寫入....</TextBlock>
+ 
+ </Grid>
+ </StackPanel>
+
+ </StackPanel>
+ </Border>
+
+ <!-- Results / Logs on the right side -->
+ <Grid Grid.Column="1" Margin="12,12,12,12">
+ <Grid.RowDefinitions>
+ <RowDefinition Height="Auto" />
+ <RowDefinition Height="*" />
+ <RowDefinition Height="Auto" />
+ <RowDefinition Height="120" />
+ </Grid.RowDefinitions>
+
+ <StackPanel Orientation="Horizontal" Grid.Row="0">
+ <TextBlock Text="Results" FontWeight="Bold" />
+ <TextBlock x:Name="txtCurrentCommand" Text="" FontWeight="Normal" Margin="8,0,0,0" Foreground="Gray" />
+ </StackPanel>
+ <DataGrid x:Name="dgResults" Grid.Row="1" Margin="0,6,0,6" AutoGenerateColumns="False" IsReadOnly="True">
+ <DataGrid.Columns>
+ <DataGridTextColumn Header="#" Binding="{Binding Index}" Width="60" />
+ <DataGridTextColumn Header="Address" Binding="{Binding Address}" Width="100" />
+ <DataGridTextColumn Header="Value" Binding="{Binding Value}" Width="*" />
+ </DataGrid.Columns>
+ </DataGrid>
+
+ <TextBlock Text="Log" Grid.Row="2" FontWeight="Bold" />
+ <TextBox x:Name="txtLog" Grid.Row="3" Height="120" IsReadOnly="True" VerticalScrollBarVisibility="Auto" TextWrapping="Wrap" />
+ </Grid>
+
+ </Grid>
+</UserControl>

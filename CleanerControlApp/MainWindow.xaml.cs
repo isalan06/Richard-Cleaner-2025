@@ -9,6 +9,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Collections.Generic;
 
 using Microsoft.Extensions.Logging;
 using CleanerControlApp.Vision;
@@ -29,6 +30,12 @@ namespace CleanerControlApp
         private readonly IConfiguration _configuration;
         private readonly UserManager _userManager;
         private readonly IServiceProvider _services;
+
+        // Navigation buttons list and original backgrounds
+        private List<Button>? _navButtons;
+        private Dictionary<Button, Brush>? _originalBackgrounds;
+        private Brush _selectedBackground = new SolidColorBrush(Color.FromRgb(0x33,0x99,0xFF));
+        private Brush _selectedForeground = Brushes.White;
 
         /// <summary>
         /// 建構式，注入 Logger
@@ -76,8 +83,23 @@ namespace CleanerControlApp
             // Update button visibility based on user role
             UpdateButtonVisibility();
 
+            // Prepare nav buttons collection and capture original backgrounds
+            _navButtons = new List<Button> { BtnHome, BtnManual, BtnIO, BtnAlarm, BtnInfo, BtnSetting, BtnUser, BtnDeveloper };
+            _originalBackgrounds = new Dictionary<Button, Brush>();
+            foreach (var b in _navButtons)
+            {
+                if (b != null)
+                {
+                    // preserve original; if null use Transparent
+                    _originalBackgrounds[b] = b.Background ?? Brushes.Transparent;
+                }
+            }
+
             // Load default Home view
             MainContent.Content = new HomeView();
+
+            // Mark Home as active
+            SetActiveButton(BtnHome);
         }
 
         private void UpdateCurrentUserDisplay()
@@ -135,44 +157,81 @@ namespace CleanerControlApp
             }
         }
 
+        /// <summary>
+        /// Set the active navigation button's visual state
+        /// </summary>
+        /// <param name="active"></param>
+        private void SetActiveButton(Button active)
+        {
+            if (_navButtons == null) return;
+
+            foreach (var b in _navButtons)
+            {
+                if (b == null) continue;
+                if (b == active)
+                {
+                    b.Background = _selectedBackground;
+                    b.Foreground = _selectedForeground;
+                }
+                else
+                {
+                    if (_originalBackgrounds != null && _originalBackgrounds.ContainsKey(b))
+                        b.Background = _originalBackgrounds[b];
+                    else
+                        b.Background = Brushes.Transparent;
+
+                    // Reset foreground to default (black)
+                    b.Foreground = Brushes.Black;
+                }
+            }
+        }
+
         private void BtnHome_Click(object sender, RoutedEventArgs e)
         {
             MainContent.Content = new HomeView();
+            SetActiveButton(BtnHome);
         }
 
         private void BtnManual_Click(object sender, RoutedEventArgs e)
         {
             MainContent.Content = new ManualView();
+            SetActiveButton(BtnManual);
         }
 
         private void BtnIO_Click(object sender, RoutedEventArgs e)
         {
             MainContent.Content = new IOView();
+            SetActiveButton(BtnIO);
         }
 
         private void BtnAlarm_Click(object sender, RoutedEventArgs e)
         {
             MainContent.Content = new AlarmView();
+            SetActiveButton(BtnAlarm);
         }
 
         private void BtnInfo_Click(object sender, RoutedEventArgs e)
         {
             MainContent.Content = new InfoView();
+            SetActiveButton(BtnInfo);
         }
 
         private void BtnSetting_Click(object sender, RoutedEventArgs e)
         {
             MainContent.Content = new SettingView();
+            SetActiveButton(BtnSetting);
         }
 
         private void BtnUser_Click(object sender, RoutedEventArgs e)
         {
             MainContent.Content = new UserView();
+            SetActiveButton(BtnUser);
         }
 
         private void BtnDeveloper_Click(object sender, RoutedEventArgs e)
         {
             MainContent.Content = new DeveloperView();
+            SetActiveButton(BtnDeveloper);
         }
 
         private void LogoutButton_Click(object sender, RoutedEventArgs e)
@@ -188,6 +247,7 @@ namespace CleanerControlApp
                 UpdateButtonVisibility();
                 // Return to Home page after re-login
                 MainContent.Content = new HomeView();
+                SetActiveButton(BtnHome);
                 this.Show();
             }
             else

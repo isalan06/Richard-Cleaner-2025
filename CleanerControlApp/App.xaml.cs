@@ -12,6 +12,8 @@ using System.Windows;
 using SQLitePCL;
 using CleanerControlApp.Vision;
 using NLog.Extensions.Logging;
+using CleanerControlApp.Modules.Modbus.Interfaces;
+using CleanerControlApp.Modules.Modbus.Services;
 
 namespace CleanerControlApp
 {
@@ -88,6 +90,7 @@ namespace CleanerControlApp
                     services.AddSingleton<UserManager>(); // 註冊 UserManager 為 Singleton
                     services.AddTransient<LoginWindow>(); // 改為 Transient
                     services.AddSingleton<MainWindow>(); // 註冊 MainWindow 為 Singleton
+                    services.AddSingleton<IModbusTCPService, ModbusTCPService>(); // 註冊 ModbusTCPService 為 Singleton
                 })
                 .Build();
         }
