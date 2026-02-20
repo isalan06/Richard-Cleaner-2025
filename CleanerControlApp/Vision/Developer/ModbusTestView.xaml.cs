@@ -406,11 +406,14 @@ namespace CleanerControlApp.Vision.Developer
  private class DummyModbusService : IModbusTCPService
  {
  public string Ip { get; set; } = "127.0.0.1";
- public int Port { get; set; } =502;
+ public int Port { get; set; } = 502;
  public bool IsConnected { get; private set; } = false;
 
  public bool Connect() { IsConnected = true; return true; }
  public bool Disconnect() { IsConnected = false; return true; }
+
+ public Task<bool> ConnectAsync() => Task.FromResult(Connect());
+ public Task<bool> DisconnectAsync() => Task.FromResult(Disconnect());
 
  public Modules.Modbus.Models.ModbusTCPFrame ExecuteFrame { get; set; } = new Modules.Modbus.Models.ModbusTCPFrame();
 
@@ -428,6 +431,13 @@ namespace CleanerControlApp.Vision.Developer
  for (int i =0; i < ExecuteFrame.Data.Length; i++) ExecuteFrame.Data[i] = (ushort)(i + ExecuteFrame.StartAddress);
  }
  return true;
+ }
+
+ public Task<Modules.Modbus.Models.ModbusTCPFrame?> ExecuteAsync(Modules.Modbus.Models.ModbusTCPFrame frame)
+ {
+ ExecuteFrame = frame;
+ Execute();
+ return Task.FromResult<Modules.Modbus.Models.ModbusTCPFrame?>(ExecuteFrame);
  }
  }
  #endregion

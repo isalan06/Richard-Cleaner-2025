@@ -9,6 +9,7 @@ using Modbus.Device;
 using System.Net.Sockets;
 using CleanerControlApp.Modules.Modbus.Models;
 using Microsoft.Extensions.Logging;
+using System.Threading;
 
 namespace CleanerControlApp.Modules.Modbus.Services
 {
@@ -24,6 +25,9 @@ namespace CleanerControlApp.Modules.Modbus.Services
         protected TcpClient _tcpClient = new TcpClient();
         protected IModbusMaster? _master;
         private readonly ILogger<ModbusTCPService>? _logger;
+
+        // Semaphore to allow only one operation (connect/disconnect/execute) at a time
+        private readonly SemaphoreSlim _semaphore = new SemaphoreSlim(1, 1);
 
         #endregion
 
@@ -44,7 +48,7 @@ namespace CleanerControlApp.Modules.Modbus.Services
 
         #region IDisposable & destructor
 
-       
+
 
         protected virtual void Dispose(bool disposing)
         {
@@ -54,15 +58,20 @@ namespace CleanerControlApp.Modules.Modbus.Services
                 {
                     // TODO: 處置受控狀態 (受控物件)
                     Disconnect();
+                    try
+                    {
+                        _semaphore?.Dispose();
+                    }
+                    catch { }
                 }
 
-                // TODO: 釋出非受控資源 (非受控物件) 並覆寫完成項
+                // TODO:釋出非受控資源 (非受控物件) 並覆寫完成項
                 // TODO: 將大型欄位設為 Null
                 disposedValue = true;
             }
         }
 
-        // TODO: 僅有當 'Dispose(bool disposing)' 具有會釋出非受控資源的程式碼時，才覆寫完成項
+        // TODO: 僅有當 'Dispose(bool disposing)'具有會釋出非受控資源的程式碼時，才覆寫完成項
         ~ModbusTCPService()
         {
             // 請勿變更此程式碼。請將清除程式碼放入 'Dispose(bool disposing)' 方法
@@ -82,28 +91,68 @@ namespace CleanerControlApp.Modules.Modbus.Services
         public string Ip { get => _ip; set => _ip = value; }
         public int Port { get => _port; set => _port = value; }
 
-        public bool IsConnected { get => _tcpClient.Connected; }
+        public bool IsConnected { get => _tcpClient?.Connected ?? false; }
 
         public bool Connect()
         {
             bool result = false;
 
-            if (!IsConnected)
+            _semaphore.Wait();
+            try
             {
-                try
+                if (!IsConnected)
                 {
-                    _tcpClient = new TcpClient();
-                    _tcpClient.Connect(_ip, _port);
-                    _master = ModbusIpMaster.CreateIp(_tcpClient);
-                    result = true;
+                    try
+                    {
+                        _tcpClient = new TcpClient();
+                        _tcpClient.Connect(_ip, _port);
+                        _master = ModbusIpMaster.CreateIp(_tcpClient);
+                        result = true;
+                    }
+                    catch (Exception ex)
+                    {
+                        if (_logger != null)
+                            _logger.LogError(ex, "Modbus TCP連線失敗: {Message}", ex.Message);
+                        else
+                            System.Diagnostics.Debug.WriteLine($"Modbus TCP連線失敗: {ex.Message}");
+                    }
                 }
-                catch (Exception ex)
+            }
+            finally
+            {
+                _semaphore.Release();
+            }
+
+            return result;
+        }
+
+        public async Task<bool> ConnectAsync()
+        {
+            bool result = false;
+            await _semaphore.WaitAsync().ConfigureAwait(false);
+            try
+            {
+                if (!IsConnected)
                 {
-                    if (_logger != null)
-                        _logger.LogError(ex, "Modbus TCP連線失敗: {Message}", ex.Message);
-                    else
-                        System.Diagnostics.Debug.WriteLine($"Modbus TCP連線失敗: {ex.Message}");
+                    try
+                    {
+                        _tcpClient = new TcpClient();
+                        await _tcpClient.ConnectAsync(_ip, _port).ConfigureAwait(false);
+                        _master = ModbusIpMaster.CreateIp(_tcpClient);
+                        result = true;
+                    }
+                    catch (Exception ex)
+                    {
+                        if (_logger != null)
+                            _logger.LogError(ex, "Modbus TCP連線失敗: {Message}", ex.Message);
+                        else
+                            System.Diagnostics.Debug.WriteLine($"Modbus TCP連線失敗: {ex.Message}");
+                    }
                 }
+            }
+            finally
+            {
+                _semaphore.Release();
             }
 
             return result;
@@ -113,21 +162,63 @@ namespace CleanerControlApp.Modules.Modbus.Services
         {
             bool result = false;
 
-            if (IsConnected)
+            _semaphore.Wait();
+            try
             {
-                try
+                if (IsConnected)
                 {
-                    _tcpClient.Close();
-                    _master?.Dispose();
-                    result = true;
+                    try
+                    {
+                        _tcpClient.Close();
+                        _master?.Dispose();
+                        _master = null;
+                        result = true;
+                    }
+                    catch (Exception ex)
+                    {
+                        if (_logger != null)
+                            _logger.LogError(ex, "Modbus TCP斷線失敗: {Message}", ex.Message);
+                        else
+                            System.Diagnostics.Debug.WriteLine($"Modbus TCP斷線失敗: {ex.Message}");
+                    }
                 }
-                catch (Exception ex)
+            }
+            finally
+            {
+                _semaphore.Release();
+            }
+
+            return result;
+        }
+
+        public async Task<bool> DisconnectAsync()
+        {
+            bool result = false;
+
+            await _semaphore.WaitAsync().ConfigureAwait(false);
+            try
+            {
+                if (IsConnected)
                 {
-                    if (_logger != null)
-                        _logger.LogError(ex, "Modbus TCP斷線失敗: {Message}", ex.Message);
-                    else
-                        System.Diagnostics.Debug.WriteLine($"Modbus TCP斷線失敗: {ex.Message}");
+                    try
+                    {
+                        _tcpClient.Close();
+                        _master?.Dispose();
+                        _master = null;
+                        result = true;
+                    }
+                    catch (Exception ex)
+                    {
+                        if (_logger != null)
+                            _logger.LogError(ex, "Modbus TCP斷線失敗: {Message}", ex.Message);
+                        else
+                            System.Diagnostics.Debug.WriteLine($"Modbus TCP斷線失敗: {ex.Message}");
+                    }
                 }
+            }
+            finally
+            {
+                _semaphore.Release();
             }
 
             return result;
@@ -138,123 +229,224 @@ namespace CleanerControlApp.Modules.Modbus.Services
         public bool Execute()
         {
             bool result = false;
-            if (IsConnected && _master != null)
+            _semaphore.Wait();
+            try
             {
-                try
+                if (IsConnected && _master != null)
                 {
-                    byte slaveAddress = ExecuteFrame.SlaveAddress;
-                    ModbusFunctionCode functionCode = ExecuteFrame.FunctionCodeName;
-                    ushort startAddress = ExecuteFrame.StartAddress;
-                    ushort dataNumber = ExecuteFrame.DataNumber;
-                    var readData = ExecuteFrame.Data != null ? (ushort[])ExecuteFrame.Data.Clone() : null;
-                    var boolData = ExecuteFrame.BoolData != null ? (bool[])ExecuteFrame.BoolData.Clone() : null;
-                    if (ExecuteFrame.IsRead)
+                    try
                     {
-                        try
+                        byte slaveAddress = ExecuteFrame.SlaveAddress;
+                        ModbusFunctionCode functionCode = ExecuteFrame.FunctionCodeName;
+                        ushort startAddress = ExecuteFrame.StartAddress;
+                        ushort dataNumber = ExecuteFrame.DataNumber;
+                        var readData = ExecuteFrame.Data != null ? (ushort[])ExecuteFrame.Data.Clone() : null;
+                        var boolData = ExecuteFrame.BoolData != null ? (bool[])ExecuteFrame.BoolData.Clone() : null;
+                        if (ExecuteFrame.IsRead)
                         {
-                            // 讀取資料
+                            try
+                            {
+                                //讀取資料
+                                switch (functionCode)
+                                {
+                                    case ModbusFunctionCode.ReadCoils:
+                                        boolData = _master.ReadCoils(slaveAddress, startAddress, dataNumber);
+                                        break;
+
+                                    case ModbusFunctionCode.ReadDiscreteInputs:
+                                        boolData = _master.ReadInputs(slaveAddress, startAddress, dataNumber);
+                                        break;
+
+                                    case ModbusFunctionCode.ReadHoldingRegisters:
+                                        readData = _master.ReadHoldingRegisters(slaveAddress, startAddress, dataNumber);
+                                        break;
+
+                                    case ModbusFunctionCode.ReadInputRegisters:
+                                        readData = _master.ReadInputRegisters(slaveAddress, startAddress, dataNumber);
+                                        break;
+                                }
+
+                                // Copy read results into ExecuteFrame to avoid exposing internal references
+                                if (readData != null)
+                                {
+                                    // Use ExecuteFrame.Set to copy ushort[] safely
+                                    ExecuteFrame.Set(readData);
+                                }
+
+                                if (boolData != null)
+                                {
+                                    // Clone bool array before assigning
+                                    ExecuteFrame.BoolData = (bool[])boolData.Clone();
+                                }
+
+                                result = true;
+                            }
+                            catch (Exception ex)
+                            {
+                                // optionally log
+                                if (_logger != null)
+                                    _logger.LogError(ex, "Modbus TCP讀取失敗: {Message}", ex.Message);
+                                else
+                                    System.Diagnostics.Debug.WriteLine($"Modbus TCP讀取失敗: {ex.Message}");
+                            }
+
+                        }
+                        else
+                        {
+                            // 寫入資料
+                            try
+                            {
+                                switch (functionCode)
+                                {
+                                    case ModbusFunctionCode.WriteSingleCoil:
+                                        if (ExecuteFrame.BoolData != null && ExecuteFrame.BoolData.Length > 0)
+                                        {
+                                            _master.WriteSingleCoil(slaveAddress, startAddress, ExecuteFrame.BoolData[0]);
+                                            result = true;
+                                        }
+                                        break;
+                                    case ModbusFunctionCode.WriteSingleRegister:
+                                        if (ExecuteFrame.Data != null && ExecuteFrame.Data.Length > 0)
+                                        {
+                                            _master.WriteSingleRegister(slaveAddress, startAddress, ExecuteFrame.Data[0]);
+                                            result = true;
+                                        }
+                                        break;
+                                    case ModbusFunctionCode.WriteMultipleCoils:
+                                        if (ExecuteFrame.BoolData != null)
+                                        {
+                                            _master.WriteMultipleCoils(slaveAddress, startAddress, ExecuteFrame.BoolData);
+                                            result = true;
+                                        }
+                                        break;
+                                    case ModbusFunctionCode.WriteMultipleRegisters:
+                                        if (ExecuteFrame.Data != null)
+                                        {
+                                            _master.WriteMultipleRegisters(slaveAddress, startAddress, ExecuteFrame.Data);
+                                            result = true;
+                                        }
+                                        break;
+                                }
+
+                            }
+                            catch (Exception ex)
+                            {
+                                // optionally log
+                                if (_logger != null)
+                                    _logger.LogError(ex, "Modbus TCP 寫入失敗: {Message}", ex.Message);
+                                else
+                                    System.Diagnostics.Debug.WriteLine($"Modbus TCP 寫入失敗: {ex.Message}");
+                            }
+                        }
+
+                    }
+                    catch (Exception ex)
+                    {
+                        if (_logger != null)
+                            _logger.LogError(ex, "Modbus TCP 執行命令失敗: {Message}", ex.Message);
+                        else
+                            System.Diagnostics.Debug.WriteLine($"Modbus TCP 執行命令失敗: {ex.Message}");
+                    }
+                }
+            }
+            finally
+            {
+                _semaphore.Release();
+            }
+            return result;
+        }
+
+        public async Task<ModbusTCPFrame?> ExecuteAsync(ModbusTCPFrame? frame)
+        {
+            if (frame == null) return null;
+
+            await _semaphore.WaitAsync().ConfigureAwait(false);
+            try
+            {
+                if (IsConnected && _master != null)
+                {
+                    try
+                    {
+                        // Work on a clone to avoid mutating caller's instance
+                        var localFrame = frame.Clone();
+
+                        byte slaveAddress = localFrame.SlaveAddress;
+                        ModbusFunctionCode functionCode = localFrame.FunctionCodeName;
+                        ushort startAddress = localFrame.StartAddress;
+                        ushort dataNumber = localFrame.DataNumber;
+
+                        ushort[]? readData = localFrame.Data != null ? (ushort[])localFrame.Data.Clone() : null;
+                        bool[]? boolData = localFrame.BoolData != null ? (bool[])localFrame.BoolData.Clone() : null;
+
+                        if (localFrame.IsRead)
+                        {
                             switch (functionCode)
                             {
                                 case ModbusFunctionCode.ReadCoils:
                                     boolData = _master.ReadCoils(slaveAddress, startAddress, dataNumber);
                                     break;
-
                                 case ModbusFunctionCode.ReadDiscreteInputs:
                                     boolData = _master.ReadInputs(slaveAddress, startAddress, dataNumber);
                                     break;
-
                                 case ModbusFunctionCode.ReadHoldingRegisters:
                                     readData = _master.ReadHoldingRegisters(slaveAddress, startAddress, dataNumber);
                                     break;
-
                                 case ModbusFunctionCode.ReadInputRegisters:
                                     readData = _master.ReadInputRegisters(slaveAddress, startAddress, dataNumber);
                                     break;
                             }
 
-                            // Copy read results into ExecuteFrame to avoid exposing internal references
                             if (readData != null)
-                            {
-                                // Use ExecuteFrame.Set to copy ushort[] safely
-                                ExecuteFrame.Set(readData);
-                            }
+                                localFrame.Set(readData);
 
                             if (boolData != null)
-                            {
-                                // Clone bool array before assigning
-                                ExecuteFrame.BoolData = (bool[])boolData.Clone();
-                            }
+                                localFrame.BoolData = (bool[])boolData.Clone();
 
-                            result = true;
+                            return localFrame;
                         }
-                        catch (Exception ex)
+                        else
                         {
-                            // optionally log
-                            if (_logger != null)
-                                _logger.LogError(ex, "Modbus TCP讀取失敗: {Message}", ex.Message);
-                            else
-                                System.Diagnostics.Debug.WriteLine($"Modbus TCP讀取失敗: {ex.Message}");
-                        }
-                        
-                    }
-                    else
-                    {
-                        // 寫入資料
-                        try
-                        {
-                            switch(functionCode)
+                            // write
+                            switch (functionCode)
                             {
                                 case ModbusFunctionCode.WriteSingleCoil:
-                                    if (ExecuteFrame.BoolData != null && ExecuteFrame.BoolData.Length > 0)
-                                    {
-                                        _master.WriteSingleCoil(slaveAddress, startAddress, ExecuteFrame.BoolData[0]);
-                                        result = true;
-                                    }
+                                    if (localFrame.BoolData != null && localFrame.BoolData.Length > 0)
+                                        _master.WriteSingleCoil(slaveAddress, startAddress, localFrame.BoolData[0]);
                                     break;
                                 case ModbusFunctionCode.WriteSingleRegister:
-                                    if (ExecuteFrame.Data != null && ExecuteFrame.Data.Length > 0)
-                                    {
-                                        _master.WriteSingleRegister(slaveAddress, startAddress, ExecuteFrame.Data[0]);
-                                        result = true;
-                                    }
+                                    if (localFrame.Data != null && localFrame.Data.Length > 0)
+                                        _master.WriteSingleRegister(slaveAddress, startAddress, localFrame.Data[0]);
                                     break;
                                 case ModbusFunctionCode.WriteMultipleCoils:
-                                    if (ExecuteFrame.BoolData != null)
-                                    {
-                                        _master.WriteMultipleCoils(slaveAddress, startAddress, ExecuteFrame.BoolData);
-                                        result = true;
-                                    }
+                                    if (localFrame.BoolData != null)
+                                        _master.WriteMultipleCoils(slaveAddress, startAddress, localFrame.BoolData);
                                     break;
                                 case ModbusFunctionCode.WriteMultipleRegisters:
-                                    if (ExecuteFrame.Data != null)
-                                    {
-                                        _master.WriteMultipleRegisters(slaveAddress, startAddress, ExecuteFrame.Data);
-                                        result = true;
-                                    }
+                                    if (localFrame.Data != null)
+                                        _master.WriteMultipleRegisters(slaveAddress, startAddress, localFrame.Data);
                                     break;
                             }
-                            
-                        }
-                        catch (Exception ex)
-                        {
-                            // optionally log
-                            if (_logger != null)
-                                _logger.LogError(ex, "Modbus TCP 寫入失敗: {Message}", ex.Message);
-                            else
-                                System.Diagnostics.Debug.WriteLine($"Modbus TCP 寫入失敗: {ex.Message}");
+
+                            return localFrame;
                         }
                     }
-                    
-                }
-                catch (Exception ex)
-                {
-                    if (_logger != null)
-                        _logger.LogError(ex, "Modbus TCP 執行命令失敗: {Message}", ex.Message);
-                    else
-                        System.Diagnostics.Debug.WriteLine($"Modbus TCP 執行命令失敗: {ex.Message}");
+                    catch (Exception ex)
+                    {
+                        if (_logger != null)
+                            _logger.LogError(ex, "Modbus TCP 執行命令失敗: {Message}", ex.Message);
+                        else
+                            System.Diagnostics.Debug.WriteLine($"Modbus TCP 執行命令失敗: {ex.Message}");
+
+                        return null;
+                    }
                 }
             }
-            return result;
+            finally
+            {
+                _semaphore.Release();
+            }
+
+            return null;
         }
 
         #endregion

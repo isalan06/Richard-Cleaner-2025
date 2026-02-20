@@ -14,6 +14,8 @@ using CleanerControlApp.Vision;
 using NLog.Extensions.Logging;
 using CleanerControlApp.Modules.Modbus.Interfaces;
 using CleanerControlApp.Modules.Modbus.Services;
+using CleanerControlApp.Modules.MitsubishiPLC.Interfaces;
+using CleanerControlApp.Modules.MitsubishiPLC.Services;
 
 namespace CleanerControlApp
 {
@@ -91,6 +93,9 @@ namespace CleanerControlApp
                     services.AddTransient<LoginWindow>(); // 改為 Transient
                     services.AddSingleton<MainWindow>(); // 註冊 MainWindow 為 Singleton
                     services.AddSingleton<IModbusTCPService, ModbusTCPService>(); // 註冊 ModbusTCPService 為 Singleton
+                    services.AddSingleton<IPLCService, PLCService>();
+                    // Also register IPLCOperator to resolve to the same PLCService singleton implementation
+                    services.AddSingleton<IPLCOperator>(sp => (IPLCOperator)sp.GetRequiredService<IPLCService>());
                 })
                 .Build();
         }

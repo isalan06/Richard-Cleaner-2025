@@ -17,8 +17,15 @@ namespace CleanerControlApp.Modules.Modbus.Interfaces
         bool Connect();
         bool Disconnect();
 
+        // Asynchronous counterparts
+        Task<bool> ConnectAsync();
+        Task<bool> DisconnectAsync();
+
         ModbusTCPFrame ExecuteFrame { get; set; }
 
         bool Execute();
+
+        // Asynchronous execute that accepts a frame and returns the resulting frame (or null on failure)
+        Task<ModbusTCPFrame?> ExecuteAsync(ModbusTCPFrame? frame);
     }
 }
