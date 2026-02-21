@@ -737,13 +737,13 @@ namespace CleanerControlApp.Modules.MitsubishiPLC.Services
         }
         public bool Command_Axis1ServoOn
         {
-            get { return _command[1].Bit9; }
-            set { _command[1].Bit9 = value; }
+            get { return _command[1].Bit8; }
+            set { _command[1].Bit8 = value; }
         }
         public bool Command_Axis1AlarmReset
         {
-            get { return _command[1].Bit10; }
-            set { _command[1].Bit10 = value; }
+            get { return _command[1].Bit9; }
+            set { _command[1].Bit9 = value; }
         }
 
         public bool Command_Axis2JogP
@@ -783,13 +783,13 @@ namespace CleanerControlApp.Modules.MitsubishiPLC.Services
         }
         public bool Command_Axis2ServoOn
         {
-            get { return _command[2].Bit9; }
-            set { _command[2].Bit9 = value; }
+            get { return _command[2].Bit8; }
+            set { _command[2].Bit8 = value; }
         }
         public bool Command_Axis2AlarmReset
         {
-            get { return _command[2].Bit10; }
-            set { _command[2].Bit10 = value; }
+            get { return _command[2].Bit9; }
+            set { _command[2].Bit9 = value; }
         }
 
         public bool Command_Axis3JogP
@@ -829,13 +829,13 @@ namespace CleanerControlApp.Modules.MitsubishiPLC.Services
         }
         public bool Command_Axis3ServoOn
         {
-            get { return _command[3].Bit9; }
-            set { _command[3].Bit9 = value; }
+            get { return _command[3].Bit8; }
+            set { _command[3].Bit8 = value; }
         }
         public bool Command_Axis3AlarmReset
         {
-            get { return _command[3].Bit10; }
-            set { _command[3].Bit10 = value; }
+            get { return _command[3].Bit9; }
+            set { _command[3].Bit9 = value; }
         }
 
         public bool Command_Axis4JogP
@@ -875,13 +875,13 @@ namespace CleanerControlApp.Modules.MitsubishiPLC.Services
         }
         public bool Command_Axis4ServoOn
         {
-            get { return _command[4].Bit9; }
-            set { _command[4].Bit9 = value; }
+            get { return _command[4].Bit8; }
+            set { _command[4].Bit8 = value; }
         }
         public bool Command_Axis4AlarmReset
         {
-            get { return _command[4].Bit10; }
-            set { _command[4].Bit10 = value; }
+            get { return _command[4].Bit9; }
+            set { _command[4].Bit9 = value; }
         }
 
         #endregion

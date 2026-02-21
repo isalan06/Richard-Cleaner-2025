@@ -58,6 +58,14 @@
                         <TextBlock x:Name="SystemErrorText" Grid.Column="1" Text="系統異常" Margin="8,0,0,0" VerticalAlignment="Center" FontWeight="SemiBold" />
                     </Grid>
 
+                    <!-- 異常復歸按鈕 -->
+                    <Button x:Name="BtnAlarmReset" Content="異常復歸" Width="140" Height="40" Margin="0,8,0,0"
+                            PreviewMouseLeftButtonDown="BtnAlarmReset_PreviewMouseLeftButtonDown"
+                            PreviewMouseLeftButtonUp="BtnAlarmReset_PreviewMouseLeftButtonUp"
+                            MouseLeave="BtnAlarmReset_MouseLeave"
+                            TouchDown="BtnAlarmReset_TouchDown"
+                            TouchUp="BtnAlarmReset_TouchUp" />
+
                 </StackPanel>
             </Grid>
         </Border>

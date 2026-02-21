@@ -4,6 +4,7 @@ using System.Windows.Media;
 using System.Windows.Threading;
 using CleanerControlApp.Modules.MitsubishiPLC.Interfaces;
 using CleanerControlApp.Modules.MitsubishiPLC.Models;
+using System.Windows.Input;
 
 namespace CleanerControlApp.Vision.Developer
 {
@@ -212,6 +213,55 @@ namespace CleanerControlApp.Vision.Developer
  if (_paramView == null) _paramView = new PlcTest_ParameterView();
  TabContentPlaceholder.Content = _paramView;
  break;
+ }
+ }
+
+ // 異常復歸 按下 (Mouse)
+ private void BtnAlarmReset_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+ {
+ var op = this.DataContext as IPLCOperator ?? App.AppHost?.Services.GetService(typeof(IPLCOperator)) as IPLCOperator;
+ if (op != null)
+ {
+ op.Command_AlarmReset = true;
+ }
+ }
+
+ // 異常復歸 放開 (Mouse)
+ private void BtnAlarmReset_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+ {
+ var op = this.DataContext as IPLCOperator ?? App.AppHost?.Services.GetService(typeof(IPLCOperator)) as IPLCOperator;
+ if (op != null)
+ {
+ op.Command_AlarmReset = false;
+ }
+ }
+
+ // 異常復歸 按鈕滑鼠離開時，確保放開
+ private void BtnAlarmReset_MouseLeave(object sender, System.Windows.Input.MouseEventArgs e)
+ {
+ var op = this.DataContext as IPLCOperator ?? App.AppHost?.Services.GetService(typeof(IPLCOperator)) as IPLCOperator;
+ if (op != null)
+ {
+ op.Command_AlarmReset = false;
+ }
+ }
+
+ // Touch support
+ private void BtnAlarmReset_TouchDown(object sender, TouchEventArgs e)
+ {
+ var op = this.DataContext as IPLCOperator ?? App.AppHost?.Services.GetService(typeof(IPLCOperator)) as IPLCOperator;
+ if (op != null)
+ {
+ op.Command_AlarmReset = true;
+ }
+ }
+
+ private void BtnAlarmReset_TouchUp(object sender, TouchEventArgs e)
+ {
+ var op = this.DataContext as IPLCOperator ?? App.AppHost?.Services.GetService(typeof(IPLCOperator)) as IPLCOperator;
+ if (op != null)
+ {
+ op.Command_AlarmReset = false;
  }
  }
 
