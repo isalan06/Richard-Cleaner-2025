@@ -94,25 +94,60 @@
  
  <!-- Control Buttons: switch from WrapPanel to two-column UniformGrid -->
  <UniformGrid Columns="2" Margin="4,8,4,0" HorizontalAlignment="Stretch">
- <Button Margin="4" Click="OnJogPlusClick" HorizontalAlignment="Stretch" Height="40">Jog+</Button>
- <Button Margin="4" Click="OnJogMinusClick" HorizontalAlignment="Stretch" Height="40">Jog-</Button>
- <Button Margin="4" Click="OnJSpeedHighClick" HorizontalAlignment="Stretch" Height="40">JSpeedH</Button>
- <Button Margin="4" Click="OnJSpeedMedClick" HorizontalAlignment="Stretch" Height="40">JSpeedM</Button>
- <Button Margin="4" Click="OnHomeClick" HorizontalAlignment="Stretch" Height="40">Home</Button>
- <Button Margin="4" Click="OnStopClick" HorizontalAlignment="Stretch" Height="40">Stop</Button>
- <Button Margin="4" Click="OnCommandClick" HorizontalAlignment="Stretch" Height="40">Command</Button>
- <Button Margin="4" Click="OnServoOnClick" HorizontalAlignment="Stretch" Height="40">Servo On</Button>
- <Button Margin="4" Click="OnAlarmResetClick" HorizontalAlignment="Stretch" Height="40">Alarm Reset</Button>
+ <Button Margin="4" PreviewMouseLeftButtonDown="OnActionButtonDown" PreviewMouseLeftButtonUp="OnActionButtonUp" Tag="JogP" HorizontalAlignment="Stretch" Height="40">Jog+</Button>
+ <Button Margin="4" PreviewMouseLeftButtonDown="OnActionButtonDown" PreviewMouseLeftButtonUp="OnActionButtonUp" Tag="JogN" HorizontalAlignment="Stretch" Height="40">Jog-</Button>
+ <Button Margin="4" PreviewMouseLeftButtonDown="OnCommandButtonDown" PreviewMouseLeftButtonUp="OnCommandButtonUp" Tag="JSpeedH" HorizontalAlignment="Stretch" Height="40">JSpeedH
+ <Button.Style>
+ <Style TargetType="Button">
+ <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.ControlBrushKey}}"/>
+ <Style.Triggers>
+ <DataTrigger Binding="{Binding JSpeedH_On}" Value="True">
+ <Setter Property="Background" Value="LightGreen" />
+ </DataTrigger>
+ </Style.Triggers>
+ </Style>
+ </Button.Style>
+ </Button>
+ <Button Margin="4" PreviewMouseLeftButtonDown="OnCommandButtonDown" PreviewMouseLeftButtonUp="OnCommandButtonUp" Tag="JSpeedM" HorizontalAlignment="Stretch" Height="40">JSpeedM
+ <Button.Style>
+ <Style TargetType="Button">
+ <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.ControlBrushKey}}"/>
+ <Style.Triggers>
+ <DataTrigger Binding="{Binding JSpeedM_On}" Value="True">
+ <Setter Property="Background" Value="LightGreen" />
+ </DataTrigger>
+ </Style.Triggers>
+ </Style>
+ </Button.Style>
+ </Button>
+ <Button Margin="4" PreviewMouseLeftButtonDown="OnActionButtonDown" PreviewMouseLeftButtonUp="OnActionButtonUp" Tag="Home" HorizontalAlignment="Stretch" Height="40">Home</Button>
+ <Button Margin="4" PreviewMouseLeftButtonDown="OnActionButtonDown" PreviewMouseLeftButtonUp="OnActionButtonUp" Tag="Stop" HorizontalAlignment="Stretch" Height="40">Stop</Button>
+ <Button Margin="4" PreviewMouseLeftButtonDown="OnActionButtonDown" PreviewMouseLeftButtonUp="OnActionButtonUp" Tag="Command" HorizontalAlignment="Stretch" Height="40">Command</Button>
+ <Button Margin="4" PreviewMouseLeftButtonDown="OnCommandButtonDown" PreviewMouseLeftButtonUp="OnCommandButtonUp" Tag="ServoOn" HorizontalAlignment="Stretch" Height="40">Servo On
+ <Button.Style>
+ <Style TargetType="Button">
+ <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.ControlBrushKey}}"/>
+ <Style.Triggers>
+ <DataTrigger Binding="{Binding ServoOn_On}" Value="True">
+ <Setter Property="Background" Value="LightGreen" />
+ </DataTrigger>
+ </Style.Triggers>
+ </Style>
+ </Button.Style>
+ </Button>
+ <Button Margin="4" PreviewMouseLeftButtonDown="OnActionButtonDown" PreviewMouseLeftButtonUp="OnActionButtonUp" Tag="AlarmReset" HorizontalAlignment="Stretch" Height="40">Alarm Reset</Button>
  </UniformGrid>
  
- <!-- New: Target position and Speed input lines -->
+ <!-- Target position and Speed input lines -->
  <StackPanel Margin="4,8,4,0">
  <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,2,0,2">
  <TextBlock Text="定位位址:" VerticalAlignment="Center" Width="80" />
- <TextBox Width="120" Text="{Binding TargetPositionText, UpdateSourceTrigger=PropertyChanged}" PreviewTextInput="NumberOnly_PreviewTextInput" DataObject.Pasting="NumberOnly_Pasting" />
+ <!-- allow signed number for target position -->
+ <TextBox Width="120" Text="{Binding TargetPositionText, UpdateSourceTrigger=PropertyChanged}" PreviewTextInput="SignedNumber_PreviewTextInput" DataObject.Pasting="SignedNumber_Pasting" />
  </StackPanel>
  <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,2,0,2">
  <TextBlock Text="運轉速度:" VerticalAlignment="Center" Width="80" />
+ <!-- speed remains numeric only -->
  <TextBox Width="120" Text="{Binding SpeedText, UpdateSourceTrigger=PropertyChanged}" PreviewTextInput="NumberOnly_PreviewTextInput" DataObject.Pasting="NumberOnly_Pasting" />
  </StackPanel>
  </StackPanel>

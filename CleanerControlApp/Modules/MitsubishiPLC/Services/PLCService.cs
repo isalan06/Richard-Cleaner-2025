@@ -181,6 +181,18 @@ namespace CleanerControlApp.Modules.MitsubishiPLC.Services
                     if (_modbusService != null)
                     {
                         await PollModbusAsync(token).ConfigureAwait(false);
+
+                        if (_readparameter)
+                        {
+                            _readparameter = false;
+                            await readParameter();
+                        }
+
+                        if (_writeparameter)
+                        {
+                            _writeparameter = false;
+                            await writeParameter();
+                        }
                     }
 
                     // Place for other periodic work (e.g., update StatusIO, process commands)
@@ -280,6 +292,108 @@ namespace CleanerControlApp.Modules.MitsubishiPLC.Services
                     _moveInfo[6].LowWord, _moveInfo[6].HighWord, _moveInfo[7].LowWord, _moveInfo[7].HighWord,
                 };
             }
+        }
+
+        // Event to notify UI when parameter read completes
+        public event EventHandler? ParametersReadCompleted;
+        // Event to notify UI when parameter write completes
+        public event EventHandler? ParametersWriteCompleted;
+
+        private async Task readParameter()
+        {
+            if (_modbusService != null && _modbusService.IsConnected)
+            {
+                PLCFrame plcFrame = new PLCFrame()
+                {
+                    Id = 11,
+                    Name = "Read Parameter",
+                    DataFrame = new ModbusTCPFrame()
+                    {
+                        SlaveAddress = 1,
+                        FunctionCode = 0x3,
+                        StartAddress = 700,
+                        DataNumber = 64
+                    }
+                };
+
+                var data = await _modbusService.ExecuteAsync(plcFrame.DataFrame);
+
+                if (data != null)
+                {
+                    if (data is ModbusTCPFrame)
+                    {
+                        if (data.Data != null && data.Data.Length == 64)
+                        {
+                            for (int i = 0; i < 4; i++)
+                            {
+                                _paramMotionInfo[i * 6].Set(data.Data[i * 16], data.Data[i * 16 + 1]);
+                                _paramMotionInfo[i * 6 + 1].Set(data.Data[i * 16 + 2], data.Data[i * 16 + 3]);
+                                _paramMotionInfo[i * 6 + 2].Set(data.Data[i * 16 + 4], data.Data[i * 16 + 5]);
+                                _paramMotionInfo[i * 6 + 3].Set(data.Data[i * 16 + 6], data.Data[i * 16 + 7]);
+                                _paramMotionInfo[i * 6 + 4].Set(data.Data[i * 16 + 8], data.Data[i * 16 + 9]);
+                                _paramMotionInfo[i * 6 + 5].Set(data.Data[i * 16 + 10], data.Data[i * 16 + 11]);
+                                _paramTimeout[i * 2].Data = data.Data[i * 16 + 12];
+                                _paramTimeout[i * 2 + 1].Data = data.Data[i * 16 + 13];
+                            }
+                        }
+                    }
+                }
+            }
+
+            // notify listeners that parameter read completed (even if modbus not connected or data null)
+            try
+            {
+                ParametersReadCompleted?.Invoke(this, EventArgs.Empty);
+            }
+            catch { }
+        }
+
+        private async Task writeParameter()
+        {
+            if (_modbusService != null && _modbusService.IsConnected)
+            {
+                PLCFrame plcFrame = new PLCFrame()
+                {
+                    Id = 11,
+                    Name = "Write Parameter",
+                    DataFrame = new ModbusTCPFrame()
+                    {
+                        SlaveAddress = 1,
+                        FunctionCode = 0x10,
+                        StartAddress = 800,
+                        DataNumber = 64
+                    }
+                };
+
+                plcFrame.DataFrame.Data = new ushort[]
+                {
+                    _paramMotionInfoW[0].LowWord, _paramMotionInfoW[0].HighWord, _paramMotionInfoW[1].LowWord, _paramMotionInfoW[1].HighWord,
+                    _paramMotionInfoW[2].LowWord, _paramMotionInfoW[2].HighWord, _paramMotionInfoW[3].LowWord, _paramMotionInfoW[3].HighWord,
+                    _paramMotionInfoW[4].LowWord, _paramMotionInfoW[4].HighWord, _paramMotionInfoW[5].LowWord, _paramMotionInfoW[5].HighWord,
+                    _paramTimeoutW[0].Data, _paramTimeoutW[1].Data, 0, 0,
+                    _paramMotionInfoW[6].LowWord, _paramMotionInfoW[6].HighWord, _paramMotionInfoW[7].LowWord, _paramMotionInfoW[7].HighWord,
+                    _paramMotionInfoW[8].LowWord, _paramMotionInfoW[8].HighWord, _paramMotionInfoW[9].LowWord, _paramMotionInfoW[9].HighWord,
+                    _paramMotionInfoW[10].LowWord, _paramMotionInfoW[10].HighWord, _paramMotionInfoW[11].LowWord, _paramMotionInfoW[11].HighWord,
+                    _paramTimeoutW[2].Data, _paramTimeoutW[3].Data, 0, 0,
+                    _paramMotionInfoW[12].LowWord, _paramMotionInfoW[12].HighWord, _paramMotionInfoW[13].LowWord, _paramMotionInfoW[13].HighWord,
+                    _paramMotionInfoW[14].LowWord, _paramMotionInfoW[14].HighWord, _paramMotionInfoW[15].LowWord, _paramMotionInfoW[15].HighWord,
+                    _paramMotionInfoW[16].LowWord, _paramMotionInfoW[16].HighWord, _paramMotionInfoW[17].LowWord, _paramMotionInfoW[17].HighWord,
+                    _paramTimeoutW[4].Data, _paramTimeoutW[5].Data, 0, 0,
+                    _paramMotionInfoW[18].LowWord, _paramMotionInfoW[18].HighWord, _paramMotionInfoW[19].LowWord, _paramMotionInfoW[19].HighWord,
+                    _paramMotionInfoW[20].LowWord, _paramMotionInfoW[20].HighWord, _paramMotionInfoW[21].LowWord, _paramMotionInfoW[21].HighWord,
+                    _paramMotionInfoW[22].LowWord, _paramMotionInfoW[22].HighWord, _paramMotionInfoW[23].LowWord, _paramMotionInfoW[23].HighWord,
+                    _paramTimeoutW[6].Data, _paramTimeoutW[7].Data, 0, 0
+                };
+
+                var data = await _modbusService.ExecuteAsync(plcFrame.DataFrame);
+            }
+
+            // notify listeners that parameter write completed (even if modbus not connected or data null)
+            try
+            {
+                ParametersWriteCompleted?.Invoke(this, EventArgs.Empty);
+            }
+            catch { }
         }
 
         #endregion
@@ -594,42 +708,42 @@ namespace CleanerControlApp.Modules.MitsubishiPLC.Services
         public bool Command_Axis1JogN
         {
             get { return _command[1].Bit1; }
-            set { _command[1].Bit0 = value; }
+            set { _command[1].Bit1 = value; }
         }
         public bool Command_Axis1JogSpeedH
         {
             get { return _command[1].Bit2; }
-            set { _command[1].Bit0 = value; }
+            set { _command[1].Bit2 = value; }
         }
         public bool Command_Axis1JogSpeedM
         {
             get { return _command[1].Bit3; }
-            set { _command[1].Bit0 = value; }
+            set { _command[1].Bit3 = value; }
         }
         public bool Command_Axis1Home
         {
             get { return _command[1].Bit4; }
-            set { _command[1].Bit0 = value; }
+            set { _command[1].Bit4 = value; }
         }
         public bool Command_Axis1Stop
         {
             get { return _command[1].Bit5; }
-            set { _command[1].Bit0 = value; }
+            set { _command[1].Bit5 = value; }
         }
         public bool Command_Axis1Command
         {
             get { return _command[1].Bit6; }
-            set { _command[1].Bit0 = value; }
+            set { _command[1].Bit6 = value; }
         }
         public bool Command_Axis1ServoOn
         {
             get { return _command[1].Bit9; }
-            set { _command[1].Bit0 = value; }
+            set { _command[1].Bit9 = value; }
         }
         public bool Command_Axis1AlarmReset
         {
             get { return _command[1].Bit10; }
-            set { _command[1].Bit0 = value; }
+            set { _command[1].Bit10 = value; }
         }
 
         public bool Command_Axis2JogP
@@ -640,42 +754,42 @@ namespace CleanerControlApp.Modules.MitsubishiPLC.Services
         public bool Command_Axis2JogN
         {
             get { return _command[2].Bit1; }
-            set { _command[2].Bit0 = value; }
+            set { _command[2].Bit1 = value; }
         }
         public bool Command_Axis2JogSpeedH
         {
             get { return _command[2].Bit2; }
-            set { _command[2].Bit0 = value; }
+            set { _command[2].Bit2 = value; }
         }
         public bool Command_Axis2JogSpeedM
         {
             get { return _command[2].Bit3; }
-            set { _command[2].Bit0 = value; }
+            set { _command[2].Bit3 = value; }
         }
         public bool Command_Axis2Home
         {
             get { return _command[2].Bit4; }
-            set { _command[2].Bit0 = value; }
+            set { _command[2].Bit4 = value; }
         }
         public bool Command_Axis2Stop
         {
             get { return _command[2].Bit5; }
-            set { _command[2].Bit0 = value; }
+            set { _command[2].Bit5 = value; }
         }
         public bool Command_Axis2Command
         {
             get { return _command[2].Bit6; }
-            set { _command[2].Bit0 = value; }
+            set { _command[2].Bit6 = value; }
         }
         public bool Command_Axis2ServoOn
         {
             get { return _command[2].Bit9; }
-            set { _command[2].Bit0 = value; }
+            set { _command[2].Bit9 = value; }
         }
         public bool Command_Axis2AlarmReset
         {
             get { return _command[2].Bit10; }
-            set { _command[2].Bit0 = value; }
+            set { _command[2].Bit10 = value; }
         }
 
         public bool Command_Axis3JogP
@@ -686,42 +800,42 @@ namespace CleanerControlApp.Modules.MitsubishiPLC.Services
         public bool Command_Axis3JogN
         {
             get { return _command[3].Bit1; }
-            set { _command[3].Bit0 = value; }
+            set { _command[3].Bit1 = value; }
         }
         public bool Command_Axis3JogSpeedH
         {
             get { return _command[3].Bit2; }
-            set { _command[3].Bit0 = value; }
+            set { _command[3].Bit2 = value; }
         }
         public bool Command_Axis3JogSpeedM
         {
             get { return _command[3].Bit3; }
-            set { _command[3].Bit0 = value; }
+            set { _command[3].Bit3 = value; }
         }
         public bool Command_Axis3Home
         {
             get { return _command[3].Bit4; }
-            set { _command[3].Bit0 = value; }
+            set { _command[3].Bit4 = value; }
         }
         public bool Command_Axis3Stop
         {
             get { return _command[3].Bit5; }
-            set { _command[3].Bit0 = value; }
+            set { _command[3].Bit5 = value; }
         }
         public bool Command_Axis3Command
         {
             get { return _command[3].Bit6; }
-            set { _command[3].Bit0 = value; }
+            set { _command[3].Bit6 = value; }
         }
         public bool Command_Axis3ServoOn
         {
             get { return _command[3].Bit9; }
-            set { _command[3].Bit0 = value; }
+            set { _command[3].Bit9 = value; }
         }
         public bool Command_Axis3AlarmReset
         {
             get { return _command[3].Bit10; }
-            set { _command[3].Bit0 = value; }
+            set { _command[3].Bit10 = value; }
         }
 
         public bool Command_Axis4JogP
@@ -732,42 +846,42 @@ namespace CleanerControlApp.Modules.MitsubishiPLC.Services
         public bool Command_Axis4JogN
         {
             get { return _command[4].Bit1; }
-            set { _command[4].Bit0 = value; }
+            set { _command[4].Bit1 = value; }
         }
         public bool Command_Axis4JogSpeedH
         {
             get { return _command[4].Bit2; }
-            set { _command[4].Bit0 = value; }
+            set { _command[4].Bit2 = value; }
         }
         public bool Command_Axis4JogSpeedM
         {
             get { return _command[4].Bit3; }
-            set { _command[4].Bit0 = value; }
+            set { _command[4].Bit3 = value; }
         }
         public bool Command_Axis4Home
         {
             get { return _command[4].Bit4; }
-            set { _command[4].Bit0 = value; }
+            set { _command[4].Bit4 = value; }
         }
         public bool Command_Axis4Stop
         {
             get { return _command[4].Bit5; }
-            set { _command[4].Bit0 = value; }
+            set { _command[4].Bit5 = value; }
         }
         public bool Command_Axis4Command
         {
             get { return _command[4].Bit6; }
-            set { _command[4].Bit0 = value; }
+            set { _command[4].Bit6 = value; }
         }
         public bool Command_Axis4ServoOn
         {
             get { return _command[4].Bit9; }
-            set { _command[4].Bit0 = value; }
+            set { _command[4].Bit9 = value; }
         }
         public bool Command_Axis4AlarmReset
         {
             get { return _command[4].Bit10; }
-            set { _command[4].Bit0 = value; }
+            set { _command[4].Bit10 = value; }
         }
 
         #endregion

@@ -58,6 +58,36 @@
  </TabItem.Header>
  <dev:PlcTestView HorizontalAlignment="Stretch" />
  </TabItem>
+ <!-- New Parameter tab -->
+ <TabItem>
+ <TabItem.Header>
+ <Grid>
+ <Grid.ColumnDefinitions>
+ <ColumnDefinition SharedSizeGroup="TabHeaderWidth" />
+ </Grid.ColumnDefinitions>
+ <TextBlock TextAlignment="Center" HorizontalAlignment="Center">
+ <Run>Parameter</Run>
+ </TextBlock>
+ </Grid>
+ </TabItem.Header>
+ <dev:DeveloperParameterView HorizontalAlignment="Stretch" />
+ </TabItem>
+ <!-- New Modbus RTU Test tab -->
+ <TabItem>
+ <TabItem.Header>
+ <Grid>
+ <Grid.ColumnDefinitions>
+ <ColumnDefinition SharedSizeGroup="TabHeaderWidth" />
+ </Grid.ColumnDefinitions>
+ <TextBlock TextAlignment="Center" HorizontalAlignment="Center">
+ <Run>Modbus RTU</Run>
+ <LineBreak/>
+ <Run>Test</Run>
+ </TextBlock>
+ </Grid>
+ </TabItem.Header>
+ <dev:ModbusRTUTestView HorizontalAlignment="Stretch" />
+ </TabItem>
  </TabControl>
  </Grid>
 </UserControl>

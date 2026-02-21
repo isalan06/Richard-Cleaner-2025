@@ -139,7 +139,7 @@ namespace CleanerControlApp.Vision.Developer
 
  public class DOGroup
  {
- public string Header { get; set; }
+ public string? Header { get; set; }
  public ObservableCollection<DOItem> Items { get; } = new ObservableCollection<DOItem>();
  }
 
@@ -228,7 +228,7 @@ namespace CleanerControlApp.Vision.Developer
  }
 
  public event PropertyChangedEventHandler PropertyChanged;
- protected void OnPropertyChanged([CallerMemberName] string propName = null)
+ protected void OnPropertyChanged([CallerMemberName] string? propName = null)
  {
  PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propName));
  }

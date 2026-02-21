@@ -68,6 +68,7 @@ namespace CleanerControlApp.Vision.Developer
  _refreshTimer.Start();
  // refresh immediately
  RefreshRunningIndicator();
+ RefreshSystemErrorIndicator();
 
  // initialize tab button styles and show default DI page
  InitializeTabButtons();
@@ -83,6 +84,7 @@ namespace CleanerControlApp.Vision.Developer
  private void RefreshTimer_Tick(object? sender, EventArgs e)
  {
  RefreshRunningIndicator();
+ RefreshSystemErrorIndicator();
  }
 
  private void RefreshRunningIndicator()
@@ -99,6 +101,48 @@ namespace CleanerControlApp.Vision.Developer
  catch
  {
  // ignore any exceptions during refresh
+ }
+ }
+
+ private void RefreshSystemErrorIndicator()
+ {
+ try
+ {
+ bool sysErr = false;
+
+ // Prefer operator view if available
+ var op = this.DataContext as IPLCOperator ?? App.AppHost?.Services.GetService(typeof(IPLCOperator)) as IPLCOperator;
+ if (op != null)
+ {
+ sysErr = op.SystemError;
+ }
+ else
+ {
+ // Fallback: try reading StatusIO from IPLCService directly
+ var svc = this.DataContext as IPLCService ?? App.AppHost?.Services.GetService(typeof(IPLCService)) as IPLCService;
+ if (svc != null && svc.StatusIO != null && svc.StatusIO.Length >0)
+ {
+ try
+ {
+ sysErr = svc.StatusIO[0].GetBit(0);
+ }
+ catch
+ {
+ sysErr = false;
+ }
+ }
+ }
+
+ var el = this.FindName("SystemErrorIndicator") as System.Windows.Shapes.Ellipse;
+ var tb = this.FindName("SystemErrorText") as System.Windows.Controls.TextBlock;
+ if (el != null)
+ el.Fill = sysErr ? Brushes.Red : Brushes.Gray;
+ if (tb != null)
+ tb.Text = "系統異常"; // always show the label
+ }
+ catch
+ {
+ // ignore
  }
  }
 
@@ -191,6 +235,12 @@ namespace CleanerControlApp.Vision.Developer
  public void Stop() { }
  public void ReadParameter() { }
  public void WriteParameter() { }
+
+ // 實作 IPLCService 介面的 ParametersReadCompleted 事件
+ public event EventHandler? ParametersReadCompleted;
+
+ // 實作 IPLCService 介面的 ParametersWriteCompleted 事件
+ public event EventHandler? ParametersWriteCompleted;
  }
  }
 }

@@ -1,10 +1,334 @@
-<UserControl x:Class="CleanerControlApp.Vision.Developer.PlcTest_ParameterView"
+﻿<UserControl x:Class="CleanerControlApp.Vision.Developer.PlcTest_ParameterView"
  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
  mc:Ignorable="d">
  <Grid Background="White">
- <TextBlock Text="Parameter Page" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="20" />
+ <Grid.RowDefinitions>
+ <RowDefinition Height="Auto" />
+ <RowDefinition Height="10" />
+ <RowDefinition Height="*" />
+ </Grid.RowDefinitions>
+
+ <!-- Top buttons -->
+ <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Grid.Row="0" Margin="0,0,0,10">
+ <Button x:Name="BtnReadParams" Content="Read Params" Width="120" Height="36" Margin="0,0,10,0" Click="BtnReadParams_Click" />
+ <Button x:Name="BtnWriteParams" Content="Write Params" Width="120" Height="36" Margin="0,0,10,0" Click="BtnWriteParams_Click" />
+ <!-- Added preview mouse/touch handlers so press sets command and release clears it -->
+ <Button x:Name="BtnSet" Content="Set" Width="120" Height="36" Click="BtnSet_Click"
+ PreviewMouseLeftButtonDown="BtnSet_PreviewMouseLeftButtonDown"
+ PreviewMouseLeftButtonUp="BtnSet_PreviewMouseLeftButtonUp"
+ TouchDown="BtnSet_TouchDown"
+ TouchUp="BtnSet_TouchUp" />
+ </StackPanel>
+
+ <ScrollViewer Grid.Row="2" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+ <!-- change to4 columns x1 row -->
+ <UniformGrid Columns="4" Rows="1" Margin="6" HorizontalAlignment="Left">
+
+ <!-- Axis1 -->
+ <Border BorderBrush="Black" BorderThickness="1" Padding="6" Margin="6" VerticalAlignment="Top">
+ <StackPanel Width="260">
+ <TextBlock Text="Axis1 - Loader X" FontWeight="Bold" Margin="2" />
+
+ <GroupBox Header="Speed" Margin="0,6,0,6">
+ <Grid>
+ <Grid.ColumnDefinitions>
+ <ColumnDefinition Width="100" />
+ <ColumnDefinition Width="60" />
+ <ColumnDefinition Width="80" />
+ </Grid.ColumnDefinitions>
+ <Grid.RowDefinitions>
+ <RowDefinition Height="34" />
+ <RowDefinition Height="34" />
+ <RowDefinition Height="34" />
+ <RowDefinition Height="34" />
+ <RowDefinition Height="34" />
+ <RowDefinition Height="34" />
+ </Grid.RowDefinitions>
+
+ <TextBlock Grid.Row="0" Grid.Column="0" Text="Jog H:" VerticalAlignment="Center" />
+ <TextBlock x:Name="Axis1_JogSpeedH_Display" Grid.Row="0" Grid.Column="1" Text="111" VerticalAlignment="Center" HorizontalAlignment="Right" />
+ <TextBox x:Name="Axis1_JogSpeedH_Input" Grid.Row="0" Grid.Column="2" Width="80" HorizontalContentAlignment="Right" PreviewTextInput="NumericOnly_PreviewTextInput" DataObject.Pasting="NumericOnly_Pasting" LostFocus="ParamInput_LostFocus" Tag="Param_Write_Axis1JogSpeedH" />
+
+ <TextBlock Grid.Row="1" Grid.Column="0" Text="Jog M:" VerticalAlignment="Center" />
+ <TextBlock x:Name="Axis1_JogSpeedM_Display" Grid.Row="1" Grid.Column="1" Text="55" VerticalAlignment="Center" HorizontalAlignment="Right" />
+ <TextBox x:Name="Axis1_JogSpeedM_Input" Grid.Row="1" Grid.Column="2" Width="80" HorizontalContentAlignment="Right" PreviewTextInput="NumericOnly_PreviewTextInput" DataObject.Pasting="NumericOnly_Pasting" LostFocus="ParamInput_LostFocus" Tag="Param_Write_Axis1JogSpeedM" />
+
+ <TextBlock Grid.Row="2" Grid.Column="0" Text="Jog L:" VerticalAlignment="Center" />
+ <TextBlock x:Name="Axis1_JogSpeedL_Display" Grid.Row="2" Grid.Column="1" Text="22" VerticalAlignment="Center" HorizontalAlignment="Right" />
+ <TextBox x:Name="Axis1_JogSpeedL_Input" Grid.Row="2" Grid.Column="2" Width="80" HorizontalContentAlignment="Right" PreviewTextInput="NumericOnly_PreviewTextInput" DataObject.Pasting="NumericOnly_Pasting" LostFocus="ParamInput_LostFocus" Tag="Param_Write_Axis1JogSpeedL" />
+
+ <TextBlock Grid.Row="3" Grid.Column="0" Text="Home H:" VerticalAlignment="Center" />
+ <TextBlock x:Name="Axis1_HomeSpeedH_Display" Grid.Row="3" Grid.Column="1" Text="222" VerticalAlignment="Center" HorizontalAlignment="Right" />
+ <TextBox x:Name="Axis1_HomeSpeedH_Input" Grid.Row="3" Grid.Column="2" Width="80" HorizontalContentAlignment="Right" PreviewTextInput="NumericOnly_PreviewTextInput" DataObject.Pasting="NumericOnly_Pasting" LostFocus="ParamInput_LostFocus" Tag="Param_Write_Axis1HomeSpeedH" />
+
+ <TextBlock Grid.Row="4" Grid.Column="0" Text="Home M:" VerticalAlignment="Center" />
+ <TextBlock x:Name="Axis1_HomeSpeedM_Display" Grid.Row="4" Grid.Column="1" Text="88" VerticalAlignment="Center" HorizontalAlignment="Right" />
+ <TextBox x:Name="Axis1_HomeSpeedM_Input" Grid.Row="4" Grid.Column="2" Width="80" HorizontalContentAlignment="Right" PreviewTextInput="NumericOnly_PreviewTextInput" DataObject.Pasting="NumericOnly_Pasting" LostFocus="ParamInput_LostFocus" Tag="Param_Write_Axis1HomeSpeedM" />
+
+ <TextBlock Grid.Row="5" Grid.Column="0" Text="Home L:" VerticalAlignment="Center" />
+ <TextBlock x:Name="Axis1_HomeSpeedL_Display" Grid.Row="5" Grid.Column="1" Text="11" VerticalAlignment="Center" HorizontalAlignment="Right" />
+ <TextBox x:Name="Axis1_HomeSpeedL_Input" Grid.Row="5" Grid.Column="2" Width="80" HorizontalContentAlignment="Right" PreviewTextInput="NumericOnly_PreviewTextInput" DataObject.Pasting="NumericOnly_Pasting" LostFocus="ParamInput_LostFocus" Tag="Param_Write_Axis1HomeSpeedL" />
+ </Grid>
+ </GroupBox>
+
+ <GroupBox Header="Timeout(ms)" Margin="0,2,0,0">
+ <Grid>
+ <Grid.ColumnDefinitions>
+ <ColumnDefinition Width="100" />
+ <ColumnDefinition Width="60" />
+ <ColumnDefinition Width="80" />
+ </Grid.ColumnDefinitions>
+ <Grid.RowDefinitions>
+ <RowDefinition Height="34" />
+ <RowDefinition Height="34" />
+ </Grid.RowDefinitions>
+
+ <TextBlock Grid.Row="0" Grid.Column="0" Text="Home:" VerticalAlignment="Center" />
+ <TextBlock x:Name="Axis1_HomeTimeout_Display" Grid.Row="0" Grid.Column="1" Text="60000" VerticalAlignment="Center" HorizontalAlignment="Right" />
+ <TextBox x:Name="Axis1_HomeTimeout_Input" Grid.Row="0" Grid.Column="2" Width="80" HorizontalContentAlignment="Right" PreviewTextInput="NumericOnly_PreviewTextInput" DataObject.Pasting="NumericOnly_Pasting" LostFocus="ParamInput_LostFocus" Tag="Param_Write_Axis1HomeTimeoutValue_ms" />
+
+ <TextBlock Grid.Row="1" Grid.Column="0" Text="Command:" VerticalAlignment="Center" />
+ <TextBlock x:Name="Axis1_CommandTimeout_Display" Grid.Row="1" Grid.Column="1" Text="60000" VerticalAlignment="Center" HorizontalAlignment="Right" />
+ <TextBox x:Name="Axis1_CommandTimeout_Input" Grid.Row="1" Grid.Column="2" Width="80" HorizontalContentAlignment="Right" PreviewTextInput="NumericOnly_PreviewTextInput" DataObject.Pasting="NumericOnly_Pasting" LostFocus="ParamInput_LostFocus" Tag="Param_Write_Axis1CommandTimeoutValue_ms" />
+ </Grid>
+ </GroupBox>
+
+ </StackPanel>
+ </Border>
+
+ <!-- Axis2 -->
+ <Border BorderBrush="Black" BorderThickness="1" Padding="6" Margin="6" VerticalAlignment="Top">
+ <StackPanel Width="260">
+ <TextBlock Text="Axis2 - Loader Z" FontWeight="Bold" Margin="2" />
+
+ <GroupBox Header="Speed" Margin="0,6,0,6">
+ <Grid>
+ <Grid.ColumnDefinitions>
+ <ColumnDefinition Width="100" />
+ <ColumnDefinition Width="60" />
+ <ColumnDefinition Width="80" />
+ </Grid.ColumnDefinitions>
+ <Grid.RowDefinitions>
+ <RowDefinition Height="34" />
+ <RowDefinition Height="34" />
+ <RowDefinition Height="34" />
+ <RowDefinition Height="34" />
+ <RowDefinition Height="34" />
+ <RowDefinition Height="34" />
+ </Grid.RowDefinitions>
+
+ <TextBlock Grid.Row="0" Grid.Column="0" Text="Jog H:" VerticalAlignment="Center" />
+ <TextBlock x:Name="Axis2_JogSpeedH_Display" Grid.Row="0" Grid.Column="1" Text="111" VerticalAlignment="Center" HorizontalAlignment="Right" />
+ <TextBox x:Name="Axis2_JogSpeedH_Input" Grid.Row="0" Grid.Column="2" Width="80" HorizontalContentAlignment="Right" PreviewTextInput="NumericOnly_PreviewTextInput" DataObject.Pasting="NumericOnly_Pasting" LostFocus="ParamInput_LostFocus" Tag="Param_Write_Axis2JogSpeedH" />
+
+ <TextBlock Grid.Row="1" Grid.Column="0" Text="Jog M:" VerticalAlignment="Center" />
+ <TextBlock x:Name="Axis2_JogSpeedM_Display" Grid.Row="1" Grid.Column="1" Text="55" VerticalAlignment="Center" HorizontalAlignment="Right" />
+ <TextBox x:Name="Axis2_JogSpeedM_Input" Grid.Row="1" Grid.Column="2" Width="80" HorizontalContentAlignment="Right" PreviewTextInput="NumericOnly_PreviewTextInput" DataObject.Pasting="NumericOnly_Pasting" LostFocus="ParamInput_LostFocus" Tag="Param_Write_Axis2JogSpeedM" />
+
+ <TextBlock Grid.Row="2" Grid.Column="0" Text="Jog L:" VerticalAlignment="Center" />
+ <TextBlock x:Name="Axis2_JogSpeedL_Display" Grid.Row="2" Grid.Column="1" Text="22" VerticalAlignment="Center" HorizontalAlignment="Right" />
+ <TextBox x:Name="Axis2_JogSpeedL_Input" Grid.Row="2" Grid.Column="2" Width="80" HorizontalContentAlignment="Right" PreviewTextInput="NumericOnly_PreviewTextInput" DataObject.Pasting="NumericOnly_Pasting" LostFocus="ParamInput_LostFocus" Tag="Param_Write_Axis2JogSpeedL" />
+
+ <TextBlock Grid.Row="3" Grid.Column="0" Text="Home H:" VerticalAlignment="Center" />
+ <TextBlock x:Name="Axis2_HomeSpeedH_Display" Grid.Row="3" Grid.Column="1" Text="222" VerticalAlignment="Center" HorizontalAlignment="Right" />
+ <TextBox x:Name="Axis2_HomeSpeedH_Input" Grid.Row="3" Grid.Column="2" Width="80" HorizontalContentAlignment="Right" PreviewTextInput="NumericOnly_PreviewTextInput" DataObject.Pasting="NumericOnly_Pasting" LostFocus="ParamInput_LostFocus" Tag="Param_Write_Axis2HomeSpeedH" />
+
+ <TextBlock Grid.Row="4" Grid.Column="0" Text="Home M:" VerticalAlignment="Center" />
+ <TextBlock x:Name="Axis2_HomeSpeedM_Display" Grid.Row="4" Grid.Column="1" Text="88" VerticalAlignment="Center" HorizontalAlignment="Right" />
+ <TextBox x:Name="Axis2_HomeSpeedM_Input" Grid.Row="4" Grid.Column="2" Width="80" HorizontalContentAlignment="Right" PreviewTextInput="NumericOnly_PreviewTextInput" DataObject.Pasting="NumericOnly_Pasting" LostFocus="ParamInput_LostFocus" Tag="Param_Write_Axis2HomeSpeedM" />
+
+ <TextBlock Grid.Row="5" Grid.Column="0" Text="Home L:" VerticalAlignment="Center" />
+ <TextBlock x:Name="Axis2_HomeSpeedL_Display" Grid.Row="5" Grid.Column="1" Text="11" VerticalAlignment="Center" HorizontalAlignment="Right" />
+ <TextBox x:Name="Axis2_HomeSpeedL_Input" Grid.Row="5" Grid.Column="2" Width="80" HorizontalContentAlignment="Right" PreviewTextInput="NumericOnly_PreviewTextInput" DataObject.Pasting="NumericOnly_Pasting" LostFocus="ParamInput_LostFocus" Tag="Param_Write_Axis2HomeSpeedL" />
+ </Grid>
+ </GroupBox>
+
+ <GroupBox Header="Timeout(ms)" Margin="0,2,0,0">
+ <Grid>
+ <Grid.ColumnDefinitions>
+ <ColumnDefinition Width="100" />
+ <ColumnDefinition Width="60" />
+ <ColumnDefinition Width="80" />
+ </Grid.ColumnDefinitions>
+ <Grid.RowDefinitions>
+ <RowDefinition Height="34" />
+ <RowDefinition Height="34" />
+ </Grid.RowDefinitions>
+
+ <TextBlock Grid.Row="0" Grid.Column="0" Text="Home:" VerticalAlignment="Center" />
+ <TextBlock x:Name="Axis2_HomeTimeout_Display" Grid.Row="0" Grid.Column="1" Text="60000" VerticalAlignment="Center" HorizontalAlignment="Right" />
+ <TextBox x:Name="Axis2_HomeTimeout_Input" Grid.Row="0" Grid.Column="2" Width="80" HorizontalContentAlignment="Right" PreviewTextInput="NumericOnly_PreviewTextInput" DataObject.Pasting="NumericOnly_Pasting" LostFocus="ParamInput_LostFocus" Tag="Param_Write_Axis2HomeTimeoutValue_ms" />
+
+ <TextBlock Grid.Row="1" Grid.Column="0" Text="Command:" VerticalAlignment="Center" />
+ <TextBlock x:Name="Axis2_CommandTimeout_Display" Grid.Row="1" Grid.Column="1" Text="60000" VerticalAlignment="Center" HorizontalAlignment="Right" />
+ <TextBox x:Name="Axis2_CommandTimeout_Input" Grid.Row="1" Grid.Column="2" Width="80" HorizontalContentAlignment="Right" PreviewTextInput="NumericOnly_PreviewTextInput" DataObject.Pasting="NumericOnly_Pasting" LostFocus="ParamInput_LostFocus" Tag="Param_Write_Axis2CommandTimeoutValue_ms" />
+ </Grid>
+ </GroupBox>
+
+ </StackPanel>
+ </Border>
+
+ <!-- Axis3 -->
+ <Border BorderBrush="Black" BorderThickness="1" Padding="6" Margin="6" VerticalAlignment="Top">
+ <StackPanel Width="260">
+ <TextBlock Text="Axis3 - Rinse Z" FontWeight="Bold" Margin="2" />
+
+ <GroupBox Header="Speed" Margin="0,6,0,6">
+ <Grid>
+ <Grid.ColumnDefinitions>
+ <ColumnDefinition Width="100" />
+ <ColumnDefinition Width="60" />
+ <ColumnDefinition Width="80" />
+ </Grid.ColumnDefinitions>
+ <Grid.RowDefinitions>
+ <RowDefinition Height="34" />
+ <RowDefinition Height="34" />
+ <RowDefinition Height="34" />
+ <RowDefinition Height="34" />
+ <RowDefinition Height="34" />
+ <RowDefinition Height="34" />
+ </Grid.RowDefinitions>
+
+ <TextBlock Grid.Row="0" Grid.Column="0" Text="Jog H:" VerticalAlignment="Center" />
+ <TextBlock x:Name="Axis3_JogSpeedH_Display" Grid.Row="0" Grid.Column="1" Text="111" VerticalAlignment="Center" HorizontalAlignment="Right" />
+ <TextBox x:Name="Axis3_JogSpeedH_Input" Grid.Row="0" Grid.Column="2" Width="80" HorizontalContentAlignment="Right" PreviewTextInput="NumericOnly_PreviewTextInput" DataObject.Pasting="NumericOnly_Pasting" LostFocus="ParamInput_LostFocus" Tag="Param_Write_Axis3JogSpeedH" />
+
+ <TextBlock Grid.Row="1" Grid.Column="0" Text="Jog M:" VerticalAlignment="Center" />
+ <TextBlock x:Name="Axis3_JogSpeedM_Display" Grid.Row="1" Grid.Column="1" Text="55" VerticalAlignment="Center" HorizontalAlignment="Right" />
+ <TextBox x:Name="Axis3_JogSpeedM_Input" Grid.Row="1" Grid.Column="2" Width="80" HorizontalContentAlignment="Right" PreviewTextInput="NumericOnly_PreviewTextInput" DataObject.Pasting="NumericOnly_Pasting" LostFocus="ParamInput_LostFocus" Tag="Param_Write_Axis3JogSpeedM" />
+
+ <TextBlock Grid.Row="2" Grid.Column="0" Text="Jog L:" VerticalAlignment="Center" />
+ <TextBlock x:Name="Axis3_JogSpeedL_Display" Grid.Row="2" Grid.Column="1" Text="22" VerticalAlignment="Center" HorizontalAlignment="Right" />
+ <TextBox x:Name="Axis3_JogSpeedL_Input" Grid.Row="2" Grid.Column="2" Width="80" HorizontalContentAlignment="Right" PreviewTextInput="NumericOnly_PreviewTextInput" DataObject.Pasting="NumericOnly_Pasting" LostFocus="ParamInput_LostFocus" Tag="Param_Write_Axis3JogSpeedL" />
+
+ <TextBlock Grid.Row="3" Grid.Column="0" Text="Home H:" VerticalAlignment="Center" />
+ <TextBlock x:Name="Axis3_HomeSpeedH_Display" Grid.Row="3" Grid.Column="1" Text="222" VerticalAlignment="Center" HorizontalAlignment="Right" />
+ <TextBox x:Name="Axis3_HomeSpeedH_Input" Grid.Row="3" Grid.Column="2" Width="80" HorizontalContentAlignment="Right" PreviewTextInput="NumericOnly_PreviewTextInput" DataObject.Pasting="NumericOnly_Pasting" LostFocus="ParamInput_LostFocus" Tag="Param_Write_Axis3HomeSpeedH" />
+
+ <TextBlock Grid.Row="4" Grid.Column="0" Text="Home M:" VerticalAlignment="Center" />
+ <TextBlock x:Name="Axis3_HomeSpeedM_Display" Grid.Row="4" Grid.Column="1" Text="88" VerticalAlignment="Center" HorizontalAlignment="Right" />
+ <TextBox x:Name="Axis3_HomeSpeedM_Input" Grid.Row="4" Grid.Column="2" Width="80" HorizontalContentAlignment="Right" PreviewTextInput="NumericOnly_PreviewTextInput" DataObject.Pasting="NumericOnly_Pasting" LostFocus="ParamInput_LostFocus" Tag="Param_Write_Axis3HomeSpeedM" />
+
+ <TextBlock Grid.Row="5" Grid.Column="0" Text="Home L:" VerticalAlignment="Center" />
+ <TextBlock x:Name="Axis3_HomeSpeedL_Display" Grid.Row="5" Grid.Column="1" Text="11" VerticalAlignment="Center" HorizontalAlignment="Right" />
+ <TextBox x:Name="Axis3_HomeSpeedL_Input" Grid.Row="5" Grid.Column="2" Width="80" HorizontalContentAlignment="Right" PreviewTextInput="NumericOnly_PreviewTextInput" DataObject.Pasting="NumericOnly_Pasting" LostFocus="ParamInput_LostFocus" Tag="Param_Write_Axis3HomeSpeedL" />
+
+ </Grid>
+ </GroupBox>
+
+ <GroupBox Header="Timeout(ms)" Margin="0,2,0,0">
+ <Grid>
+ <Grid.ColumnDefinitions>
+ <ColumnDefinition Width="100" />
+ <ColumnDefinition Width="60" />
+ <ColumnDefinition Width="80" />
+ </Grid.ColumnDefinitions>
+ <Grid.RowDefinitions>
+ <RowDefinition Height="34" />
+ <RowDefinition Height="34" />
+ </Grid.RowDefinitions>
+
+ <TextBlock Grid.Row="0" Grid.Column="0" Text="Home:" VerticalAlignment="Center" />
+ <TextBlock x:Name="Axis3_HomeTimeout_Display" Grid.Row="0" Grid.Column="1" Text="60000" VerticalAlignment="Center" HorizontalAlignment="Right" />
+ <TextBox x:Name="Axis3_HomeTimeout_Input" Grid.Row="0" Grid.Column="2" Width="80" HorizontalContentAlignment="Right" PreviewTextInput="NumericOnly_PreviewTextInput" DataObject.Pasting="NumericOnly_Pasting" LostFocus="ParamInput_LostFocus" Tag="Param_Write_Axis3HomeTimeoutValue_ms" />
+
+ <TextBlock Grid.Row="1" Grid.Column="0" Text="Command:" VerticalAlignment="Center" />
+ <TextBlock x:Name="Axis3_CommandTimeout_Display" Grid.Row="1" Grid.Column="1" Text="60000" VerticalAlignment="Center" HorizontalAlignment="Right" />
+ <TextBox x:Name="Axis3_CommandTimeout_Input" Grid.Row="1" Grid.Column="2" Width="80" HorizontalContentAlignment="Right" PreviewTextInput="NumericOnly_PreviewTextInput" DataObject.Pasting="NumericOnly_Pasting" LostFocus="ParamInput_LostFocus" Tag="Param_Write_Axis3CommandTimeoutValue_ms" />
+ </Grid>
+ </GroupBox>
+
+ </StackPanel>
+ </Border>
+
+ <!-- Axis4 -->
+ <Border BorderBrush="Black" BorderThickness="1" Padding="6" Margin="6" VerticalAlignment="Top">
+ <StackPanel Width="260">
+ <TextBlock Text="Axis4 - Soak Z" FontWeight="Bold" Margin="2" />
+
+ <GroupBox Header="Speed" Margin="0,6,0,6">
+ <Grid>
+ <Grid.ColumnDefinitions>
+ <ColumnDefinition Width="100" />
+ <ColumnDefinition Width="60" />
+ <ColumnDefinition Width="80" />
+ </Grid.ColumnDefinitions>
+ <Grid.RowDefinitions>
+ <RowDefinition Height="34" />
+ <RowDefinition Height="34" />
+ <RowDefinition Height="34" />
+ <RowDefinition Height="34" />
+ <RowDefinition Height="34" />
+ <RowDefinition Height="34" />
+ </Grid.RowDefinitions>
+
+ <TextBlock Grid.Row="0" Grid.Column="0" Text="Jog H:" VerticalAlignment="Center" />
+ <TextBlock x:Name="Axis4_JogSpeedH_Display" Grid.Row="0" Grid.Column="1" Text="111" VerticalAlignment="Center" HorizontalAlignment="Right" />
+ <TextBox x:Name="Axis4_JogSpeedH_Input" Grid.Row="0" Grid.Column="2" Width="80" HorizontalContentAlignment="Right" PreviewTextInput="NumericOnly_PreviewTextInput" DataObject.Pasting="NumericOnly_Pasting" LostFocus="ParamInput_LostFocus" Tag="Param_Write_Axis4JogSpeedH" />
+
+ <TextBlock Grid.Row="1" Grid.Column="0" Text="Jog M:" VerticalAlignment="Center" />
+ <TextBlock x:Name="Axis4_JogSpeedM_Display" Grid.Row="1" Grid.Column="1" Text="55" VerticalAlignment="Center" HorizontalAlignment="Right" />
+ <TextBox x:Name="Axis4_JogSpeedM_Input" Grid.Row="1" Grid.Column="2" Width="80" HorizontalContentAlignment="Right" PreviewTextInput="NumericOnly_PreviewTextInput" DataObject.Pasting="NumericOnly_Pasting" LostFocus="ParamInput_LostFocus" Tag="Param_Write_Axis4JogSpeedM" />
+
+ <TextBlock Grid.Row="2" Grid.Column="0" Text="Jog L:" VerticalAlignment="Center" />
+ <TextBlock x:Name="Axis4_JogSpeedL_Display" Grid.Row="2" Grid.Column="1" Text="22" VerticalAlignment="Center" HorizontalAlignment="Right" />
+ <TextBox x:Name="Axis4_JogSpeedL_Input" Grid.Row="2" Grid.Column="2" Width="80" HorizontalContentAlignment="Right" PreviewTextInput="NumericOnly_PreviewTextInput" DataObject.Pasting="NumericOnly_Pasting" LostFocus="ParamInput_LostFocus" Tag="Param_Write_Axis4JogSpeedL" />
+
+ <TextBlock Grid.Row="3" Grid.Column="0" Text="Home H:" VerticalAlignment="Center" />
+ <TextBlock x:Name="Axis4_HomeSpeedH_Display" Grid.Row="3" Grid.Column="1" Text="222" VerticalAlignment="Center" HorizontalAlignment="Right" />
+ <TextBox x:Name="Axis4_HomeSpeedH_Input" Grid.Row="3" Grid.Column="2" Width="80" HorizontalContentAlignment="Right" PreviewTextInput="NumericOnly_PreviewTextInput" DataObject.Pasting="NumericOnly_Pasting" LostFocus="ParamInput_LostFocus" Tag="Param_Write_Axis4HomeSpeedH" />
+
+ <TextBlock Grid.Row="4" Grid.Column="0" Text="Home M:" VerticalAlignment="Center" />
+ <TextBlock x:Name="Axis4_HomeSpeedM_Display" Grid.Row="4" Grid.Column="1" Text="88" VerticalAlignment="Center" HorizontalAlignment="Right" />
+ <TextBox x:Name="Axis4_HomeSpeedM_Input" Grid.Row="4" Grid.Column="2" Width="80" HorizontalContentAlignment="Right" PreviewTextInput="NumericOnly_PreviewTextInput" DataObject.Pasting="NumericOnly_Pasting" LostFocus="ParamInput_LostFocus" Tag="Param_Write_Axis4HomeSpeedM" />
+
+ <TextBlock Grid.Row="5" Grid.Column="0" Text="Home L:" VerticalAlignment="Center" />
+ <TextBlock x:Name="Axis4_HomeSpeedL_Display" Grid.Row="5" Grid.Column="1" Text="11" VerticalAlignment="Center" HorizontalAlignment="Right" />
+ <TextBox x:Name="Axis4_HomeSpeedL_Input" Grid.Row="5" Grid.Column="2" Width="80" HorizontalContentAlignment="Right" PreviewTextInput="NumericOnly_PreviewTextInput" DataObject.Pasting="NumericOnly_Pasting" LostFocus="ParamInput_LostFocus" Tag="Param_Write_Axis4HomeSpeedL" />
+
+ </Grid>
+ </GroupBox>
+
+ <GroupBox Header="Timeout(ms)" Margin="0,2,0,0">
+ <Grid>
+ <Grid.ColumnDefinitions>
+ <ColumnDefinition Width="100" />
+ <ColumnDefinition Width="60" />
+ <ColumnDefinition Width="80" />
+ </Grid.ColumnDefinitions>
+ <Grid.RowDefinitions>
+ <RowDefinition Height="34" />
+ <RowDefinition Height="34" />
+ </Grid.RowDefinitions>
+
+ <TextBlock Grid.Row="0" Grid.Column="0" Text="Home:" VerticalAlignment="Center" />
+ <TextBlock x:Name="Axis4_HomeTimeout_Display" Grid.Row="0" Grid.Column="1" Text="60000" VerticalAlignment="Center" HorizontalAlignment="Right" />
+ <TextBox x:Name="Axis4_HomeTimeout_Input" Grid.Row="0" Grid.Column="2" Width="80" HorizontalContentAlignment="Right" PreviewTextInput="NumericOnly_PreviewTextInput" DataObject.Pasting="NumericOnly_Pasting" LostFocus="ParamInput_LostFocus" Tag="Param_Write_Axis4HomeTimeoutValue_ms" />
+
+ <TextBlock Grid.Row="1" Grid.Column="0" Text="Command:" VerticalAlignment="Center" />
+ <TextBlock x:Name="Axis4_CommandTimeout_Display" Grid.Row="1" Grid.Column="1" Text="60000" VerticalAlignment="Center" HorizontalAlignment="Right" />
+ <TextBox x:Name="Axis4_CommandTimeout_Input" Grid.Row="1" Grid.Column="2" Width="80" HorizontalContentAlignment="Right" PreviewTextInput="NumericOnly_PreviewTextInput" DataObject.Pasting="NumericOnly_Pasting" LostFocus="ParamInput_LostFocus" Tag="Param_Write_Axis4CommandTimeoutValue_ms" />
+ </Grid>
+ </GroupBox>
+
+ </StackPanel>
+ </Border>
+
+ </UniformGrid>
+ </ScrollViewer>
+
+ <!-- Loading overlay -->
+ <Grid x:Name="LoadingOverlay" Visibility="Collapsed" Background="#80000000" Grid.RowSpan="3">
+ <Border Width="260" Height="120" Background="White" CornerRadius="6" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="12">
+ <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+ <ProgressBar Width="200" Height="16" IsIndeterminate="True" />
+ <TextBlock x:Name="LoadingText" Text="讀取中..." Margin="8" FontWeight="Bold" HorizontalAlignment="Center" />
+ </StackPanel>
+ </Border>
+ </Grid>
+
  </Grid>
 </UserControl>

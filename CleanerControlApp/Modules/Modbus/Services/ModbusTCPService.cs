@@ -18,7 +18,7 @@ namespace CleanerControlApp.Modules.Modbus.Services
 
         #region attribute
 
-        protected string _ip = "127.0.0.1";
+        protected string _ip = "192.168.3.20";
         protected int _port = 502;
         protected bool disposedValue;
 

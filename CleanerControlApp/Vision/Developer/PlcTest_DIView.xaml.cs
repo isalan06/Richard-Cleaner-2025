@@ -154,7 +154,7 @@ namespace CleanerControlApp.Vision.Developer
 
     public class DIGroup
     {
-        public string Header { get; set; }
+        public string? Header { get; set; }
         public ObservableCollection<DIItem> Items { get; } = new ObservableCollection<DIItem>();
     }
 
@@ -206,7 +206,7 @@ namespace CleanerControlApp.Vision.Developer
         public void Refresh() => OnPropertyChanged(nameof(IsOn));
 
         public event PropertyChangedEventHandler PropertyChanged;
-        protected void OnPropertyChanged([CallerMemberName] string propName = null)
+        protected void OnPropertyChanged([CallerMemberName] string? propName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propName));
         }

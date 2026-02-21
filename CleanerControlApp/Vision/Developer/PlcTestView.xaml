@@ -19,7 +19,7 @@
             <Grid VerticalAlignment="Stretch">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
-                    <RowDefinition Height="*" />
+                    <RowDefinition />
                 </Grid.RowDefinitions>
 
                 <!-- top controls -->
@@ -46,6 +46,18 @@
                     <Button x:Name="BtnTabDO" Content="DO" Height="72" HorizontalAlignment="Stretch" Margin="0,0,0,6" Click="BtnTabDO_Click" />
                     <Button x:Name="BtnTabMotor" Content="馬達狀態" Height="72" HorizontalAlignment="Stretch" Margin="0,0,0,6" Click="BtnTabMotor_Click" />
                     <Button x:Name="BtnTabParam" Content="參數" Height="72" HorizontalAlignment="Stretch" Click="BtnTabParam_Click" />
+
+                    <!-- 新增：分隔線與系統異常燈號 -->
+                    <Separator Margin="0,12,0,8" />
+                    <Grid Margin="0,4,0,0" VerticalAlignment="Top">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+                        <Ellipse x:Name="SystemErrorIndicator" Width="18" Height="18" Stroke="Gray" StrokeThickness="1" Fill="Gray" VerticalAlignment="Center" />
+                        <TextBlock x:Name="SystemErrorText" Grid.Column="1" Text="系統異常" Margin="8,0,0,0" VerticalAlignment="Center" FontWeight="SemiBold" />
+                    </Grid>
+
                 </StackPanel>
             </Grid>
         </Border>

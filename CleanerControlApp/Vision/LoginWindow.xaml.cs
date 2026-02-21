@@ -30,6 +30,11 @@ namespace CleanerControlApp.Vision
             InitializeComponent();
             _userManager = userManager;
             _logger = logger;
+
+            // Pre-fill credentials for testing to avoid repeatedly typing them.
+            // TODO: Remove these defaults before production.
+            UsernameTextBox.Text = "supervisor";
+            PasswordBox.Password = "9527";
         }
 
 

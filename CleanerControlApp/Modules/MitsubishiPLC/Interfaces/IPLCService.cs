@@ -49,5 +49,10 @@ namespace CleanerControlApp.Modules.MitsubishiPLC.Interfaces
 
         public void WriteParameter();
 
+        // Event fired when parameter read operation completes (successful or not)
+        public event EventHandler? ParametersReadCompleted;
+
+        // Event fired when parameter write operation completes (successful or not)
+        public event EventHandler? ParametersWriteCompleted;
     }
 }
