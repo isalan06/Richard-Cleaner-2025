@@ -33,7 +33,7 @@ namespace CleanerControlApp.Modules.MitsubishiPLC.Services
         private PLC_DWord_Union[] _motionPos = Array.Empty<PLC_DWord_Union>();
 
         // 預設 Command 數量
-        private const int DefaultCommandCount = 9;
+        private const int DefaultCommandCount = 10;
         private PLC_Bit_Union[] _command = Array.Empty<PLC_Bit_Union>();
 
         // 預設 MoveInfo (DWord) 數量
@@ -212,6 +212,8 @@ namespace CleanerControlApp.Modules.MitsubishiPLC.Services
                 // TODO: add real read/write frames using _modbusService.ExecuteAsync
                 if (_modbusService != null && _modbusService.IsConnected && _running)
                 {
+                    SetModbusTCPFrame(_routeProcess[_routeIndex]);
+
                     var data = await _modbusService.ExecuteAsync(_routeProcess[_routeIndex].DataFrame);
 
                     if (data != null)
@@ -253,6 +255,30 @@ namespace CleanerControlApp.Modules.MitsubishiPLC.Services
 
                 for (int i = 0; i < _motionPos.Length && (i * 2 + 19) < frame.Data.Length; i++)
                     _motionPos[i].Set(frame.Data[i * 2 + 18], frame.Data[i * 2 + 19]);
+            }
+        }
+
+        private void SetModbusTCPFrame(PLCFrame command)
+        {
+            if (command.Id == 1)
+            {
+                // Ensure the target frame instance exists to avoid CS8602 (DataFrame may be null)
+                var targetFrame = _routeProcess[1].DataFrame;
+                if (targetFrame == null)
+                {
+                    targetFrame = new ModbusTCPFrame();
+                    _routeProcess[1].DataFrame = targetFrame;
+                }
+
+                targetFrame.Data = new ushort[]
+                {
+                    _command[0].Data, _command[1].Data, _command[2].Data, _command[3].Data, _command[4].Data,
+                    _command[5].Data, _command[6].Data, _command[7].Data, _command[8].Data, _command[9].Data,
+                    _moveInfo[0].LowWord, _moveInfo[0].HighWord, _moveInfo[1].LowWord, _moveInfo[1].HighWord,
+                    _moveInfo[2].LowWord, _moveInfo[2].HighWord, _moveInfo[3].LowWord, _moveInfo[3].HighWord,
+                    _moveInfo[4].LowWord, _moveInfo[4].HighWord, _moveInfo[5].LowWord, _moveInfo[5].HighWord,
+                    _moveInfo[6].LowWord, _moveInfo[6].HighWord, _moveInfo[7].LowWord, _moveInfo[7].HighWord,
+                };
             }
         }
 
@@ -538,6 +564,685 @@ namespace CleanerControlApp.Modules.MitsubishiPLC.Services
         public int Axis2Pos => _motionPos[1].IntValue;
         public int Axis3Pos => _motionPos[2].IntValue;
         public int Axis4Pos => _motionPos[3].IntValue;
+
+        #endregion
+
+        #region Command
+
+        public bool Command_AutoStart
+        {
+            get { return _command[0].Bit0; }
+            set { _command[0].Bit0 = value; }
+        }
+        public bool Command_AlarmReset
+        {
+            get { return _command[0].Bit1; }
+            set { _command[0].Bit1 = value; }
+        }
+
+        public bool Command_WriteParameter
+        {
+            get { return _command[0].Bit2; }
+            set { _command[0].Bit2 = value; }
+        }
+
+        public bool Command_Axis1JogP
+        {
+            get { return _command[1].Bit0; }
+            set { _command[1].Bit0 = value; }
+        }
+        public bool Command_Axis1JogN
+        {
+            get { return _command[1].Bit1; }
+            set { _command[1].Bit0 = value; }
+        }
+        public bool Command_Axis1JogSpeedH
+        {
+            get { return _command[1].Bit2; }
+            set { _command[1].Bit0 = value; }
+        }
+        public bool Command_Axis1JogSpeedM
+        {
+            get { return _command[1].Bit3; }
+            set { _command[1].Bit0 = value; }
+        }
+        public bool Command_Axis1Home
+        {
+            get { return _command[1].Bit4; }
+            set { _command[1].Bit0 = value; }
+        }
+        public bool Command_Axis1Stop
+        {
+            get { return _command[1].Bit5; }
+            set { _command[1].Bit0 = value; }
+        }
+        public bool Command_Axis1Command
+        {
+            get { return _command[1].Bit6; }
+            set { _command[1].Bit0 = value; }
+        }
+        public bool Command_Axis1ServoOn
+        {
+            get { return _command[1].Bit9; }
+            set { _command[1].Bit0 = value; }
+        }
+        public bool Command_Axis1AlarmReset
+        {
+            get { return _command[1].Bit10; }
+            set { _command[1].Bit0 = value; }
+        }
+
+        public bool Command_Axis2JogP
+        {
+            get { return _command[2].Bit0; }
+            set { _command[2].Bit0 = value; }
+        }
+        public bool Command_Axis2JogN
+        {
+            get { return _command[2].Bit1; }
+            set { _command[2].Bit0 = value; }
+        }
+        public bool Command_Axis2JogSpeedH
+        {
+            get { return _command[2].Bit2; }
+            set { _command[2].Bit0 = value; }
+        }
+        public bool Command_Axis2JogSpeedM
+        {
+            get { return _command[2].Bit3; }
+            set { _command[2].Bit0 = value; }
+        }
+        public bool Command_Axis2Home
+        {
+            get { return _command[2].Bit4; }
+            set { _command[2].Bit0 = value; }
+        }
+        public bool Command_Axis2Stop
+        {
+            get { return _command[2].Bit5; }
+            set { _command[2].Bit0 = value; }
+        }
+        public bool Command_Axis2Command
+        {
+            get { return _command[2].Bit6; }
+            set { _command[2].Bit0 = value; }
+        }
+        public bool Command_Axis2ServoOn
+        {
+            get { return _command[2].Bit9; }
+            set { _command[2].Bit0 = value; }
+        }
+        public bool Command_Axis2AlarmReset
+        {
+            get { return _command[2].Bit10; }
+            set { _command[2].Bit0 = value; }
+        }
+
+        public bool Command_Axis3JogP
+        {
+            get { return _command[3].Bit0; }
+            set { _command[3].Bit0 = value; }
+        }
+        public bool Command_Axis3JogN
+        {
+            get { return _command[3].Bit1; }
+            set { _command[3].Bit0 = value; }
+        }
+        public bool Command_Axis3JogSpeedH
+        {
+            get { return _command[3].Bit2; }
+            set { _command[3].Bit0 = value; }
+        }
+        public bool Command_Axis3JogSpeedM
+        {
+            get { return _command[3].Bit3; }
+            set { _command[3].Bit0 = value; }
+        }
+        public bool Command_Axis3Home
+        {
+            get { return _command[3].Bit4; }
+            set { _command[3].Bit0 = value; }
+        }
+        public bool Command_Axis3Stop
+        {
+            get { return _command[3].Bit5; }
+            set { _command[3].Bit0 = value; }
+        }
+        public bool Command_Axis3Command
+        {
+            get { return _command[3].Bit6; }
+            set { _command[3].Bit0 = value; }
+        }
+        public bool Command_Axis3ServoOn
+        {
+            get { return _command[3].Bit9; }
+            set { _command[3].Bit0 = value; }
+        }
+        public bool Command_Axis3AlarmReset
+        {
+            get { return _command[3].Bit10; }
+            set { _command[3].Bit0 = value; }
+        }
+
+        public bool Command_Axis4JogP
+        {
+            get { return _command[4].Bit0; }
+            set { _command[4].Bit0 = value; }
+        }
+        public bool Command_Axis4JogN
+        {
+            get { return _command[4].Bit1; }
+            set { _command[4].Bit0 = value; }
+        }
+        public bool Command_Axis4JogSpeedH
+        {
+            get { return _command[4].Bit2; }
+            set { _command[4].Bit0 = value; }
+        }
+        public bool Command_Axis4JogSpeedM
+        {
+            get { return _command[4].Bit3; }
+            set { _command[4].Bit0 = value; }
+        }
+        public bool Command_Axis4Home
+        {
+            get { return _command[4].Bit4; }
+            set { _command[4].Bit0 = value; }
+        }
+        public bool Command_Axis4Stop
+        {
+            get { return _command[4].Bit5; }
+            set { _command[4].Bit0 = value; }
+        }
+        public bool Command_Axis4Command
+        {
+            get { return _command[4].Bit6; }
+            set { _command[4].Bit0 = value; }
+        }
+        public bool Command_Axis4ServoOn
+        {
+            get { return _command[4].Bit9; }
+            set { _command[4].Bit0 = value; }
+        }
+        public bool Command_Axis4AlarmReset
+        {
+            get { return _command[4].Bit10; }
+            set { _command[4].Bit0 = value; }
+        }
+
+        #endregion
+
+        #region Command DO
+
+        public bool Command_ShuttleXServoMotorPLS
+        {
+            get { return _command[5].Bit0; }
+            set { _command[5].Bit0 = value; }
+        }
+        public bool Command_ShuttleZServoMotorPLS
+        {
+            get { return _command[5].Bit1; }
+            set { _command[5].Bit1 = value; }
+        }
+        public bool Command_CleanerZServoMotorPLS
+        {
+            get { return _command[5].Bit2; }
+            set { _command[5].Bit2 = value; }
+        }
+        public bool Command_TankZServoMotorPLS
+        {
+            get { return _command[5].Bit3; }
+            set { _command[5].Bit3 = value; }
+        }
+        public bool Command_ShuttleXServoMotorSIGN
+        {
+            get { return _command[5].Bit4; }
+            set { _command[5].Bit4 = value; }
+        }
+        public bool Command_ShuttleZServoMotorSIGN
+        {
+            get { return _command[5].Bit5; }
+            set { _command[5].Bit5 = value; }
+        }
+        public bool Command_CleanerZServoMotorSIGN
+        {
+            get { return _command[5].Bit6; }
+            set { _command[5].Bit6 = value; }
+        }
+        public bool Command_TankZServoMotorSIGN
+        {
+            get { return _command[5].Bit7; }
+            set { _command[5].Bit7 = value; }
+        }
+
+        public bool Command_ShuttleXServoPosCommandStop
+        {
+            get { return _command[5].Bit8; }
+            set { _command[5].Bit8 = value; }
+        }
+        public bool Command_ShuttleXServoAlarmReset
+        {
+            get { return _command[5].Bit9; }
+            set { _command[5].Bit9 = value; }
+        }
+        public bool Command_ShuttleXServoServoOn
+        {
+            get { return _command[5].Bit10; }
+            set { _command[5].Bit10 = value; }
+        }
+        public bool Command_ShuttleZServoPosCommandStop
+        {
+            get { return _command[5].Bit11; }
+            set { _command[5].Bit11 = value; }
+        }
+        public bool Command_ShuttleZServoAlarmReset
+        {
+            get { return _command[5].Bit12; }
+            set { _command[5].Bit12 = value; }
+        }
+        public bool Command_ShuttleZServoServoOn
+        {
+            get { return _command[5].Bit13; }
+            set { _command[5].Bit13 = value; }
+        }
+        public bool Command_CleanerZServoPosCommandStop
+        {
+            get { return _command[5].Bit14; }
+            set { _command[5].Bit14 = value; }
+        }
+        public bool Command_CleanerZServoAlarmReset
+        {
+            get { return _command[5].Bit15; }
+            set { _command[5].Bit15 = value; }
+        }
+
+        public bool Command_CleanerZServoServoOn
+        {
+            get { return _command[6].Bit0; }
+            set { _command[6].Bit0 = value; }
+        }
+        public bool Command_TankZServoPosCommandStop
+        {
+            get { return _command[6].Bit1; }
+            set { _command[6].Bit1 = value; }
+        }
+        public bool Command_TankZServoAlarmReset
+        {
+            get { return _command[6].Bit2; }
+            set { _command[6].Bit2 = value; }
+        }
+        public bool Command_TankZServoServoOn
+        {
+            get { return _command[6].Bit3; }
+            set { _command[6].Bit3 = value; }
+        }
+
+        public bool Command_ShuttleZServoMotorBrake
+        {
+            get { return _command[6].Bit8; }
+            set { _command[6].Bit8 = value; }
+        }
+        public bool Command_CleanerZServoMotorBrake
+        {
+            get { return _command[6].Bit9; }
+            set { _command[6].Bit9 = value; }
+        }
+        public bool Command_TankZServoMotorBrake
+        {
+            get { return _command[6].Bit10; }
+            set { _command[6].Bit10 = value; }
+        }
+        public bool Command_Heater1Blower
+        {
+            get { return _command[6].Bit11; }
+            set { _command[6].Bit11 = value; }
+        }
+        public bool Command_Heater2Blower
+        {
+            get { return _command[6].Bit12; }
+            set { _command[6].Bit12 = value; }
+        }
+
+        public bool Command_ShuttleZClampOpen
+        {
+            get { return _command[7].Bit0; }
+            set { _command[7].Bit0 = value; }
+        }
+        public bool Command_ShuttleZClampClose
+        {
+            get { return _command[7].Bit1; }
+            set { _command[7].Bit1 = value; }
+        }
+        public bool Command_InputWaterValveOpen
+        {
+            get { return _command[7].Bit2; }
+            set { _command[7].Bit2 = value; }
+        }
+        public bool Command_TankOutputWaterValveOpen
+        {
+            get { return _command[7].Bit3; }
+            set { _command[7].Bit3 = value; }
+        }
+        public bool Command_HeaterTankSwitchValveOpen
+        {
+            get { return _command[7].Bit4; }
+            set { _command[7].Bit4 = value; }
+        }
+
+        public bool Command_CleanerCoverOpen
+        {
+            get { return _command[7].Bit8; }
+            set { _command[7].Bit8 = value; }
+        }
+        public bool Command_TankCoverOpen
+        {
+            get { return _command[7].Bit9; }
+            set { _command[7].Bit9 = value; }
+        }
+        public bool Command_Heater1CoverOpen
+        {
+            get { return _command[7].Bit10; }
+            set { _command[7].Bit10 = value; }
+        }
+        public bool Command_Heater2CoverOpen
+        {
+            get { return _command[7].Bit11; }
+            set { _command[7].Bit11 = value; }
+        }
+        public bool Command_CleanerAirKnifeOpen
+        {
+            get { return _command[7].Bit12; }
+            set { _command[7].Bit12 = value; }
+        }
+        public bool Command_TankAirKnifeOpen
+        {
+            get { return _command[7].Bit13; }
+            set { _command[7].Bit13 = value; }
+        }
+        public bool Command_Heater1AirOpen
+        {
+            get { return _command[7].Bit14; }
+            set { _command[7].Bit14 = value; }
+        }
+        public bool Command_Heater2AirOpen
+        {
+            get { return _command[7].Bit15; }
+            set { _command[7].Bit15 = value; }
+        }
+
+        public bool Command_LighterRed
+        {
+            get { return _command[8].Bit0; }
+            set { _command[8].Bit0 = value; }
+        }
+        public bool Command_LighterYellow
+        {
+            get { return _command[8].Bit1; }
+            set { _command[8].Bit1 = value; }
+        }
+        public bool Command_LighterGreen
+        {
+            get { return _command[8].Bit2; }
+            set { _command[8].Bit2 = value; }
+        }
+        public bool Command_LighterBuzzer
+        {
+            get { return _command[8].Bit3; }
+            set { _command[8].Bit3 = value; }
+        }
+
+        #endregion
+
+        #region Move Info
+
+        public int Command_Axis1Pos
+        {
+            get { return _moveInfo[0].IntValue; }
+            set { _moveInfo[0].IntValue = value; }
+        }
+        public int Command_Axis1Speed
+        {
+            get { return _moveInfo[1].IntValue; }
+            set { _moveInfo[1].IntValue = value; }
+        }
+        public int Command_Axis2Pos
+        {
+            get { return _moveInfo[2].IntValue; }
+            set { _moveInfo[2].IntValue = value; }
+        }
+        public int Command_Axis2Speed
+        {
+            get { return _moveInfo[3].IntValue; }
+            set { _moveInfo[3].IntValue = value; }
+        }
+        public int Command_Axis3Pos
+        {
+            get { return _moveInfo[4].IntValue; }
+            set { _moveInfo[4].IntValue = value; }
+        }
+        public int Command_Axis3Speed
+        {
+            get { return _moveInfo[5].IntValue; }
+            set { _moveInfo[5].IntValue = value; }
+        }
+        public int Command_Axis4Pos
+        {
+            get { return _moveInfo[6].IntValue; }
+            set { _moveInfo[6].IntValue = value; }
+        }
+        public int Command_Axis4Speed
+        {
+            get { return _moveInfo[7].IntValue; }
+            set { _moveInfo[7].IntValue = value; }
+        }
+
+        #endregion
+
+        #region Parameter Read
+
+        public int Param_Read_Axis1JogSpeedH => _paramMotionInfo[0].IntValue;
+        public int Param_Read_Axis1JogSpeedM => _paramMotionInfo[1].IntValue;
+        public int Param_Read_Axis1JogSpeedL => _paramMotionInfo[2].IntValue;
+        public int Param_Read_Axis1HomeSpeedH => _paramMotionInfo[3].IntValue;
+        public int Param_Read_Axis1HomeSpeedM => _paramMotionInfo[4].IntValue;
+        public int Param_Read_Axis1HomeSpeedL => _paramMotionInfo[5].IntValue;
+        public int Param_Read_Axis1HomeTimeoutValue_ms => _paramTimeout[0].IntValue;
+        public int Param_Read_Axis1CommandTimeoutValue_ms => _paramTimeout[1].IntValue;
+
+        public int Param_Read_Axis2JogSpeedH => ParamMotionInfo[6].IntValue;
+        public int Param_Read_Axis2JogSpeedM => ParamMotionInfo[7].IntValue;
+        public int Param_Read_Axis2JogSpeedL => ParamMotionInfo[8].IntValue;
+        public int Param_Read_Axis2HomeSpeedH => ParamMotionInfo[9].IntValue;
+        public int Param_Read_Axis2HomeSpeedM => ParamMotionInfo[10].IntValue;
+        public int Param_Read_Axis2HomeSpeedL => ParamMotionInfo[11].IntValue;
+        public int Param_Read_Axis2HomeTimeoutValue_ms => _paramTimeout[2].IntValue;
+        public int Param_Read_Axis2CommandTimeoutValue_ms => _paramTimeout[3].IntValue;
+
+        public int Param_Read_Axis3JogSpeedH => _paramMotionInfo[12].IntValue;
+        public int Param_Read_Axis3JogSpeedM => _paramMotionInfo[13].IntValue;
+        public int Param_Read_Axis3JogSpeedL => _paramMotionInfo[14].IntValue;
+        public int Param_Read_Axis3HomeSpeedH => _paramMotionInfo[15].IntValue;
+        public int Param_Read_Axis3HomeSpeedM => _paramMotionInfo[16].IntValue;
+        public int Param_Read_Axis3HomeSpeedL => _paramMotionInfo[17].IntValue;
+        public int Param_Read_Axis3HomeTimeoutValue_ms => _paramTimeout[4].IntValue;
+        public int Param_Read_Axis3CommandTimeoutValue_ms => _paramTimeout[5].IntValue;
+
+        public int Param_Read_Axis4JogSpeedH => _paramMotionInfo[18].IntValue;
+        public int Param_Read_Axis4JogSpeedM => _paramMotionInfo[19].IntValue;
+        public int Param_Read_Axis4JogSpeedL => _paramMotionInfo[20].IntValue;
+        public int Param_Read_Axis4HomeSpeedH => _paramMotionInfo[21].IntValue;
+        public int Param_Read_Axis4HomeSpeedM => _paramMotionInfo[22].IntValue;
+        public int Param_Read_Axis4HomeSpeedL => _paramMotionInfo[23].IntValue;
+        public int Param_Read_Axis4HomeTimeoutValue_ms => _paramTimeout[6].IntValue;
+        public int Param_Read_Axis4CommandTimeoutValue_ms => _paramTimeout[7].IntValue;
+
+        #endregion
+
+        #region Parameter Write
+
+        public int Param_Write_Axis1JogSpeedH
+        {
+            get { return _paramMotionInfoW[0].IntValue; }
+            set { _paramMotionInfoW[0].IntValue = value; }
+        }
+        public int Param_Write_Axis1JogSpeedM
+        {
+            get { return _paramMotionInfoW[1].IntValue; }
+            set { _paramMotionInfoW[1].IntValue = value; }
+        }
+        public int Param_Write_Axis1JogSpeedL
+        {
+            get { return _paramMotionInfoW[2].IntValue; }
+            set { _paramMotionInfoW[2].IntValue = value; }
+        }
+        public int Param_Write_Axis1HomeSpeedH
+        {
+            get { return _paramMotionInfoW[3].IntValue; }
+            set { _paramMotionInfoW[3].IntValue = value; }
+        }
+        public int Param_Write_Axis1HomeSpeedM
+        {
+            get { return _paramMotionInfoW[4].IntValue; }
+            set { _paramMotionInfoW[4].IntValue = value; }
+        }
+        public int Param_Write_Axis1HomeSpeedL
+        {
+            get { return _paramMotionInfoW[5].IntValue; }
+            set { _paramMotionInfoW[5].IntValue = value; }
+        }
+        public int Param_Write_Axis1HomeTimeoutValue_ms
+        { 
+            get { return _paramTimeoutW[0].IntValue; }
+            set { _paramTimeoutW[0].IntValue = value; } 
+        }
+        public int Param_Write_Axis1CommandTimeoutValue_ms
+        {
+            get { return _paramTimeoutW[1].IntValue; }
+            set { _paramTimeoutW[1].IntValue = value; }
+        }
+
+        public int Param_Write_Axis2JogSpeedH
+        {
+            get { return _paramMotionInfoW[6].IntValue; }
+            set { _paramMotionInfoW[6].IntValue = value; }
+        }
+        public int Param_Write_Axis2JogSpeedM
+        {
+            get { return _paramMotionInfoW[7].IntValue; }
+            set { _paramMotionInfoW[7].IntValue = value; }
+        }
+        public int Param_Write_Axis2JogSpeedL
+        {
+            get { return _paramMotionInfoW[8].IntValue; }
+            set { _paramMotionInfoW[8].IntValue = value; }
+        }
+        public int Param_Write_Axis2HomeSpeedH
+        {
+            get { return _paramMotionInfoW[9].IntValue; }
+            set { _paramMotionInfoW[9].IntValue = value; }
+        }
+        public int Param_Write_Axis2HomeSpeedM
+        {
+            get { return _paramMotionInfoW[10].IntValue; }
+            set { _paramMotionInfoW[10].IntValue = value; }
+        }
+        public int Param_Write_Axis2HomeSpeedL
+        {
+            get { return _paramMotionInfoW[11].IntValue; }
+            set { _paramMotionInfoW[11].IntValue = value; }
+        }
+        public int Param_Write_Axis2HomeTimeoutValue_ms
+        {
+            get { return _paramTimeoutW[2].IntValue; }
+            set { _paramTimeoutW[2].IntValue = value; }
+        }
+        public int Param_Write_Axis2CommandTimeoutValue_ms
+        {
+            get { return _paramTimeoutW[3].IntValue; }
+            set { _paramTimeoutW[3].IntValue = value; }
+        }
+
+        public int Param_Write_Axis3JogSpeedH
+        {
+            get { return _paramMotionInfoW[12].IntValue; }
+            set { _paramMotionInfoW[12].IntValue = value; }
+        }
+        public int Param_Write_Axis3JogSpeedM
+        {
+            get { return _paramMotionInfoW[13].IntValue; }
+            set { _paramMotionInfoW[13].IntValue = value; }
+        }
+        public int Param_Write_Axis3JogSpeedL
+        {
+            get { return _paramMotionInfoW[14].IntValue; }
+            set { _paramMotionInfoW[14].IntValue = value; }
+        }
+        public int Param_Write_Axis3HomeSpeedH
+        {
+            get { return _paramMotionInfoW[15].IntValue; }
+            set { _paramMotionInfoW[15].IntValue = value; }
+        }
+        public int Param_Write_Axis3HomeSpeedM
+        {
+            get { return _paramMotionInfoW[16].IntValue; }
+            set { _paramMotionInfoW[16].IntValue = value; }
+        }
+        public int Param_Write_Axis3HomeSpeedL
+        {
+            get { return _paramMotionInfoW[17].IntValue; }
+            set { _paramMotionInfoW[17].IntValue = value; }
+        }
+        public int Param_Write_Axis3HomeTimeoutValue_ms
+        {
+            get { return _paramTimeoutW[4].IntValue; }
+            set { _paramTimeoutW[4].IntValue = value; }
+        }
+        public int Param_Write_Axis3CommandTimeoutValue_ms
+        {
+            get { return _paramTimeoutW[5].IntValue; }
+            set { _paramTimeoutW[5].IntValue = value; }
+        }
+
+        public int Param_Write_Axis4JogSpeedH
+        {
+            get { return _paramMotionInfoW[18].IntValue; }
+            set { _paramMotionInfoW[18].IntValue = value; }
+        }
+        public int Param_Write_Axis4JogSpeedM
+        {
+            get { return _paramMotionInfoW[19].IntValue; }
+            set { _paramMotionInfoW[19].IntValue = value; }
+        }
+        public int Param_Write_Axis4JogSpeedL
+        {
+            get { return _paramMotionInfoW[20].IntValue; }
+            set { _paramMotionInfoW[20].IntValue = value; }
+        }
+        public int Param_Write_Axis4HomeSpeedH
+        {
+            get { return _paramMotionInfoW[21].IntValue; }
+            set { _paramMotionInfoW[21].IntValue = value; }
+        }
+        public int Param_Write_Axis4HomeSpeedM
+        {
+            get { return _paramMotionInfoW[22].IntValue; }
+            set { _paramMotionInfoW[22].IntValue = value; }
+        }
+        public int Param_Write_Axis4HomeSpeedL
+        {
+            get { return _paramMotionInfoW[23].IntValue; }
+            set { _paramMotionInfoW[23].IntValue = value; }
+        }
+        public int Param_Write_Axis4HomeTimeoutValue_ms
+        {
+            get { return _paramTimeoutW[6].IntValue; }
+            set { _paramTimeoutW[6].IntValue = value; }
+        }
+        public int Param_Write_Axis4CommandTimeoutValue_ms
+        {
+            get { return _paramTimeoutW[7].IntValue; }
+            set { _paramTimeoutW[7].IntValue = value; }
+        }
 
         #endregion
 

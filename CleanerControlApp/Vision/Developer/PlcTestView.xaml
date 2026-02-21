@@ -3,6 +3,56 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:dev="clr-namespace:CleanerControlApp.Vision.Developer"
              mc:Ignorable="d">
-    <!-- 在這裡加入您的 UI 元素 -->
+    <Grid VerticalAlignment="Stretch">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="280" />
+            <ColumnDefinition />
+        </Grid.ColumnDefinitions>
+
+        <!-- 左側方框: 控制與分頁按鈕 -->
+        <Border Grid.Row="0" Grid.Column="0" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="8,8,8,8" Padding="8" BorderBrush="Gray" BorderThickness="1" CornerRadius="4" Background="#FFF">
+            <Grid VerticalAlignment="Stretch">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <!-- top controls -->
+                <StackPanel Grid.Row="0">
+                    <TextBlock Text="PLC Service操作" FontWeight="Bold" FontSize="14" />
+                    <StackPanel Orientation="Horizontal" Margin="0,8,0,0" VerticalAlignment="Top" HorizontalAlignment="Left">
+                        <TextBlock Text="Running狀態: " FontWeight="SemiBold" VerticalAlignment="Center" />
+                        <Ellipse x:Name="RunningIndicator" Width="16" Height="16" Fill="Red" Stroke="Black" StrokeThickness="0.5" Margin="6,0,6,0" VerticalAlignment="Center" />
+                        <TextBlock x:Name="RunningText" Text="停止" VerticalAlignment="Center" />
+                    </StackPanel>
+
+                    <!-- Run / Stop buttons -->
+                    <StackPanel Orientation="Horizontal" Margin="0,12,0,0" HorizontalAlignment="Left">
+                        <Button x:Name="BtnRun" Content="Run" Width="80" Height="44" Margin="0,0,8,0" Click="BtnRun_Click" />
+                        <Button x:Name="BtnStop" Content="Stop" Width="80" Height="44" Click="BtnStop_Click" />
+                    </StackPanel>
+
+                    <Separator Margin="0,12,0,12" />
+                </StackPanel>
+
+                <!-- bottom area: tab buttons anchored to top of this region but this region fills remaining height -->
+                <StackPanel Grid.Row="1" VerticalAlignment="Top" Margin="0,0,0,8">
+                    <Button x:Name="BtnTabDI" Content="DI" Height="72" HorizontalAlignment="Stretch" Margin="0,0,0,6" Click="BtnTabDI_Click" />
+                    <Button x:Name="BtnTabDO" Content="DO" Height="72" HorizontalAlignment="Stretch" Margin="0,0,0,6" Click="BtnTabDO_Click" />
+                    <Button x:Name="BtnTabMotor" Content="馬達狀態" Height="72" HorizontalAlignment="Stretch" Margin="0,0,0,6" Click="BtnTabMotor_Click" />
+                    <Button x:Name="BtnTabParam" Content="參數" Height="72" HorizontalAlignment="Stretch" Click="BtnTabParam_Click" />
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!--右側顯示區: 放置 TabContentPlaceholder，初始會由程式將相應 UserControl 放入 -->
+        <Border Grid.Row="0" Grid.Column="1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="8,8,8,8" Padding="8" BorderBrush="LightGray" BorderThickness="1" CornerRadius="4" Background="#FAFAFA">
+            <ContentControl x:Name="TabContentPlaceholder" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
+        </Border>
+    </Grid>
 </UserControl>

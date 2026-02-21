@@ -67,15 +67,15 @@
  <StackPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal" VerticalAlignment="Center">
  <TextBlock Text="Port:" Width="30" VerticalAlignment="Center" />
  <TextBox x:Name="txtPort" Width="80" Height="22" />
- <Button x:Name="btnSet" Content="Set" Width="56" Height="22" Click="BtnSet_Click" Margin="6,0,0,0" />
+ <Button x:Name="btnSet" Content="Set" Width="56" Height="44" Click="BtnSet_Click" Margin="6,0,0,0" />
  </StackPanel>
 
  </Grid>
 
  <!-- Connect / Disconnect -->
  <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
- <Button x:Name="btnConnect" Content="Connect" Width="80" Height="26" Click="BtnConnect_Click" />
- <Button x:Name="btnDisconnect" Content="Disconnect" Width="80" Height="26" Margin="6,0,0,0" Click="BtnDisconnect_Click" />
+ <Button x:Name="btnConnect" Content="Connect" Width="80" Height="52" Click="BtnConnect_Click" />
+ <Button x:Name="btnDisconnect" Content="Disconnect" Width="80" Height="52" Margin="6,0,0,0" Click="BtnDisconnect_Click" />
  </StackPanel>
 
  <!-- Slave / Start / Number inputs (defaults set) -->
@@ -102,10 +102,10 @@
 
  <!-- Read buttons2x2 -->
  <UniformGrid Columns="2" Rows="2" Margin="0,8,0,0" HorizontalAlignment="Stretch">
- <Button x:Name="btnReadCoils" Content="Read Coils" Margin="4" Click="BtnReadCoils_Click" />
- <Button x:Name="btnReadDiscreteInputs" Content="Read DI" Margin="4" Click="BtnReadDiscreteInputs_Click" />
- <Button x:Name="btnReadHoldingRegisters" Content="Read HR" Margin="4" Click="BtnReadHoldingRegisters_Click" />
- <Button x:Name="btnReadInputRegisters" Content="Read IR" Margin="4" Click="BtnReadInputRegisters_Click" />
+ <Button x:Name="btnReadCoils" Content="Read Coils" Margin="4" Height="44" Click="BtnReadCoils_Click" />
+ <Button x:Name="btnReadDiscreteInputs" Content="Read DI" Margin="4" Height="44" Click="BtnReadDiscreteInputs_Click" />
+ <Button x:Name="btnReadHoldingRegisters" Content="Read HR" Margin="4" Height="44" Click="BtnReadHoldingRegisters_Click" />
+ <Button x:Name="btnReadInputRegisters" Content="Read IR" Margin="4" Height="44" Click="BtnReadInputRegisters_Click" />
  </UniformGrid>
 
  <!-- Set Value2x2 inputs -->
@@ -130,8 +130,8 @@
 
  <!-- Write buttons (aligned right, reduced width) placed above error message -->
  <StackPanel Orientation="Horizontal" Grid.Row="2" Grid.ColumnSpan="2" HorizontalAlignment="Right" Margin="0,6,0,0">
- <Button x:Name="btnWriteCoils" Content="Write Coils" Width="70" Height="24" Click="BtnWriteCoils_Click" Margin="4,0,0,0" />
- <Button x:Name="btnWriteHR" Content="Write HR" Width="70" Height="24" Margin="4,0,0,0" Click="BtnWriteHoldingRegisters_Click" />
+ <Button x:Name="btnWriteCoils" Content="Write Coils" Width="70" Height="48" Click="BtnWriteCoils_Click" Margin="4,0,0,0" />
+ <Button x:Name="btnWriteHR" Content="Write HR" Width="70" Height="48" Margin="4,0,0,0" Click="BtnWriteHoldingRegisters_Click" />
  </StackPanel>
 
  <!-- Inline validation / instruction message BELOW the buttons -->

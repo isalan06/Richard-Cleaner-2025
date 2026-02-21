@@ -1,0 +1,83 @@
+<UserControl x:Class="CleanerControlApp.Vision.Developer.PlcTest_DOView"
+ xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+ xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+ xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+ mc:Ignorable="d">
+ <Grid Background="White">
+ <DockPanel Margin="8">
+ <TextBlock Text="DO Status / Control" DockPanel.Dock="Top" FontSize="18" FontWeight="SemiBold" Margin="4" />
+ <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
+ <ItemsControl ItemsSource="{Binding Groups}">
+ <ItemsControl.ItemsPanel>
+ <ItemsPanelTemplate>
+ <UniformGrid Columns="3" />
+ </ItemsPanelTemplate>
+ </ItemsControl.ItemsPanel>
+
+ <ItemsControl.ItemTemplate>
+ <DataTemplate>
+ <Border BorderBrush="#FFB0B0B0" BorderThickness="1" Margin="6" Padding="8" CornerRadius="6" Background="WhiteSmoke" Width="380">
+ <StackPanel>
+ <TextBlock Text="{Binding Header}" FontWeight="Bold" Margin="4" HorizontalAlignment="Center" />
+ <Separator Margin="2" />
+ <ItemsControl ItemsSource="{Binding Items}">
+ <ItemsControl.ItemsPanel>
+ <ItemsPanelTemplate>
+ <StackPanel />
+ </ItemsPanelTemplate>
+ </ItemsControl.ItemsPanel>
+ <ItemsControl.ItemTemplate>
+ <DataTemplate>
+ <!-- Use Grid so middle column expands and button stays right -->
+ <Grid Margin="4">
+ <Grid.ColumnDefinitions>
+ <ColumnDefinition Width="Auto" />
+ <ColumnDefinition Width="*" />
+ <ColumnDefinition Width="Auto" />
+ </Grid.ColumnDefinitions>
+ <Ellipse Width="18" Height="18" Stroke="Gray" StrokeThickness="1" Grid.Column="0" VerticalAlignment="Center" Margin="0,0,8,0">
+ <Ellipse.Style>
+ <Style TargetType="Ellipse">
+ <Setter Property="Fill" Value="Gray" />
+ <Style.Triggers>
+ <DataTrigger Binding="{Binding IsOn}" Value="True">
+ <Setter Property="Fill" Value="Red" />
+ </DataTrigger>
+ </Style.Triggers>
+ </Style>
+ </Ellipse.Style>
+ </Ellipse>
+ <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Grid.Column="1">
+ <TextBlock Text="{Binding Address}" Width="56" />
+ <TextBlock Text=" - " />
+ <TextBlock Text="{Binding Description}" TextWrapping="Wrap" />
+ </StackPanel>
+ <Button Width="80" Grid.Column="2" Margin="8,0,0,0" Click="OnSetButtonClick">
+ <Button.Style>
+ <Style TargetType="Button">
+ <Setter Property="Content" Value="設定" />
+ <Setter Property="Background" Value="LightGray" />
+ <Setter Property="Foreground" Value="Black" />
+ <Style.Triggers>
+ <DataTrigger Binding="{Binding CommandIsOn}" Value="True">
+ <Setter Property="Background" Value="Red" />
+ <Setter Property="Foreground" Value="White" />
+ </DataTrigger>
+ </Style.Triggers>
+ </Style>
+ </Button.Style>
+ </Button>
+ </Grid>
+ </DataTemplate>
+ </ItemsControl.ItemTemplate>
+ </ItemsControl>
+ </StackPanel>
+ </Border>
+ </DataTemplate>
+ </ItemsControl.ItemTemplate>
+ </ItemsControl>
+ </ScrollViewer>
+ </DockPanel>
+ </Grid>
+</UserControl>

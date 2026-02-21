@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
+using System.Security.Policy;
 using System.Security.RightsManagement;
 using System.Text;
 using System.Threading.Tasks;
@@ -206,5 +208,200 @@ namespace CleanerControlApp.Modules.MitsubishiPLC.Interfaces
         public int Axis4Pos { get; }
 
         #endregion
+
+        #region Command
+
+        public bool Command_AutoStart { get; set; }
+        public bool Command_AlarmReset { get; set; }
+        public bool Command_WriteParameter { get; set; }
+
+        public bool Command_Axis1JogP { get; set; }
+        public bool Command_Axis1JogN { get; set; }
+        public bool Command_Axis1JogSpeedH { get; set; }
+        public bool Command_Axis1JogSpeedM { get; set; }
+        public bool Command_Axis1Home { get; set; }
+        public bool Command_Axis1Stop { get; set; }
+        public bool Command_Axis1Command { get; set; }
+        public bool Command_Axis1ServoOn { get; set; }
+        public bool Command_Axis1AlarmReset { get; set; }
+
+        public bool Command_Axis2JogP { get; set; }
+        public bool Command_Axis2JogN { get; set; }
+        public bool Command_Axis2JogSpeedH { get; set; }
+        public bool Command_Axis2JogSpeedM { get; set; }
+        public bool Command_Axis2Home { get; set; }
+        public bool Command_Axis2Stop { get; set; }
+        public bool Command_Axis2Command { get; set; }
+        public bool Command_Axis2ServoOn { get; set; }
+        public bool Command_Axis2AlarmReset { get; set; }
+
+        public bool Command_Axis3JogP { get; set; }
+        public bool Command_Axis3JogN { get; set; }
+        public bool Command_Axis3JogSpeedH { get; set; }
+        public bool Command_Axis3JogSpeedM { get; set; }
+        public bool Command_Axis3Home { get; set; }
+        public bool Command_Axis3Stop { get; set; }
+        public bool Command_Axis3Command { get; set; }
+        public bool Command_Axis3ServoOn { get; set; }
+        public bool Command_Axis3AlarmReset { get; set; }
+
+        public bool Command_Axis4JogP { get; set; }
+        public bool Command_Axis4JogN { get; set; }
+        public bool Command_Axis4JogSpeedH { get; set; }
+        public bool Command_Axis4JogSpeedM { get; set; }
+        public bool Command_Axis4Home { get; set; }
+        public bool Command_Axis4Stop { get; set; }
+        public bool Command_Axis4Command { get; set; }
+        public bool Command_Axis4ServoOn { get; set; }
+        public bool Command_Axis4AlarmReset { get; set; }
+
+        #endregion
+
+        #region Command DO
+
+        public bool Command_ShuttleXServoMotorPLS { get; }
+        public bool Command_ShuttleZServoMotorPLS { get; }
+        public bool Command_CleanerZServoMotorPLS { get; }
+        public bool Command_TankZServoMotorPLS { get; }
+        public bool Command_ShuttleXServoMotorSIGN { get; }
+        public bool Command_ShuttleZServoMotorSIGN { get; }
+        public bool Command_CleanerZServoMotorSIGN { get; }
+        public bool Command_TankZServoMotorSIGN { get; }
+
+        public bool Command_ShuttleXServoPosCommandStop { get; }
+        public bool Command_ShuttleXServoAlarmReset { get; }
+        public bool Command_ShuttleXServoServoOn { get; }
+        public bool Command_ShuttleZServoPosCommandStop { get; }
+        public bool Command_ShuttleZServoAlarmReset { get; }
+        public bool Command_ShuttleZServoServoOn { get; }
+        public bool Command_CleanerZServoPosCommandStop { get; }
+        public bool Command_CleanerZServoAlarmReset { get; }
+
+        public bool Command_CleanerZServoServoOn { get; }
+        public bool Command_TankZServoPosCommandStop { get; }
+        public bool Command_TankZServoAlarmReset { get; }
+        public bool Command_TankZServoServoOn { get; }
+
+        public bool Command_ShuttleZServoMotorBrake { get; }
+        public bool Command_CleanerZServoMotorBrake { get; }
+        public bool Command_TankZServoMotorBrake { get; }
+        public bool Command_Heater1Blower { get; }
+        public bool Command_Heater2Blower { get; }
+
+        public bool Command_ShuttleZClampOpen { get; }
+        public bool Command_ShuttleZClampClose { get; }
+        public bool Command_InputWaterValveOpen { get; }
+        public bool Command_TankOutputWaterValveOpen { get; }
+        public bool Command_HeaterTankSwitchValveOpen { get; }
+
+        public bool Command_CleanerCoverOpen { get; }
+        public bool Command_TankCoverOpen { get; }
+        public bool Command_Heater1CoverOpen { get; }
+        public bool Command_Heater2CoverOpen { get; }
+        public bool Command_CleanerAirKnifeOpen { get; }
+        public bool Command_TankAirKnifeOpen { get; }
+        public bool Command_Heater1AirOpen { get; }
+        public bool Command_Heater2AirOpen { get; }
+
+        public bool Command_LighterRed { get; }
+        public bool Command_LighterYellow { get; }
+        public bool Command_LighterGreen { get; }
+        public bool Command_LighterBuzzer { get; }
+
+        #endregion
+
+        #region Move Info
+
+        public int Command_Axis1Pos { get; set; }
+        public int Command_Axis1Speed { get; set; }
+        public int Command_Axis2Pos { get; set; }
+        public int Command_Axis2Speed { get; set; }
+        public int Command_Axis3Pos { get; set; }
+        public int Command_Axis3Speed { get; set; }
+        public int Command_Axis4Pos { get; set; }
+        public int Command_Axis4Speed { get; set; }
+
+        #endregion
+
+        #region Parameter Read
+
+        public int Param_Read_Axis1JogSpeedH { get; }
+        public int Param_Read_Axis1JogSpeedM { get; }
+        public int Param_Read_Axis1JogSpeedL { get; }
+        public int Param_Read_Axis1HomeSpeedH { get; }
+        public int Param_Read_Axis1HomeSpeedM { get; }
+        public int Param_Read_Axis1HomeSpeedL { get; }
+        public int Param_Read_Axis1HomeTimeoutValue_ms { get; }
+        public int Param_Read_Axis1CommandTimeoutValue_ms { get; }
+
+        public int Param_Read_Axis2JogSpeedH { get; }
+        public int Param_Read_Axis2JogSpeedM { get; }
+        public int Param_Read_Axis2JogSpeedL { get; }
+        public int Param_Read_Axis2HomeSpeedH { get; }
+        public int Param_Read_Axis2HomeSpeedM { get; }
+        public int Param_Read_Axis2HomeSpeedL { get; }
+        public int Param_Read_Axis2HomeTimeoutValue_ms { get; }
+        public int Param_Read_Axis2CommandTimeoutValue_ms { get; }
+
+        public int Param_Read_Axis3JogSpeedH { get; }
+        public int Param_Read_Axis3JogSpeedM { get; }
+        public int Param_Read_Axis3JogSpeedL { get; }
+        public int Param_Read_Axis3HomeSpeedH { get; }
+        public int Param_Read_Axis3HomeSpeedM { get; }
+        public int Param_Read_Axis3HomeSpeedL { get; }
+        public int Param_Read_Axis3HomeTimeoutValue_ms { get; }
+        public int Param_Read_Axis3CommandTimeoutValue_ms { get; }
+
+        public int Param_Read_Axis4JogSpeedH { get; }
+        public int Param_Read_Axis4JogSpeedM { get; }
+        public int Param_Read_Axis4JogSpeedL { get; }
+        public int Param_Read_Axis4HomeSpeedH { get; }
+        public int Param_Read_Axis4HomeSpeedM { get; }
+        public int Param_Read_Axis4HomeSpeedL { get; }
+        public int Param_Read_Axis4HomeTimeoutValue_ms { get; }
+        public int Param_Read_Axis4CommandTimeoutValue_ms { get; }
+
+        #endregion
+
+        #region Parameter Write
+
+        public int Param_Write_Axis1JogSpeedH { get; set; }
+        public int Param_Write_Axis1JogSpeedM { get; set; }
+        public int Param_Write_Axis1JogSpeedL { get; set; }
+        public int Param_Write_Axis1HomeSpeedH { get; set; }
+        public int Param_Write_Axis1HomeSpeedM { get; set; }
+        public int Param_Write_Axis1HomeSpeedL { get; set; }
+        public int Param_Write_Axis1HomeTimeoutValue_ms { get; set; }
+        public int Param_Write_Axis1CommandTimeoutValue_ms { get; set; }
+
+        public int Param_Write_Axis2JogSpeedH { get; set; }
+        public int Param_Write_Axis2JogSpeedM { get; set; }
+        public int Param_Write_Axis2JogSpeedL { get; set; }
+        public int Param_Write_Axis2HomeSpeedH { get; set; }
+        public int Param_Write_Axis2HomeSpeedM { get; set; }
+        public int Param_Write_Axis2HomeSpeedL { get; set; }
+        public int Param_Write_Axis2HomeTimeoutValue_ms { get; set; }
+        public int Param_Write_Axis2CommandTimeoutValue_ms { get; set; }
+
+        public int Param_Write_Axis3JogSpeedH { get; set; }
+        public int Param_Write_Axis3JogSpeedM { get; set; }
+        public int Param_Write_Axis3JogSpeedL { get; set; }
+        public int Param_Write_Axis3HomeSpeedH { get; set; }
+        public int Param_Write_Axis3HomeSpeedM { get; set; }
+        public int Param_Write_Axis3HomeSpeedL { get; set; }
+        public int Param_Write_Axis3HomeTimeoutValue_ms { get; set; }
+        public int Param_Write_Axis3CommandTimeoutValue_ms { get; set; }
+
+        public int Param_Write_Axis4JogSpeedH { get; set; }
+        public int Param_Write_Axis4JogSpeedM { get; set; }
+        public int Param_Write_Axis4JogSpeedL { get; set; }
+        public int Param_Write_Axis4HomeSpeedH { get; set; }
+        public int Param_Write_Axis4HomeSpeedM { get; set; }
+        public int Param_Write_Axis4HomeSpeedL { get; set; }
+        public int Param_Write_Axis4HomeTimeoutValue_ms { get; set; }
+        public int Param_Write_Axis4CommandTimeoutValue_ms { get; set; }
+
+        #endregion
+
     }
 }

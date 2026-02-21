@@ -7,12 +7,56 @@
  mc:Ignorable="d"
  d:DesignHeight="600" d:DesignWidth="800">
  <Grid Background="White">
- <TabControl>
- <TabItem Header="Modbus TCP Test">
- <dev:ModbusTestView />
+ <!-- Enable shared size scope so header grids can share a ColumnDefinition width -->
+ <TabControl VerticalContentAlignment="Top" HorizontalContentAlignment="Stretch" Grid.IsSharedSizeScope="True">
+ <!-- Ensure content presenter stretches to fill available space -->
+ <TabControl.ContentTemplate>
+ <DataTemplate>
+ <ContentPresenter Content="{Binding}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
+ </DataTemplate>
+ </TabControl.ContentTemplate>
+ <!-- Style to increase the tab header height (approx.3x default) -->
+ <TabControl.Resources>
+ <Style TargetType="TabItem">
+ <!-- Set a minimum height to enlarge the header area -->
+ <Setter Property="MinHeight" Value="48" />
+ <!-- Add some vertical padding to center the header text nicely -->
+ <Setter Property="Padding" Value="12,8" />
+ <!-- Ensure the TabItem's CONTENT aligns to the top (prevents vertical centering) -->
+ <Setter Property="VerticalContentAlignment" Value="Top" />
+ </Style>
+ </TabControl.Resources>
+ <TabItem>
+ <TabItem.Header>
+ <!-- Grid with SharedSizeGroup ensures this header width is shared across headers -->
+ <Grid>
+ <Grid.ColumnDefinitions>
+ <ColumnDefinition SharedSizeGroup="TabHeaderWidth" />
+ </Grid.ColumnDefinitions>
+ <TextBlock TextAlignment="Center" HorizontalAlignment="Center">
+ <Run>Modbus TCP</Run>
+ <LineBreak/>
+ <Run>Test</Run>
+ </TextBlock>
+ </Grid>
+ </TabItem.Header>
+ <dev:ModbusTestView HorizontalAlignment="Stretch" />
  </TabItem>
- <TabItem Header="PLC Test">
- <dev:PlcTestView />
+ <TabItem>
+ <TabItem.Header>
+ <!-- Use the same SharedSizeGroup so this header matches the width above -->
+ <Grid>
+ <Grid.ColumnDefinitions>
+ <ColumnDefinition SharedSizeGroup="TabHeaderWidth" />
+ </Grid.ColumnDefinitions>
+ <TextBlock TextAlignment="Center" HorizontalAlignment="Center">
+ <Run>PLC</Run>
+ <LineBreak/>
+ <Run>Test</Run>
+ </TextBlock>
+ </Grid>
+ </TabItem.Header>
+ <dev:PlcTestView HorizontalAlignment="Stretch" />
  </TabItem>
  </TabControl>
  </Grid>
