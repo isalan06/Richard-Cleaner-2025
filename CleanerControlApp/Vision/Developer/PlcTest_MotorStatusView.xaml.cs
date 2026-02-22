@@ -220,7 +220,7 @@ namespace CleanerControlApp.Vision.Developer
 			}
 		}
 
-		private void OnActionButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+		private void OnActionButtonDown(object sender, RoutedEventArgs e)
 		{
 			if (sender is Button btn && !_pressedCommandButtons.Contains(btn))
 			{
@@ -238,11 +238,11 @@ namespace CleanerControlApp.Vision.Developer
 						case "AlarmReset": axis.SetMomentaryCommand(MomentaryCommand.AlarmReset, true); break;
 					}
 				}
-				e.Handled = true;
+				// Do not mark handled here so the Button's visual pressed state (IsPressed) can be applied
 			}
 		}
 
-		private void OnActionButtonUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
+		private void OnActionButtonUp(object sender, RoutedEventArgs e)
 		{
 			if (sender is Button btn)
 			{
@@ -260,7 +260,7 @@ namespace CleanerControlApp.Vision.Developer
 						case "AlarmReset": axis.SetMomentaryCommand(MomentaryCommand.AlarmReset, false); break;
 					}
 				}
-				e.Handled = true;
+				// Do not mark handled so Button visuals update normally
 			}
 		}
 	}

@@ -94,8 +94,36 @@
  
  <!-- Control Buttons: switch from WrapPanel to two-column UniformGrid -->
  <UniformGrid Columns="2" Margin="4,8,4,0" HorizontalAlignment="Stretch">
- <Button Margin="4" PreviewMouseLeftButtonDown="OnActionButtonDown" PreviewMouseLeftButtonUp="OnActionButtonUp" Tag="JogP" HorizontalAlignment="Stretch" Height="40">Jog+</Button>
- <Button Margin="4" PreviewMouseLeftButtonDown="OnActionButtonDown" PreviewMouseLeftButtonUp="OnActionButtonUp" Tag="JogN" HorizontalAlignment="Stretch" Height="40">Jog-</Button>
+ <Button Margin="4" MouseLeftButtonDown="OnActionButtonDown" MouseLeftButtonUp="OnActionButtonUp" Tag="JogP" HorizontalAlignment="Stretch" Height="40">
+ <Button.Style>
+ <Style TargetType="Button">
+ <Setter Property="Background" Value="Teal"/>
+ <Setter Property="Foreground" Value="Black" />
+ <Style.Triggers>
+ <Trigger Property="IsPressed" Value="True">
+ <Setter Property="Background" Value="DarkBlue" />
+ <Setter Property="Foreground" Value="Red" />
+ </Trigger>
+ </Style.Triggers>
+ </Style>
+ </Button.Style>
+ Jog+
+ </Button>
+ <Button Margin="4" MouseLeftButtonDown="OnActionButtonDown" MouseLeftButtonUp="OnActionButtonUp" Tag="JogN" HorizontalAlignment="Stretch" Height="40">
+ <Button.Style>
+ <Style TargetType="Button">
+ <Setter Property="Background" Value="Teal"/>
+ <Setter Property="Foreground" Value="Black" />
+ <Style.Triggers>
+ <Trigger Property="IsPressed" Value="True">
+ <Setter Property="Background" Value="DarkBlue" />
+ <Setter Property="Foreground" Value="Red" />
+ </Trigger>
+ </Style.Triggers>
+ </Style>
+ </Button.Style>
+ Jog-
+ </Button>
  <Button Margin="4" PreviewMouseLeftButtonDown="OnCommandButtonDown" PreviewMouseLeftButtonUp="OnCommandButtonUp" Tag="JSpeedH" HorizontalAlignment="Stretch" Height="40">JSpeedH
  <Button.Style>
  <Style TargetType="Button">
@@ -120,9 +148,9 @@
  </Style>
  </Button.Style>
  </Button>
- <Button Margin="4" PreviewMouseLeftButtonDown="OnActionButtonDown" PreviewMouseLeftButtonUp="OnActionButtonUp" Tag="Home" HorizontalAlignment="Stretch" Height="40">Home</Button>
- <Button Margin="4" PreviewMouseLeftButtonDown="OnActionButtonDown" PreviewMouseLeftButtonUp="OnActionButtonUp" Tag="Stop" HorizontalAlignment="Stretch" Height="40">Stop</Button>
- <Button Margin="4" PreviewMouseLeftButtonDown="OnActionButtonDown" PreviewMouseLeftButtonUp="OnActionButtonUp" Tag="Command" HorizontalAlignment="Stretch" Height="40">Command</Button>
+ <Button Margin="4" MouseLeftButtonDown="OnActionButtonDown" MouseLeftButtonUp="OnActionButtonUp" Tag="Home" HorizontalAlignment="Stretch" Height="40">Home</Button>
+ <Button Margin="4" MouseLeftButtonDown="OnActionButtonDown" MouseLeftButtonUp="OnActionButtonUp" Tag="Stop" HorizontalAlignment="Stretch" Height="40">Stop</Button>
+ <Button Margin="4" MouseLeftButtonDown="OnActionButtonDown" MouseLeftButtonUp="OnActionButtonUp" Tag="Command" HorizontalAlignment="Stretch" Height="40">Command</Button>
  <Button Margin="4" PreviewMouseLeftButtonDown="OnCommandButtonDown" PreviewMouseLeftButtonUp="OnCommandButtonUp" Tag="ServoOn" HorizontalAlignment="Stretch" Height="40">Servo On
  <Button.Style>
  <Style TargetType="Button">
@@ -135,7 +163,7 @@
  </Style>
  </Button.Style>
  </Button>
- <Button Margin="4" PreviewMouseLeftButtonDown="OnActionButtonDown" PreviewMouseLeftButtonUp="OnActionButtonUp" Tag="AlarmReset" HorizontalAlignment="Stretch" Height="40">Alarm Reset</Button>
+ <Button Margin="4" MouseLeftButtonDown="OnActionButtonDown" MouseLeftButtonUp="OnActionButtonUp" Tag="AlarmReset" HorizontalAlignment="Stretch" Height="40">Alarm Reset</Button>
  </UniformGrid>
  
  <!-- Target position and Speed input lines -->
