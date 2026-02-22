@@ -220,11 +220,13 @@ namespace CleanerControlApp.Vision.Developer
 			}
 		}
 
-		private void OnActionButtonDown(object sender, RoutedEventArgs e)
+		private void OnActionButtonDown(object sender, MouseButtonEventArgs e)
 		{
 			if (sender is Button btn && !_pressedCommandButtons.Contains(btn))
 			{
 				_pressedCommandButtons.Add(btn);
+				// capture mouse so we always get the corresponding MouseUp even if pointer leaves
+				btn.CaptureMouse();
 				if (btn.DataContext is AxisViewModel axis)
 				{
 					var tag = (btn.Tag as string) ?? string.Empty;
@@ -238,15 +240,17 @@ namespace CleanerControlApp.Vision.Developer
 						case "AlarmReset": axis.SetMomentaryCommand(MomentaryCommand.AlarmReset, true); break;
 					}
 				}
-				// Do not mark handled here so the Button's visual pressed state (IsPressed) can be applied
+				// do not mark handled so the Button's visual pressed state (IsPressed) can be applied
 			}
 		}
 
-		private void OnActionButtonUp(object sender, RoutedEventArgs e)
+		private void OnActionButtonUp(object sender, MouseButtonEventArgs e)
 		{
 			if (sender is Button btn)
 			{
 				_pressedCommandButtons.Remove(btn);
+				// release capture
+				if (Mouse.Captured == btn) btn.ReleaseMouseCapture();
 				if (btn.DataContext is AxisViewModel axis)
 				{
 					var tag = (btn.Tag as string) ?? string.Empty;
@@ -260,7 +264,7 @@ namespace CleanerControlApp.Vision.Developer
 						case "AlarmReset": axis.SetMomentaryCommand(MomentaryCommand.AlarmReset, false); break;
 					}
 				}
-				// Do not mark handled so Button visuals update normally
+				// do not mark handled so Button visuals update normally
 			}
 		}
 	}
