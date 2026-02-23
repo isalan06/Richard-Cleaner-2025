@@ -96,6 +96,11 @@ namespace CleanerControlApp
                     services.AddSingleton<IPLCService, PLCService>();
                     // Also register IPLCOperator to resolve to the same PLCService singleton implementation
                     services.AddSingleton<IPLCOperator>(sp => (IPLCOperator)sp.GetRequiredService<IPLCService>());
+                    services.AddSingleton<IModbusRTUService, ModbusRTUService>();
+
+                    // ILogger<ModbusRTUPoolService> will be resolved from DI; provide the int explicitly.
+                    services.AddSingleton<IModbusRTUPollService>(sp =>
+                        new ModbusRTUPoolService(sp.GetRequiredService<ILogger<ModbusRTUPoolService>>(),6));
                 })
                 .Build();
         }
