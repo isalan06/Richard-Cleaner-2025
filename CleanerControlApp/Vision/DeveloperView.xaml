@@ -8,13 +8,7 @@
  d:DesignHeight="600" d:DesignWidth="800">
  <Grid Background="White">
  <!-- Enable shared size scope so header grids can share a ColumnDefinition width -->
- <TabControl VerticalContentAlignment="Top" HorizontalContentAlignment="Stretch" Grid.IsSharedSizeScope="True">
- <!-- Ensure content presenter stretches to fill available space -->
- <TabControl.ContentTemplate>
- <DataTemplate>
- <ContentPresenter Content="{Binding}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
- </DataTemplate>
- </TabControl.ContentTemplate>
+ <TabControl x:Name="tcDeveloper" VerticalContentAlignment="Top" HorizontalContentAlignment="Stretch" Grid.IsSharedSizeScope="True">
  <!-- Style to increase the tab header height (approx.3x default) -->
  <TabControl.Resources>
  <Style TargetType="TabItem">
@@ -59,7 +53,7 @@
  <dev:PlcTestView HorizontalAlignment="Stretch" />
  </TabItem>
  <!-- New Parameter tab -->
- <TabItem>
+ <TabItem x:Name="tabParameter">
  <TabItem.Header>
  <Grid>
  <Grid.ColumnDefinitions>

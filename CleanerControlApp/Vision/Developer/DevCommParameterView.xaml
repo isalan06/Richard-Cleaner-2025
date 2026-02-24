@@ -1,0 +1,246 @@
+﻿<UserControl x:Class="CleanerControlApp.Vision.Developer.DevCommParameterView"
+ xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+ xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+ xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+ mc:Ignorable="d" d:DesignHeight="300" d:DesignWidth="400">
+ <Grid Background="White" Margin="0,0,-47,-277">
+ <Grid.RowDefinitions>
+ <RowDefinition Height="Auto" />
+ <RowDefinition Height="Auto" />
+ <RowDefinition Height="*" />
+ </Grid.RowDefinitions>
+
+ <!-- Main title above the boxes with action buttons next to the title -->
+ <Grid Grid.Row="0" Margin="8,8,8,6">
+ <Grid.ColumnDefinitions>
+ <ColumnDefinition Width="Auto" />
+ <ColumnDefinition Width="Auto" />
+ <ColumnDefinition Width="*" />
+ </Grid.ColumnDefinitions>
+ <TextBlock Grid.Column="0" Text="通訊參數" FontSize="16" FontWeight="Bold" HorizontalAlignment="Left" VerticalAlignment="Center" />
+ <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center">
+ <Button x:Name="BtnLoadParams" Content="讀取參數" Padding="8,4" Margin="8,0,6,0" Click="BtnLoadParams_Click" />
+ <Button x:Name="BtnSaveParams" Content="寫入參數" Padding="8,4" Click="BtnSaveParams_Click" />
+ </StackPanel>
+ </Grid>
+
+ <!-- Top area with two boxes: left and right -->
+ <Grid Grid.Row="1" Margin="8">
+ <Grid.ColumnDefinitions>
+ <ColumnDefinition Width="192" />
+ <ColumnDefinition Width="220" />
+ </Grid.ColumnDefinitions>
+
+ <!-- Left box: include PLC title and Modbus TCP parameters inside this box -->
+ <Border Grid.Column="0" Background="#FFF8F8F8" BorderBrush="#FFBDBDBD" BorderThickness="1" CornerRadius="6" Padding="8" Margin="0,0,6,0">
+ <StackPanel>
+ <TextBlock FontWeight="Bold" FontSize="14" VerticalAlignment="Center" HorizontalAlignment="Left" ><Run Text="三菱 PLC"/><Run Language="zh-tw" Text=" "/><Run Text="連線參數"/></TextBlock>
+
+ <!-- Modbus TCP parameters placed under the PLC title -->
+ <StackPanel Margin="0,8,0,0">
+ <Grid>
+ <Grid.ColumnDefinitions>
+ <ColumnDefinition Width="Auto" />
+ <ColumnDefinition />
+ </Grid.ColumnDefinitions>
+ <Grid.RowDefinitions>
+ <RowDefinition Height="Auto" />
+ <RowDefinition Height="Auto" />
+ </Grid.RowDefinitions>
+
+ <!-- Left: labels -->
+ <TextBlock Grid.Row="0" Grid.Column="0" Text="IP" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="4,0,8,6" />
+ <TextBlock Grid.Row="1" Grid.Column="0" Text="Port" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="4,0,8,0" />
+
+ <!-- Right: input boxes (will be initialized from appsettings.json in code-behind) -->
+ <TextBox x:Name="TxtModbusIP" Grid.Row="0" Grid.Column="1" Text="192.168.3.20" Margin="0,0,0,6" HorizontalAlignment="Stretch" />
+ <TextBox x:Name="TxtModbusPort" Grid.Row="1" Grid.Column="1" Text="502" Margin="0,0,0,0" HorizontalAlignment="Stretch" />
+
+ </Grid>
+ </StackPanel>
+ </StackPanel>
+ </Border>
+
+ <!-- Right box: Modbus RTU parameters -->
+ <Border Grid.Column="1" Background="#FFF8F8F8" BorderBrush="#FFBDBDBD" BorderThickness="1" CornerRadius="6" Padding="8" Margin="6,0,0,0">
+ <StackPanel>
+ <TextBlock Text="Modbus RTU Test" FontWeight="Bold" FontSize="14" VerticalAlignment="Center" HorizontalAlignment="Left" />
+
+ <!-- Parameters (labels left, inputs right) -->
+ <Grid Margin="0,8,0,0">
+ <Grid.ColumnDefinitions>
+ <ColumnDefinition Width="90" />
+ <ColumnDefinition Width="*" />
+ </Grid.ColumnDefinitions>
+ <Grid.RowDefinitions>
+ <RowDefinition Height="Auto" />
+ <RowDefinition Height="Auto" />
+ <RowDefinition Height="Auto" />
+ <RowDefinition Height="Auto" />
+ <RowDefinition Height="Auto" />
+ </Grid.RowDefinitions>
+
+ <TextBlock Grid.Row="0" Grid.Column="0" Text="PortName:" VerticalAlignment="Center" />
+ <ComboBox x:Name="cmbRTUPortName" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Stretch" Margin="0,0,0,2"/>
+
+ <TextBlock Grid.Row="1" Grid.Column="0" Text="Baudrate:" VerticalAlignment="Center" />
+ <ComboBox x:Name="cmbRTUBaudRate" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Stretch" Margin="0,0,0,2"/>
+
+ <TextBlock Grid.Row="2" Grid.Column="0" Text="Parity:" VerticalAlignment="Center" />
+ <ComboBox x:Name="cmbRTUParity" Grid.Row="2" Grid.Column="1" HorizontalAlignment="Stretch" Margin="0,0,0,2"/>
+
+ <TextBlock Grid.Row="3" Grid.Column="0" Text="DataBits:" VerticalAlignment="Center" />
+ <ComboBox x:Name="cmbRTUDataBits" Grid.Row="3" Grid.Column="1" HorizontalAlignment="Stretch" Margin="0,0,0,2"/>
+
+ <TextBlock Grid.Row="4" Grid.Column="0" Text="StopBit:" VerticalAlignment="Center" />
+ <ComboBox x:Name="cmbRTUStopBit" Grid.Row="4" Grid.Column="1" HorizontalAlignment="Stretch" />
+ </Grid>
+
+ </StackPanel>
+ </Border>
+ </Grid>
+
+ <!-- New box below the top two boxes -->
+ <Grid Grid.Row="2" Margin="8,0,8,8">
+ <Border Background="#FFF8F8F8" BorderBrush="#FFBDBDBD" BorderThickness="1" CornerRadius="6" Padding="8" Width="431" HorizontalAlignment="Left">
+ <StackPanel>
+ <TextBlock Text="超音波/變頻器/溫控器連線參數" FontWeight="Bold" FontSize="14" HorizontalAlignment="Left" Margin="0,0,0,6" />
+ <!--2x2 grid of parameter boxes -->
+ <Grid>
+ <Grid.RowDefinitions>
+ <RowDefinition Height="Auto" />
+ <RowDefinition Height="Auto" />
+ </Grid.RowDefinitions>
+ <Grid.ColumnDefinitions>
+ <ColumnDefinition Width="206.5" />
+ <ColumnDefinition Width="206.5" />
+ </Grid.ColumnDefinitions>
+
+ <!-- Port1 -->
+ <Border Grid.Row="0" Grid.Column="0" Background="#FFFFFFFF" BorderBrush="#FFBDBDBD" BorderThickness="1" CornerRadius="6" Padding="8" Margin="4">
+ <StackPanel>
+ <TextBlock Text="Port1 -變頻器1" FontWeight="Bold" FontSize="12" Margin="0,0,0,6" />
+ <Grid>
+ <Grid.ColumnDefinitions>
+ <ColumnDefinition Width="90" />
+ <ColumnDefinition Width="90.5" />
+ </Grid.ColumnDefinitions>
+ <Grid.RowDefinitions>
+ <RowDefinition Height="Auto" />
+ <RowDefinition Height="Auto" />
+ <RowDefinition Height="Auto" />
+ <RowDefinition Height="Auto" />
+ <RowDefinition Height="Auto" />
+ </Grid.RowDefinitions>
+ <TextBlock Grid.Row="0" Grid.Column="0" Text="PortName:" VerticalAlignment="Center" />
+ <ComboBox x:Name="cmbPool1PortName" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Stretch" Margin="0,0,0,2" />
+ <TextBlock Grid.Row="1" Grid.Column="0" Text="Baudrate:" VerticalAlignment="Center" />
+ <ComboBox x:Name="cmbPool1BaudRate" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Stretch" Margin="0,0,0,2" />
+ <TextBlock Grid.Row="2" Grid.Column="0" Text="Parity:" VerticalAlignment="Center" />
+ <ComboBox x:Name="cmbPool1Parity" Grid.Row="2" Grid.Column="1" HorizontalAlignment="Stretch" Margin="0,0,0,2" />
+ <TextBlock Grid.Row="3" Grid.Column="0" Text="DataBits:" VerticalAlignment="Center" />
+ <ComboBox x:Name="cmbPool1DataBits" Grid.Row="3" Grid.Column="1" HorizontalAlignment="Stretch" Margin="0,0,0,2" />
+ <TextBlock Grid.Row="4" Grid.Column="0" Text="StopBit:" VerticalAlignment="Center" />
+ <ComboBox x:Name="cmbPool1StopBit" Grid.Row="4" Grid.Column="1" HorizontalAlignment="Stretch" />
+ </Grid>
+ </StackPanel>
+ </Border>
+
+ <!-- Port2 -->
+ <Border Grid.Row="0" Grid.Column="1" Background="#FFFFFFFF" BorderBrush="#FFBDBDBD" BorderThickness="1" CornerRadius="6" Padding="8" Margin="4">
+ <StackPanel>
+ <TextBlock Text="Port2 -變頻器2" FontWeight="Bold" FontSize="12" Margin="0,0,0,6" />
+ <Grid>
+ <Grid.ColumnDefinitions>
+ <ColumnDefinition Width="90" />
+ <ColumnDefinition Width="90.5" />
+ </Grid.ColumnDefinitions>
+ <Grid.RowDefinitions>
+ <RowDefinition Height="Auto" />
+ <RowDefinition Height="Auto" />
+ <RowDefinition Height="Auto" />
+ <RowDefinition Height="Auto" />
+ <RowDefinition Height="Auto" />
+ </Grid.RowDefinitions>
+ <TextBlock Grid.Row="0" Grid.Column="0" Text="PortName:" VerticalAlignment="Center" />
+ <ComboBox x:Name="cmbPool2PortName" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Stretch" Margin="0,0,0,2" />
+ <TextBlock Grid.Row="1" Grid.Column="0" Text="Baudrate:" VerticalAlignment="Center" />
+ <ComboBox x:Name="cmbPool2BaudRate" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Stretch" Margin="0,0,0,2" />
+ <TextBlock Grid.Row="2" Grid.Column="0" Text="Parity:" VerticalAlignment="Center" />
+ <ComboBox x:Name="cmbPool2Parity" Grid.Row="2" Grid.Column="1" HorizontalAlignment="Stretch" Margin="0,0,0,2" />
+ <TextBlock Grid.Row="3" Grid.Column="0" Text="DataBits:" VerticalAlignment="Center" />
+ <ComboBox x:Name="cmbPool2DataBits" Grid.Row="3" Grid.Column="1" HorizontalAlignment="Stretch" Margin="0,0,0,2" />
+ <TextBlock Grid.Row="4" Grid.Column="0" Text="StopBit:" VerticalAlignment="Center" />
+ <ComboBox x:Name="cmbPool2StopBit" Grid.Row="4" Grid.Column="1" HorizontalAlignment="Stretch" />
+ </Grid>
+ </StackPanel>
+ </Border>
+
+ <!-- Port3 -->
+ <Border Grid.Row="1" Grid.Column="0" Background="#FFFFFFFF" BorderBrush="#FFBDBDBD" BorderThickness="1" CornerRadius="6" Padding="8" Margin="4">
+ <StackPanel>
+ <TextBlock Text="Port3 - 溫控器" FontWeight="Bold" FontSize="12" Margin="0,0,0,6" />
+ <Grid>
+ <Grid.ColumnDefinitions>
+ <ColumnDefinition Width="90" />
+ <ColumnDefinition Width="90.5" />
+ </Grid.ColumnDefinitions>
+ <Grid.RowDefinitions>
+ <RowDefinition Height="Auto" />
+ <RowDefinition Height="Auto" />
+ <RowDefinition Height="Auto" />
+ <RowDefinition Height="Auto" />
+ <RowDefinition Height="Auto" />
+ </Grid.RowDefinitions>
+ <TextBlock Grid.Row="0" Grid.Column="0" Text="PortName:" VerticalAlignment="Center" />
+ <ComboBox x:Name="cmbPool3PortName" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Stretch" Margin="0,0,0,2" />
+ <TextBlock Grid.Row="1" Grid.Column="0" Text="Baudrate:" VerticalAlignment="Center" />
+ <ComboBox x:Name="cmbPool3BaudRate" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Stretch" Margin="0,0,0,2" />
+ <TextBlock Grid.Row="2" Grid.Column="0" Text="Parity:" VerticalAlignment="Center" />
+ <ComboBox x:Name="cmbPool3Parity" Grid.Row="2" Grid.Column="1" HorizontalAlignment="Stretch" Margin="0,0,0,2" />
+ <TextBlock Grid.Row="3" Grid.Column="0" Text="DataBits:" VerticalAlignment="Center" />
+ <ComboBox x:Name="cmbPool3DataBits" Grid.Row="3" Grid.Column="1" HorizontalAlignment="Stretch" Margin="0,0,0,2" />
+ <TextBlock Grid.Row="4" Grid.Column="0" Text="StopBit:" VerticalAlignment="Center" />
+ <ComboBox x:Name="cmbPool3StopBit" Grid.Row="4" Grid.Column="1" HorizontalAlignment="Stretch" />
+ </Grid>
+ </StackPanel>
+ </Border>
+
+ <!-- Port4 -->
+ <Border Grid.Row="1" Grid.Column="1" Background="#FFFFFFFF" BorderBrush="#FFBDBDBD" BorderThickness="1" CornerRadius="6" Padding="8" Margin="4">
+ <StackPanel>
+ <TextBlock Text="Port4 - 超音波" FontWeight="Bold" FontSize="12" Margin="0,0,0,6" />
+ <Grid>
+ <Grid.ColumnDefinitions>
+ <ColumnDefinition Width="90" />
+ <ColumnDefinition Width="90.5" />
+ </Grid.ColumnDefinitions>
+ <Grid.RowDefinitions>
+ <RowDefinition Height="Auto" />
+ <RowDefinition Height="Auto" />
+ <RowDefinition Height="Auto" />
+ <RowDefinition Height="Auto" />
+ <RowDefinition Height="Auto" />
+ </Grid.RowDefinitions>
+ <TextBlock Grid.Row="0" Grid.Column="0" Text="PortName:" VerticalAlignment="Center" />
+ <ComboBox x:Name="cmbPool4PortName" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Stretch" Margin="0,0,0,2" />
+ <TextBlock Grid.Row="1" Grid.Column="0" Text="Baudrate:" VerticalAlignment="Center" />
+ <ComboBox x:Name="cmbPool4BaudRate" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Stretch" Margin="0,0,0,2" />
+ <TextBlock Grid.Row="2" Grid.Column="0" Text="Parity:" VerticalAlignment="Center" />
+ <ComboBox x:Name="cmbPool4Parity" Grid.Row="2" Grid.Column="1" HorizontalAlignment="Stretch" Margin="0,0,0,2" />
+ <TextBlock Grid.Row="3" Grid.Column="0" Text="DataBits:" VerticalAlignment="Center" />
+ <ComboBox x:Name="cmbPool4DataBits" Grid.Row="3" Grid.Column="1" HorizontalAlignment="Stretch" Margin="0,0,0,2" />
+ <TextBlock Grid.Row="4" Grid.Column="0" Text="StopBit:" VerticalAlignment="Center" />
+ <ComboBox x:Name="cmbPool4StopBit" Grid.Row="4" Grid.Column="1" HorizontalAlignment="Stretch" />
+ </Grid>
+ </StackPanel>
+ </Border>
+
+ </Grid>
+ </StackPanel>
+ </Border>
+ </Grid>
+
+ </Grid>
+</UserControl>

@@ -8,6 +8,7 @@ using System.Configuration;
 using System.Data;
 using System.Runtime.InteropServices;
 using System.Windows;
+using System.IO.Ports;
 
 using SQLitePCL;
 using CleanerControlApp.Vision;
@@ -99,11 +100,94 @@ namespace CleanerControlApp
                         services.AddSingleton<UserManager>(); // 註冊 UserManager 為 Singleton
                         services.AddTransient<LoginWindow>(); // 改為 Transient
                         services.AddSingleton<MainWindow>(); // 註冊 MainWindow 為 Singleton
-                        services.AddSingleton<IModbusTCPService, ModbusTCPService>(); // 註冊 ModbusTCPService 為 Singleton
+                        services.AddSingleton<IModbusTCPService>(sp =>
+                        {
+                            // Read configuration values
+                            var cfgSection = hostContext.Configuration.GetSection("CommunicationSettings:ModbusTCPParameter");
+                            var ip = cfgSection.GetValue<string>("IP");
+                            var port = cfgSection.GetValue<int>("Port");
+
+                            // Resolve logger (ILogger<T> is provided by the host)
+                            var logger = sp.GetService<ILogger<ModbusTCPService>>();
+
+                            // Create instance and apply settings
+                            ModbusTCPService svc;
+                            if (logger != null)
+                                svc = new ModbusTCPService(logger);
+                            else
+                                svc = new ModbusTCPService();
+
+                            if (!string.IsNullOrWhiteSpace(ip))
+                                svc.Ip = ip!;
+                            if (port >0)
+                                svc.Port = port;
+
+                            return svc as IModbusTCPService;
+                        });
                         services.AddSingleton<IPLCService, PLCService>();
                         // Also register IPLCOperator to resolve to the same PLCService singleton implementation
                         services.AddSingleton<IPLCOperator>(sp => (IPLCOperator)sp.GetRequiredService<IPLCService>());
-                        services.AddSingleton<IModbusRTUService, ModbusRTUService>();
+
+                        // Register ModbusRTUService using factory and apply serial settings from configuration
+                        services.AddSingleton<IModbusRTUService>(sp =>
+                        {
+                            var cfg = hostContext.Configuration.GetSection("CommunicationSettings:ModbusRTUParameter");
+                            var portName = cfg.GetValue<string>("PortName");
+                            var baud = cfg.GetValue<int>("Baudrate");
+                            var parityStr = cfg.GetValue<string>("Parity");
+                            var dataBits = cfg.GetValue<int>("DataBits");
+                            var stopBitVal = cfg.GetValue<int>("StopBit");
+
+                            var logger = sp.GetService<ILogger<ModbusRTUService>>();
+
+                            ModbusRTUService svc;
+                            if (logger != null)
+                                svc = new ModbusRTUService(logger);
+                            else
+                                svc = new ModbusRTUService();
+
+                            if (!string.IsNullOrWhiteSpace(portName))
+                                svc.PortName = portName!;
+
+                            if (baud >0)
+                                svc.BaudRate = baud;
+
+                            if (dataBits >0)
+                                svc.DataBits = dataBits;
+
+                            // parse parity
+                            if (!string.IsNullOrWhiteSpace(parityStr))
+                            {
+                                if (Enum.TryParse<System.IO.Ports.Parity>(parityStr, true, out var parity))
+                                {
+                                    svc.Parity = parity;
+                                }
+                                else
+                                {
+                                    // fallback mapping for common names
+                                    switch (parityStr.Trim().ToLowerInvariant())
+                                    {
+                                        case "none": svc.Parity = System.IO.Ports.Parity.None; break;
+                                        case "odd": svc.Parity = System.IO.Ports.Parity.Odd; break;
+                                        case "even": svc.Parity = System.IO.Ports.Parity.Even; break;
+                                        case "mark": svc.Parity = System.IO.Ports.Parity.Mark; break;
+                                        case "space": svc.Parity = System.IO.Ports.Parity.Space; break;
+                                    }
+                                }
+                            }
+
+                            // map stop bit value to StopBits enum
+                            switch (stopBitVal)
+                            {
+                                case 0: svc.StopBits = StopBits.None; break;
+                                case 1: svc.StopBits = StopBits.One; break;
+                                case 2: svc.StopBits = StopBits.Two; break;
+                                case 3: svc.StopBits = StopBits.OnePointFive; break;
+                                default: svc.StopBits = StopBits.One; break;
+                            }
+
+                            return svc as IModbusRTUService;
+                        });
 
                         // ILogger<ModbusRTUPoolService> will be resolved from DI; provide the int explicitly.
                         services.AddSingleton<IModbusRTUPollService>(sp =>
