@@ -95,8 +95,24 @@ namespace CleanerControlApp
                     })
                     .ConfigureServices((hostContext, services) =>
                     {
+                        // 這裡的 hostContext.Configuration 已經包含了 appsettings.json 的設定，可以直接使用
+                        var configuration = hostContext.Configuration;
+
+                        ConfigLoader.Load();
+
+                        // 預先載入設定並綁定到 AppSettings 類別，確保在註冊服務前就有設定物件可用
+                        var settings = new AppSettings();
+                        settings = ConfigLoader.GetSettings();
+
+                        // 同樣載入通訊設定，確保在註冊服務前就有設定物件可用
+                        var communicationSettings = new CommunicationSettings();
+                        communicationSettings = ConfigLoader.GetCommunicationSettings();
+
                         // 註冊設定物件
                         services.Configure<AppSettings>(hostContext.Configuration.GetSection("AppSettings"));
+                        services.AddSingleton(settings); // 直接註冊已經綁定的設定物件，讓它可以被注入到需要的地方
+                        services.Configure<CommunicationSettings>(hostContext.Configuration.GetSection("CommunicationSettings"));
+                        services.AddSingleton(communicationSettings); // 直接註冊已經綁定的通訊設定物件，讓它可以被注入到需要的地方
                         services.AddSingleton<UserManager>(); // 註冊 UserManager 為 Singleton
                         services.AddTransient<LoginWindow>(); // 改為 Transient
                         services.AddSingleton<MainWindow>(); // 註冊 MainWindow 為 Singleton
@@ -104,8 +120,8 @@ namespace CleanerControlApp
                         {
                             // Read configuration values
                             var cfgSection = hostContext.Configuration.GetSection("CommunicationSettings:ModbusTCPParameter");
-                            var ip = cfgSection.GetValue<string>("IP");
-                            var port = cfgSection.GetValue<int>("Port");
+                            var ip = (communicationSettings.ModbusTCPParameter == null) ? "127.0.0.1" : communicationSettings.ModbusTCPParameter.IP; // 直接從已綁定的設定物件讀取
+                            var port = (communicationSettings.ModbusTCPParameter == null) ? 502 : communicationSettings.ModbusTCPParameter.Port; // 直接從已綁定的設定物件讀取
 
                             // Resolve logger (ILogger<T> is provided by the host)
                             var logger = sp.GetService<ILogger<ModbusTCPService>>();
@@ -131,12 +147,13 @@ namespace CleanerControlApp
                         // Register ModbusRTUService using factory and apply serial settings from configuration
                         services.AddSingleton<IModbusRTUService>(sp =>
                         {
-                            var cfg = hostContext.Configuration.GetSection("CommunicationSettings:ModbusRTUParameter");
-                            var portName = cfg.GetValue<string>("PortName");
-                            var baud = cfg.GetValue<int>("Baudrate");
-                            var parityStr = cfg.GetValue<string>("Parity");
-                            var dataBits = cfg.GetValue<int>("DataBits");
-                            var stopBitVal = cfg.GetValue<int>("StopBit");
+                            //var cfg = hostContext.Configuration.GetSection("CommunicationSettings:ModbusRTUParameter");
+                            var cfg = communicationSettings.ModbusRTUParameter; // 直接從已綁定的設定物件讀取
+                            var portName = string.IsNullOrWhiteSpace(cfg?.PortName) ? "COM1" : cfg!.PortName;
+                            var baud = (cfg?.BaudRate ?? 0) > 0 ? cfg!.BaudRate : 9600;
+                            var parityStr = string.IsNullOrWhiteSpace(cfg?.Parity) ? "None" : cfg!.Parity;
+                            var dataBits = (cfg?.DataBits ?? 0) > 0 ? cfg!.DataBits : 8;
+                            var stopBitVal = (cfg?.StopBits ?? 0) > 0 ? cfg!.StopBits : 1;
 
                             var logger = sp.GetService<ILogger<ModbusRTUService>>();
 
@@ -191,7 +208,7 @@ namespace CleanerControlApp
 
                         // ILogger<ModbusRTUPoolService> will be resolved from DI; provide the int explicitly.
                         services.AddSingleton<IModbusRTUPollService>(sp =>
-                            new ModbusRTUPoolService(sp.GetRequiredService<ILogger<ModbusRTUPoolService>>(),6));
+                            new ModbusRTUPoolService(sp.GetRequiredService<ILogger<ModbusRTUPoolService>>(),4));
                     })
                     .Build();
             }

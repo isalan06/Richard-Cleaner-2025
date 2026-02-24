@@ -20,8 +20,8 @@
  </Grid.ColumnDefinitions>
  <TextBlock Grid.Column="0" Text="通訊參數" FontSize="16" FontWeight="Bold" HorizontalAlignment="Left" VerticalAlignment="Center" />
  <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center">
- <Button x:Name="BtnLoadParams" Content="讀取參數" Padding="8,4" Margin="8,0,6,0" Click="BtnLoadParams_Click" />
- <Button x:Name="BtnSaveParams" Content="寫入參數" Padding="8,4" Click="BtnSaveParams_Click" />
+ <Button x:Name="BtnLoadParams" Content="讀取參數檔" Padding="8,4" Margin="8,0,6,0" Click="BtnLoadParams_Click" />
+ <Button x:Name="BtnSaveParams" Content="寫入參數檔" Padding="8,4" Click="BtnSaveParams_Click" />
  </StackPanel>
  </Grid>
 
