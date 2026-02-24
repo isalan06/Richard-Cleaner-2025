@@ -8,6 +8,7 @@ using System.IO.Ports;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Threading;
 
 
 namespace CleanerControlApp.Modules.Modbus.Services
@@ -18,17 +19,71 @@ namespace CleanerControlApp.Modules.Modbus.Services
 
         private SerialPort _serialPort = new SerialPort();
 
-        public string PortName { get; set; } = "COM1";
-        public int BaudRate { get; set; } = 230400;
-        public Parity Parity { get; set; } = Parity.Even;
-        public int DataBits { get; set; } = 8;
-        public StopBits StopBits { get; set; } = StopBits.One;
+        private string _portName = "COM1";
+        public string PortName
+        {
+            get => _portName;
+            set
+            {
+                if (string.Equals(_portName, value, StringComparison.Ordinal)) return;
+                _portName = value;
+                ApplySettingsToSerialPort();
+            }
+        }
+
+        private int _baudRate =230400;
+        public int BaudRate
+        {
+            get => _baudRate;
+            set
+            {
+                if (_baudRate == value) return;
+                _baudRate = value;
+                ApplySettingsToSerialPort();
+            }
+        }
+
+        private Parity _parity = Parity.Even;
+        public Parity Parity
+        {
+            get => _parity;
+            set
+            {
+                if (_parity == value) return;
+                _parity = value;
+                ApplySettingsToSerialPort();
+            }
+        }
+
+        private int _dataBits =8;
+        public int DataBits
+        {
+            get => _dataBits;
+            set
+            {
+                if (_dataBits == value) return;
+                _dataBits = value;
+                ApplySettingsToSerialPort();
+            }
+        }
+
+        private StopBits _stopBits = StopBits.One;
+        public StopBits StopBits
+        {
+            get => _stopBits;
+            set
+            {
+                if (_stopBits == value) return;
+                _stopBits = value;
+                ApplySettingsToSerialPort();
+            }
+        }
 
         public bool IsRunning { get; internal set; } = false;
 
         private IModbusSerialMaster? _master = null;
 
-        public int Timeout { get; set; } = 5000;
+        public int Timeout { get; set; } =5000;
 
         private bool _readResult = false;
         private ushort[]? _readData = null;
@@ -38,12 +93,14 @@ namespace CleanerControlApp.Modules.Modbus.Services
 
         private CancellationTokenSource source = new CancellationTokenSource();
 
-        public static double InterFrameActMilliseconds = 0.0; // Modbus RTU inter-frame Act in milliseconds
-        public static double FrameReadMilliseconds = 0.0; // Modbus RTU frame read in milliseconds
+        public static double InterFrameActMilliseconds =0.0; // Modbus RTU inter-frame Act in milliseconds
+        public static double FrameReadMilliseconds =0.0; // Modbus RTU frame read in milliseconds
 
         private DateTime dt_next = DateTime.Now;
 
         private readonly ILogger<ModbusRTUService>? _logger;
+
+        private readonly object _sync = new object();
 
         #endregion
 
@@ -53,9 +110,11 @@ namespace CleanerControlApp.Modules.Modbus.Services
         {
             _serialPort.DataReceived += _serialPort_DataReceived;
             _master = ModbusSerialMaster.CreateRtu(_serialPort);
+            // apply initial settings
+            ApplySettingsToSerialPort(doNotReopen: true);
         }
 
-        public ModbusRTUService(ILogger<ModbusRTUService>? logger) : this() 
+        public ModbusRTUService(ILogger<ModbusRTUService>? logger) : this()
         { _logger = logger; }
 
         #endregion
@@ -73,16 +132,16 @@ namespace CleanerControlApp.Modules.Modbus.Services
                     // TODO: 處置受控狀態 (受控物件)
                     source.Cancel();
                     IsRunning = false;
-                    _serialPort.Dispose();
+                    try { _serialPort?.Dispose(); } catch { }
                 }
 
-                // TODO: 釋出非受控資源 (非受控物件) 並覆寫完成項
+                // TODO:釋出非受控資源 (非受控物件) 並覆寫完成項
                 // TODO: 將大型欄位設為 Null
                 disposedValue = true;
             }
         }
 
-        // // TODO: 僅有當 'Dispose(bool disposing)' 具有會釋出非受控資源的程式碼時，才覆寫完成項
+        // // TODO: 僅有當 'Dispose(bool disposing)'具有會釋出非受控資源的程式碼時，才覆寫完成項
         ~ModbusRTUService()
         {
             // 請勿變更此程式碼。請將清除程式碼放入 'Dispose(bool disposing)' 方法
@@ -102,7 +161,7 @@ namespace CleanerControlApp.Modules.Modbus.Services
 
         private void _serialPort_DataReceived(object sender, SerialDataReceivedEventArgs e)
         {
-            
+
         }
 
         #endregion
@@ -132,6 +191,49 @@ namespace CleanerControlApp.Modules.Modbus.Services
 
         #region Functions
 
+        private void ApplySettingsToSerialPort(bool doNotReopen = false)
+        {
+            lock (_sync)
+            {
+                bool wasOpen = false;
+                try
+                {
+                    wasOpen = _serialPort.IsOpen;
+                }
+                catch { wasOpen = false; }
+
+                try
+                {
+                    if (wasOpen)
+                    {
+                        try { _serialPort.Close(); } catch { }
+                    }
+
+                    _serialPort.PortName = _portName ?? "";
+                    _serialPort.BaudRate = _baudRate;
+                    _serialPort.Parity = _parity;
+                    _serialPort.DataBits = _dataBits;
+                    _serialPort.StopBits = _stopBits;
+
+                    // keep reasonable timeouts
+                    _serialPort.ReadTimeout =1000;
+                    _serialPort.WriteTimeout =1000;
+
+                    if (wasOpen && !doNotReopen)
+                    {
+                        try { _serialPort.Open(); } catch (Exception ex)
+                        {
+                            if (_logger != null) _logger.LogWarning(ex, "Failed to reopen serial port after applying settings");
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    if (_logger != null) _logger.LogError(ex, "Error applying serial port settings");
+                }
+            }
+        }
+
         public bool Open()
         {
             bool result = false;
@@ -140,13 +242,9 @@ namespace CleanerControlApp.Modules.Modbus.Services
             {
                 try
                 {
-                    _serialPort.PortName = PortName;
-                    _serialPort.BaudRate = BaudRate;
-                    _serialPort.Parity = Parity;
-                    _serialPort.DataBits = DataBits;
-                    _serialPort.StopBits = StopBits;
-                    _serialPort.ReadTimeout = 1000;
-                    _serialPort.WriteTimeout = 1000;
+                    // ensure serial port uses current properties
+                    ApplySettingsToSerialPort(doNotReopen: true);
+
                     _serialPort.Open();
                     result = true;
                     IsRunning = true;
@@ -198,7 +296,7 @@ namespace CleanerControlApp.Modules.Modbus.Services
             if (command != null && command.EmptyCommand)
             {
                 _frame = new ModbusRTUFrame(command);
-                _frame.DataNumber = 0;
+                _frame.DataNumber =0;
                 _frame.HasResponse = true;
                 return _frame;
             }
@@ -229,18 +327,17 @@ namespace CleanerControlApp.Modules.Modbus.Services
                             break;
 
                         case 0x6:
-                            if (_frame.Data != null && _frame.Data.Length > 0)
+                            if (_frame.Data != null && _frame.Data.Length >0)
                                 await _master.WriteSingleRegisterAsync(_frame.SlaveAddress, _frame.StartAddress, _frame.Data[0]);
                             break;
 
                         case 0x10:
-                            if (_frame.Data != null && _frame.Data.Length > 0)
+                            if (_frame.Data != null && _frame.Data.Length >0)
                                 await _master.WriteMultipleRegistersAsync(_frame.SlaveAddress, _frame.StartAddress, _frame.Data);
                             break;
                     }
                 }
 
-                
 
                 FrameReadMilliseconds = DateTime.Now.Subtract(dt).TotalMilliseconds; // 記錄讀取時間
                 InterFrameActMilliseconds = DateTime.Now.Subtract(dt_next).TotalMilliseconds; // 記錄與上次Act的間隔時間
