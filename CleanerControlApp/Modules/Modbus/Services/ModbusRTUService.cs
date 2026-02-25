@@ -335,53 +335,68 @@ namespace CleanerControlApp.Modules.Modbus.Services
                 _frame = new ModbusRTUFrame(command);
                 _frame.HasResponse = false;
                 _frame.HasException = false;
-
+                _frame.HasTimeout = false;
 
                 DateTime dt = DateTime.Now;
 
                 if (_master != null)
                 {
-                    switch (_frame.FunctionCode)
+                    try
                     {
-                        case 0x1:
-                            var data1 = await _master.ReadCoilsAsync(_frame.SlaveAddress, _frame.StartAddress, _frame.DataNumber);
-                            _frame.Set(data1);
-                            break;
+                        switch (_frame.FunctionCode)
+                        {
+                            case 0x1:
+                                var data1 = await _master.ReadCoilsAsync(_frame.SlaveAddress, _frame.StartAddress, _frame.DataNumber);
+                                _frame.Set(data1);
+                                break;
 
-                        case 0x2:
-                            var data2 = await _master.ReadInputsAsync(_frame.SlaveAddress, _frame.StartAddress, _frame.DataNumber);
-                            _frame.Set(data2);
-                            break;
+                            case 0x2:
+                                var data2 = await _master.ReadInputsAsync(_frame.SlaveAddress, _frame.StartAddress, _frame.DataNumber);
+                                _frame.Set(data2);
+                                break;
 
-                        case 0x3:
-                            var data3 = await _master.ReadHoldingRegistersAsync(_frame.SlaveAddress, _frame.StartAddress, _frame.DataNumber);
-                            _frame.Set(data3);
-                            break;
+                            case 0x3:
+                                var data3 = await _master.ReadHoldingRegistersAsync(_frame.SlaveAddress, _frame.StartAddress, _frame.DataNumber);
+                                _frame.Set(data3);
+                                break;
 
-                        case 0x4:
-                            var data4 = await _master.ReadInputRegistersAsync(_frame.SlaveAddress, _frame.StartAddress, _frame.DataNumber);
-                            _frame.Set(data4);
-                            break;
+                            case 0x4:
+                                var data4 = await _master.ReadInputRegistersAsync(_frame.SlaveAddress, _frame.StartAddress, _frame.DataNumber);
+                                _frame.Set(data4);
+                                break;
 
-                        case 0x5:
-                            if (_frame.BoolData != null && _frame.BoolData.Length > 0)
-                                await _master.WriteSingleCoilAsync(_frame.SlaveAddress, _frame.StartAddress, _frame.BoolData[0]);
-                            break;
+                            case 0x5:
+                                if (_frame.BoolData != null && _frame.BoolData.Length > 0)
+                                    await _master.WriteSingleCoilAsync(_frame.SlaveAddress, _frame.StartAddress, _frame.BoolData[0]);
+                                break;
 
-                        case 0x6:
-                            if (_frame.Data != null && _frame.Data.Length >0)
-                                await _master.WriteSingleRegisterAsync(_frame.SlaveAddress, _frame.StartAddress, _frame.Data[0]);
-                            break;
+                            case 0x6:
+                                if (_frame.Data != null && _frame.Data.Length > 0)
+                                    await _master.WriteSingleRegisterAsync(_frame.SlaveAddress, _frame.StartAddress, _frame.Data[0]);
+                                break;
 
-                        case 0xF:
-                            if (_frame.BoolData != null && _frame.BoolData.Length > 0)
-                                await _master.WriteMultipleCoilsAsync(_frame.SlaveAddress, _frame.StartAddress, _frame.BoolData);
-                            break;
+                            case 0xF:
+                                if (_frame.BoolData != null && _frame.BoolData.Length > 0)
+                                    await _master.WriteMultipleCoilsAsync(_frame.SlaveAddress, _frame.StartAddress, _frame.BoolData);
+                                break;
 
-                        case 0x10:
-                            if (_frame.Data != null && _frame.Data.Length >0)
-                                await _master.WriteMultipleRegistersAsync(_frame.SlaveAddress, _frame.StartAddress, _frame.Data);
-                            break;
+                            case 0x10:
+                                if (_frame.Data != null && _frame.Data.Length > 0)
+                                    await _master.WriteMultipleRegistersAsync(_frame.SlaveAddress, _frame.StartAddress, _frame.Data);
+                                break;
+                        }
+                    }
+                    catch (TimeoutException)
+                    { 
+                        _frame.HasTimeout = true;
+                    }
+                    catch(Exception ex)
+                    {
+                        _frame.HasException = true;
+                        if (_logger != null)
+                            _logger.LogError(ex, $"Error during Modbus RTU Act: {ex.Message}");
+                        else
+                            Console.WriteLine(ex.Message);
                     }
                 }
 

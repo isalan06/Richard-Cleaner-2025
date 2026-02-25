@@ -17,6 +17,8 @@ using CleanerControlApp.Modules.Modbus.Interfaces;
 using CleanerControlApp.Modules.Modbus.Services;
 using CleanerControlApp.Modules.MitsubishiPLC.Interfaces;
 using CleanerControlApp.Modules.MitsubishiPLC.Services;
+using CleanerControlApp.Modules.TempatureController.Services;
+using CleanerControlApp.Modules.TempatureController.Interfaces;
 
 namespace CleanerControlApp
 {
@@ -210,8 +212,14 @@ namespace CleanerControlApp
                         // Construct pool service using configured pool parameters (if any)
                         services.AddSingleton<IModbusRTUPollService>(sp =>
                             new ModbusRTUPoolService(sp.GetRequiredService<ILogger<ModbusRTUPoolService>>() , communicationSettings.ModbusRTUPoolParameter));
-                    })
-                    .Build();
+                        // Register TemperatureControllers using a factory so dependencies are resolved explicitly
+                        services.AddSingleton<ITemperatureControllers>(sp =>
+                        new TemperatureControllers(
+                        sp.GetRequiredService<IModbusRTUPollService>(),
+                        sp.GetRequiredService<ILogger<TemperatureControllers>>()
+                        ));
+ })
+ .Build();
             }
             catch (Exception ex)
             {

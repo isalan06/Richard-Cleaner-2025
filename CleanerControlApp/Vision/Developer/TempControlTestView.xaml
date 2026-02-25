@@ -7,9 +7,293 @@
  mc:Ignorable="d"
  d:DesignHeight="300" d:DesignWidth="600">
  <Grid Background="White">
- <TextBlock Text="Temperature Control Test View" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,12,0,0" FontSize="16" FontWeight="Bold" />
- <StackPanel Margin="12,44,12,12">
- <TextBlock Text="This is a placeholder for Temperature Control test UI." />
+ <Grid.ColumnDefinitions>
+ <ColumnDefinition Width="215" />
+ <ColumnDefinition Width="*" />
+ </Grid.ColumnDefinitions>
+ <TextBlock Text="Temperature Control Test" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,12,0,0" FontSize="16" FontWeight="Bold" Grid.ColumnSpan="2" />
+
+ <Border Grid.Column="0" Margin="12,44,6,12" Background="#FFF8F8F8" BorderBrush="#FFCCCCCC" BorderThickness="1" CornerRadius="4" Padding="8">
+ <StackPanel>
+ <TextBlock Text="溫控器通訊集成" FontWeight="Bold" FontSize="14" Margin="0,0,0,8" />
+ <!-- 串列通訊連線狀況 -->
+ <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,4,0,0">
+ <TextBlock Text="串列通訊連線狀況" VerticalAlignment="Center" />
+ <Ellipse x:Name="ellipseRtuStatus" Width="14" Height="14" Margin="8,0,6,0" Fill="Red" Stroke="#FF888888" VerticalAlignment="Center" />
+ <TextBlock x:Name="txtRtuStatus" Text="離線" VerticalAlignment="Center" />
  </StackPanel>
+
+ <!-- Connect / Disconnect buttons -->
+ <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+ <Button x:Name="btnRtuOpen" Content="連線" Width="80" Height="26" Click="BtnRtuOpen_Click" Margin="0,0,8,0" />
+ <Button x:Name="btnRtuClose" Content="離線" Width="80" Height="26" Click="BtnRtuClose_Click" />
+ </StackPanel>
+
+ <!-- 系統運作狀況 -->
+ <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,8,0,0">
+ <TextBlock Text="系統運作狀況" VerticalAlignment="Center" />
+ <Ellipse x:Name="ellipseSystemStatus" Width="14" Height="14" Margin="8,0,6,0" Fill="Red" Stroke="#FF888888" VerticalAlignment="Center" />
+ <TextBlock x:Name="txtSystemStatus" Text="未執行" VerticalAlignment="Center" />
+ </StackPanel>
+
+ <!-- Start/Stop buttons -->
+ <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+ <Button x:Name="btnStart" Content="開始" Width="80" Height="26" Click="BtnStart_Click" Margin="0,0,8,0" />
+ <Button x:Name="btnStop" Content="停止" Width="80" Height="26" Click="BtnStop_Click" />
+ </StackPanel>
+
+ <!-- 可在此添加左側面板的更多控件 -->
+ </StackPanel>
+ </Border>
+
+ <!-- Right large box containing2x2 small boxes -->
+ <Border Grid.Column="1" Margin="6,44,12,12" Background="#FFFDFDFD" BorderBrush="#FFCCCCCC" BorderThickness="1" CornerRadius="4" Padding="8">
+ <Grid>
+ <Grid.RowDefinitions>
+ <RowDefinition Height="*" />
+ <RowDefinition Height="*" />
+ </Grid.RowDefinitions>
+ <Grid.ColumnDefinitions>
+ <ColumnDefinition Width="*" />
+ <ColumnDefinition Width="*" />
+ </Grid.ColumnDefinitions>
+
+ <!-- Small box1 -->
+ <Border Grid.Row="0" Grid.Column="0" Margin="6" Background="#FFF8F8F8" BorderBrush="#FFBBBBBB" BorderThickness="1" CornerRadius="3">
+ <Grid Margin="6">
+ <Grid.RowDefinitions>
+ <RowDefinition Height="Auto" /> <!-- title -->
+ <RowDefinition Height="Auto" /> <!-- status -->
+ <RowDefinition Height="Auto" /> <!-- separator -->
+ <RowDefinition Height="Auto" /> <!-- data -->
+ <RowDefinition Height="Auto" /> <!-- separator/controls -->
+ </Grid.RowDefinitions>
+
+ <TextBlock Grid.Row="0" Text="TC -1" FontWeight="Bold" HorizontalAlignment="Left" />
+ <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,6,0,0">
+ <TextBlock Text="設備連線狀況" VerticalAlignment="Center" />
+ <Ellipse x:Name="ellipseDev0" Width="12" Height="12" Margin="8,0,6,0" Fill="Red" Stroke="#FF888888" VerticalAlignment="Center" />
+ <TextBlock x:Name="txtDevStatus0" Text="未連線" VerticalAlignment="Center" />
+ </StackPanel>
+ <Separator Grid.Row="2" Margin="0,6,0,6" />
+ <Grid Grid.Row="3">
+ <Grid.RowDefinitions>
+ <RowDefinition Height="Auto" />
+ <RowDefinition Height="Auto" />
+ <RowDefinition Height="Auto" />
+ <RowDefinition Height="Auto" />
+ <RowDefinition Height="Auto" />
+ <RowDefinition Height="Auto" />
+ <RowDefinition Height="Auto" />
+ <RowDefinition Height="Auto" />
+ </Grid.RowDefinitions>
+ <Grid.ColumnDefinitions>
+ <ColumnDefinition Width="2*" />
+ <ColumnDefinition Width="3*" />
+ </Grid.ColumnDefinitions>
+ <TextBlock Grid.Row="0" Grid.Column="0" Text="SV - Setting value" />
+ <TextBlock Grid.Row="0" Grid.Column="1" x:Name="txtSV0" Text="-" />
+ <TextBlock Grid.Row="1" Grid.Column="0" Text="PV - Process value" />
+ <TextBlock Grid.Row="1" Grid.Column="1" x:Name="txtPV0" Text="-" />
+ <TextBlock Grid.Row="2" Grid.Column="0" Text="Un - Output volume" />
+ <TextBlock Grid.Row="2" Grid.Column="1" x:Name="txtUn0" Text="-" />
+ <TextBlock Grid.Row="3" Grid.Column="0" Text="Ctu - Process current value" />
+ <TextBlock Grid.Row="3" Grid.Column="1" x:Name="txtCtu0" Text="-" />
+ <TextBlock Grid.Row="4" Grid.Column="0" Text="Status - Out1/Out2/AL1/AL2" />
+ <TextBlock Grid.Row="4" Grid.Column="1" x:Name="txtStatusVal0" Text="-" />
+ <TextBlock Grid.Row="5" Grid.Column="0" Text="AL1 - #1 alarm" />
+ <TextBlock Grid.Row="5" Grid.Column="1" x:Name="txtAL10" Text="-" />
+ <TextBlock Grid.Row="6" Grid.Column="0" Text="AL2 - #2 alarm" />
+ <TextBlock Grid.Row="6" Grid.Column="1" x:Name="txtAL20" Text="-" />
+ <TextBlock Grid.Row="7" Grid.Column="0" Text="HB - Current setting" />
+ <TextBlock Grid.Row="7" Grid.Column="1" x:Name="txtHB0" Text="-" />
+ </Grid>
+
+ <!-- controls under data -->
+ <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,6,0,0">
+ <TextBlock Text="SV:" VerticalAlignment="Center" Margin="0,0,6,0" />
+ <TextBox x:Name="txtSetSV0" Width="80" HorizontalAlignment="Left" />
+ <Button x:Name="btnSetSV0" Content="設定" Width="60" Height="24" Margin="8,0,0,0" Click="BtnSetSV0_Click" />
+ </StackPanel>
+ </Grid>
+ </Border>
+
+ <!-- Small box2 -->
+ <Border Grid.Row="0" Grid.Column="1" Margin="6" Background="#FFF8F8F8" BorderBrush="#FFBBBBBB" BorderThickness="1" CornerRadius="3">
+ <Grid Margin="6">
+ <Grid.RowDefinitions>
+ <RowDefinition Height="Auto" />
+ <RowDefinition Height="Auto" />
+ <RowDefinition Height="Auto" />
+ <RowDefinition Height="Auto" />
+ <RowDefinition Height="Auto" />
+ </Grid.RowDefinitions>
+ <TextBlock Grid.Row="0" Text="TC -2" FontWeight="Bold" HorizontalAlignment="Left" />
+ <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,6,0,0">
+ <TextBlock Text="設備連線狀況" VerticalAlignment="Center" />
+ <Ellipse x:Name="ellipseDev1" Width="12" Height="12" Margin="8,0,6,0" Fill="Red" Stroke="#FF888888" VerticalAlignment="Center" />
+ <TextBlock x:Name="txtDevStatus1" Text="未連線" VerticalAlignment="Center" />
+ </StackPanel>
+ <Separator Grid.Row="2" Margin="0,6,0,6" />
+ <Grid Grid.Row="3">
+ <Grid.RowDefinitions>
+ <RowDefinition Height="Auto" />
+ <RowDefinition Height="Auto" />
+ <RowDefinition Height="Auto" />
+ <RowDefinition Height="Auto" />
+ <RowDefinition Height="Auto" />
+ <RowDefinition Height="Auto" />
+ <RowDefinition Height="Auto" />
+ <RowDefinition Height="Auto" />
+ </Grid.RowDefinitions>
+ <Grid.ColumnDefinitions>
+ <ColumnDefinition Width="2*" />
+ <ColumnDefinition Width="3*" />
+ </Grid.ColumnDefinitions>
+ <TextBlock Grid.Row="0" Grid.Column="0" Text="SV - Setting value" />
+ <TextBlock Grid.Row="0" Grid.Column="1" x:Name="txtSV1" Text="-" />
+ <TextBlock Grid.Row="1" Grid.Column="0" Text="PV - Process value" />
+ <TextBlock Grid.Row="1" Grid.Column="1" x:Name="txtPV1" Text="-" />
+ <TextBlock Grid.Row="2" Grid.Column="0" Text="Un - Output volume" />
+ <TextBlock Grid.Row="2" Grid.Column="1" x:Name="txtUn1" Text="-" />
+ <TextBlock Grid.Row="3" Grid.Column="0" Text="Ctu - Process current value" />
+ <TextBlock Grid.Row="3" Grid.Column="1" x:Name="txtCtu1" Text="-" />
+ <TextBlock Grid.Row="4" Grid.Column="0" Text="Status - Out1/Out2/AL1/AL2" />
+ <TextBlock Grid.Row="4" Grid.Column="1" x:Name="txtStatusVal1" Text="-" />
+ <TextBlock Grid.Row="5" Grid.Column="0" Text="AL1 - #1 alarm" />
+ <TextBlock Grid.Row="5" Grid.Column="1" x:Name="txtAL11" Text="-" />
+ <TextBlock Grid.Row="6" Grid.Column="0" Text="AL2 - #2 alarm" />
+ <TextBlock Grid.Row="6" Grid.Column="1" x:Name="txtAL21" Text="-" />
+ <TextBlock Grid.Row="7" Grid.Column="0" Text="HB - Current setting" />
+ <TextBlock Grid.Row="7" Grid.Column="1" x:Name="txtHB1" Text="-" />
+ </Grid>
+
+ <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,6,0,0">
+ <TextBlock Text="SV:" VerticalAlignment="Center" Margin="0,0,6,0" />
+ <TextBox x:Name="txtSetSV1" Width="80" HorizontalAlignment="Left" />
+ <Button x:Name="btnSetSV1" Content="設定" Width="60" Height="24" Margin="8,0,0,0" Click="BtnSetSV1_Click" />
+ </StackPanel>
+ </Grid>
+ </Border>
+
+ <!-- Small box3 -->
+ <Border Grid.Row="1" Grid.Column="0" Margin="6" Background="#FFF8F8F8" BorderBrush="#FFBBBBBB" BorderThickness="1" CornerRadius="3">
+ <Grid Margin="6">
+ <Grid.RowDefinitions>
+ <RowDefinition Height="Auto" />
+ <RowDefinition Height="Auto" />
+ <RowDefinition Height="Auto" />
+ <RowDefinition Height="Auto" />
+ <RowDefinition Height="Auto" />
+ </Grid.RowDefinitions>
+ <TextBlock Grid.Row="0" Text="TC -3" FontWeight="Bold" HorizontalAlignment="Left" />
+ <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,6,0,0">
+ <TextBlock Text="設備連線狀況" VerticalAlignment="Center" />
+ <Ellipse x:Name="ellipseDev2" Width="12" Height="12" Margin="8,0,6,0" Fill="Red" Stroke="#FF888888" VerticalAlignment="Center" />
+ <TextBlock x:Name="txtDevStatus2" Text="未連線" VerticalAlignment="Center" />
+ </StackPanel>
+ <Separator Grid.Row="2" Margin="0,6,0,6" />
+ <Grid Grid.Row="3">
+ <Grid.RowDefinitions>
+ <RowDefinition Height="Auto" />
+ <RowDefinition Height="Auto" />
+ <RowDefinition Height="Auto" />
+ <RowDefinition Height="Auto" />
+ <RowDefinition Height="Auto" />
+ <RowDefinition Height="Auto" />
+ <RowDefinition Height="Auto" />
+ <RowDefinition Height="Auto" />
+ </Grid.RowDefinitions>
+ <Grid.ColumnDefinitions>
+ <ColumnDefinition Width="2*" />
+ <ColumnDefinition Width="3*" />
+ </Grid.ColumnDefinitions>
+ <TextBlock Grid.Row="0" Grid.Column="0" Text="SV - Setting value" />
+ <TextBlock Grid.Row="0" Grid.Column="1" x:Name="txtSV2" Text="-" />
+ <TextBlock Grid.Row="1" Grid.Column="0" Text="PV - Process value" />
+ <TextBlock Grid.Row="1" Grid.Column="1" x:Name="txtPV2" Text="-" />
+ <TextBlock Grid.Row="2" Grid.Column="0" Text="Un - Output volume" />
+ <TextBlock Grid.Row="2" Grid.Column="1" x:Name="txtUn2" Text="-" />
+ <TextBlock Grid.Row="3" Grid.Column="0" Text="Ctu - Process current value" />
+ <TextBlock Grid.Row="3" Grid.Column="1" x:Name="txtCtu2" Text="-" />
+ <TextBlock Grid.Row="4" Grid.Column="0" Text="Status - Out1/Out2/AL1/AL2" />
+ <TextBlock Grid.Row="4" Grid.Column="1" x:Name="txtStatusVal2" Text="-" />
+ <TextBlock Grid.Row="5" Grid.Column="0" Text="AL1 - #1 alarm" />
+ <TextBlock Grid.Row="5" Grid.Column="1" x:Name="txtAL12" Text="-" />
+ <TextBlock Grid.Row="6" Grid.Column="0" Text="AL2 - #2 alarm" />
+ <TextBlock Grid.Row="6" Grid.Column="1" x:Name="txtAL22" Text="-" />
+ <TextBlock Grid.Row="7" Grid.Column="0" Text="HB - Current setting" />
+ <TextBlock Grid.Row="7" Grid.Column="1" x:Name="txtHB2" Text="-" />
+ </Grid>
+
+ <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,6,0,0">
+ <TextBlock Text="SV:" VerticalAlignment="Center" Margin="0,0,6,0" />
+ <TextBox x:Name="txtSetSV2" Width="80" HorizontalAlignment="Left" />
+ <Button x:Name="btnSetSV2" Content="設定" Width="60" Height="24" Margin="8,0,0,0" Click="BtnSetSV2_Click" />
+ </StackPanel>
+ </Grid>
+ </Border>
+
+ <!-- Small box4 -->
+ <Border Grid.Row="1" Grid.Column="1" Margin="6" Background="#FFF8F8F8" BorderBrush="#FFBBBBBB" BorderThickness="1" CornerRadius="3">
+ <Grid Margin="6">
+ <Grid.RowDefinitions>
+ <RowDefinition Height="Auto" />
+ <RowDefinition Height="Auto" />
+ <RowDefinition Height="Auto" />
+ <RowDefinition Height="Auto" />
+ <RowDefinition Height="Auto" />
+ </Grid.RowDefinitions>
+ <TextBlock Grid.Row="0" Text="TC -4" FontWeight="Bold" HorizontalAlignment="Left" />
+ <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,6,0,0">
+ <TextBlock Text="設備連線狀況" VerticalAlignment="Center" />
+ <Ellipse x:Name="ellipseDev3" Width="12" Height="12" Margin="8,0,6,0" Fill="Red" Stroke="#FF888888" VerticalAlignment="Center" />
+ <TextBlock x:Name="txtDevStatus3" Text="未連線" VerticalAlignment="Center" />
+ </StackPanel>
+ <Separator Grid.Row="2" Margin="0,6,0,6" />
+ <Grid Grid.Row="3">
+ <Grid.RowDefinitions>
+ <RowDefinition Height="Auto" />
+ <RowDefinition Height="Auto" />
+ <RowDefinition Height="Auto" />
+ <RowDefinition Height="Auto" />
+ <RowDefinition Height="Auto" />
+ <RowDefinition Height="Auto" />
+ <RowDefinition Height="Auto" />
+ <RowDefinition Height="Auto" />
+ </Grid.RowDefinitions>
+ <Grid.ColumnDefinitions>
+ <ColumnDefinition Width="2*" />
+ <ColumnDefinition Width="3*" />
+ </Grid.ColumnDefinitions>
+ <TextBlock Grid.Row="0" Grid.Column="0" Text="SV - Setting value" />
+ <TextBlock Grid.Row="0" Grid.Column="1" x:Name="txtSV3" Text="-" />
+ <TextBlock Grid.Row="1" Grid.Column="0" Text="PV - Process value" />
+ <TextBlock Grid.Row="1" Grid.Column="1" x:Name="txtPV3" Text="-" />
+ <TextBlock Grid.Row="2" Grid.Column="0" Text="Un - Output volume" />
+ <TextBlock Grid.Row="2" Grid.Column="1" x:Name="txtUn3" Text="-" />
+ <TextBlock Grid.Row="3" Grid.Column="0" Text="Ctu - Process current value" />
+ <TextBlock Grid.Row="3" Grid.Column="1" x:Name="txtCtu3" Text="-" />
+ <TextBlock Grid.Row="4" Grid.Column="0" Text="Status - Out1/Out2/AL1/AL2" />
+ <TextBlock Grid.Row="4" Grid.Column="1" x:Name="txtStatusVal3" Text="-" />
+ <TextBlock Grid.Row="5" Grid.Column="0" Text="AL1 - #1 alarm" />
+ <TextBlock Grid.Row="5" Grid.Column="1" x:Name="txtAL13" Text="-" />
+ <TextBlock Grid.Row="6" Grid.Column="0" Text="AL2 - #2 alarm" />
+ <TextBlock Grid.Row="6" Grid.Column="1" x:Name="txtAL23" Text="-" />
+ <TextBlock Grid.Row="7" Grid.Column="0" Text="HB - Current setting" />
+ <TextBlock Grid.Row="7" Grid.Column="1" x:Name="txtHB3" Text="-" />
+ </Grid>
+
+ <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,6,0,0">
+ <TextBlock Text="SV:" VerticalAlignment="Center" Margin="0,0,6,0" />
+ <TextBox x:Name="txtSetSV3" Width="80" HorizontalAlignment="Left" />
+ <Button x:Name="btnSetSV3" Content="設定" Width="60" Height="24" Margin="8,0,0,0" Click="BtnSetSV3_Click" />
+ </StackPanel>
+ </Grid>
+ </Border>
+
+ </Grid>
+ </Border>
+
  </Grid>
 </UserControl>

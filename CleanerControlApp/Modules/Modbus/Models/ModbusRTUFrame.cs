@@ -17,6 +17,7 @@ namespace CleanerControlApp.Modules.Modbus.Models
 
         public bool HasResponse { get; set; } = false;
         public bool HasException { get; set; } = false;
+        public bool HasTimeout { get; set; } = false;
         public bool IsRead { get; internal set; } = false;
         public bool IsWrite { get; internal set; } = false;
 
