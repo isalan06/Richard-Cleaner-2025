@@ -588,11 +588,12 @@ namespace CleanerControlApp.Modules.MitsubishiPLC.Services
         public bool TankZServoAlarmReset => _dioY[1].Bit2;
         public bool TankZServoServoOn => _dioY[1].Bit3;
 
-        public bool ShuttleZServoMotorBrake => _dioY[1].Bit8;
-        public bool CleanerZServoMotorBrake => _dioY[1].Bit9;
-        public bool TankZServoMotorBrake => _dioY[1].Bit10;
-        public bool Heater1Blower => _dioY[1].Bit11;
-        public bool Heater2Blower => _dioY[1].Bit12;
+        public bool ShuttleXServoMotorBrake => _dioY[1].Bit8;
+        public bool ShuttleZServoMotorBrake => _dioY[1].Bit9;
+        public bool CleanerZServoMotorBrake => _dioY[1].Bit10;
+        public bool TankZServoMotorBrake => _dioY[1].Bit11;
+        public bool Heater1Blower => _dioY[1].Bit12;
+        public bool Heater2Blower => _dioY[1].Bit13;
 
         public bool ShuttleZClampOpen => _dioY[2].Bit0;
         public bool ShuttleZClampClose => _dioY[2].Bit1;
@@ -991,30 +992,35 @@ namespace CleanerControlApp.Modules.MitsubishiPLC.Services
             set { _command[6].Bit3 = value; }
         }
 
-        public bool Command_ShuttleZServoMotorBrake
+        public bool Command_ShuttleXServoMotorBrake
         {
             get { return _command[6].Bit8; }
             set { _command[6].Bit8 = value; }
         }
-        public bool Command_CleanerZServoMotorBrake
+        public bool Command_ShuttleZServoMotorBrake
         {
             get { return _command[6].Bit9; }
             set { _command[6].Bit9 = value; }
         }
-        public bool Command_TankZServoMotorBrake
+        public bool Command_CleanerZServoMotorBrake
         {
             get { return _command[6].Bit10; }
             set { _command[6].Bit10 = value; }
         }
-        public bool Command_Heater1Blower
+        public bool Command_TankZServoMotorBrake
         {
             get { return _command[6].Bit11; }
             set { _command[6].Bit11 = value; }
         }
-        public bool Command_Heater2Blower
+        public bool Command_Heater1Blower
         {
             get { return _command[6].Bit12; }
             set { _command[6].Bit12 = value; }
+        }
+        public bool Command_Heater2Blower
+        {
+            get { return _command[6].Bit13; }
+            set { _command[6].Bit13 = value; }
         }
 
         public bool Command_ShuttleZClampOpen

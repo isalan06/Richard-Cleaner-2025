@@ -116,6 +116,7 @@ namespace CleanerControlApp.Modules.MitsubishiPLC.Interfaces
         public bool TankZServoAlarmReset { get; }
         public bool TankZServoServoOn { get; }
 
+        public bool ShuttleXServoMotorBrake { get; }
         public bool ShuttleZServoMotorBrake { get; }
         public bool CleanerZServoMotorBrake { get; }
         public bool TankZServoMotorBrake { get; }
@@ -282,6 +283,7 @@ namespace CleanerControlApp.Modules.MitsubishiPLC.Interfaces
         public bool Command_TankZServoAlarmReset { get; }
         public bool Command_TankZServoServoOn { get; }
 
+        public bool Command_ShuttleXServoMotorBrake { get; }
         public bool Command_ShuttleZServoMotorBrake { get; }
         public bool Command_CleanerZServoMotorBrake { get; }
         public bool Command_TankZServoMotorBrake { get; }

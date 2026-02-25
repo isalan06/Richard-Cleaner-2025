@@ -206,9 +206,10 @@ namespace CleanerControlApp
                             return svc as IModbusRTUService;
                         });
 
-                        // ILogger<ModbusRTUPoolService> will be resolved from DI; provide the int explicitly.
+                        // ILogger<ModbusRTUPoolService> will be resolved from DI; provide the int explicitly
+                        // Construct pool service using configured pool parameters (if any)
                         services.AddSingleton<IModbusRTUPollService>(sp =>
-                            new ModbusRTUPoolService(sp.GetRequiredService<ILogger<ModbusRTUPoolService>>(),4));
+                            new ModbusRTUPoolService(sp.GetRequiredService<ILogger<ModbusRTUPoolService>>() , communicationSettings.ModbusRTUPoolParameter));
                     })
                     .Build();
             }

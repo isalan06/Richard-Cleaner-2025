@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<UserControl x:Class="CleanerControlApp.Vision.Developer.DeltaMS300TestView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Grid Background="White">
+        <TextBlock Text="Delta MS300 Test View" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,12,0,0" FontSize="16" FontWeight="Bold" />
+        <StackPanel Margin="12,44,12,12">
+            <TextBlock Text="This is a placeholder for Delta MS300 test UI." />
+        </StackPanel>
+    </Grid>
+</UserControl>

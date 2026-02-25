@@ -20,6 +20,8 @@
  <Setter Property="VerticalContentAlignment" Value="Top" />
  </Style>
  </TabControl.Resources>
+
+ <!-- Modbus TCP Test tab -->
  <TabItem>
  <TabItem.Header>
  <!-- Grid with SharedSizeGroup ensures this header width is shared across headers -->
@@ -36,6 +38,8 @@
  </TabItem.Header>
  <dev:ModbusTestView HorizontalAlignment="Stretch" />
  </TabItem>
+
+ <!-- PLC Test tab -->
  <TabItem>
  <TabItem.Header>
  <!-- Use the same SharedSizeGroup so this header matches the width above -->
@@ -52,7 +56,8 @@
  </TabItem.Header>
  <dev:PlcTestView HorizontalAlignment="Stretch" />
  </TabItem>
- <!-- New Parameter tab -->
+
+ <!-- Parameter tab -->
  <TabItem x:Name="tabParameter">
  <TabItem.Header>
  <Grid>
@@ -66,7 +71,8 @@
  </TabItem.Header>
  <dev:DeveloperParameterView HorizontalAlignment="Stretch" />
  </TabItem>
- <!-- New Modbus RTU Test tab -->
+
+ <!-- Modbus RTU Test tab -->
  <TabItem>
  <TabItem.Header>
  <Grid>
@@ -82,6 +88,58 @@
  </TabItem.Header>
  <dev:ModbusRTUTestView HorizontalAlignment="Stretch" />
  </TabItem>
+
+ <!-- Delta MS300 Test tab -->
+ <TabItem>
+ <TabItem.Header>
+ <Grid>
+ <Grid.ColumnDefinitions>
+ <ColumnDefinition SharedSizeGroup="TabHeaderWidth" />
+ </Grid.ColumnDefinitions>
+ <TextBlock TextAlignment="Center" HorizontalAlignment="Center">
+ <Run>Delta MS300</Run>
+ <LineBreak/>
+ <Run>Test</Run>
+ </TextBlock>
+ </Grid>
+ </TabItem.Header>
+ <dev:DeltaMS300TestView HorizontalAlignment="Stretch" />
+ </TabItem>
+
+ <!-- Temperature Control Test tab -->
+ <TabItem>
+ <TabItem.Header>
+ <Grid>
+ <Grid.ColumnDefinitions>
+ <ColumnDefinition SharedSizeGroup="TabHeaderWidth" />
+ </Grid.ColumnDefinitions>
+ <TextBlock TextAlignment="Center" HorizontalAlignment="Center">
+ <Run>Temperature Control</Run>
+ <LineBreak/>
+ <Run>Test</Run>
+ </TextBlock>
+ </Grid>
+ </TabItem.Header>
+ <dev:TempControlTestView HorizontalAlignment="Stretch" />
+ </TabItem>
+
+ <!-- Ultrasonic Device Test tab -->
+ <TabItem>
+ <TabItem.Header>
+ <Grid>
+ <Grid.ColumnDefinitions>
+ <ColumnDefinition SharedSizeGroup="TabHeaderWidth" />
+ </Grid.ColumnDefinitions>
+ <TextBlock TextAlignment="Center" HorizontalAlignment="Center">
+ <Run>Ultrasonic Device</Run>
+ <LineBreak/>
+ <Run>Test</Run>
+ </TextBlock>
+ </Grid>
+ </TabItem.Header>
+ <dev:UltrasonicDeviceTestView HorizontalAlignment="Stretch" />
+ </TabItem>
+
  </TabControl>
  </Grid>
 </UserControl>

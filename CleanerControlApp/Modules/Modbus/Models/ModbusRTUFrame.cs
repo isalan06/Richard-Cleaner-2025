@@ -46,7 +46,7 @@ namespace CleanerControlApp.Modules.Modbus.Models
             this.Clone(frame);
         }
 
-        public void Set(byte slaveAddress, byte functionCode, ushort startAddress, ushort dataNumber, ushort[] data, bool hasResponse = false, bool hasException = false, bool finalCommand = false, bool emptyCommand = false)
+        public void Set(byte slaveAddress, byte functionCode, ushort startAddress, ushort dataNumber, ushort[]? data, bool hasResponse = false, bool hasException = false, bool finalCommand = false, bool emptyCommand = false)
         {
             SlaveAddress = slaveAddress;
             FunctionCode = functionCode;
@@ -74,7 +74,7 @@ namespace CleanerControlApp.Modules.Modbus.Models
             IsWrite = !_read;
 
         }
-        public void Set(byte slaveAddress, byte functionCode, ushort startAddress, ushort dataNumber, bool[] boolData, bool hasResponse = false, bool hasException = false, bool finalCommand = false, bool emptyCommand = false)
+        public void Set(byte slaveAddress, byte functionCode, ushort startAddress, ushort dataNumber, bool[]? boolData, bool hasResponse = false, bool hasException = false, bool finalCommand = false, bool emptyCommand = false)
         {
             SlaveAddress = slaveAddress;
             FunctionCode = functionCode;
@@ -127,7 +127,7 @@ namespace CleanerControlApp.Modules.Modbus.Models
 
         public void Clone(ModbusRTUFrame frame)
         {
-            Set(frame.SlaveAddress, frame.FunctionCode, frame.StartAddress, frame.DataNumber, frame.Data, frame.HasResponse, frame.HasException, frame.FinalCommand, frame.EmptyCommand);
+            Set(frame.SlaveAddress, frame.FunctionCode, frame.StartAddress, frame.DataNumber, frame.Data ?? new ushort[] { 0}, frame.HasResponse, frame.HasException, frame.FinalCommand, frame.EmptyCommand);
             // copy bool data too
             if (frame.BoolData != null)
             {

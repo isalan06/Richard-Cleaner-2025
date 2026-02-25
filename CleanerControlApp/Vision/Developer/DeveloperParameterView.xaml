@@ -18,8 +18,8 @@
  <TextBlock Text="Parameter操作" FontWeight="Bold" FontSize="14" Margin="4" />
 
  <StackPanel Margin="4,8,4,0">
- <Button x:Name="Btn_ReadParameter" Content="讀取參數檔" Height="30" Margin="0,4,0,0" />
- <Button x:Name="Btn_WriteParameter" Content="寫入參數檔" Height="30" Margin="0,4,0,0" />
+ <Button x:Name="Btn_ReadParameter" Content="讀取參數檔" Height="30" Margin="0,4,0,0" Click="Btn_ReadParameter_Click" />
+ <Button x:Name="Btn_WriteParameter" Content="寫入參數檔" Height="30" Margin="0,4,0,0" Click="Btn_WriteParameter_Click" />
  </StackPanel>
 
  <Separator Margin="0,12" />
@@ -27,6 +27,8 @@
  <TextBlock Text="參數頁面切換" FontSize="12" FontWeight="SemiBold" Margin="4,0,4,6" HorizontalAlignment="Left" />
  <Button x:Name="Btn_CommunicationParameter" Content="通訊參數" Height="30" Margin="4,8,4,0" Click="Btn_CommunicationParameter_Click" />
 
+ <!-- Fill remaining space to push elements to top if needed -->
+ <StackPanel VerticalAlignment="Stretch" />
  <!-- spacer to consume remaining space if any -->
  <StackPanel Height="8" />
  </StackPanel>

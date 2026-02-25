@@ -9,6 +9,7 @@ using CleanerControlApp.Modules.Modbus.Models;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
+using CleanerControlApp.Utilities;
 
 namespace CleanerControlApp.Vision.Developer
 {
@@ -195,6 +196,8 @@ namespace CleanerControlApp.Vision.Developer
             }
             catch { }
 
+            await Task.Delay(10); // slight delay to allow any property change events to propagate before logging
+
             AppendLog($"Set applied: Port={_modbusService.PortName}, Baud={_modbusService.BaudRate}, Parity={_modbusService.Parity}, DataBits={_modbusService.DataBits}, StopBits={_modbusService.StopBits}");
         }
 
@@ -275,11 +278,11 @@ namespace CleanerControlApp.Vision.Developer
             // choose overload based on function: coils/discrete use bool[], registers use ushort[]
             if (function == ModbusFunctionCode.ReadCoils || function == ModbusFunctionCode.ReadDiscreteInputs)
             {
-                frame.Set(slave, (byte)function, start, number, (bool[])null);
+                frame.Set(slave, (byte)function, start, number, (bool[]?)null);
             }
             else
             {
-                frame.Set(slave, (byte)function, start, number, (ushort[])null);
+                frame.Set(slave, (byte)function, start, number, (ushort[]?)null);
             }
 
             // ensure open
@@ -510,6 +513,11 @@ namespace CleanerControlApp.Vision.Developer
                     }
                 }
                 return Task.FromResult<ModbusRTUFrame?>(f);
+            }
+
+            public void RefreshSerialPortSettings(CommunicationSettings? settings)
+            {
+                // Dummy implementation: do nothing
             }
         }
         #endregion

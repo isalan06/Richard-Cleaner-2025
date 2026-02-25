@@ -205,7 +205,7 @@ namespace CleanerControlApp.Vision.Developer
 
         public void Refresh() => OnPropertyChanged(nameof(IsOn));
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler? PropertyChanged;
         protected void OnPropertyChanged([CallerMemberName] string? propName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propName));

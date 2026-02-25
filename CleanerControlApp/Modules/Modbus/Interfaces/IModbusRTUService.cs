@@ -1,4 +1,5 @@
 ﻿using CleanerControlApp.Modules.Modbus.Models;
+using CleanerControlApp.Utilities;
 using System;
 using System.Collections.Generic;
 using System.IO.Ports;
@@ -24,5 +25,7 @@ namespace CleanerControlApp.Modules.Modbus.Interfaces
         void Close();
 
         Task<ModbusRTUFrame?> Act(ModbusRTUFrame? coammand);
+
+        void RefreshSerialPortSettings(CommunicationSettings? settings);
     }
 }

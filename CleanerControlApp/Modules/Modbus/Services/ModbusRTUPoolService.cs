@@ -1,4 +1,5 @@
 ﻿using CleanerControlApp.Modules.Modbus.Interfaces;
+using CleanerControlApp.Utilities;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -34,6 +35,63 @@ namespace CleanerControlApp.Modules.Modbus.Services
                 // Use parameterless constructor for individual services. If you want to pass a logger
                 // to each ModbusRTUService, modify ModbusRTUService to accept ILogger<ModbusRTUService> here.
                 _services[i] = new ModbusRTUService();
+            }
+        }
+
+        // New constructor: accepts a list of ModbusRTUParameter to configure each pool item
+        public ModbusRTUPoolService(ILogger<ModbusRTUPoolService>? logger, IList<ModbusRTUParameter>? poolParameters)
+        {
+            _logger = logger;
+
+            int serviceNumber = (poolParameters == null || poolParameters.Count == 0) ? 1 : poolParameters.Count;
+
+            _services = new ModbusRTUService[serviceNumber];
+            for (int i = 0; i < serviceNumber; i++)
+            {
+                var svc = new ModbusRTUService();
+
+                var param = (poolParameters != null && i < poolParameters.Count) ? poolParameters[i] : null;
+                if (param != null)
+                {
+                    try
+                    {
+                        if (!string.IsNullOrWhiteSpace(param.PortName)) svc.PortName = param.PortName;
+                        if (param.BaudRate > 0) svc.BaudRate = param.BaudRate;
+                        if (param.DataBits > 0) svc.DataBits = param.DataBits;
+
+                        if (!string.IsNullOrWhiteSpace(param.Parity))
+                        {
+                            if (Enum.TryParse<System.IO.Ports.Parity>(param.Parity, true, out var parity))
+                                svc.Parity = parity;
+                            else
+                            {
+                                switch (param.Parity.Trim().ToLowerInvariant())
+                                {
+                                    case "none": svc.Parity = System.IO.Ports.Parity.None; break;
+                                    case "odd": svc.Parity = System.IO.Ports.Parity.Odd; break;
+                                    case "even": svc.Parity = System.IO.Ports.Parity.Even; break;
+                                    case "mark": svc.Parity = System.IO.Ports.Parity.Mark; break;
+                                    case "space": svc.Parity = System.IO.Ports.Parity.Space; break;
+                                }
+                            }
+                        }
+
+                        switch (param.StopBits)
+                        {
+                            case 0: svc.StopBits = System.IO.Ports.StopBits.None; break;
+                            case 1: svc.StopBits = System.IO.Ports.StopBits.One; break;
+                            case 2: svc.StopBits = System.IO.Ports.StopBits.Two; break;
+                            case 3: svc.StopBits = System.IO.Ports.StopBits.OnePointFive; break;
+                            default: svc.StopBits = System.IO.Ports.StopBits.One; break;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger?.LogError(ex, "Error applying Modbus RTU pool parameter to service #{Index}", i);
+                    }
+                }
+
+                _services[i] = svc;
             }
         }
 
@@ -110,6 +168,26 @@ namespace CleanerControlApp.Modules.Modbus.Services
         }
 
         public int Count => _services?.Length ?? 0;
+
+        public void RefreshSerialPortSettings(CommunicationSettings? settings)
+        {
+            if (_services == null)
+            {
+                _logger?.LogWarning("Modbus RTU service pool is not initialized. Cannot refresh serial port settings.");
+                return;
+            }
+            foreach (var svc in _services)
+            {
+                try
+                {
+                    svc?.RefreshSerialPortSettings(settings);
+                }
+                catch (Exception ex)
+                {
+                    _logger?.LogError(ex, "Error refreshing serial port settings for a Modbus RTU service.");
+                }
+            }
+        }
 
         #endregion
 

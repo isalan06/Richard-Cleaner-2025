@@ -58,12 +58,12 @@ namespace CleanerControlApp.Vision.Developer
  });
 
             AddGroup("Y30~Y37", new[] {
- ("Y30","移載組Z軸伺服馬達剎車"),
- ("Y31","沖水槽Z軸伺服馬達剎車"),
- ("Y32","浸泡槽Z軸伺服馬達剎車"),
- ("Y33","烘乾槽1鼓風機開"),
- ("Y34","烘乾槽2鼓風機開"),
- ("Y35","Reserved"),
+ ("Y30","移載組X軸伺服馬達剎車"),
+ ("Y31","移載組Z軸伺服馬達剎車"),
+ ("Y32","沖水槽Z軸伺服馬達剎車"),
+ ("Y33","浸泡槽Z軸伺服馬達剎車"),
+ ("Y34","烘乾槽1鼓風機開"),
+ ("Y35","烘乾槽2鼓風機開"),
  ("Y36","Reserved"),
  ("Y37","Reserved")
  });
@@ -145,7 +145,7 @@ namespace CleanerControlApp.Vision.Developer
 
  public class DOItem : INotifyPropertyChanged
  {
- private readonly IPLCService? _plc;
+ private readonly IPLCService? _plc = null;
  private readonly int _wordIndex;
  private readonly int _bitIndex;
 
@@ -227,7 +227,7 @@ namespace CleanerControlApp.Vision.Developer
  OnPropertyChanged(nameof(CommandIsOn));
  }
 
- public event PropertyChangedEventHandler PropertyChanged;
+ public event PropertyChangedEventHandler? PropertyChanged;
  protected void OnPropertyChanged([CallerMemberName] string? propName = null)
  {
  PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propName));

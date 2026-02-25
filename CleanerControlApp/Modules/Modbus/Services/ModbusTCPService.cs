@@ -1,15 +1,16 @@
 ﻿using CleanerControlApp.Modules.Modbus.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Navigation;
-using Modbus.Device;
-using System.Net.Sockets;
 using CleanerControlApp.Modules.Modbus.Models;
 using Microsoft.Extensions.Logging;
+using Modbus.Device;
+using System;
+using System.Collections.Generic;
+using System.IO.Ports;
+using System.Linq;
+using System.Net.Sockets;
+using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
+using System.Windows.Navigation;
 
 namespace CleanerControlApp.Modules.Modbus.Services
 {
@@ -28,6 +29,8 @@ namespace CleanerControlApp.Modules.Modbus.Services
 
         // Semaphore to allow only one operation (connect/disconnect/execute) at a time
         private readonly SemaphoreSlim _semaphore = new SemaphoreSlim(1, 1);
+
+        private readonly object _sync = new object();
 
         #endregion
 
@@ -447,6 +450,54 @@ namespace CleanerControlApp.Modules.Modbus.Services
             }
 
             return null;
+        }
+
+        #endregion
+
+        #region Function
+
+        private void ApplySettingsToTcpClient(bool doNotReopen = false)
+        {
+            lock (_sync)
+            {
+                bool wasOpen = false;
+                try
+                {
+                    wasOpen = _tcpClient.Connected;
+                }
+                catch { wasOpen = false; }
+
+                try
+                {
+                    if (wasOpen)
+                    {
+                        try {
+                            _tcpClient.Close();
+                            _master?.Dispose();
+                            _master = null;
+                        } 
+                        catch { }
+                    }
+
+                    if (wasOpen && !doNotReopen)
+                    {
+                        try 
+                        {
+                            _tcpClient = new TcpClient();
+                            _tcpClient.Connect(_ip, _port);
+                            _master = ModbusIpMaster.CreateIp(_tcpClient);
+                        }
+                        catch (Exception ex)
+                        {
+                            if (_logger != null) _logger.LogWarning(ex, "Failed to reopen tcp client after applying settings");
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    if (_logger != null) _logger.LogError(ex, "Error applying tcp client settings");
+                }
+            }
         }
 
         #endregion

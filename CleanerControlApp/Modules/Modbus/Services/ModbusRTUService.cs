@@ -9,6 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Threading;
+using CleanerControlApp.Utilities;
 
 
 namespace CleanerControlApp.Modules.Modbus.Services
@@ -85,8 +86,8 @@ namespace CleanerControlApp.Modules.Modbus.Services
 
         public int Timeout { get; set; } =5000;
 
-        private bool _readResult = false;
-        private ushort[]? _readData = null;
+        //private bool _readResult = false;
+        //private ushort[]? _readData = null;
         private List<byte> _buffer = new List<byte>();
 
         public bool IsConnected { get { return _serialPort.IsOpen; } }
@@ -191,6 +192,24 @@ namespace CleanerControlApp.Modules.Modbus.Services
 
         #region Functions
 
+        public void RefreshSerialPortSettings(CommunicationSettings? settings = null)
+        {
+            if( settings != null && settings.ModbusRTUParameter != null)
+            {
+                var param = settings.ModbusRTUParameter;
+                _portName = param.PortName;
+                _baudRate = param.BaudRate;
+                // 修正：將 string 轉換為 Parity 列舉型別
+                if (Enum.TryParse<Parity>(param.Parity, true, out var parityValue))
+                    _parity = parityValue;
+                else
+                    _parity = Parity.None; // 或根據需求設定預設值
+                _dataBits = param.DataBits;
+                // 修正：將 int 轉換為 StopBits 列舉型別
+                _stopBits = (StopBits)param.StopBits;
+            }
+            ApplySettingsToSerialPort();
+        }
         private void ApplySettingsToSerialPort(bool doNotReopen = false)
         {
             lock (_sync)
@@ -310,8 +329,8 @@ namespace CleanerControlApp.Modules.Modbus.Services
                 _serialPort.DiscardInBuffer();
                 _serialPort.DiscardOutBuffer();
                 _buffer.Clear();
-                _readResult = false;
-                _readData = null;
+                //_readResult = false;
+                //_readData = null;
 
                 _frame = new ModbusRTUFrame(command);
                 _frame.HasResponse = false;

@@ -283,8 +283,14 @@ namespace CleanerControlApp.Vision.Developer
 
  public void Start() { }
  public void Stop() { }
- public void ReadParameter() { }
- public void WriteParameter() { }
+ public void ReadParameter() 
+ {
+ ParametersReadCompleted?.Invoke(this, EventArgs.Empty);
+ }
+ public void WriteParameter() 
+ {
+ ParametersWriteCompleted?.Invoke(this, EventArgs.Empty);
+ }
 
  // 實作 IPLCService 介面的 ParametersReadCompleted 事件
  public event EventHandler? ParametersReadCompleted;

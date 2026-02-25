@@ -433,9 +433,9 @@ namespace CleanerControlApp.Vision.Developer
  return true;
  }
 
- public Task<Modules.Modbus.Models.ModbusTCPFrame?> ExecuteAsync(Modules.Modbus.Models.ModbusTCPFrame frame)
- {
- ExecuteFrame = frame;
+ public Task<Modules.Modbus.Models.ModbusTCPFrame?> ExecuteAsync(Modules.Modbus.Models.ModbusTCPFrame? frame)
+ {  
+ ExecuteFrame = frame ?? new ModbusTCPFrame();
  Execute();
  return Task.FromResult<Modules.Modbus.Models.ModbusTCPFrame?>(ExecuteFrame);
  }

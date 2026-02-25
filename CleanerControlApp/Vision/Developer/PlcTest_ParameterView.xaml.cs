@@ -325,7 +325,7 @@ namespace CleanerControlApp.Vision.Developer
                 return;
 
             string valueText = textBox.Text ?? string.Empty;
-            string paramTag = textBox.Tag as string;
+            string paramTag = textBox.Tag as string ?? string.Empty;
             if (string.IsNullOrEmpty(paramTag))
                 return;
 

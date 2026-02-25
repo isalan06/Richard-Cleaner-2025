@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CleanerControlApp.Utilities;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -17,5 +18,7 @@ namespace CleanerControlApp.Modules.Modbus.Interfaces
         /// Number of pooled RTU services.
         /// </summary>
         int Count { get; }
+
+        void RefreshSerialPortSettings(CommunicationSettings? settings);
     }
 }
