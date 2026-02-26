@@ -8,6 +8,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Diagnostics;
+using System.Threading;
 
 namespace CleanerControlApp.Modules.TempatureController.Services
 {
@@ -15,8 +17,8 @@ namespace CleanerControlApp.Modules.TempatureController.Services
     {
         #region Constants
 
-        public static readonly int ModuleCount = 4;
-        public static readonly int RTUAssemblyIndex = 2;
+        public static readonly int ModuleCount =4;
+        public static readonly int RTUAssemblyIndex =2;
 
         #endregion
 
@@ -29,17 +31,31 @@ namespace CleanerControlApp.Modules.TempatureController.Services
         // background loop
         private CancellationTokenSource? _cts;
         private Task? _loopTask;
-        private readonly TimeSpan _loopInterval = TimeSpan.FromMilliseconds(50);
+        private readonly TimeSpan _loopInterval = TimeSpan.FromMilliseconds(10);
 
         private IModbusRTUService? _modbusService;
 
         private bool _running;
 
-        private int _routeIndex = 0;
+        private int _routeIndex =0;
 
         private bool[]? _deviceConnected = null;
+        private bool[]? _deviceTimeout = null;
+        private bool[]? _deviceError = null;
 
         private Queue<TCCommandFrame> _commandQueue = new Queue<TCCommandFrame>();
+
+        // diagnostics: measure loop iteration time and command execution count
+        private long _loopIterationCount =0; // number of completed loop iterations
+        private long _totalLoopTicks =0; // accumulated Stopwatch ticks for all iterations
+        private long _lastLoopTicks =0; // last iteration ticks
+        private long _commandExecutedCount =0; // number of times command Act was invoked
+
+        // per-device timeout timers: when a device times out, start a timer to clear timeout after a delay
+        private Timer?[]? _timeoutTimers = null;
+
+        // timeout duration for retry
+        private static readonly TimeSpan DeviceTimeoutClearDelay = TimeSpan.FromMinutes(10);
 
         #endregion
 
@@ -51,9 +67,14 @@ namespace CleanerControlApp.Modules.TempatureController.Services
             _logger = logger;
 
             _deviceConnected = new bool[ModuleCount];
+            _deviceTimeout = new bool[ModuleCount];
+            _deviceError = new bool[ModuleCount];
+
+            // initialize timeout timers array
+            _timeoutTimers = new Timer[ModuleCount];
 
             _controllers = new ISingleTemperatureController[ModuleCount];
-            for (int i = 0; i < ModuleCount; i++)
+            for (int i =0; i < ModuleCount; i++)
             {
                 _controllers[i] = new SingleTemperatureController();
             }
@@ -94,16 +115,31 @@ namespace CleanerControlApp.Modules.TempatureController.Services
                         _loopTask = null;
                     }
 
+                    // dispose any active timeout timers
+                    try
+                    {
+                        if (_timeoutTimers != null)
+                        {
+                            for (int i =0; i < _timeoutTimers.Length; i++)
+                            {
+                                try { _timeoutTimers[i]?.Dispose(); } catch { }
+                                _timeoutTimers[i] = null;
+                            }
+                            _timeoutTimers = null;
+                        }
+                    }
+                    catch { }
+
                     // TODO: 處置受控狀態 (受控物件)
                 }
 
-                // TODO: 釋出非受控資源 (非受控物件) 並覆寫完成項
+                // TODO:釋出非受控資源 (非受控物件) 並覆寫完成項
                 // TODO: 將大型欄位設為 Null
                 disposedValue = true;
             }
         }
 
-        // TODO: 僅有當 'Dispose(bool disposing)' 具有會釋出非受控資源的程式碼時，才覆寫完成項
+        // TODO: 僅有當 'Dispose(bool disposing)'具有會釋出非受控資源的程式碼時，才覆寫完成項
         ~TemperatureControllers()
         {
             // 請勿變更此程式碼。請將清除程式碼放入 'Dispose(bool disposing)' 方法
@@ -127,12 +163,14 @@ namespace CleanerControlApp.Modules.TempatureController.Services
         public void Stop() { _running = false; }
 
         public bool[]? DeviceConnected => _deviceConnected;
+        public bool[]? DeviceTimeout => _deviceTimeout;
+        public bool[]? DeviceError => _deviceError;
 
         public ISingleTemperatureController? this[int index]
         {
             get
             {
-                if (_controllers != null && index >= 0 && index < _controllers.Length)
+                if (_controllers != null && index >=0 && index < _controllers.Length)
                 {
                     return _controllers[index];
                 }
@@ -140,23 +178,23 @@ namespace CleanerControlApp.Modules.TempatureController.Services
             }
         }
 
-        public int Count => _controllers?.Length ?? 0;
+        public int Count => _controllers?.Length ??0;
 
         public void SetSV(int moduleIndex, int value)
         {
-            if (_controllers != null && moduleIndex >= 0 && moduleIndex < _controllers.Length)
+            if (_controllers != null && moduleIndex >=0 && moduleIndex < _controllers.Length)
             {
                 TCCommandFrame commandFrame = new TCCommandFrame()
                 {
-                    Id = 11,
-                    Name = $"TC - {moduleIndex + 1} Set Value ({value})",
+                    Id =11,
+                    Name = $"TC - {moduleIndex +1} Set Value ({value})",
                     ModuleIndex = moduleIndex,
                     CommandFrame = new ModbusRTUFrame()
                     {
                         SlaveAddress = (byte)(moduleIndex+1),
-                        FunctionCode = 0x10,
-                        StartAddress = 64,
-                        DataNumber = 1,
+                        FunctionCode =0x10,
+                        StartAddress =64,
+                        DataNumber =1,
                         Data = new ushort[] { (ushort)value }
                     }
                 };
@@ -187,6 +225,7 @@ namespace CleanerControlApp.Modules.TempatureController.Services
         {
             while (!token.IsCancellationRequested)
             {
+                var sw = Stopwatch.StartNew();
                 try
                 {
                     // Poll modbus if available
@@ -194,14 +233,27 @@ namespace CleanerControlApp.Modules.TempatureController.Services
                     {
                         await PollModbusAsync(token).ConfigureAwait(false);
 
-                        if (_commandQueue.Count > 0)
+                        if (_commandQueue.Count >0)
                         {
                             var command = _commandQueue.Dequeue();
                             if (_deviceConnected != null && _deviceConnected[command.ModuleIndex])
                             {
                                 if (_modbusService != null && _modbusService.IsRunning && _running)
                                 {
+                                    // count command execution attempts
+                                    Interlocked.Increment(ref _commandExecutedCount);
                                     var data = await _modbusService.Act(command.CommandFrame);
+                                    if (data != null && data.HasException)
+                                    { 
+                                        if(_deviceError != null)
+                                            _deviceError[command.ModuleIndex] = true;
+                                    }
+
+                                    if (data != null && !data.HasException)
+                                    {
+                                        if (_deviceError != null)
+                                            _deviceError[command.ModuleIndex] = false;
+                                    }
                                 }
                             }
                         }
@@ -220,6 +272,13 @@ namespace CleanerControlApp.Modules.TempatureController.Services
                 {
                     // swallow or consider logging
                 }
+                finally
+                {
+                    sw.Stop();
+                    Interlocked.Increment(ref _loopIterationCount);
+                    Interlocked.Exchange(ref _lastLoopTicks, sw.ElapsedTicks);
+                    Interlocked.Add(ref _totalLoopTicks, sw.ElapsedTicks);
+                }
             }
         }
 
@@ -231,17 +290,82 @@ namespace CleanerControlApp.Modules.TempatureController.Services
                 // TODO: add real read/write frames using _modbusService.ExecuteAsync
                 if (_modbusService != null && _modbusService.IsRunning && _running)
                 {
-                    var data = await _modbusService.Act(_routeProcess[_routeIndex].CommandFrame);
-
-                    if (data != null)
+                    if (_deviceTimeout != null && !_deviceTimeout[_routeProcess[_routeIndex].ModuleIndex])
                     {
-                        if (_controllers != null && data is ModbusRTUFrame)
+                        var data = await _modbusService.Act(_routeProcess[_routeIndex].CommandFrame);
+
+                        if (data != null)
                         {
-                            if (!data.HasTimeout)
+                            if (_controllers != null && data is ModbusRTUFrame)
                             {
-                                _controllers[_routeProcess[_routeIndex].ModuleIndex].SetData(data.Data);
-                                if (_deviceConnected != null)
-                                    _deviceConnected[_routeProcess[_routeIndex].ModuleIndex] = true;
+                                if (!data.HasTimeout)
+                                {
+                                    _controllers[_routeProcess[_routeIndex].ModuleIndex].SetData(data.Data);
+                                    if (_deviceConnected != null)
+                                        _deviceConnected[_routeProcess[_routeIndex].ModuleIndex] = true;
+                                    if (_deviceTimeout != null)
+                                    {
+                                        // clear timeout flag and cancel any pending timer
+                                        _deviceTimeout[_routeProcess[_routeIndex].ModuleIndex] = false;
+                                        try
+                                        {
+                                            if (_timeoutTimers != null)
+                                            {
+                                                var tIndex = _routeProcess[_routeIndex].ModuleIndex;
+                                                try { _timeoutTimers[tIndex]?.Dispose(); } catch { }
+                                                _timeoutTimers[tIndex] = null;
+                                            }
+                                        }
+                                        catch { }
+                                    }
+
+                                }
+                                else
+                                {
+                                    if (_deviceConnected != null)
+                                        _deviceConnected[_routeProcess[_routeIndex].ModuleIndex] = false;
+                                    if (_deviceTimeout != null)
+                                    {
+                                        // set timeout flag and start a timer to clear it after delay
+                                        int idx = _routeProcess[_routeIndex].ModuleIndex;
+                                        _deviceTimeout[idx] = true;
+
+                                        // dispose existing timer if any
+                                        try
+                                        {
+                                            if (_timeoutTimers != null && _timeoutTimers[idx] != null)
+                                            {
+                                                try { _timeoutTimers[idx]?.Dispose(); } catch { }
+                                                _timeoutTimers[idx] = null;
+                                            }
+                                        }
+                                        catch { }
+
+                                        // capture local idx for callback
+                                        int captured = idx;
+
+                                        if (_timeoutTimers != null)
+                                        {
+                                            _timeoutTimers[captured] = new Timer(state =>
+                                            {
+                                                try
+                                                {
+                                                    if (_deviceTimeout != null) _deviceTimeout[captured] = false;
+                                                }
+                                                catch { }
+                                                try
+                                                {
+                                                    if (_timeoutTimers != null)
+                                                    {
+                                                        try { _timeoutTimers[captured]?.Dispose(); } catch { }
+                                                        _timeoutTimers[captured] = null;
+                                                    }
+                                                }
+                                                catch { }
+                                            }, null, DeviceTimeoutClearDelay, Timeout.InfiniteTimeSpan);
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
@@ -249,8 +373,6 @@ namespace CleanerControlApp.Modules.TempatureController.Services
                     if (++_routeIndex >= _routeProcess.Length)
                         _routeIndex = 0;
                 }
-
-
             }
             catch (OperationCanceledException)
             {
@@ -267,60 +389,69 @@ namespace CleanerControlApp.Modules.TempatureController.Services
         #region Route process
 
         private TCCommandFrame[] _routeProcess = new TCCommandFrame[]
+        {
+            new TCCommandFrame()
             {
-                new TCCommandFrame()
+                Id =1,
+                Name = "Read Value of TC1",
+                ModuleIndex =0,
+                CommandFrame = new ModbusRTUFrame()
                 {
-                    Id = 1,
-                    Name = "Read Value of TC 1",
-                    ModuleIndex = 0,
-                    CommandFrame = new ModbusRTUFrame()
-                    {
-                        SlaveAddress = 1,
-                        FunctionCode = 0x3,
-                        StartAddress = 64,
-                        DataNumber = (ushort)SingleTemperatureController.BUFFER_SIZE
-                    }
-                },
-                new TCCommandFrame()
+                    SlaveAddress =1,
+                    FunctionCode =0x3,
+                    StartAddress =64,
+                    DataNumber = (ushort)SingleTemperatureController.BUFFER_SIZE
+                }
+            },
+            new TCCommandFrame()
+            {
+                Id =2,
+                Name = "Read Value of TC2",
+                ModuleIndex =1,
+                CommandFrame = new ModbusRTUFrame()
                 {
-                    Id = 2,
-                    Name = "Read Value of TC 2",
-                    ModuleIndex = 1,
-                    CommandFrame = new ModbusRTUFrame()
-                    {
-                        SlaveAddress = 2,
-                        FunctionCode = 0x3,
-                        StartAddress = 64,
-                        DataNumber = (ushort)SingleTemperatureController.BUFFER_SIZE
-                    }
-                },
-                new TCCommandFrame()
+                    SlaveAddress =2,
+                    FunctionCode =0x3,
+                    StartAddress =64,
+                    DataNumber = (ushort)SingleTemperatureController.BUFFER_SIZE
+                }
+            },
+            new TCCommandFrame()
+            {
+                Id =3,
+                Name = "Read Value of TC3",
+                ModuleIndex =2,
+                CommandFrame = new ModbusRTUFrame()
                 {
-                    Id = 3,
-                    Name = "Read Value of TC 3",
-                    ModuleIndex = 2,
-                    CommandFrame = new ModbusRTUFrame()
-                    {
-                        SlaveAddress = 3,
-                        FunctionCode = 0x3,
-                        StartAddress = 64,
-                        DataNumber = (ushort)SingleTemperatureController.BUFFER_SIZE
-                    }
-                },
-                new TCCommandFrame()
+                    SlaveAddress =3,
+                    FunctionCode =0x3,
+                    StartAddress =64,
+                    DataNumber = (ushort)SingleTemperatureController.BUFFER_SIZE
+                }
+            },
+            new TCCommandFrame()
+            {
+                Id =4,
+                Name = "Read Value of TC4",
+                ModuleIndex =3,
+                CommandFrame = new ModbusRTUFrame()
                 {
-                    Id = 4,
-                    Name = "Read Value of TC 4",
-                    ModuleIndex = 3,
-                    CommandFrame = new ModbusRTUFrame()
-                    {
-                        SlaveAddress = 4,
-                        FunctionCode = 0x3,
-                        StartAddress = 64,
-                        DataNumber = (ushort)SingleTemperatureController.BUFFER_SIZE
-                    }
-                },
-            };
+                    SlaveAddress =4,
+                    FunctionCode =0x3,
+                    StartAddress =64,
+                    DataNumber = (ushort)SingleTemperatureController.BUFFER_SIZE
+                }
+            },
+        };
+
+        #endregion
+
+        #region Diagnostics properties
+
+        public long LoopIterationCount => Interlocked.Read(ref _loopIterationCount);
+        public double LastLoopDurationMilliseconds => (double)Interlocked.Read(ref _lastLoopTicks) *1000.0 / Stopwatch.Frequency;
+        public double AverageLoopDurationMilliseconds => LoopIterationCount >0 ? ((double)Interlocked.Read(ref _totalLoopTicks) *1000.0 / Stopwatch.Frequency) / LoopIterationCount :0.0;
+        public long CommandQueueExecutedCount => Interlocked.Read(ref _commandExecutedCount);
 
         #endregion
     }

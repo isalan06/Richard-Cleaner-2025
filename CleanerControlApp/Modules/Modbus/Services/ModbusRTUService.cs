@@ -389,6 +389,7 @@ namespace CleanerControlApp.Modules.Modbus.Services
                     catch (TimeoutException)
                     { 
                         _frame.HasTimeout = true;
+                        _frame.HasException = true;
                     }
                     catch(Exception ex)
                     {

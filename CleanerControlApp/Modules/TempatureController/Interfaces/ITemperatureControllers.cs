@@ -16,6 +16,8 @@ namespace CleanerControlApp.Modules.TempatureController.Interfaces
         void Stop();
 
         bool[]? DeviceConnected { get; }
+        bool[]? DeviceError { get; }
+        bool[]? DeviceTimeout { get; }
 
         ISingleTemperatureController? this[int index] { get; }
 
@@ -24,5 +26,11 @@ namespace CleanerControlApp.Modules.TempatureController.Interfaces
         void SetSV(int moduleIndex, int value);
 
         IModbusRTUService? ModbusRTUService { get; }
+
+        // Diagnostics: loop timing and command execution statistics
+        long LoopIterationCount { get; }
+        double LastLoopDurationMilliseconds { get; }
+        double AverageLoopDurationMilliseconds { get; }
+        long CommandQueueExecutedCount { get; }
     }
 }

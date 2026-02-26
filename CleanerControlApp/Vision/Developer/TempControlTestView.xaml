@@ -42,6 +42,33 @@
  <Button x:Name="btnStop" Content="停止" Width="80" Height="26" Click="BtnStop_Click" />
  </StackPanel>
 
+ <!-- separator and diagnostics section -->
+ <Separator Margin="0,10,0,8" />
+ <TextBlock Text="通訊運行狀況" FontWeight="Bold" FontSize="13" Margin="0,0,0,6" />
+
+ <!-- Diagnostics: vertical list, each property uses two lines (header + value) -->
+ <StackPanel Margin="0,4,0,0">
+ <StackPanel Margin="4">
+ <TextBlock Text="迴圈次數" FontSize="12" />
+ <TextBlock x:Name="txtLoopIterationCount" Text="-" FontWeight="Bold" Margin="0,2,0,6" />
+ </StackPanel>
+
+ <StackPanel Margin="4">
+ <TextBlock Text="上次迴圈耗時 (ms)" FontSize="12" />
+ <TextBlock x:Name="txtLastLoopMs" Text="-" FontWeight="Bold" Margin="0,2,0,6" />
+ </StackPanel>
+
+ <StackPanel Margin="4">
+ <TextBlock Text="平均迴圈耗時 (ms)" FontSize="12" />
+ <TextBlock x:Name="txtAvgLoopMs" Text="-" FontWeight="Bold" Margin="0,2,0,6" />
+ </StackPanel>
+
+ <StackPanel Margin="4">
+ <TextBlock Text="命令執行次數" FontSize="12" />
+ <TextBlock x:Name="txtCmdExecCount" Text="-" FontWeight="Bold" Margin="0,2,0,6" />
+ </StackPanel>
+ </StackPanel>
+
  <!-- 可在此添加左側面板的更多控件 -->
  </StackPanel>
  </Border>
@@ -63,17 +90,25 @@
  <Grid Margin="6">
  <Grid.RowDefinitions>
  <RowDefinition Height="Auto" /> <!-- title -->
- <RowDefinition Height="Auto" /> <!-- status -->
+ <RowDefinition Height="Auto" /> <!-- status + error/time -->
  <RowDefinition Height="Auto" /> <!-- separator -->
  <RowDefinition Height="Auto" /> <!-- data -->
  <RowDefinition Height="Auto" /> <!-- separator/controls -->
  </Grid.RowDefinitions>
 
  <TextBlock Grid.Row="0" Text="TC -1" FontWeight="Bold" HorizontalAlignment="Left" />
- <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,6,0,0">
+ <StackPanel Grid.Row="1" Margin="0,6,0,0">
+ <StackPanel Orientation="Horizontal">
  <TextBlock Text="設備連線狀況" VerticalAlignment="Center" />
  <Ellipse x:Name="ellipseDev0" Width="12" Height="12" Margin="8,0,6,0" Fill="Red" Stroke="#FF888888" VerticalAlignment="Center" />
  <TextBlock x:Name="txtDevStatus0" Text="未連線" VerticalAlignment="Center" />
+ </StackPanel>
+ <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+ <TextBlock Text="Error:" VerticalAlignment="Center" />
+ <TextBlock x:Name="txtDevError0" Text="-" VerticalAlignment="Center" Margin="6,0,12,0" FontWeight="Bold" />
+ <TextBlock Text="Timeout:" VerticalAlignment="Center" />
+ <TextBlock x:Name="txtDevTimeout0" Text="-" VerticalAlignment="Center" Margin="6,0,0,0" FontWeight="Bold" />
+ </StackPanel>
  </StackPanel>
  <Separator Grid.Row="2" Margin="0,6,0,6" />
  <Grid Grid.Row="3">
@@ -122,17 +157,25 @@
  <Border Grid.Row="0" Grid.Column="1" Margin="6" Background="#FFF8F8F8" BorderBrush="#FFBBBBBB" BorderThickness="1" CornerRadius="3">
  <Grid Margin="6">
  <Grid.RowDefinitions>
- <RowDefinition Height="Auto" />
- <RowDefinition Height="Auto" />
- <RowDefinition Height="Auto" />
- <RowDefinition Height="Auto" />
- <RowDefinition Height="Auto" />
+ <RowDefinition Height="Auto" /> <!-- title -->
+ <RowDefinition Height="Auto" /> <!-- status + error/time -->
+ <RowDefinition Height="Auto" /> <!-- separator -->
+ <RowDefinition Height="Auto" /> <!-- data -->
+ <RowDefinition Height="Auto" /> <!-- separator/controls -->
  </Grid.RowDefinitions>
  <TextBlock Grid.Row="0" Text="TC -2" FontWeight="Bold" HorizontalAlignment="Left" />
- <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,6,0,0">
+ <StackPanel Grid.Row="1" Margin="0,6,0,0">
+ <StackPanel Orientation="Horizontal">
  <TextBlock Text="設備連線狀況" VerticalAlignment="Center" />
  <Ellipse x:Name="ellipseDev1" Width="12" Height="12" Margin="8,0,6,0" Fill="Red" Stroke="#FF888888" VerticalAlignment="Center" />
  <TextBlock x:Name="txtDevStatus1" Text="未連線" VerticalAlignment="Center" />
+ </StackPanel>
+ <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+ <TextBlock Text="Error:" VerticalAlignment="Center" />
+ <TextBlock x:Name="txtDevError1" Text="-" VerticalAlignment="Center" Margin="6,0,12,0" FontWeight="Bold" />
+ <TextBlock Text="Timeout:" VerticalAlignment="Center" />
+ <TextBlock x:Name="txtDevTimeout1" Text="-" VerticalAlignment="Center" Margin="6,0,0,0" FontWeight="Bold" />
+ </StackPanel>
  </StackPanel>
  <Separator Grid.Row="2" Margin="0,6,0,6" />
  <Grid Grid.Row="3">
@@ -168,6 +211,7 @@
  <TextBlock Grid.Row="7" Grid.Column="1" x:Name="txtHB1" Text="-" />
  </Grid>
 
+ <!-- controls under data -->
  <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,6,0,0">
  <TextBlock Text="SV:" VerticalAlignment="Center" Margin="0,0,6,0" />
  <TextBox x:Name="txtSetSV1" Width="80" HorizontalAlignment="Left" />
@@ -180,17 +224,25 @@
  <Border Grid.Row="1" Grid.Column="0" Margin="6" Background="#FFF8F8F8" BorderBrush="#FFBBBBBB" BorderThickness="1" CornerRadius="3">
  <Grid Margin="6">
  <Grid.RowDefinitions>
- <RowDefinition Height="Auto" />
- <RowDefinition Height="Auto" />
- <RowDefinition Height="Auto" />
- <RowDefinition Height="Auto" />
- <RowDefinition Height="Auto" />
+ <RowDefinition Height="Auto" /> <!-- title -->
+ <RowDefinition Height="Auto" /> <!-- status + error/time -->
+ <RowDefinition Height="Auto" /> <!-- separator -->
+ <RowDefinition Height="Auto" /> <!-- data -->
+ <RowDefinition Height="Auto" /> <!-- separator/controls -->
  </Grid.RowDefinitions>
  <TextBlock Grid.Row="0" Text="TC -3" FontWeight="Bold" HorizontalAlignment="Left" />
- <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,6,0,0">
+ <StackPanel Grid.Row="1" Margin="0,6,0,0">
+ <StackPanel Orientation="Horizontal">
  <TextBlock Text="設備連線狀況" VerticalAlignment="Center" />
  <Ellipse x:Name="ellipseDev2" Width="12" Height="12" Margin="8,0,6,0" Fill="Red" Stroke="#FF888888" VerticalAlignment="Center" />
  <TextBlock x:Name="txtDevStatus2" Text="未連線" VerticalAlignment="Center" />
+ </StackPanel>
+ <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+ <TextBlock Text="Error:" VerticalAlignment="Center" />
+ <TextBlock x:Name="txtDevError2" Text="-" VerticalAlignment="Center" Margin="6,0,12,0" FontWeight="Bold" />
+ <TextBlock Text="Timeout:" VerticalAlignment="Center" />
+ <TextBlock x:Name="txtDevTimeout2" Text="-" VerticalAlignment="Center" Margin="6,0,0,0" FontWeight="Bold" />
+ </StackPanel>
  </StackPanel>
  <Separator Grid.Row="2" Margin="0,6,0,6" />
  <Grid Grid.Row="3">
@@ -226,6 +278,7 @@
  <TextBlock Grid.Row="7" Grid.Column="1" x:Name="txtHB2" Text="-" />
  </Grid>
 
+ <!-- controls under data -->
  <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,6,0,0">
  <TextBlock Text="SV:" VerticalAlignment="Center" Margin="0,0,6,0" />
  <TextBox x:Name="txtSetSV2" Width="80" HorizontalAlignment="Left" />
@@ -238,17 +291,25 @@
  <Border Grid.Row="1" Grid.Column="1" Margin="6" Background="#FFF8F8F8" BorderBrush="#FFBBBBBB" BorderThickness="1" CornerRadius="3">
  <Grid Margin="6">
  <Grid.RowDefinitions>
- <RowDefinition Height="Auto" />
- <RowDefinition Height="Auto" />
- <RowDefinition Height="Auto" />
- <RowDefinition Height="Auto" />
- <RowDefinition Height="Auto" />
+ <RowDefinition Height="Auto" /> <!-- title -->
+ <RowDefinition Height="Auto" /> <!-- status + error/time -->
+ <RowDefinition Height="Auto" /> <!-- separator -->
+ <RowDefinition Height="Auto" /> <!-- data -->
+ <RowDefinition Height="Auto" /> <!-- separator/controls -->
  </Grid.RowDefinitions>
  <TextBlock Grid.Row="0" Text="TC -4" FontWeight="Bold" HorizontalAlignment="Left" />
- <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,6,0,0">
+ <StackPanel Grid.Row="1" Margin="0,6,0,0">
+ <StackPanel Orientation="Horizontal">
  <TextBlock Text="設備連線狀況" VerticalAlignment="Center" />
  <Ellipse x:Name="ellipseDev3" Width="12" Height="12" Margin="8,0,6,0" Fill="Red" Stroke="#FF888888" VerticalAlignment="Center" />
  <TextBlock x:Name="txtDevStatus3" Text="未連線" VerticalAlignment="Center" />
+ </StackPanel>
+ <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+ <TextBlock Text="Error:" VerticalAlignment="Center" />
+ <TextBlock x:Name="txtDevError3" Text="-" VerticalAlignment="Center" Margin="6,0,12,0" FontWeight="Bold" />
+ <TextBlock Text="Timeout:" VerticalAlignment="Center" />
+ <TextBlock x:Name="txtDevTimeout3" Text="-" VerticalAlignment="Center" Margin="6,0,0,0" FontWeight="Bold" />
+ </StackPanel>
  </StackPanel>
  <Separator Grid.Row="2" Margin="0,6,0,6" />
  <Grid Grid.Row="3">
@@ -284,6 +345,7 @@
  <TextBlock Grid.Row="7" Grid.Column="1" x:Name="txtHB3" Text="-" />
  </Grid>
 
+ <!-- controls under data -->
  <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,6,0,0">
  <TextBlock Text="SV:" VerticalAlignment="Center" Margin="0,0,6,0" />
  <TextBox x:Name="txtSetSV3" Width="80" HorizontalAlignment="Left" />

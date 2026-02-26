@@ -73,6 +73,22 @@ namespace CleanerControlApp.Vision.Developer
  UpdateDeviceIndicator(2, false);
  UpdateDeviceIndicator(3, false);
  }
+
+ // Update DeviceError/DeviceTimeout display
+ var devErr = _temperatureControllers?.DeviceError;
+ var devTo = _temperatureControllers?.DeviceTimeout;
+
+ txtDevError0.Text = (devErr != null && devErr.Length >0 && devErr[0]) ? "True" : "False";
+ txtDevTimeout0.Text = (devTo != null && devTo.Length >0 && devTo[0]) ? "True" : "False";
+
+ txtDevError1.Text = (devErr != null && devErr.Length >1 && devErr[1]) ? "True" : "False";
+ txtDevTimeout1.Text = (devTo != null && devTo.Length >1 && devTo[1]) ? "True" : "False";
+
+ txtDevError2.Text = (devErr != null && devErr.Length >2 && devErr[2]) ? "True" : "False";
+ txtDevTimeout2.Text = (devTo != null && devTo.Length >2 && devTo[2]) ? "True" : "False";
+
+ txtDevError3.Text = (devErr != null && devErr.Length >3 && devErr[3]) ? "True" : "False";
+ txtDevTimeout3.Text = (devTo != null && devTo.Length >3 && devTo[3]) ? "True" : "False";
  }
  catch { }
 
@@ -83,6 +99,26 @@ namespace CleanerControlApp.Vision.Developer
  UpdateDataForIndex(1);
  UpdateDataForIndex(2);
  UpdateDataForIndex(3);
+ }
+ catch { }
+
+ // Update diagnostics properties
+ try
+ {
+ if (_temperatureControllers != null)
+ {
+ txtLoopIterationCount.Text = _temperatureControllers.LoopIterationCount.ToString();
+ txtLastLoopMs.Text = _temperatureControllers.LastLoopDurationMilliseconds.ToString("F2");
+ txtAvgLoopMs.Text = _temperatureControllers.AverageLoopDurationMilliseconds.ToString("F2");
+ txtCmdExecCount.Text = _temperatureControllers.CommandQueueExecutedCount.ToString();
+ }
+ else
+ {
+ txtLoopIterationCount.Text = "-";
+ txtLastLoopMs.Text = "-";
+ txtAvgLoopMs.Text = "-";
+ txtCmdExecCount.Text = "-";
+ }
  }
  catch { }
  }
@@ -332,6 +368,9 @@ namespace CleanerControlApp.Vision.Developer
 
  public bool[]? DeviceConnected => null;
 
+ public bool[]? DeviceError => null;
+ public bool[]? DeviceTimeout => null;
+
  public ISingleTemperatureController? this[int index] => null;
 
  public int Count =>0;
@@ -339,6 +378,12 @@ namespace CleanerControlApp.Vision.Developer
  public void SetSV(int moduleIndex, int value) { }
 
  public CleanerControlApp.Modules.Modbus.Interfaces.IModbusRTUService? ModbusRTUService => null;
+
+ // implement diagnostic properties for dummy
+ public long LoopIterationCount =>0;
+ public double LastLoopDurationMilliseconds =>0.0;
+ public double AverageLoopDurationMilliseconds =>0.0;
+ public long CommandQueueExecutedCount =>0;
  }
  }
 }
