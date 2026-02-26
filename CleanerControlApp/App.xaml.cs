@@ -21,6 +21,9 @@ using CleanerControlApp.Modules.TempatureController.Services;
 using CleanerControlApp.Modules.TempatureController.Interfaces;
 using CleanerControlApp.Modules.UltrasonicDevice.Interfaces;
 using CleanerControlApp.Modules.UltrasonicDevice.Services;
+using CleanerControlApp.Modules.DeltaMS300.Interfaces;
+using CleanerControlApp.Modules.DeltaMS300.Services;
+using System.Linq;
 
 namespace CleanerControlApp
 {
@@ -214,6 +217,23 @@ namespace CleanerControlApp
                         // Construct pool service using configured pool parameters (if any)
                         services.AddSingleton<IModbusRTUPollService>(sp =>
                             new ModbusRTUPoolService(sp.GetRequiredService<ILogger<ModbusRTUPoolService>>() , communicationSettings.ModbusRTUPoolParameter));
+
+                        // Register DeltaMS300 instances (2 modules) and expose as arrays for injection
+                        services.AddSingleton<DeltaMS300[]>(sp =>
+                        {
+                            var pool = sp.GetRequiredService<IModbusRTUPollService>();
+                            var loggerFactory = sp.GetService<ILoggerFactory>();
+                            var arr = new DeltaMS300[DeltaMS300.ModuleCount];
+                            for (int i =0; i < DeltaMS300.ModuleCount; i++)
+                            {
+                                var logger = loggerFactory?.CreateLogger<DeltaMS300>();
+                                arr[i] = new DeltaMS300(i, pool, logger);
+                            }
+                            return arr;
+                        });
+
+                        // Also register as IDeltaMS300[] so consumers can request the interface array
+                        services.AddSingleton<IDeltaMS300[]>(sp => (IDeltaMS300[])sp.GetRequiredService<DeltaMS300[]>());
                         // Register TemperatureControllers using a factory so dependencies are resolved explicitly
                         services.AddSingleton<ITemperatureControllers>(sp =>
                         new TemperatureControllers(
@@ -226,6 +246,7 @@ namespace CleanerControlApp
                         sp.GetRequiredService<IModbusRTUPollService>(),
                         sp.GetRequiredService<ILogger<UltrasonicDevice>>()
                         ));
+
                     })
  .Build();
             }
