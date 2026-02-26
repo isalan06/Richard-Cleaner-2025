@@ -1,11 +1,141 @@
 <?xml version="1.0" encoding="utf-8"?>
 <UserControl x:Class="CleanerControlApp.Vision.Developer.UltrasonicDeviceTestView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d"
+             d:DesignHeight="300" d:DesignWidth="600">
     <Grid Background="White">
-        <TextBlock Text="Delta MS300 Test View" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,12,0,0" FontSize="16" FontWeight="Bold" />
-        <StackPanel Margin="12,44,12,12">
-            <TextBlock Text="This is a placeholder for Delta MS300 test UI." />
-        </StackPanel>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="215" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <TextBlock Text="超聲波設備測試" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,12,0,0" FontSize="16" FontWeight="Bold" Grid.ColumnSpan="2" />
+
+        <!-- Left panel: uses IUltrasonicDevice information -->
+        <Border Grid.Column="0" Margin="12,44,6,12" Background="#FFF8F8F8" BorderBrush="#FFCCCCCC" BorderThickness="1" CornerRadius="4" Padding="8">
+            <StackPanel>
+                <TextBlock Text="超聲波通訊集成" FontWeight="Bold" FontSize="14" Margin="0,0,0,8" />
+
+                <!-- Device connection status -->
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,4,0,0">
+                    <TextBlock Text="設備連線狀況" VerticalAlignment="Center" />
+                    <Ellipse x:Name="ellipseUDDeviceStatus" Width="14" Height="14" Margin="8,0,6,0" Fill="Red" Stroke="#FF888888" VerticalAlignment="Center" />
+                    <TextBlock x:Name="txtUDDeviceStatus" Text="未連線" VerticalAlignment="Center" />
+                </StackPanel>
+
+                <!-- Connect / Disconnect buttons (no Click handlers here) -->
+                <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                    <Button x:Name="btnUDOpen" Content="連線" Width="80" Height="26" Margin="0,0,8,0" />
+                    <Button x:Name="btnUDClose" Content="離線" Width="80" Height="26" />
+                </StackPanel>
+
+                <!-- System / Running status -->
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,8,0,0">
+                    <TextBlock Text="系統運作狀況" VerticalAlignment="Center" />
+                    <Ellipse x:Name="ellipseUDSystemStatus" Width="14" Height="14" Margin="8,0,6,0" Fill="Red" Stroke="#FF888888" VerticalAlignment="Center" />
+                    <TextBlock x:Name="txtUDSystemStatus" Text="未執行" VerticalAlignment="Center" />
+                </StackPanel>
+
+                <!-- Start/Stop buttons -->
+                <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                    <Button x:Name="btnUDStart" Content="開始" Width="80" Height="26" Margin="0,0,8,0" />
+                    <Button x:Name="btnUDStop" Content="停止" Width="80" Height="26" />
+                </StackPanel>
+
+                <Separator Margin="0,10,0,8" />
+                <TextBlock Text="通訊運行狀況" FontWeight="Bold" FontSize="13" Margin="0,0,0,6" />
+
+                <!-- Diagnostics: loop times and command counts (spacing reduced to2) -->
+                <StackPanel Margin="0,2,0,0">
+                    <StackPanel Margin="2">
+                        <TextBlock Text="迴圈次數" FontSize="12" />
+                        <TextBlock x:Name="txtUDLoopIterationCount" Text="-" FontWeight="Bold" Margin="0,1,0,2" />
+                    </StackPanel>
+
+                    <StackPanel Margin="2">
+                        <TextBlock Text="上次迴圈耗時 (ms)" FontSize="12" />
+                        <TextBlock x:Name="txtUDLastLoopMs" Text="-" FontWeight="Bold" Margin="0,1,0,2" />
+                    </StackPanel>
+
+                    <StackPanel Margin="2">
+                        <TextBlock Text="平均迴圈耗時 (ms)" FontSize="12" />
+                        <TextBlock x:Name="txtUDAvgLoopMs" Text="-" FontWeight="Bold" Margin="0,1,0,2" />
+                    </StackPanel>
+
+                    <StackPanel Margin="2">
+                        <TextBlock Text="命令執行次數" FontSize="12" />
+                        <TextBlock x:Name="txtUDCmdExecCount" Text="-" FontWeight="Bold" Margin="0,1,0,2" />
+                    </StackPanel>
+                </StackPanel>
+
+                <!-- Error/Timeout section (spacing reduced to2) -->
+                <Separator Margin="0,10,0,8" />
+                <TextBlock Text="診斷" FontWeight="Bold" FontSize="13" Margin="0,0,0,6" />
+                <StackPanel Margin="0,2,0,0">
+                    <StackPanel Margin="2">
+                        <TextBlock Text="Error" FontSize="12" />
+                        <TextBlock x:Name="txtUDError" Text="-" FontWeight="Bold" Margin="0,1,0,2" />
+                    </StackPanel>
+                    <StackPanel Margin="2">
+                        <TextBlock Text="Timeout" FontSize="12" />
+                        <TextBlock x:Name="txtUDTimeout" Text="-" FontWeight="Bold" Margin="0,1,0,2" />
+                    </StackPanel>
+                </StackPanel>
+
+            </StackPanel>
+        </Border>
+
+        <!-- Right large outer box now contains the moved 設備參數 -->
+        <Border Grid.Column="1" Margin="6,44,12,12" Background="#FFFDFDFD" BorderBrush="#FFCCCCCC" BorderThickness="1" CornerRadius="4" Padding="8">
+            <StackPanel>
+                <TextBlock Text="設備參數" FontWeight="Bold" FontSize="13" Margin="0,0,0,6" />
+
+                <!-- Moved Device properties from IUltrasonicDevice -->
+                <StackPanel Margin="0,4,0,0">
+                    <StackPanel Margin="4">
+                        <TextBlock Text="已啟用" FontSize="12" />
+                        <TextBlock x:Name="txtUDEnabled" Text="-" FontWeight="Bold" Margin="0,2,0,6" />
+                    </StackPanel>
+
+                    <StackPanel Margin="4">
+                        <TextBlock Text="設定電流 (A)" FontSize="12" />
+                        <TextBlock x:Name="txtUDSettingCurrent" Text="-" FontWeight="Bold" Margin="0,2,0,6" />
+                    </StackPanel>
+
+                    <StackPanel Margin="4">
+                        <TextBlock Text="頻率 (kHz)" FontSize="12" />
+                        <TextBlock x:Name="txtUDFrequency" Text="-" FontWeight="Bold" Margin="0,2,0,6" />
+                    </StackPanel>
+
+                    <StackPanel Margin="4">
+                        <TextBlock Text="時間 (s)" FontSize="12" />
+                        <TextBlock x:Name="txtUDTime" Text="-" FontWeight="Bold" Margin="0,2,0,6" />
+                    </StackPanel>
+
+                    <StackPanel Margin="4">
+                        <TextBlock Text="功率 (%)" FontSize="12" />
+                        <TextBlock x:Name="txtUDPower" Text="-" FontWeight="Bold" Margin="0,2,0,6" />
+                    </StackPanel>
+                </StackPanel>
+
+                <!-- New Operate buttons -->
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,6,0,0">
+                    <Button x:Name="btnUDOperateOn" Content="啟動" Width="80" Height="26" Margin="0,0,8,0" Click="BtnUDOperateOn_Click" />
+                    <Button x:Name="btnUDOperateOff" Content="關閉" Width="80" Height="26" Click="BtnUDOperateOff_Click" />
+                </StackPanel>
+
+                <!-- New Current set input and button -->
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,8,0,0">
+                    <TextBlock VerticalAlignment="Center" Text="電流設定 (A):" Margin="0,0,6,0" />
+                    <TextBox x:Name="txtUDSetCurrent" Width="100" Height="22" VerticalAlignment="Center" />
+                    <Button x:Name="btnUDSetCurrent" Content="設定" Width="60" Height="24" Margin="8,0,0,0" Click="BtnUDSetCurrent_Click" />
+                </StackPanel>
+
+            </StackPanel>
+        </Border>
+
     </Grid>
 </UserControl>

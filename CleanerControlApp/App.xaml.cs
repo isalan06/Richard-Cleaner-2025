@@ -19,6 +19,8 @@ using CleanerControlApp.Modules.MitsubishiPLC.Interfaces;
 using CleanerControlApp.Modules.MitsubishiPLC.Services;
 using CleanerControlApp.Modules.TempatureController.Services;
 using CleanerControlApp.Modules.TempatureController.Interfaces;
+using CleanerControlApp.Modules.UltrasonicDevice.Interfaces;
+using CleanerControlApp.Modules.UltrasonicDevice.Services;
 
 namespace CleanerControlApp
 {
@@ -218,7 +220,13 @@ namespace CleanerControlApp
                         sp.GetRequiredService<IModbusRTUPollService>(),
                         sp.GetRequiredService<ILogger<TemperatureControllers>>()
                         ));
- })
+                        // Register UltrasonicDevice using a factory so dependencies are resolved explicitly
+                        services.AddSingleton<IUltrasonicDevice>(sp =>
+                        new UltrasonicDevice(
+                        sp.GetRequiredService<IModbusRTUPollService>(),
+                        sp.GetRequiredService<ILogger<UltrasonicDevice>>()
+                        ));
+                    })
  .Build();
             }
             catch (Exception ex)
