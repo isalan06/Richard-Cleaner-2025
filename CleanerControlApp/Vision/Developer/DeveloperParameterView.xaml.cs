@@ -26,8 +26,11 @@ namespace CleanerControlApp.Vision.Developer
  .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
  var config = builder.Build();
  var title = config.GetSection("AppSettings").GetValue<string>("Title");
- // You can use the loaded settings as needed; for now set DataContext or show in Tooltip
+ // Only set tooltip when a meaningful title is provided (avoid default "Hello World")
+ if (!string.IsNullOrWhiteSpace(title) && !string.Equals(title, "Hello World", System.StringComparison.OrdinalIgnoreCase))
+ {
  this.ToolTip = title;
+ }
  }
  catch
  {
@@ -93,6 +96,22 @@ namespace CleanerControlApp.Vision.Developer
  catch (System.Exception ex)
  {
  MessageBox.Show("寫入參數檔失敗: " + ex.Message, "錯誤", MessageBoxButton.OK, MessageBoxImage.Error);
+ }
+ }
+
+ private void Btn_UnitParameter_Click(object sender, RoutedEventArgs e)
+ {
+ try
+ {
+ // Create instance of the DevUnitParameterView and load its data, then set it into the right content area
+ var view = new DevUnitParameterView();
+ // Ask the child view to load settings from configuration / DI singletons
+ view.LoadUnitSettings();
+ RightContent.Content = view;
+ }
+ catch
+ {
+ // ignore
  }
  }
  }

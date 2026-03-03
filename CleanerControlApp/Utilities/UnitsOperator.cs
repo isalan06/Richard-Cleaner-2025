@@ -18,6 +18,8 @@ namespace CleanerControlApp.Utilities
 
                 // Get CommunicationSettings from file
                 var commFromFile = ConfigLoader.GetCommunicationSettings();
+                var unitFromFile = ConfigLoader.GetUnitSettings();
+                var moduleFromFile = ConfigLoader.GetModuleSettings();
 
                 // If application host is available, update the DI-registered singleton instance
                 var host = global::CleanerControlApp.App.AppHost;
@@ -30,6 +32,18 @@ namespace CleanerControlApp.Utilities
                         diComm.ModbusTCPParameter = commFromFile.ModbusTCPParameter;
                         diComm.ModbusRTUParameter = commFromFile.ModbusRTUParameter;
                         diComm.ModbusRTUPoolParameter = commFromFile.ModbusRTUPoolParameter;
+                    }
+
+                    var diUnit = host.Services.GetService<UnitSettings>();
+                    if (diUnit != null && unitFromFile != null)
+                    {
+                        diUnit.DryingTanks = unitFromFile.DryingTanks;
+                    }
+
+                    var diModule = host.Services.GetService<ModuleSettings>();
+                    if (diModule != null && moduleFromFile != null)
+                    {
+                        diModule.DryingTanks = moduleFromFile.DryingTanks;
                     }
                 }
             }
