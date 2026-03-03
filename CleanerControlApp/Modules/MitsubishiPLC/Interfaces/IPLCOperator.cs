@@ -67,7 +67,7 @@ namespace CleanerControlApp.Modules.MitsubishiPLC.Interfaces
         public bool Heater1CoverBIn { get; }
 
         public bool Heater2CoverFIn { get; }
-        public bool Hater2CoverBIn { get; }
+        public bool Heater2CoverBIn { get; }
         public bool HotWaterPosLL { get; }
         public bool HotWaterPosL { get; }
         public bool HotWaterPosH { get; }
@@ -260,55 +260,55 @@ namespace CleanerControlApp.Modules.MitsubishiPLC.Interfaces
 
         #region Command DO
 
-        public bool Command_ShuttleXServoMotorPLS { get; }
-        public bool Command_ShuttleZServoMotorPLS { get; }
-        public bool Command_CleanerZServoMotorPLS { get; }
-        public bool Command_TankZServoMotorPLS { get; }
-        public bool Command_ShuttleXServoMotorSIGN { get; }
-        public bool Command_ShuttleZServoMotorSIGN { get; }
-        public bool Command_CleanerZServoMotorSIGN { get; }
-        public bool Command_TankZServoMotorSIGN { get; }
+        public bool Command_ShuttleXServoMotorPLS { get; set; }
+        public bool Command_ShuttleZServoMotorPLS { get; set; }
+        public bool Command_CleanerZServoMotorPLS { get; set; }
+        public bool Command_TankZServoMotorPLS { get; set; }
+        public bool Command_ShuttleXServoMotorSIGN { get; set; }
+        public bool Command_ShuttleZServoMotorSIGN { get; set; }
+        public bool Command_CleanerZServoMotorSIGN { get; set; }
+        public bool Command_TankZServoMotorSIGN { get; set; }
 
-        public bool Command_ShuttleXServoPosCommandStop { get; }
-        public bool Command_ShuttleXServoAlarmReset { get; }
-        public bool Command_ShuttleXServoServoOn { get; }
-        public bool Command_ShuttleZServoPosCommandStop { get; }
-        public bool Command_ShuttleZServoAlarmReset { get; }
-        public bool Command_ShuttleZServoServoOn { get; }
-        public bool Command_CleanerZServoPosCommandStop { get; }
-        public bool Command_CleanerZServoAlarmReset { get; }
+        public bool Command_ShuttleXServoPosCommandStop { get; set; }
+        public bool Command_ShuttleXServoAlarmReset { get; set; }
+        public bool Command_ShuttleXServoServoOn { get; set; }
+        public bool Command_ShuttleZServoPosCommandStop { get; set; }
+        public bool Command_ShuttleZServoAlarmReset { get; set; }
+        public bool Command_ShuttleZServoServoOn { get; set; }
+        public bool Command_CleanerZServoPosCommandStop { get; set; }
+        public bool Command_CleanerZServoAlarmReset { get; set; }
 
-        public bool Command_CleanerZServoServoOn { get; }
-        public bool Command_TankZServoPosCommandStop { get; }
-        public bool Command_TankZServoAlarmReset { get; }
-        public bool Command_TankZServoServoOn { get; }
+        public bool Command_CleanerZServoServoOn { get; set; }
+        public bool Command_TankZServoPosCommandStop { get; set; }
+        public bool Command_TankZServoAlarmReset { get; set; }
+        public bool Command_TankZServoServoOn { get; set; }
 
-        public bool Command_ShuttleXServoMotorBrake { get; }
-        public bool Command_ShuttleZServoMotorBrake { get; }
-        public bool Command_CleanerZServoMotorBrake { get; }
-        public bool Command_TankZServoMotorBrake { get; }
-        public bool Command_Heater1Blower { get; }
-        public bool Command_Heater2Blower { get; }
+        public bool Command_ShuttleXServoMotorBrake { get; set; }
+        public bool Command_ShuttleZServoMotorBrake { get; set; }
+        public bool Command_CleanerZServoMotorBrake { get; set; }
+        public bool Command_TankZServoMotorBrake { get; set; }
+        public bool Command_Heater1Blower { get; set; }
+        public bool Command_Heater2Blower { get; set; }
 
-        public bool Command_ShuttleZClampOpen { get; }
-        public bool Command_ShuttleZClampClose { get; }
-        public bool Command_InputWaterValveOpen { get; }
-        public bool Command_TankOutputWaterValveOpen { get; }
-        public bool Command_HeaterTankSwitchValveOpen { get; }
+        public bool Command_ShuttleZClampOpen { get; set; }
+        public bool Command_ShuttleZClampClose { get; set; }
+        public bool Command_InputWaterValveOpen { get; set; }
+        public bool Command_TankOutputWaterValveOpen { get; set; }
+        public bool Command_HeaterTankSwitchValveOpen { get; set; }
 
-        public bool Command_CleanerCoverOpen { get; }
-        public bool Command_TankCoverOpen { get; }
-        public bool Command_Heater1CoverOpen { get; }
-        public bool Command_Heater2CoverOpen { get; }
-        public bool Command_CleanerAirKnifeOpen { get; }
-        public bool Command_TankAirKnifeOpen { get; }
-        public bool Command_Heater1AirOpen { get; }
-        public bool Command_Heater2AirOpen { get; }
+        public bool Command_CleanerCoverOpen { get; set; }
+        public bool Command_TankCoverOpen { get; set; }
+        public bool Command_Heater1CoverOpen { get; set; }
+        public bool Command_Heater2CoverOpen { get; set; }
+        public bool Command_CleanerAirKnifeOpen { get; set; }
+        public bool Command_TankAirKnifeOpen { get; set; }
+        public bool Command_Heater1AirOpen { get; set; }
+        public bool Command_Heater2AirOpen { get; set; }
 
-        public bool Command_LighterRed { get; }
-        public bool Command_LighterYellow { get; }
-        public bool Command_LighterGreen { get; }
-        public bool Command_LighterBuzzer { get; }
+        public bool Command_LighterRed { get; set; }
+        public bool Command_LighterYellow { get; set; }
+        public bool Command_LighterGreen { get; set; }
+        public bool Command_LighterBuzzer { get; set; }
 
         #endregion
 

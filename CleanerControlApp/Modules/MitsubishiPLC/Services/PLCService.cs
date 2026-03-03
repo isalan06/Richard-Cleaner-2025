@@ -19,6 +19,7 @@ namespace CleanerControlApp.Modules.MitsubishiPLC.Services
         // 預設 DIO X 數量（可視需求調整）
         private const int DefaultDICount = 5;
         private PLC_Bit_Union[] _dioX = Array.Empty<PLC_Bit_Union>();
+        private PLC_Bit_Union[] _dioX_Sim = Array.Empty<PLC_Bit_Union>();
 
         // 預設 DIO Y (DO) 數量
         private const int DefaultDOCount = 4;
@@ -91,6 +92,7 @@ namespace CleanerControlApp.Modules.MitsubishiPLC.Services
         private void InitializeArrays()
         {
             _dioX = new PLC_Bit_Union[DefaultDICount];
+            _dioX_Sim = new PLC_Bit_Union[DefaultDICount];
             _dioY = new PLC_Bit_Union[DefaultDOCount];
             _statusIO = new PLC_Bit_Union[DefaultStatusIOCount];
             _motionPos = new PLC_DWord_Union[DefaultMotionPosCount];
@@ -406,6 +408,12 @@ namespace CleanerControlApp.Modules.MitsubishiPLC.Services
             set => _dioX = value ?? Array.Empty<PLC_Bit_Union>();
         }
 
+        public PLC_Bit_Union[] DIO_X_Sim
+        {
+            get => _dioX_Sim;
+            set => _dioX_Sim = value ?? Array.Empty<PLC_Bit_Union>();
+        }
+
         public PLC_Bit_Union[] DIO_Y
         {
             get => _dioY;
@@ -483,83 +491,83 @@ namespace CleanerControlApp.Modules.MitsubishiPLC.Services
 
         #region DI
 
-        public bool ShuttleXLimitN => _dioX[0].Bit0;
-        public bool ShuttleXLimitP => _dioX[0].Bit1;
-        public bool ShuttleZLimitN => _dioX[0].Bit2;
-        public bool ShuttleZLimitP => _dioX[0].Bit3;
-        public bool CleanerZLimitN => _dioX[0].Bit4;
-        public bool CleanerZLimitP => _dioX[0].Bit5;
-        public bool TankZLimitN => _dioX[0].Bit6;
-        public bool TankZLimitP => _dioX[0].Bit7;
+        public bool ShuttleXLimitN => _dioX[0].Bit0 || _dioX_Sim[0].Bit0;
+        public bool ShuttleXLimitP => _dioX[0].Bit1 || _dioX_Sim[0].Bit1;
+        public bool ShuttleZLimitN => _dioX[0].Bit2 || _dioX_Sim[0].Bit2;
+        public bool ShuttleZLimitP => _dioX[0].Bit3 || _dioX_Sim[0].Bit3;
+        public bool CleanerZLimitN => _dioX[0].Bit4 || _dioX_Sim[0].Bit4;
+        public bool CleanerZLimitP => _dioX[0].Bit5 || _dioX_Sim[0].Bit5;
+        public bool TankZLimitN => _dioX[0].Bit6 || _dioX_Sim[0].Bit6;
+        public bool TankZLimitP => _dioX[0].Bit7 || _dioX_Sim[0].Bit0;
 
-        public bool ShuttleXIdle => _dioX[0].Bit8;
-        public bool ShuttleXInPos => _dioX[0].Bit9;
-        public bool ShuttleXAlarm => _dioX[0].Bit10;
-        public bool ShuttleXHome => _dioX[0].Bit11;
+        public bool ShuttleXIdle => _dioX[0].Bit8 || _dioX_Sim[0].Bit8;
+        public bool ShuttleXInPos => _dioX[0].Bit9 || _dioX_Sim[0].Bit9;
+        public bool ShuttleXAlarm => _dioX[0].Bit10 || _dioX_Sim[0].Bit10;
+        public bool ShuttleXHome => _dioX[0].Bit11 || _dioX_Sim[0].Bit11;
 
-        public bool ShuttleZIdle => _dioX[0].Bit12;
-        public bool ShuttleZInPos => _dioX[0].Bit13;
-        public bool ShuttleZAlarm => _dioX[0].Bit14;
-        public bool ShuttleZHome => _dioX[0].Bit15;
+        public bool ShuttleZIdle => _dioX[0].Bit12 || _dioX_Sim[0].Bit12;
+        public bool ShuttleZInPos => _dioX[0].Bit13 || _dioX_Sim[0].Bit13;
+        public bool ShuttleZAlarm => _dioX[0].Bit14 || _dioX_Sim[0].Bit14;
+        public bool ShuttleZHome => _dioX[0].Bit15 || _dioX_Sim[0].Bit15;
 
-        public bool CleanerZIdle => _dioX[1].Bit0;
-        public bool CleanerZInPos => _dioX[1].Bit1;
-        public bool CleanerZAlarm => _dioX[1].Bit2;
-        public bool CleanerZHome => _dioX[1].Bit3;
-        public bool TankZIdle => _dioX[1].Bit4;
-        public bool TankZInPos => _dioX[1].Bit5;
-        public bool TankZAlarm => _dioX[1].Bit6;
-        public bool TankZHome => _dioX[1].Bit7;
+        public bool CleanerZIdle => _dioX[1].Bit0 || _dioX_Sim[1].Bit0;
+        public bool CleanerZInPos => _dioX[1].Bit1 || _dioX_Sim[1].Bit1;
+        public bool CleanerZAlarm => _dioX[1].Bit2 || _dioX_Sim[1].Bit2;
+        public bool CleanerZHome => _dioX[1].Bit3 || _dioX_Sim[1].Bit3;
+        public bool TankZIdle => _dioX[1].Bit4 || _dioX_Sim[1].Bit4;
+        public bool TankZInPos => _dioX[1].Bit5 || _dioX_Sim[1].Bit5;
+        public bool TankZAlarm => _dioX[1].Bit6 || _dioX_Sim[1].Bit6;
+        public bool TankZHome => _dioX[1].Bit7 || _dioX_Sim[1].Bit7;
 
-        public bool ShuttleZClamperExist1 => _dioX[1].Bit8;
-        public bool ShuttleZClamperExist2 => _dioX[1].Bit9;
-        public bool ShuttleZFClamperOpen => _dioX[1].Bit10;
-        public bool ShuttleZFClamperClose => _dioX[1].Bit11;
-        public bool ShuttleZBClamperOpen => _dioX[1].Bit12;
-        public bool ShuttleZBClamperClose => _dioX[1].Bit13;
-        public bool InSlotExist1 => _dioX[1].Bit14;
-        public bool InSlotExist2 => _dioX[1].Bit15;
+        public bool ShuttleZClamperExist1 => _dioX[1].Bit8 || _dioX_Sim[1].Bit8;
+        public bool ShuttleZClamperExist2 => _dioX[1].Bit9 || _dioX_Sim[1].Bit9;
+        public bool ShuttleZFClamperOpen => _dioX[1].Bit10 || _dioX_Sim[1].Bit10;
+        public bool ShuttleZFClamperClose => _dioX[1].Bit11 || _dioX_Sim[1].Bit11;
+        public bool ShuttleZBClamperOpen => _dioX[1].Bit12 || _dioX_Sim[1].Bit12;
+        public bool ShuttleZBClamperClose => _dioX[1].Bit13 || _dioX_Sim[1].Bit13;
+        public bool InSlotExist1 => _dioX[1].Bit14 || _dioX_Sim[1].Bit14;
+        public bool InSlotExist2 => _dioX[1].Bit15 || _dioX_Sim[1].Bit15;
 
-        public bool InSlotExist3 => _dioX[2].Bit0;
-        public bool InSlotExist4 => _dioX[2].Bit1;
-        public bool InSlotExist5 => _dioX[2].Bit2;
-        public bool OutSlotExist1 => _dioX[2].Bit3;
-        public bool OutSlotExist2 => _dioX[2].Bit4;
-        public bool OutSlotExist3 => _dioX[2].Bit5;
-        public bool OutSlotExist4 => _dioX[2].Bit6;
-        public bool OutSlotExist5 => _dioX[2].Bit7;
+        public bool InSlotExist3 => _dioX[2].Bit0 || _dioX_Sim[2].Bit0;
+        public bool InSlotExist4 => _dioX[2].Bit1 || _dioX_Sim[2].Bit1;
+        public bool InSlotExist5 => _dioX[2].Bit2 || _dioX_Sim[2].Bit2;
+        public bool OutSlotExist1 => _dioX[2].Bit3 || _dioX_Sim[2].Bit3;
+        public bool OutSlotExist2 => _dioX[2].Bit4 || _dioX_Sim[2].Bit4;
+        public bool OutSlotExist3 => _dioX[2].Bit5 || _dioX_Sim[2].Bit5;
+        public bool OutSlotExist4 => _dioX[2].Bit6 || _dioX_Sim[2].Bit6;
+        public bool OutSlotExist5 => _dioX[2].Bit7 || _dioX_Sim[2].Bit7;
 
-        public bool CleanerCoverFIn => _dioX[2].Bit8;
-        public bool CleanerCoverBIn => _dioX[2].Bit9;
-        public bool TankCoverFIn => _dioX[2].Bit10;
-        public bool TankCoverBIn => _dioX[2].Bit11;
-        public bool TankWaterPosL => _dioX[2].Bit12;
-        public bool TankWaterPosH => _dioX[2].Bit13;
-        public bool Heater1CoverFIn => _dioX[2].Bit14;
-        public bool Heater1CoverBIn => _dioX[2].Bit15;
+        public bool CleanerCoverFIn => _dioX[2].Bit8 || _dioX_Sim[2].Bit8;
+        public bool CleanerCoverBIn => _dioX[2].Bit9 || _dioX_Sim[2].Bit9;
+        public bool TankCoverFIn => _dioX[2].Bit10 || _dioX_Sim[2].Bit10;
+        public bool TankCoverBIn => _dioX[2].Bit11 || _dioX_Sim[2].Bit11;
+        public bool TankWaterPosL => _dioX[2].Bit12 || _dioX_Sim[2].Bit12;
+        public bool TankWaterPosH => _dioX[2].Bit13 || _dioX_Sim[2].Bit13;
+        public bool Heater1CoverFIn => _dioX[2].Bit14 || _dioX_Sim[2].Bit14;
+        public bool Heater1CoverBIn => _dioX[2].Bit15 || _dioX_Sim[2].Bit15;
 
-        public bool Heater2CoverFIn => _dioX[3].Bit0;
-        public bool Hater2CoverBIn => _dioX[3].Bit1;
-        public bool HotWaterPosLL => _dioX[3].Bit2;
-        public bool HotWaterPosL => _dioX[3].Bit3;
-        public bool HotWaterPosH => _dioX[3].Bit4;
-        public bool HotWaterPosHH => _dioX[3].Bit5;
-        public bool WasteWaterPosH => _dioX[3].Bit6;
+        public bool Heater2CoverFIn => _dioX[3].Bit0 || _dioX_Sim[3].Bit0;
+        public bool Heater2CoverBIn => _dioX[3].Bit1 || _dioX_Sim[3].Bit1;
+        public bool HotWaterPosLL => _dioX[3].Bit2 || _dioX_Sim[3].Bit2;
+        public bool HotWaterPosL => _dioX[3].Bit3 || _dioX_Sim[3].Bit3;
+        public bool HotWaterPosH => _dioX[3].Bit4 || _dioX_Sim[3].Bit4;
+        public bool HotWaterPosHH => _dioX[3].Bit5 || _dioX_Sim[3].Bit5;
+        public bool WasteWaterPosH => _dioX[3].Bit6 || _dioX_Sim[3].Bit6;
 
-        public bool EMOSign => _dioX[3].Bit8;
-        public bool MaintainSign => _dioX[3].Bit9;
-        public bool ShuttleZClamperOpenSign => _dioX[3].Bit10;
-        public bool ShuttleZClamperCloseSign => _dioX[3].Bit11;
-        public bool MainPowerSign => _dioX[3].Bit12;
-        public bool FrontDoor1 => _dioX[3].Bit13;
-        public bool FrontDoor2 => _dioX[3].Bit14;
-        public bool FrontDoor3 => _dioX[3].Bit15;
+        public bool EMOSign => _dioX[3].Bit8 || _dioX_Sim[3].Bit8;
+        public bool MaintainSign => _dioX[3].Bit9 || _dioX_Sim[3].Bit9;
+        public bool ShuttleZClamperOpenSign => _dioX[3].Bit10 || _dioX_Sim[3].Bit10;
+        public bool ShuttleZClamperCloseSign => _dioX[3].Bit11 || _dioX_Sim[3].Bit11;
+        public bool MainPowerSign => _dioX[3].Bit12 || _dioX_Sim[3].Bit12;
+        public bool FrontDoor1 => _dioX[3].Bit13 || _dioX_Sim[3].Bit13;
+        public bool FrontDoor2 => _dioX[3].Bit14 || _dioX_Sim[3].Bit14;
+        public bool FrontDoor3 => _dioX[3].Bit15 || _dioX_Sim[3].Bit15;
 
-        public bool FrontDoor4 => _dioX[4].Bit0;
-        public bool SideDoor1 => _dioX[4].Bit1;
-        public bool SideDoor2 => _dioX[4].Bit2;
-        public bool Leakage1 => _dioX[4].Bit3;
-        public bool Leakage2 => _dioX[4].Bit4;
+        public bool FrontDoor4 => _dioX[4].Bit0 || _dioX_Sim[4].Bit0;
+        public bool SideDoor1 => _dioX[4].Bit1 || _dioX_Sim[4].Bit1;
+        public bool SideDoor2 => _dioX[4].Bit2 || _dioX_Sim[4].Bit2;
+        public bool Leakage1 => _dioX[4].Bit3 || _dioX_Sim[4].Bit3;
+        public bool Leakage2 => _dioX[4].Bit4 || _dioX_Sim[4].Bit4;
 
         #endregion
 

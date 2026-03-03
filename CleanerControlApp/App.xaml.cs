@@ -1,29 +1,31 @@
-﻿using CleanerControlApp.Modules.UserManagement.Services;
+﻿using CleanerControlApp.Hardwares.DryingTank.Interfacaes;
+using CleanerControlApp.Hardwares.DryingTank.Services;
+using CleanerControlApp.Modules.DeltaMS300.Interfaces;
+using CleanerControlApp.Modules.DeltaMS300.Services;
+using CleanerControlApp.Modules.MitsubishiPLC.Interfaces;
+using CleanerControlApp.Modules.MitsubishiPLC.Services;
+using CleanerControlApp.Modules.Modbus.Interfaces;
+using CleanerControlApp.Modules.Modbus.Services;
+using CleanerControlApp.Modules.TempatureController.Interfaces;
+using CleanerControlApp.Modules.TempatureController.Services;
+using CleanerControlApp.Modules.UltrasonicDevice.Interfaces;
+using CleanerControlApp.Modules.UltrasonicDevice.Services;
+using CleanerControlApp.Modules.UserManagement.Services;
 using CleanerControlApp.Utilities;
+using CleanerControlApp.Utilities.HandShaking;
+using CleanerControlApp.Vision;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using NLog.Extensions.Logging;
+using SQLitePCL;
 using System.Configuration;
 using System.Data;
+using System.IO.Ports;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Windows;
-using System.IO.Ports;
-
-using SQLitePCL;
-using CleanerControlApp.Vision;
-using NLog.Extensions.Logging;
-using CleanerControlApp.Modules.Modbus.Interfaces;
-using CleanerControlApp.Modules.Modbus.Services;
-using CleanerControlApp.Modules.MitsubishiPLC.Interfaces;
-using CleanerControlApp.Modules.MitsubishiPLC.Services;
-using CleanerControlApp.Modules.TempatureController.Services;
-using CleanerControlApp.Modules.TempatureController.Interfaces;
-using CleanerControlApp.Modules.UltrasonicDevice.Interfaces;
-using CleanerControlApp.Modules.UltrasonicDevice.Services;
-using CleanerControlApp.Modules.DeltaMS300.Interfaces;
-using CleanerControlApp.Modules.DeltaMS300.Services;
-using System.Linq;
 
 namespace CleanerControlApp
 {
@@ -115,11 +117,26 @@ namespace CleanerControlApp
                         var communicationSettings = new CommunicationSettings();
                         communicationSettings = ConfigLoader.GetCommunicationSettings();
 
+                        // 同樣載入元件設定，確保在註冊服務前就有設定物件可用
+                        var unitSettings = new UnitSettings();
+                        unitSettings = ConfigLoader.GetUnitSettings();
+
+                        // 同樣載入元件設定，確保在註冊服務前就有設定物件可用
+                        var moduleSettings = new ModuleSettings();
+                        moduleSettings = ConfigLoader.GetModuleSettings();
+
                         // 註冊設定物件
                         services.Configure<AppSettings>(hostContext.Configuration.GetSection("AppSettings"));
                         services.AddSingleton(settings); // 直接註冊已經綁定的設定物件，讓它可以被注入到需要的地方
                         services.Configure<CommunicationSettings>(hostContext.Configuration.GetSection("CommunicationSettings"));
                         services.AddSingleton(communicationSettings); // 直接註冊已經綁定的通訊設定物件，讓它可以被注入到需要的地方
+                        services.Configure<UnitSettings>(hostContext.Configuration.GetSection("UnitSettings"));
+                        services.AddSingleton(unitSettings);
+                        services.Configure<ModuleSettings>(hostContext.Configuration.GetSection("ModuleSettings"));
+                        services.AddSingleton(moduleSettings);
+
+                        services.AddSingleton<HandShakingManager>(); // 註冊 HandShakingManager 為 Singleton
+
                         services.AddSingleton<UserManager>(); // 註冊 UserManager 為 Singleton
                         services.AddTransient<LoginWindow>(); // 改為 Transient
                         services.AddSingleton<MainWindow>(); // 註冊 MainWindow 為 Singleton
@@ -142,7 +159,7 @@ namespace CleanerControlApp
 
                             if (!string.IsNullOrWhiteSpace(ip))
                                 svc.Ip = ip!;
-                            if (port >0)
+                            if (port > 0)
                                 svc.Port = port;
 
                             return svc as IModbusTCPService;
@@ -173,10 +190,10 @@ namespace CleanerControlApp
                             if (!string.IsNullOrWhiteSpace(portName))
                                 svc.PortName = portName!;
 
-                            if (baud >0)
+                            if (baud > 0)
                                 svc.BaudRate = baud;
 
-                            if (dataBits >0)
+                            if (dataBits > 0)
                                 svc.DataBits = dataBits;
 
                             // parse parity
@@ -216,7 +233,7 @@ namespace CleanerControlApp
                         // ILogger<ModbusRTUPoolService> will be resolved from DI; provide the int explicitly
                         // Construct pool service using configured pool parameters (if any)
                         services.AddSingleton<IModbusRTUPollService>(sp =>
-                            new ModbusRTUPoolService(sp.GetRequiredService<ILogger<ModbusRTUPoolService>>() , communicationSettings.ModbusRTUPoolParameter));
+                            new ModbusRTUPoolService(sp.GetRequiredService<ILogger<ModbusRTUPoolService>>(), communicationSettings.ModbusRTUPoolParameter));
 
                         // Register DeltaMS300 instances (2 modules) and expose as arrays for injection
                         services.AddSingleton<DeltaMS300[]>(sp =>
@@ -224,7 +241,7 @@ namespace CleanerControlApp
                             var pool = sp.GetRequiredService<IModbusRTUPollService>();
                             var loggerFactory = sp.GetService<ILoggerFactory>();
                             var arr = new DeltaMS300[DeltaMS300.ModuleCount];
-                            for (int i =0; i < DeltaMS300.ModuleCount; i++)
+                            for (int i = 0; i < DeltaMS300.ModuleCount; i++)
                             {
                                 var logger = loggerFactory?.CreateLogger<DeltaMS300>();
                                 arr[i] = new DeltaMS300(i, pool, logger);
@@ -247,8 +264,26 @@ namespace CleanerControlApp
                         sp.GetRequiredService<ILogger<UltrasonicDevice>>()
                         ));
 
+                        services.AddSingleton<IDryingTank[]>(sp =>
+                        {
+                            var loggerFactory = sp.GetService<ILoggerFactory>();
+                            var plc = sp.GetRequiredService<IPLCOperator>();
+                            var tempControllers = sp.GetRequiredService<ITemperatureControllers>();
+                            var unitSettings = sp.GetRequiredService<UnitSettings>();
+                            var moduleSetting = sp.GetRequiredService<ModuleSettings>();
+
+                            var arr = new IDryingTank[DryingTank.DryingTankCount];
+                            for (int i =0; i < DryingTank.DryingTankCount; i++)
+                            {
+                                var logger = loggerFactory?.CreateLogger<DryingTank>();
+                                arr[i] = new DryingTank(i, logger, plc, tempControllers, unitSettings, moduleSetting);
+                            }
+
+                            return arr;
+                        });
+
                     })
- .Build();
+                    .Build();
             }
             catch (Exception ex)
             {

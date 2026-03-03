@@ -33,7 +33,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Hardwares\" />
+    <Folder Include="Hardwares\DryingTank\Models\" />
+    <Folder Include="Modules\Motor\Models\" />
   </ItemGroup>
 
 </Project>

@@ -1,4 +1,4 @@
-<UserControl x:Class="CleanerControlApp.Vision.IOView"
+﻿<UserControl x:Class="CleanerControlApp.Vision.IOView"
  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -6,6 +6,22 @@
  mc:Ignorable="d"
  d:DesignHeight="600" d:DesignWidth="800">
  <Grid Background="White">
- <TextBlock Text="IO Page" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="36"/>
+ <Grid.ColumnDefinitions>
+ <ColumnDefinition Width="180" />
+ <ColumnDefinition />
+ </Grid.ColumnDefinitions>
+
+ <!-- 左側方框：放置按鈕 -->
+ <Border Grid.Column="0" Margin="8" Padding="8" BorderBrush="Gray" BorderThickness="1" CornerRadius="4" Background="#FFF">
+ <StackPanel VerticalAlignment="Top" Margin="0,0,0,8">
+ <Button x:Name="BtnTabDI" Content="DI" Height="72" HorizontalAlignment="Stretch" Margin="0,0,0,6" Click="BtnTabDI_Click" />
+ <Button x:Name="BtnTabDO" Content="DO" Height="72" HorizontalAlignment="Stretch" Margin="0,0,0,6" Click="BtnTabDO_Click" />
+ </StackPanel>
+ </Border>
+
+ <!--右側內容：用 ContentControl 作為崁入點 -->
+ <Border Grid.Column="1" Margin="8" Padding="8" BorderBrush="LightGray" BorderThickness="0" CornerRadius="4" Background="#FAFAFA">
+ <ContentControl x:Name="TabContentPlaceholder" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
+ </Border>
  </Grid>
 </UserControl>

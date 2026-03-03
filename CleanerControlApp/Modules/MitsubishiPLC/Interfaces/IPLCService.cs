@@ -11,6 +11,7 @@ namespace CleanerControlApp.Modules.MitsubishiPLC.Interfaces
     {
         // DIO_X 改為陣列（可讀寫），代表多個 PLC_Bit_Union 條目
         public PLC_Bit_Union[] DIO_X { get; set; }
+        public PLC_Bit_Union[] DIO_X_Sim { get; set; }
 
         // 新增 DIO_Y（數位輸出）陣列
         public PLC_Bit_Union[] DIO_Y { get; set; }

@@ -36,6 +36,20 @@ namespace CleanerControlApp.Utilities
             return communicationSettings;
         }
 
+        public static UnitSettings GetUnitSettings()
+        { 
+            var unitSettings = new UnitSettings();
+            _configuration?.GetSection("UnitSettings")?.Bind(unitSettings);
+            return unitSettings;
+        }
+
+        public static ModuleSettings GetModuleSettings()
+        { 
+            var moduleSettings = new ModuleSettings();
+            _configuration?.GetSection($"{nameof(ModuleSettings)}")?.Bind(moduleSettings);
+            return moduleSettings;
+        }
+
         public static void SetSettings(AppSettings settings)
         {
             if (settings == null) throw new ArgumentNullException(nameof(settings));
@@ -99,6 +113,82 @@ namespace CleanerControlApp.Utilities
             if (commNode == null) commNode = JsonObject.Parse("{}");
 
             root["CommunicationSettings"] = commNode;
+
+            // Write back
+            var options = new JsonSerializerOptions { WriteIndented = true };
+            var newJson = root.ToJsonString(options);
+            File.WriteAllText(path, newJson, Encoding.UTF8);
+
+            // Reload configuration
+            var builder = new ConfigurationBuilder()
+                .SetBasePath(AppContext.BaseDirectory)
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+            _configuration = builder.Build();
+        }
+
+        public static void SetUnitSettings(UnitSettings unitSettings)
+        {
+            if (unitSettings == null) throw new ArgumentNullException(nameof(unitSettings));
+
+            var path = Path.Combine(AppContext.BaseDirectory, "appsettings.json");
+            if (!File.Exists(path)) throw new FileNotFoundException("Configuration file not found.", path);
+
+            // Read existing JSON
+            var jsonText = File.ReadAllText(path);
+            JsonObject? root = null;
+            try
+            {
+                root = JsonNode.Parse(jsonText)?.AsObject();
+            }
+            catch (JsonException)
+            {
+                root = new JsonObject();
+            }
+            if (root == null) root = new JsonObject();
+
+            // Replace CommunicationSettings section
+            var commNode = JsonSerializer.SerializeToNode(unitSettings, options: new JsonSerializerOptions { WriteIndented = false });
+            if (commNode == null) commNode = JsonObject.Parse("{}");
+
+            root["UnitSettings"] = commNode;
+
+            // Write back
+            var options = new JsonSerializerOptions { WriteIndented = true };
+            var newJson = root.ToJsonString(options);
+            File.WriteAllText(path, newJson, Encoding.UTF8);
+
+            // Reload configuration
+            var builder = new ConfigurationBuilder()
+                .SetBasePath(AppContext.BaseDirectory)
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+            _configuration = builder.Build();
+        }
+
+        public static void SetModuleSettings(ModuleSettings moduleSettings)
+        {
+            if (moduleSettings == null) throw new ArgumentNullException(nameof(moduleSettings));
+
+            var path = Path.Combine(AppContext.BaseDirectory, "appsettings.json");
+            if (!File.Exists(path)) throw new FileNotFoundException("Configuration file not found.", path);
+
+            // Read existing JSON
+            var jsonText = File.ReadAllText(path);
+            JsonObject? root = null;
+            try
+            {
+                root = JsonNode.Parse(jsonText)?.AsObject();
+            }
+            catch (JsonException)
+            {
+                root = new JsonObject();
+            }
+            if (root == null) root = new JsonObject();
+
+            // Replace CommunicationSettings section
+            var commNode = JsonSerializer.SerializeToNode(moduleSettings, options: new JsonSerializerOptions { WriteIndented = false });
+            if (commNode == null) commNode = JsonObject.Parse("{}");
+
+            root["ModuleSettings"] = commNode;
 
             // Write back
             var options = new JsonSerializerOptions { WriteIndented = true };
