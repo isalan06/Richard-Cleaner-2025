@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.IO;
 
 namespace CleanerControlApp.Utilities.Alarm
 {
@@ -23,6 +24,7 @@ namespace CleanerControlApp.Utilities.Alarm
 
     /// <summary>
     /// Provides a static list of alarms with lookup helpers.
+    /// Loads from external AlarmMessage.csv in application base directory if present; otherwise writes built-in defaults to that file.
     /// </summary>
     public static class AlarmList
     {
@@ -38,6 +40,182 @@ namespace CleanerControlApp.Utilities.Alarm
             { "ALM503", new AlarmInfo("ALM503", AlarmType.Warning, "烘乾槽#2", "上蓋打開逾時", "確認蓋子/感測器狀態") },
             { "ALM504", new AlarmInfo("ALM504", AlarmType.Warning, "烘乾槽#2", "上蓋關閉逾時", "確認蓋子/感測器狀態") }
         };
+
+        private static readonly object _fileLock = new();
+
+        static AlarmList()
+        {
+            try
+            {
+                var baseDir = AppContext.BaseDirectory ?? AppDomain.CurrentDomain.BaseDirectory;
+                var file = Path.Combine(baseDir, "AlarmMessage.csv");
+
+                if (File.Exists(file))
+                {
+                    // Load from file, replacing the in-memory defaults
+                    var content = File.ReadAllText(file, Encoding.UTF8);
+                    var records = ParseCsvRecords(content);
+                    var entries = new Dictionary<string, AlarmInfo>(StringComparer.OrdinalIgnoreCase);
+
+                    // Expect header at first record, skip it
+                    foreach (var fields in records.Skip(1))
+                    {
+                        if (fields == null || fields.Length ==0)
+                            continue;
+
+                        var code = fields.ElementAtOrDefault(0)?.Trim() ?? string.Empty;
+                        if (string.IsNullOrEmpty(code))
+                            continue;
+
+                        var typeStr = fields.ElementAtOrDefault(1)?.Trim() ?? string.Empty;
+                        if (!Enum.TryParse<AlarmType>(typeStr, true, out var type))
+                            type = AlarmType.Warning;
+
+                        var module = fields.ElementAtOrDefault(2) ?? string.Empty;
+                        var desc = fields.ElementAtOrDefault(3) ?? string.Empty;
+                        var solution = fields.ElementAtOrDefault(4) ?? string.Empty;
+
+                        entries[code] = new AlarmInfo(code, type, module, desc, solution);
+                    }
+
+                    if (entries.Count >0)
+                    {
+                        _alarms.Clear();
+                        foreach (var kv in entries)
+                            _alarms[kv.Key] = kv.Value;
+                    }
+                }
+                else
+                {
+                    // File does not exist - write current defaults to file for editing
+                    var sb = new StringBuilder();
+                    sb.AppendLine("Code,Type,Module,Description,Solution");
+                    foreach (var kv in _alarms.Values)
+                    {
+                        sb.AppendLine(string.Join(",", EscapeCsv(kv.Code), EscapeCsv(kv.Type.ToString()), EscapeCsv(kv.Module), EscapeCsv(kv.Description), EscapeCsv(kv.Solution)));
+                    }
+
+                    File.WriteAllText(file, sb.ToString(), Encoding.UTF8);
+                }
+            }
+            catch
+            {
+                // Ignore errors - fallback to built-in defaults
+            }
+        }
+
+        private static string EscapeCsv(string value)
+        {
+            if (value == null)
+                return string.Empty;
+            var needsQuotes = value.Contains(',') || value.Contains('"') || value.Contains('\r') || value.Contains('\n');
+            var v = value.Replace("\"", "\"\"");
+            if (needsQuotes)
+                return "\"" + v + "\"";
+            return v;
+        }
+
+        private static List<string[]> ParseCsvRecords(string content)
+        {
+            var records = new List<string[]>();
+            if (string.IsNullOrEmpty(content))
+                return records;
+
+            var fields = new List<string>();
+            var sb = new StringBuilder();
+            bool inQuotes = false;
+            for (int i =0; i < content.Length; i++)
+            {
+                var c = content[i];
+                if (c == '"')
+                {
+                    if (inQuotes && i +1 < content.Length && content[i +1] == '"')
+                    {
+                        // Escaped quote
+                        sb.Append('"');
+                        i++; // skip next quote
+                    }
+                    else
+                    {
+                        inQuotes = !inQuotes;
+                    }
+                }
+                else if (c == ',' && !inQuotes)
+                {
+                    fields.Add(sb.ToString());
+                    sb.Clear();
+                }
+                else if ((c == '\r' || c == '\n') && !inQuotes)
+                {
+                    // handle CRLF or LF
+                    if (c == '\r' && i +1 < content.Length && content[i +1] == '\n')
+                        i++; // skip LF
+
+                    fields.Add(sb.ToString());
+                    sb.Clear();
+                    records.Add(fields.ToArray());
+                    fields = new List<string>();
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+
+            // final field/record
+            if (inQuotes)
+            {
+                // unterminated quote - still try to proceed
+            }
+
+            // append last field
+            fields.Add(sb.ToString());
+            // if there is any field or last record not empty, add
+            if (fields.Count >1 || (fields.Count ==1 && !string.IsNullOrEmpty(fields[0])))
+                records.Add(fields.ToArray());
+
+            return records;
+        }
+
+        private static string[] ParseCsvLine(string line)
+        {
+            var result = new List<string>();
+            if (line == null)
+                return result.ToArray();
+
+            var sb = new StringBuilder();
+            bool inQuotes = false;
+            for (int i =0; i < line.Length; i++)
+            {
+                char c = line[i];
+                if (c == '"')
+                {
+                    if (inQuotes && i +1 < line.Length && line[i +1] == '"')
+                    {
+                        // escaped quote
+                        sb.Append('"');
+                        i++; // skip next quote
+                    }
+                    else
+                    {
+                        inQuotes = !inQuotes;
+                    }
+                }
+                else if (c == ',' && !inQuotes)
+                {
+                    result.Add(sb.ToString());
+                    sb.Clear();
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+
+            // add final field
+            result.Add(sb.ToString());
+            return result.ToArray();
+        }
 
         /// <summary>
         /// Read-only view of all alarms.
@@ -79,6 +257,52 @@ namespace CleanerControlApp.Utilities.Alarm
                                             || a.Module.Contains(query, StringComparison.OrdinalIgnoreCase)
                                             || a.Description.Contains(query, StringComparison.OrdinalIgnoreCase)
                                             || a.Solution.Contains(query, StringComparison.OrdinalIgnoreCase));
+        }
+
+        /// <summary>
+        /// Update the Solution text for an existing alarm code and persist the AlarmMessage.csv file.
+        /// Returns true on success.
+        /// </summary>
+        public static bool UpdateSolution(string code, string solution)
+        {
+            if (string.IsNullOrWhiteSpace(code)) return false;
+            code = code.Trim();
+
+            lock (_fileLock)
+            {
+                try
+                {
+                    if (_alarms.TryGetValue(code, out var existing))
+                    {
+                        var updated = existing with { Solution = solution ?? string.Empty };
+                        _alarms[code] = updated;
+                    }
+                    else
+                    {
+                        // If not existing, add a minimal entry
+                        var added = new AlarmInfo(code, AlarmType.Warning, string.Empty, string.Empty, solution ?? string.Empty);
+                        _alarms[code] = added;
+                    }
+
+                    // write full file
+                    var baseDir = AppContext.BaseDirectory ?? AppDomain.CurrentDomain.BaseDirectory;
+                    var file = Path.Combine(baseDir, "AlarmMessage.csv");
+
+                    var sb = new StringBuilder();
+                    sb.AppendLine("Code,Type,Module,Description,Solution");
+                    foreach (var kv in _alarms.Values)
+                    {
+                        sb.AppendLine(string.Join(",", EscapeCsv(kv.Code), EscapeCsv(kv.Type.ToString()), EscapeCsv(kv.Module), EscapeCsv(kv.Description), EscapeCsv(kv.Solution)));
+                    }
+
+                    File.WriteAllText(file, sb.ToString(), Encoding.UTF8);
+                    return true;
+                }
+                catch(Exception ex)
+                {
+                    return false;
+                }
+            }
         }
     }
 }

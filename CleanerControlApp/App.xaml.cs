@@ -26,6 +26,7 @@ using System.IO.Ports;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Windows;
+using CleanerControlApp.Services;
 
 namespace CleanerControlApp
 {
@@ -69,7 +70,7 @@ namespace CleanerControlApp
             {
                 Batteries_V2.Init(); // 初始化 SQLitePCL
 
-                // 先讀取 appsettings.json，決定是否顯示 Console 視窗，不然無法在 Logger 設定前顯示
+                //先讀取 appsettings.json，決定是否顯示 Console 視窗，不然無法在 Logger 設定前顯示
                 var configBuilder = new ConfigurationBuilder()
                     .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
                     .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
@@ -80,7 +81,7 @@ namespace CleanerControlApp
                     ShowConsole();
                 }
 
-                // 先初始化使用者資料庫
+                //先初始化使用者資料庫
                 UserRepository.Initialize();
 
                 // 建立應用程式主機
@@ -104,7 +105,7 @@ namespace CleanerControlApp
                     })
                     .ConfigureServices((hostContext, services) =>
                     {
-                        // 這裡的 hostContext.Configuration 已經包含了 appsettings.json 的設定，可以直接使用
+                        //這裡的 hostContext.Configuration 已經包含了 appsettings.json 的設定，可以直接使用
                         var configuration = hostContext.Configuration;
 
                         ConfigLoader.Load();
@@ -127,9 +128,9 @@ namespace CleanerControlApp
 
                         // 註冊設定物件
                         services.Configure<AppSettings>(hostContext.Configuration.GetSection("AppSettings"));
-                        services.AddSingleton(settings); // 直接註冊已經綁定的設定物件，讓它可以被注入到需要的地方
+                        services.AddSingleton(settings); //直接註冊已經綁定的設定物件，讓它可以被注入到需要的地方
                         services.Configure<CommunicationSettings>(hostContext.Configuration.GetSection("CommunicationSettings"));
-                        services.AddSingleton(communicationSettings); // 直接註冊已經綁定的通訊設定物件，讓它可以被注入到需要的地方
+                        services.AddSingleton(communicationSettings); //直接註冊已經綁定的通訊設定物件，讓它可以被注入到需要的地方
                         services.Configure<UnitSettings>(hostContext.Configuration.GetSection("UnitSettings"));
                         services.AddSingleton(unitSettings);
                         services.Configure<ModuleSettings>(hostContext.Configuration.GetSection("ModuleSettings"));
@@ -144,8 +145,8 @@ namespace CleanerControlApp
                         {
                             // Read configuration values
                             var cfgSection = hostContext.Configuration.GetSection("CommunicationSettings:ModbusTCPParameter");
-                            var ip = (communicationSettings.ModbusTCPParameter == null) ? "127.0.0.1" : communicationSettings.ModbusTCPParameter.IP; // 直接從已綁定的設定物件讀取
-                            var port = (communicationSettings.ModbusTCPParameter == null) ? 502 : communicationSettings.ModbusTCPParameter.Port; // 直接從已綁定的設定物件讀取
+                            var ip = (communicationSettings.ModbusTCPParameter == null) ? "127.0.0.1" : communicationSettings.ModbusTCPParameter.IP; //直接從已綁定的設定物件讀取
+                            var port = (communicationSettings.ModbusTCPParameter == null) ?502 : communicationSettings.ModbusTCPParameter.Port; //直接從已綁定的設定物件讀取
 
                             // Resolve logger (ILogger<T> is provided by the host)
                             var logger = sp.GetService<ILogger<ModbusTCPService>>();
@@ -159,7 +160,7 @@ namespace CleanerControlApp
 
                             if (!string.IsNullOrWhiteSpace(ip))
                                 svc.Ip = ip!;
-                            if (port > 0)
+                            if (port >0)
                                 svc.Port = port;
 
                             return svc as IModbusTCPService;
@@ -172,12 +173,12 @@ namespace CleanerControlApp
                         services.AddSingleton<IModbusRTUService>(sp =>
                         {
                             //var cfg = hostContext.Configuration.GetSection("CommunicationSettings:ModbusRTUParameter");
-                            var cfg = communicationSettings.ModbusRTUParameter; // 直接從已綁定的設定物件讀取
+                            var cfg = communicationSettings.ModbusRTUParameter; //直接從已綁定的設定物件讀取
                             var portName = string.IsNullOrWhiteSpace(cfg?.PortName) ? "COM1" : cfg!.PortName;
-                            var baud = (cfg?.BaudRate ?? 0) > 0 ? cfg!.BaudRate : 9600;
+                            var baud = (cfg?.BaudRate ??0) >0 ? cfg!.BaudRate :9600;
                             var parityStr = string.IsNullOrWhiteSpace(cfg?.Parity) ? "None" : cfg!.Parity;
-                            var dataBits = (cfg?.DataBits ?? 0) > 0 ? cfg!.DataBits : 8;
-                            var stopBitVal = (cfg?.StopBits ?? 0) > 0 ? cfg!.StopBits : 1;
+                            var dataBits = (cfg?.DataBits ??0) >0 ? cfg!.DataBits :8;
+                            var stopBitVal = (cfg?.StopBits ??0) >0 ? cfg!.StopBits :1;
 
                             var logger = sp.GetService<ILogger<ModbusRTUService>>();
 
@@ -190,10 +191,10 @@ namespace CleanerControlApp
                             if (!string.IsNullOrWhiteSpace(portName))
                                 svc.PortName = portName!;
 
-                            if (baud > 0)
+                            if (baud >0)
                                 svc.BaudRate = baud;
 
-                            if (dataBits > 0)
+                            if (dataBits >0)
                                 svc.DataBits = dataBits;
 
                             // parse parity
@@ -241,7 +242,7 @@ namespace CleanerControlApp
                             var pool = sp.GetRequiredService<IModbusRTUPollService>();
                             var loggerFactory = sp.GetService<ILoggerFactory>();
                             var arr = new DeltaMS300[DeltaMS300.ModuleCount];
-                            for (int i = 0; i < DeltaMS300.ModuleCount; i++)
+                            for (int i =0; i < DeltaMS300.ModuleCount; i++)
                             {
                                 var logger = loggerFactory?.CreateLogger<DeltaMS300>();
                                 arr[i] = new DeltaMS300(i, pool, logger);
@@ -281,6 +282,9 @@ namespace CleanerControlApp
 
                             return arr;
                         });
+
+                        // Register System background service to run with the host
+                        services.AddHostedService<SystemBackgroundService>();
 
                     })
                     .Build();

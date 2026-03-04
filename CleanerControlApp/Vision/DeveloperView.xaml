@@ -140,6 +140,40 @@
  <dev:UltrasonicDeviceTestView HorizontalAlignment="Stretch" />
  </TabItem>
 
+ <!-- New Message Edit tab -->
+ <TabItem>
+ <TabItem.Header>
+ <Grid>
+ <Grid.ColumnDefinitions>
+ <ColumnDefinition SharedSizeGroup="TabHeaderWidth" />
+ </Grid.ColumnDefinitions>
+ <TextBlock TextAlignment="Center" HorizontalAlignment="Center">
+ <Run>Message</Run>
+ <LineBreak/>
+ <Run>Edit</Run>
+ </TextBlock>
+ </Grid>
+ </TabItem.Header>
+ <dev:DevMessageEditView HorizontalAlignment="Stretch" />
+ </TabItem>
+
+ <!-- New Module Test tab -->
+ <TabItem>
+ <TabItem.Header>
+ <Grid>
+ <Grid.ColumnDefinitions>
+ <ColumnDefinition SharedSizeGroup="TabHeaderWidth" />
+ </Grid.ColumnDefinitions>
+ <TextBlock TextAlignment="Center" HorizontalAlignment="Center">
+ <Run>Module</Run>
+ <LineBreak/>
+ <Run>Test</Run>
+ </TextBlock>
+ </Grid>
+ </TabItem.Header>
+ <dev:DevModuleTestView HorizontalAlignment="Stretch" />
+ </TabItem>
+
  </TabControl>
  </Grid>
 </UserControl>

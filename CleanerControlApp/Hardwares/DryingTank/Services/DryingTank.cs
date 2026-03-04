@@ -529,7 +529,7 @@ namespace CleanerControlApp.Hardwares.DryingTank.Services
             CheckTimeout();
             // Ensure AlarmManager polls registered flag getters so changes (like _Cover_Open_Timeout)
             // are detected and logged.
-            AlarmManager.CheckFlagGetters();
+            //AlarmManager.CheckFlagGetters();
 
             AutoProcedure();
 

@@ -1,0 +1,63 @@
+<UserControl x:Class="CleanerControlApp.Vision.Developer.DevMessageEditView"
+ xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+ xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+ xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+ mc:Ignorable="d"
+ d:DesignHeight="450" d:DesignWidth="800">
+ <Grid Background="White">
+ <Grid.ColumnDefinitions>
+ <ColumnDefinition Width="1*" />
+ <ColumnDefinition Width="2*" />
+ </Grid.ColumnDefinitions>
+
+ <TextBlock Grid.ColumnSpan="2" Text="&#x8A0A;&#x606F;&#x7DE8;&#x8F2F;" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="10" FontSize="16" FontWeight="Bold" />
+
+ <!-- Placeholder content: replace with actual message edit UI -->
+ <Border Grid.Column="0" Margin="10,44,5,10" BorderBrush="Gray" BorderThickness="1" CornerRadius="4" Background="#FFF8F8F8">
+ <StackPanel Margin="8">
+ <!-- Title inside the left panel -->
+ <TextBlock Text="&#x932F;&#x8AA4;&#x8A0A;&#x606F;&#x7DE8;&#x8F2F;" FontWeight="Bold" Margin="0,0,0,8" />
+
+ <!-- Label and custom searchable dropdown for Alarm Codes -->
+ <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+ <TextBlock Text="&#x932F;&#x8AA4;&#x78BC;:" VerticalAlignment="Center" Margin="0,0,8,0" />
+ <Grid>
+ <TextBox x:Name="txtAlarmSearch" Width="110" MinWidth="120" VerticalAlignment="Center" TextChanged="txtAlarmSearch_TextChanged" KeyDown="txtAlarmSearch_KeyDown" HorizontalAlignment="Left" />
+ <Popup x:Name="popupSuggestions" PlacementTarget="{Binding ElementName=txtAlarmSearch}" Placement="Bottom" StaysOpen="False" AllowsTransparency="True" Focusable="False">
+ <Border Background="White" BorderBrush="Gray" BorderThickness="1" CornerRadius="2">
+ <ListBox x:Name="lbAlarmSuggestions" Width="220" MaxHeight="200" MouseUp="lbAlarmSuggestions_MouseUp" KeyboardNavigation.TabNavigation="Local" />
+ </Border>
+ </Popup>
+ </Grid>
+ </StackPanel>
+
+ <!-- Display selected alarm information -->
+ <StackPanel Margin="0,12,0,0">
+ <TextBlock x:Name="txtCodeDisplay" Text="錯誤碼: " FontWeight="Normal" Margin="0,2" />
+ <TextBlock x:Name="txtTypeDisplay" Text="類別: " FontWeight="Normal" Margin="0,2" />
+ <TextBlock x:Name="txtModuleDisplay" Text="模組: " FontWeight="Normal" Margin="0,2" />
+ <TextBlock x:Name="txtDescriptionDisplay" Text="描述: " FontWeight="Normal" Margin="0,2" TextWrapping="Wrap" />
+
+ <TextBlock Text="說明:" FontWeight="Bold" Margin="0,8,0,4" />
+ <!-- Make RichTextBox editable and set FlowDocument defaults to reduce spacing -->
+ <RichTextBox x:Name="rtbSolution" Height="164" IsReadOnly="False" VerticalScrollBarVisibility="Auto">
+ <FlowDocument LineStackingStrategy="BlockLineHeight" LineHeight="14" FontSize="12">
+ <FlowDocument.Resources>
+ <Style TargetType="Paragraph">
+ <Setter Property="Margin" Value="0" />
+ <Setter Property="LineHeight" Value="14" />
+ </Style>
+ </FlowDocument.Resources>
+ <Paragraph />
+ </FlowDocument>
+ </RichTextBox>
+
+ <!-- Save button -->
+ <Button x:Name="btnSaveSolution" Content="儲存" Width="80" Margin="0,8,0,0" HorizontalAlignment="Left" Click="BtnSaveSolution_Click" />
+ </StackPanel>
+
+ </StackPanel>
+ </Border>
+ </Grid>
+</UserControl>
