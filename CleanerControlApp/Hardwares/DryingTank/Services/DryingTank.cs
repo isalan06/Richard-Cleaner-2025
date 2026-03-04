@@ -90,6 +90,8 @@ namespace CleanerControlApp.Hardwares.DryingTank.Services
             RefreshTimeoutValue();
 
             StartLoop();
+
+            Start();
         }
 
         #endregion
@@ -312,7 +314,7 @@ namespace CleanerControlApp.Hardwares.DryingTank.Services
         }
 
         public bool Auto => _auto;
-        public bool Pasuing => _pausing;
+        public bool Pausing => _pausing;
         public bool Heating => _heating;
         public bool Cassette => _cassette;
         public bool Initialized => _initialized;
@@ -682,17 +684,22 @@ namespace CleanerControlApp.Hardwares.DryingTank.Services
             if (_unitSettings.DryingTanks != null)
             {
                 _pvLowTimeoutThreshold_Value = _unitSettings.DryingTanks[_moduleIndex].PV_Low_Timeout_Second;
-                _pvHighTimeoutThreshold_Value = _unitSettings.DryingTanks[_moduleIndex].PV_Low_Timeout_Second;
-                _coverOpenTimeoutThreshold_Value = _unitSettings.DryingTanks[_moduleIndex].PV_Low_Timeout_Second;
-                _coverCloseTimeoutThreshold_Value = _unitSettings.DryingTanks[_moduleIndex].PV_Low_Timeout_Second;
+                _pvHighTimeoutThreshold_Value = _unitSettings.DryingTanks[_moduleIndex].PV_High_Timeout_Second;
+                _coverOpenTimeoutThreshold_Value = _unitSettings.DryingTanks[_moduleIndex].Cover_Close_Timeout_Second;
+                _coverCloseTimeoutThreshold_Value = _unitSettings.DryingTanks[_moduleIndex].Cover_Open_Timeout_Second;
+
+                _pvLowTimeoutThreshold = TimeSpan.FromSeconds(_pvLowTimeoutThreshold_Value);
+                _pvHighTimeoutThreshold = TimeSpan.FromSeconds(_pvHighTimeoutThreshold_Value);
+                _coverOpenTimeoutThreshold = TimeSpan.FromSeconds(_coverOpenTimeoutThreshold_Value);
+                _coverCloseTimeoutThreshold = TimeSpan.FromSeconds(_coverCloseTimeoutThreshold_Value);
             }
         }
 
         // Timer thresholds (can be adjusted). If module settings provide timeout values they can be used here instead.
-        private readonly TimeSpan _pvLowTimeoutThreshold = TimeSpan.FromSeconds(_pvLowTimeoutThreshold_Value);
-        private readonly TimeSpan _pvHighTimeoutThreshold = TimeSpan.FromSeconds(_pvHighTimeoutThreshold_Value);
-        private readonly TimeSpan _coverOpenTimeoutThreshold = TimeSpan.FromSeconds(_coverOpenTimeoutThreshold_Value);
-        private readonly TimeSpan _coverCloseTimeoutThreshold = TimeSpan.FromSeconds(_coverCloseTimeoutThreshold_Value);
+        private TimeSpan _pvLowTimeoutThreshold = TimeSpan.FromSeconds(_pvLowTimeoutThreshold_Value);
+        private TimeSpan _pvHighTimeoutThreshold = TimeSpan.FromSeconds(_pvHighTimeoutThreshold_Value);
+        private TimeSpan _coverOpenTimeoutThreshold = TimeSpan.FromSeconds(_coverOpenTimeoutThreshold_Value);
+        private TimeSpan _coverCloseTimeoutThreshold = TimeSpan.FromSeconds(_coverCloseTimeoutThreshold_Value);
 
         // Start times for each monitored condition (null when condition not active)
         private DateTime? _pvLowStart;
@@ -717,7 +724,7 @@ namespace CleanerControlApp.Hardwares.DryingTank.Services
         { 
             // Conditions to monitor (per request):
             // PV low timeout condition active when: !Heating && !LowTemperature
-            bool pvLowCondition = !Heating && !LowTemperature;
+            bool pvLowCondition = !Heating && !LowTemperature && false; // 因為低溫目的是在將加熱關掉，在本專案溫度控制器並無法降溫，所以暫時不啟用此條件
             // PV high timeout condition active when: Heating && !HighTemperature
             bool pvHighCondition = Heating && !HighTemperature;
             // Cover open timeout when: !Command_HeaterCoverClose && !Sensor_CoverOpen

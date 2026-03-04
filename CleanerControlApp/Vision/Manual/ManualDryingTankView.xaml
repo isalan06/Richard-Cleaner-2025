@@ -1,0 +1,28 @@
+<UserControl x:Class="CleanerControlApp.Vision.Manual.ManualDryingTankView"
+ xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+ xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+ xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+ xmlns:template="clr-namespace:CleanerControlApp.Vision.Template"
+ mc:Ignorable="d"
+ d:DesignHeight="400" d:DesignWidth="600">
+  <Grid Background="Transparent">
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="*" />
+    </Grid.RowDefinitions>
+
+    <!-- Top title -->
+    <TextBlock Text="烘乾槽 手動操作" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,10,0,10" />
+
+    <!-- Canvas below the title -->
+    <Canvas x:Name="MainCanvas" Grid.Row="1" Background="Transparent">
+      <!-- Inner Grid sized to the Canvas so we can center the template control easily -->
+      <Grid x:Name="InnerGrid" Canvas.Left="0" Canvas.Top="0"
+ Width="994"
+ Height="524">
+        <template:Template_DryingTank HorizontalAlignment="Right" VerticalAlignment="Top" Loaded="Template_DryingTank_Loaded" Margin="0,104,-24,0" />
+      </Grid>
+    </Canvas>
+  </Grid>
+</UserControl>

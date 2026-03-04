@@ -1,0 +1,652 @@
+<UserControl x:Class="CleanerControlApp.Vision.Template.Template_DryingTank"
+ xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+ xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+ xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+ mc:Ignorable="d"
+ d:DesignHeight="300" Width="862" x:Name="RootControl">
+  <Grid Background="Transparent" Margin="10,19,0,0">
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition Width="0*"/>
+      <ColumnDefinition Width="10*"/>
+      <ColumnDefinition Width="61*"/>
+    </Grid.ColumnDefinitions>
+    <Canvas x:Name="RootCanvas" Margin="33,5,0,5" Grid.Column="2">
+      <!-- Left tank -->
+      <Rectangle Canvas.Left="20" Canvas.Top="30" Width="150" Height="220" Stroke="#2B72C2" StrokeThickness="2" Fill="White" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+      <!-- Right tank -->
+      <Rectangle Canvas.Left="256" Canvas.Top="30" Width="150" Height="220" Stroke="#2B72C2" StrokeThickness="2" Fill="White" HorizontalAlignment="Center" VerticalAlignment="Top"/>
+
+      <!-- Tank titles (use English to avoid encoding issues) -->
+      <TextBlock Text="烘乾槽 #2" FontSize="20" Canvas.Left="49" Canvas.Top="77" Foreground="#333333" TextAlignment="Center" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+      <TextBlock Text="烘乾槽 #1" FontSize="20" Canvas.Left="290" Canvas.Top="77" Foreground="#333333" TextAlignment="Center" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+
+      <!-- Temperature controller icons -->
+      <Border Canvas.Left="30" Canvas.Top="40" Width="40" Height="32" BorderBrush="Gray" BorderThickness="1" CornerRadius="3">
+        <Border.Style>
+          <Style TargetType="Border">
+            <Setter Property="Background" Value="#FFFFFF"/>
+            <Style.Triggers>
+              <DataTrigger Binding="{Binding HeatingRight, ElementName=RootControl}" Value="True">
+                <Setter Property="Background" Value="#FF0000"/>
+              </DataTrigger>
+            </Style.Triggers>
+          </Style>
+        </Border.Style>
+        <Image Source="pack://application:,,,/CleanerControlApp;component/Pictures/TC.png" Stretch="Uniform"/>
+      </Border>
+      <Border Canvas.Left="270" Canvas.Top="40" Width="40" Height="32" BorderBrush="Gray" BorderThickness="1" CornerRadius="3" HorizontalAlignment="Left" VerticalAlignment="Center">
+        <Border.Style>
+          <Style TargetType="Border">
+            <Setter Property="Background" Value="#FFFFFF"/>
+            <Style.Triggers>
+              <DataTrigger Binding="{Binding HeatingLeft, ElementName=RootControl}" Value="True">
+                <Setter Property="Background" Value="#FF0000"/>
+              </DataTrigger>
+            </Style.Triggers>
+          </Style>
+        </Border.Style>
+        <Image Source="pack://application:,,,/CleanerControlApp;component/Pictures/TC.png" Stretch="Uniform"/>
+      </Border>
+
+      <!-- Covers (top open lids) -->
+      <Image Source="pack://application:,,,/CleanerControlApp;component/Pictures/Cover.png" Canvas.Left="42" Canvas.Top="-10" Width="110" Height="40" RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Left" VerticalAlignment="Center">
+        <Image.RenderTransform>
+          <RotateTransform Angle="0" />
+        </Image.RenderTransform>
+      </Image>
+      <Image Source="pack://application:,,,/CleanerControlApp;component/Pictures/Cover.png" Canvas.Left="278" Canvas.Top="-10" Width="120" Height="40" RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Left" VerticalAlignment="Center">
+        <Image.RenderTransform>
+          <RotateTransform Angle="0" />
+        </Image.RenderTransform>
+      </Image>
+
+      <!-- Blowers and valves at bottom right of each tank -->
+      <Image Source="pack://application:,,,/CleanerControlApp;component/Pictures/Blower.png" Canvas.Left="114" Canvas.Top="200" Width="48" Height="48" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+      <Image Source="pack://application:,,,/CleanerControlApp;component/Pictures/Blower.png" Canvas.Left="348" Canvas.Top="195" Width="48" Height="48" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+
+      <!-- Air valve icons left of each blower -->
+      <Image Source="pack://application:,,,/CleanerControlApp;component/Pictures/AirValve.png" Canvas.Left="22" Canvas.Top="220" Width="36" Height="28" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+      <Image Source="pack://application:,,,/CleanerControlApp;component/Pictures/AirValve.png" Canvas.Left="263" Canvas.Top="217" Width="36" Height="28" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+
+      <!-- Status labels with green boxes (changed to red per request) -->
+      <Border Canvas.Left="203" Canvas.Top="224" BorderBrush="#2E993E" BorderThickness="1" CornerRadius="3" Padding="4" HorizontalAlignment="Left" VerticalAlignment="Center">
+        <Border.Style>
+          <Style TargetType="Border">
+            <Setter Property="Background" Value="#FFFFFF"/>
+            <Style.Triggers>
+              <DataTrigger Binding="{Binding CommandHeaterAirLeft, ElementName=RootControl}" Value="True">
+                <Setter Property="Background" Value="#FF0000"/>
+              </DataTrigger>
+            </Style.Triggers>
+          </Style>
+        </Border.Style>
+        <TextBlock Text="Y56 - Air" FontSize="10" Foreground="#2E993E">
+          <TextBlock.Style>
+            <Style TargetType="TextBlock">
+              <Setter Property="Foreground" Value="#2E993E"/>
+              <Style.Triggers>
+                <DataTrigger Binding="{Binding CommandHeaterAirLeft, ElementName=RootControl}" Value="True">
+                  <Setter Property="Foreground" Value="White"/>
+                </DataTrigger>
+              </Style.Triggers>
+            </Style>
+          </TextBlock.Style>
+        </TextBlock>
+      </Border>
+      <Border Canvas.Left="290" Canvas.Top="219" BorderBrush="#2E993E" BorderThickness="1" CornerRadius="3" Padding="4" HorizontalAlignment="Left" VerticalAlignment="Top" Width="56">
+        <Border.Style>
+          <Style TargetType="Border">
+            <Setter Property="Background" Value="#FFFFFF"/>
+            <Style.Triggers>
+              <DataTrigger Binding="{Binding CommandHeaterBlowerLeft, ElementName=RootControl}" Value="True">
+                <Setter Property="Background" Value="#FF0000"/>
+              </DataTrigger>
+            </Style.Triggers>
+          </Style>
+        </Border.Style>
+        <TextBlock Text="Y34 - On" FontSize="10" Foreground="#2E993E">
+          <TextBlock.Style>
+            <Style TargetType="TextBlock">
+              <Setter Property="Foreground" Value="#2E993E"/>
+              <Style.Triggers>
+                <DataTrigger Binding="{Binding CommandHeaterBlowerLeft, ElementName=RootControl}" Value="True">
+                  <Setter Property="Foreground" Value="White"/>
+                </DataTrigger>
+              </Style.Triggers>
+            </Style>
+          </TextBlock.Style>
+        </TextBlock>
+      </Border>
+
+      <!-- Top small labels for sensors: RIGHT TANK (TC-3 H/L) bind to High/Low Right -->
+      <Border Canvas.Left="-23" Canvas.Top="33" BorderBrush="#2E993E" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding HighTemperatureRight, ElementName=RootControl}">
+        <Border.Style>
+          <Style TargetType="Border">
+            <Setter Property="Background" Value="#FFFFFF"/>
+            <Style.Triggers>
+              <DataTrigger Binding="{Binding HighTemperatureRight, ElementName=RootControl}" Value="True">
+                <Setter Property="Background" Value="#7CFC00"/>
+              </DataTrigger>
+            </Style.Triggers>
+          </Style>
+        </Border.Style>
+        <TextBlock Text="TC-3 H" FontSize="10" Foreground="#2E993E">
+          <TextBlock.Style>
+            <Style TargetType="TextBlock">
+              <Setter Property="Foreground" Value="#2E993E"/>
+              <Style.Triggers>
+                <DataTrigger Binding="{Binding HighTemperatureRight, ElementName=RootControl}" Value="True">
+                  <Setter Property="Foreground" Value="Black"/>
+                </DataTrigger>
+              </Style.Triggers>
+            </Style>
+          </TextBlock.Style>
+        </TextBlock>
+      </Border>
+      <Border Canvas.Left="-23" Canvas.Top="61" BorderBrush="#2E993E" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding LowTemperatureRight, ElementName=RootControl}">
+        <Border.Style>
+          <Style TargetType="Border">
+            <Setter Property="Background" Value="#FFFFFF"/>
+            <Style.Triggers>
+              <DataTrigger Binding="{Binding LowTemperatureRight, ElementName=RootControl}" Value="True">
+                <Setter Property="Background" Value="#7CFC00"/>
+              </DataTrigger>
+            </Style.Triggers>
+          </Style>
+        </Border.Style>
+        <TextBlock Text="TC-3 L" FontSize="10" Foreground="#2E993E">
+          <TextBlock.Style>
+            <Style TargetType="TextBlock">
+              <Setter Property="Foreground" Value="#2E993E"/>
+              <Style.Triggers>
+                <DataTrigger Binding="{Binding LowTemperatureRight, ElementName=RootControl}" Value="True">
+                  <Setter Property="Foreground" Value="Black"/>
+                </DataTrigger>
+              </Style.Triggers>
+            </Style>
+          </TextBlock.Style>
+        </TextBlock>
+      </Border>
+
+      <!-- TC-2 H/L for LEFT TANK (already bound to Left properties) -->
+      <Border Canvas.Left="213" Canvas.Top="33" BorderBrush="#2E993E" BorderThickness="1" CornerRadius="3" Padding="4" HorizontalAlignment="Left" VerticalAlignment="Center" ToolTip="{Binding HighTemperatureLeft, ElementName=RootControl}">
+        <Border.Style>
+          <Style TargetType="Border">
+            <Setter Property="Background" Value="#FFFFFF"/>
+            <Style.Triggers>
+              <DataTrigger Binding="{Binding HighTemperatureLeft, ElementName=RootControl}" Value="True">
+                <Setter Property="Background" Value="#7CFC00"/>
+              </DataTrigger>
+            </Style.Triggers>
+          </Style>
+        </Border.Style>
+        <TextBlock Text="TC-2 H" FontSize="10" HorizontalAlignment="Center" VerticalAlignment="Center">
+          <TextBlock.Style>
+            <Style TargetType="TextBlock">
+              <Setter Property="Foreground" Value="#2E993E"/>
+              <Style.Triggers>
+                <DataTrigger Binding="{Binding HighTemperatureLeft, ElementName=RootControl}" Value="True">
+                  <Setter Property="Foreground" Value="Black"/>
+                </DataTrigger>
+              </Style.Triggers>
+            </Style>
+          </TextBlock.Style>
+        </TextBlock>
+      </Border>
+
+      <Border Canvas.Left="214" Canvas.Top="61" BorderBrush="#2E993E" BorderThickness="1" CornerRadius="3" Padding="4" HorizontalAlignment="Left" VerticalAlignment="Center" ToolTip="{Binding LowTemperatureLeft, ElementName=RootControl}">
+        <Border.Style>
+          <Style TargetType="Border">
+            <Setter Property="Background" Value="#FFFFFF"/>
+            <Style.Triggers>
+              <DataTrigger Binding="{Binding LowTemperatureLeft, ElementName=RootControl}" Value="True">
+                <Setter Property="Background" Value="#7CFC00"/>
+              </DataTrigger>
+            </Style.Triggers>
+          </Style>
+        </Border.Style>
+        <TextBlock Text="TC-2 L" FontSize="10" HorizontalAlignment="Center" VerticalAlignment="Center">
+          <TextBlock.Style>
+            <Style TargetType="TextBlock">
+              <Setter Property="Foreground" Value="#2E993E"/>
+              <Style.Triggers>
+                <DataTrigger Binding="{Binding LowTemperatureLeft, ElementName=RootControl}" Value="True">
+                  <Setter Property="Foreground" Value="Black"/>
+                </DataTrigger>
+              </Style.Triggers>
+            </Style>
+          </TextBlock.Style>
+        </TextBlock>
+      </Border>
+
+      <!-- Border for Y52 - 閉 (left tank command cover close) -->
+      <Border Grid.Column="2" BorderBrush="#2E993E" BorderThickness="1" CornerRadius="3" Padding="4" Canvas.Left="234" Canvas.Top="-6">
+        <Border.Style>
+          <Style TargetType="Border">
+            <Setter Property="Background" Value="#FFFFFF"/>
+            <Style.Triggers>
+              <DataTrigger Binding="{Binding CommandHeaterCoverCloseLeft, ElementName=RootControl}" Value="True">
+                <Setter Property="Background" Value="#FF0000"/>
+              </DataTrigger>
+            </Style.Triggers>
+          </Style>
+        </Border.Style>
+        <TextBlock Text="Y52 - 關" FontSize="10" Foreground="#2E993E">
+          <TextBlock.Style>
+            <Style TargetType="TextBlock">
+              <Setter Property="Foreground" Value="#2E993E"/>
+              <Style.Triggers>
+                <DataTrigger Binding="{Binding CommandHeaterCoverCloseLeft, ElementName=RootControl}" Value="True">
+                  <Setter Property="Foreground" Value="White"/>
+                </DataTrigger>
+              </Style.Triggers>
+            </Style>
+          </TextBlock.Style>
+        </TextBlock>
+      </Border>
+
+      <!-- Border for Y53 - 關 (right tank command cover close) -->
+      <Border Grid.Column="2" BorderBrush="#2E993E" BorderThickness="1" CornerRadius="3" Padding="4" Canvas.Left="3" Canvas.Top="-6">
+        <Border.Style>
+          <Style TargetType="Border">
+            <Setter Property="Background" Value="#FFFFFF"/>
+            <Style.Triggers>
+              <DataTrigger Binding="{Binding CommandHeaterCoverCloseRight, ElementName=RootControl}" Value="True">
+                <Setter Property="Background" Value="#FF0000"/>
+              </DataTrigger>
+            </Style.Triggers>
+          </Style>
+        </Border.Style>
+        <TextBlock Text="Y53 - 關" FontSize="10" Foreground="#2E993E">
+          <TextBlock.Style>
+            <Style TargetType="TextBlock">
+              <Setter Property="Foreground" Value="#2E993E"/>
+              <Style.Triggers>
+                <DataTrigger Binding="{Binding CommandHeaterCoverCloseRight, ElementName=RootControl}" Value="True">
+                  <Setter Property="Foreground" Value="White"/>
+                </DataTrigger>
+              </Style.Triggers>
+            </Style>
+          </TextBlock.Style>
+        </TextBlock>
+      </Border>
+
+      <!-- Border for Y57 - Air (right tank command air) -->
+      <Border Canvas.Left="-31" Canvas.Top="225" BorderBrush="#2E993E" BorderThickness="1" CornerRadius="3" Padding="4" HorizontalAlignment="Left" VerticalAlignment="Center">
+        <Border.Style>
+          <Style TargetType="Border">
+            <Setter Property="Background" Value="#FFFFFF"/>
+            <Style.Triggers>
+              <DataTrigger Binding="{Binding CommandHeaterAirRight, ElementName=RootControl}" Value="True">
+                <Setter Property="Background" Value="#FF0000"/>
+              </DataTrigger>
+            </Style.Triggers>
+          </Style>
+        </Border.Style>
+        <TextBlock Text="Y57 - Air" FontSize="10" Foreground="#2E993E">
+          <TextBlock.Style>
+            <Style TargetType="TextBlock">
+              <Setter Property="Foreground" Value="#2E993E"/>
+              <Style.Triggers>
+                <DataTrigger Binding="{Binding CommandHeaterAirRight, ElementName=RootControl}" Value="True">
+                  <Setter Property="Foreground" Value="White"/>
+                </DataTrigger>
+              </Style.Triggers>
+            </Style>
+          </TextBlock.Style>
+        </TextBlock>
+      </Border>
+      <!-- Border for X61 - 關 (right tank cover close) -->
+      <Border Canvas.Left="152" Canvas.Top="10" Width="50" Height="22" BorderBrush="#2E993E" BorderThickness="1" CornerRadius="3" Padding="4">
+        <Border.Style>
+          <Style TargetType="Border">
+            <Setter Property="Background" Value="#FFFFFF"/>
+            <Style.Triggers>
+              <DataTrigger Binding="{Binding SensorCoverCloseRight, ElementName=RootControl}" Value="True">
+                <Setter Property="Background" Value="#7CFC00"/>
+              </DataTrigger>
+            </Style.Triggers>
+          </Style>
+        </Border.Style>
+        <TextBlock Text="X61 - 關" FontSize="10" Foreground="#2E993E">
+          <TextBlock.Style>
+            <Style TargetType="TextBlock">
+              <Setter Property="Foreground" Value="#2E993E"/>
+              <Style.Triggers>
+                <DataTrigger Binding="{Binding SensorCoverCloseRight, ElementName=RootControl}" Value="True">
+                  <Setter Property="Foreground" Value="Black"/>
+                </DataTrigger>
+              </Style.Triggers>
+            </Style>
+          </TextBlock.Style>
+        </TextBlock>
+      </Border>
+
+      <!-- Border for X56 - 開 (left tank cover open) -->
+      <Border Canvas.Left="392" Canvas.Top="-10" Width="50" Height="22" BorderBrush="#2E993E" BorderThickness="1" CornerRadius="3" Padding="4">
+        <Border.Style>
+          <Style TargetType="Border">
+            <Setter Property="Background" Value="#FFFFFF"/>
+            <Style.Triggers>
+              <DataTrigger Binding="{Binding SensorCoverOpenLeft, ElementName=RootControl}" Value="True">
+                <Setter Property="Background" Value="#7CFC00"/>
+              </DataTrigger>
+            </Style.Triggers>
+          </Style>
+        </Border.Style>
+        <TextBlock Text="X56 - 開" FontSize="10" Foreground="#2E993E">
+          <TextBlock.Style>
+            <Style TargetType="TextBlock">
+              <Setter Property="Foreground" Value="#2E993E"/>
+              <Style.Triggers>
+                <DataTrigger Binding="{Binding SensorCoverOpenLeft, ElementName=RootControl}" Value="True">
+                  <Setter Property="Foreground" Value="Black"/>
+                </DataTrigger>
+              </Style.Triggers>
+            </Style>
+          </TextBlock.Style>
+        </TextBlock>
+      </Border>
+
+      <!-- Manual control buttons for left tank cover (to the right of X56) -->
+      <Button Canvas.Left="448" Canvas.Top="-12" Width="120" Height="60" FontSize="18" Content="開啟上蓋" Click="OpenCoverLeft_Click" Background="#ADD8E6"/>
+      <Button Canvas.Left="586" Canvas.Top="-12" Width="120" Height="60" FontSize="18" Content="關閉上蓋" Click="CloseCoverLeft_Click" Background="#ADD8E6" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+
+      <!-- Manual control buttons for right tank cover (to the right of X61) -->
+      <Button Canvas.Left="-292" Canvas.Top="-12" Width="120" Height="60" FontSize="18" Content="開啟上蓋" Click="OpenCoverRight_Click" Background="#ADD8E6" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+      <Button Canvas.Left="-153" Canvas.Top="-12" Width="120" Height="60" FontSize="18" Content="關閉上蓋" Click="CloseCoverRight_Click" Background="#ADD8E6" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+
+      <!-- Elapsed and Remaining heating time for Drying Tank #1 (bound to ElapsedHeatingLeft / RemainingHeatingLeft) -->
+      <TextBlock Text="{Binding ElapsedHeatingLeft, ElementName=RootControl}" FontSize="12" Canvas.Left="331" Canvas.Top="107" Foreground="#333333" />
+      <TextBlock Text="{Binding RemainingHeatingLeft, ElementName=RootControl}" FontSize="12" Canvas.Left="331" Canvas.Top="125" Foreground="#333333" />
+
+      <!-- Elapsed and Remaining heating time for Drying Tank #2 (bound to ElapsedHeatingRight / RemainingHeatingRight) -->
+      <TextBlock Text="烘乾時間:" FontSize="12" Canvas.Left="36" Canvas.Top="107" Foreground="#333333" TextAlignment="Center" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+      <TextBlock Text="剩餘時間:" FontSize="12" Canvas.Left="36" Canvas.Top="125" Foreground="#333333" TextAlignment="Center" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+      <TextBlock Text="{Binding ElapsedHeatingRight, ElementName=RootControl}" FontSize="12" Canvas.Left="94" Canvas.Top="107" Foreground="#333333" />
+      <TextBlock Text="{Binding RemainingHeatingRight, ElementName=RootControl}" FontSize="12" Canvas.Left="94" Canvas.Top="125" Foreground="#333333" />
+
+      <!-- Left PV display bound to PVLeft -->
+      <TextBlock Text="{Binding PVLeft, StringFormat='{}{0:F2}'}" FontSize="20" Canvas.Left="318" Canvas.Top="43" Foreground="#333333" TextAlignment="Center" HorizontalAlignment="Left" VerticalAlignment="Center" Width="54"/>
+
+      <!-- Small arrow accent between tanks -->
+
+      <!-- Border for Y35 - On (right tank blower) -->
+      <Border Canvas.Left="54" Canvas.Top="220" BorderBrush="#2E993E" BorderThickness="1" CornerRadius="3" Padding="4" Width="55" HorizontalAlignment="Center" VerticalAlignment="Top">
+        <Border.Style>
+          <Style TargetType="Border">
+            <Setter Property="Background" Value="#FFFFFF"/>
+            <Style.Triggers>
+              <DataTrigger Binding="{Binding CommandHeaterBlowerRight, ElementName=RootControl}" Value="True">
+                <Setter Property="Background" Value="#FF0000"/>
+              </DataTrigger>
+            </Style.Triggers>
+          </Style>
+        </Border.Style>
+        <TextBlock Text="Y35 - On" FontSize="10" Foreground="#2E993E">
+          <TextBlock.Style>
+            <Style TargetType="TextBlock">
+              <Setter Property="Foreground" Value="#2E993E"/>
+              <Style.Triggers>
+                <DataTrigger Binding="{Binding CommandHeaterBlowerRight, ElementName=RootControl}" Value="True">
+                  <Setter Property="Foreground" Value="White"/>
+                </DataTrigger>
+              </Style.Triggers>
+            </Style>
+          </TextBlock.Style>
+        </TextBlock>
+      </Border>
+      <TextBlock Text="烘乾時間:" FontSize="12" Canvas.Left="270" Canvas.Top="107" Foreground="#333333" TextAlignment="Center" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+      <TextBlock Text="剩餘時間:" FontSize="12" Canvas.Left="270" Canvas.Top="125" Foreground="#333333" TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Top"/>
+      <Border Canvas.Left="270" Canvas.Top="145" BorderBrush="Black" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding AutoStatusLeft, ElementName=RootControl}" HorizontalAlignment="Center" VerticalAlignment="Top" Height="20">
+        <Border.Style>
+          <Style TargetType="{x:Type Border}">
+            <Setter Property="Background" Value="White"/>
+            <Style.Triggers>
+              <DataTrigger Binding="{Binding AutoStatusLeft, ElementName=RootControl}" Value="True">
+                <Setter Property="Background" Value="Lime"/>
+              </DataTrigger>
+            </Style.Triggers>
+          </Style>
+        </Border.Style>
+        <TextBlock Text="自動" FontSize="10" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black"/>
+      </Border>
+      <Border Canvas.Left="305" Canvas.Top="145" BorderBrush="Black" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding PauseStatusLeft, ElementName=RootControl}" Height="20" HorizontalAlignment="Left" VerticalAlignment="Center">
+        <Border.Style>
+          <Style TargetType="{x:Type Border}">
+            <Setter Property="Background" Value="White"/>
+            <Style.Triggers>
+              <DataTrigger Binding="{Binding PauseStatusLeft, ElementName=RootControl}" Value="True">
+                <Setter Property="Background" Value="Lime"/>
+              </DataTrigger>
+            </Style.Triggers>
+          </Style>
+        </Border.Style>
+        <TextBlock Text="暫停" FontSize="10" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black"/>
+      </Border>
+      <Border Canvas.Left="340" Canvas.Top="145" BorderBrush="Black" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding CassetteStatusLeft, ElementName=RootControl}" Height="20" HorizontalAlignment="Center" VerticalAlignment="Top">
+        <Border.Style>
+          <Style TargetType="{x:Type Border}">
+            <Setter Property="Background" Value="White"/>
+            <Style.Triggers>
+              <DataTrigger Binding="{Binding CassetteStatusLeft, ElementName=RootControl}" Value="True">
+                <Setter Property="Background" Value="Lime"/>
+              </DataTrigger>
+            </Style.Triggers>
+          </Style>
+        </Border.Style>
+        <TextBlock Text="卡匣" FontSize="10" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black"/>
+      </Border>
+      <Border Canvas.Left="270" Canvas.Top="170" BorderBrush="Black" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding IdleStatusLeft, ElementName=RootControl}" Height="20" HorizontalAlignment="Center" VerticalAlignment="Top">
+        <Border.Style>
+          <Style TargetType="{x:Type Border}">
+            <Setter Property="Background" Value="White"/>
+            <Style.Triggers>
+              <DataTrigger Binding="{Binding IdleStatusLeft, ElementName=RootControl}" Value="True">
+                <Setter Property="Background" Value="Lime"/>
+              </DataTrigger>
+            </Style.Triggers>
+          </Style>
+        </Border.Style>
+        <TextBlock Text="閒置" FontSize="10" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black"/>
+      </Border>
+      <Border Canvas.Left="305" Canvas.Top="170" BorderBrush="Black" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding InitializedStatusLeft, ElementName=RootControl}" Height="20" HorizontalAlignment="Left" VerticalAlignment="Center">
+        <Border.Style>
+          <Style TargetType="{x:Type Border}">
+            <Setter Property="Background" Value="White"/>
+            <Style.Triggers>
+              <DataTrigger Binding="{Binding InitializedStatusLeft, ElementName=RootControl}" Value="True">
+                <Setter Property="Background" Value="Lime"/>
+              </DataTrigger>
+            </Style.Triggers>
+          </Style>
+        </Border.Style>
+        <TextBlock Text="初始" FontSize="10" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black"/>
+      </Border>
+      <Border Canvas.Left="270" Canvas.Top="195" BorderBrush="Black" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding WarningStatusLeft, ElementName=RootControl}" Height="20" HorizontalAlignment="Center" VerticalAlignment="Top">
+        <Border.Style>
+          <Style TargetType="{x:Type Border}">
+            <Setter Property="Background" Value="#FFFFFF"/>
+            <Style.Triggers>
+              <DataTrigger Binding="{Binding WarningStatusLeft, ElementName=RootControl}" Value="True">
+                <Setter Property="Background" Value="Yellow"/>
+              </DataTrigger>
+            </Style.Triggers>
+          </Style>
+        </Border.Style>
+        <TextBlock Text="警告" FontSize="10" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black"/>
+      </Border>
+      <Border Canvas.Left="305" Canvas.Top="195" BorderBrush="Black" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding AlarmStatusLeft, ElementName=RootControl}" Height="20" HorizontalAlignment="Left" VerticalAlignment="Center">
+        <Border.Style>
+          <Style TargetType="{x:Type Border}">
+            <Setter Property="Background" Value="#FFFFFF"/>
+            <Style.Triggers>
+              <DataTrigger Binding="{Binding AlarmStatusLeft, ElementName=RootControl}" Value="True">
+                <Setter Property="Background" Value="Red"/>
+              </DataTrigger>
+            </Style.Triggers>
+          </Style>
+        </Border.Style>
+        <TextBlock Text="錯誤" FontSize="10" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black"/>
+      </Border>
+      <Border Canvas.Left="31" Canvas.Top="145" BorderBrush="Black" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding AutoStatusRight, ElementName=RootControl}" Height="20" HorizontalAlignment="Left" VerticalAlignment="Center">
+        <Border.Style>
+          <Style TargetType="{x:Type Border}">
+            <Setter Property="Background" Value="#FFFFFF"/>
+            <Style.Triggers>
+              <DataTrigger Binding="{Binding AutoStatusRight, ElementName=RootControl}" Value="True">
+                <Setter Property="Background" Value="Lime"/>
+              </DataTrigger>
+            </Style.Triggers>
+          </Style>
+        </Border.Style>
+        <TextBlock Text="自動" FontSize="10" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black"/>
+      </Border>
+      <Border Canvas.Left="67" Canvas.Top="145" BorderBrush="Black" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding PauseStatusRight, ElementName=RootControl}" Height="20" HorizontalAlignment="Left" VerticalAlignment="Center">
+        <Border.Style>
+          <Style TargetType="{x:Type Border}">
+            <Setter Property="Background" Value="#FFFFFF"/>
+            <Style.Triggers>
+              <DataTrigger Binding="{Binding PauseStatusRight, ElementName=RootControl}" Value="True">
+                <Setter Property="Background" Value="Lime"/>
+              </DataTrigger>
+            </Style.Triggers>
+          </Style>
+        </Border.Style>
+        <TextBlock Text="暫停" FontSize="10" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black"/>
+      </Border>
+      <Border Canvas.Left="102" Canvas.Top="145" BorderBrush="Black" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding CassetteStatusRight, ElementName=RootControl}" Height="20" HorizontalAlignment="Left" VerticalAlignment="Center">
+        <Border.Style>
+          <Style TargetType="{x:Type Border}">
+            <Setter Property="Background" Value="#FFFFFF"/>
+            <Style.Triggers>
+              <DataTrigger Binding="{Binding CassetteStatusRight, ElementName=RootControl}" Value="True">
+                <Setter Property="Background" Value="Lime"/>
+              </DataTrigger>
+            </Style.Triggers>
+          </Style>
+        </Border.Style>
+        <TextBlock Text="卡匣" FontSize="10" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black"/>
+      </Border>
+      <Border Canvas.Left="31" Canvas.Top="170" BorderBrush="Black" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding IdleStatusRight, ElementName=RootControl}" Height="20" HorizontalAlignment="Left" VerticalAlignment="Center">
+        <Border.Style>
+          <Style TargetType="{x:Type Border}">
+            <Setter Property="Background" Value="#FFFFFF"/>
+            <Style.Triggers>
+              <DataTrigger Binding="{Binding IdleStatusRight, ElementName=RootControl}" Value="True">
+                <Setter Property="Background" Value="Lime"/>
+              </DataTrigger>
+            </Style.Triggers>
+          </Style>
+        </Border.Style>
+        <TextBlock Text="閒置" FontSize="10" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black"/>
+      </Border>
+      <Border Canvas.Left="67" Canvas.Top="170" BorderBrush="Black" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding InitializedStatusRight, ElementName=RootControl}" Height="20" HorizontalAlignment="Left" VerticalAlignment="Center">
+        <Border.Style>
+          <Style TargetType="{x:Type Border}">
+            <Setter Property="Background" Value="#FFFFFF"/>
+            <Style.Triggers>
+              <DataTrigger Binding="{Binding InitializedStatusRight, ElementName=RootControl}" Value="True">
+                <Setter Property="Background" Value="Lime"/>
+              </DataTrigger>
+            </Style.Triggers>
+          </Style>
+        </Border.Style>
+        <TextBlock Text="初始" FontSize="10" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black"/>
+      </Border>
+      <Border Canvas.Left="31" Canvas.Top="195" BorderBrush="Black" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding WarningStatusRight, ElementName=RootControl}" Height="20" HorizontalAlignment="Left" VerticalAlignment="Center">
+        <Border.Style>
+          <Style TargetType="{x:Type Border}">
+            <Setter Property="Background" Value="#FFFFFF"/>
+            <Style.Triggers>
+              <DataTrigger Binding="{Binding WarningStatusRight, ElementName=RootControl}" Value="True">
+                <Setter Property="Background" Value="Yellow"/>
+              </DataTrigger>
+            </Style.Triggers>
+          </Style>
+        </Border.Style>
+        <TextBlock Text="警告" FontSize="10" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black"/>
+      </Border>
+      <Border Canvas.Left="67" Canvas.Top="195" BorderBrush="Black" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding AlarmStatusRight, ElementName=RootControl}" Height="20" HorizontalAlignment="Left" VerticalAlignment="Center">
+        <Border.Style>
+          <Style TargetType="{x:Type Border}">
+            <Setter Property="Background" Value="#FFFFFF"/>
+            <Style.Triggers>
+              <DataTrigger Binding="{Binding AlarmStatusRight, ElementName=RootControl}" Value="True">
+                <Setter Property="Background" Value="Red"/>
+              </DataTrigger>
+            </Style.Triggers>
+          </Style>
+        </Border.Style>
+        <TextBlock Text="錯誤" FontSize="10" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black"/>
+      </Border>
+    </Canvas>
+    <Border BorderBrush="#2E993E" BorderThickness="1" CornerRadius="3" Padding="4" Margin="185,-6,0,0" Grid.Column="2" HorizontalAlignment="Left" Width="51" Height="22" VerticalAlignment="Top">
+      <Border.Style>
+        <Style TargetType="Border">
+          <Setter Property="Background" Value="#FFFFFF"/>
+          <Style.Triggers>
+            <DataTrigger Binding="{Binding SensorCoverOpenRight, ElementName=RootControl}" Value="True">
+              <Setter Property="Background" Value="#7CFC00"/>
+            </DataTrigger>
+          </Style.Triggers>
+        </Style>
+      </Border.Style>
+      <TextBlock Text="X60 - 開" FontSize="10" Foreground="#2E993E">
+        <TextBlock.Style>
+          <Style TargetType="TextBlock">
+            <Setter Property="Foreground" Value="#2E993E"/>
+            <Style.Triggers>
+              <DataTrigger Binding="{Binding SensorCoverOpenRight, ElementName=RootControl}" Value="True">
+                <Setter Property="Foreground" Value="Black"/>
+              </DataTrigger>
+            </Style.Triggers>
+          </Style>
+        </TextBlock.Style>
+      </TextBlock>
+    </Border>
+    <Border BorderBrush="#2E993E" BorderThickness="1" CornerRadius="3" Padding="4" Margin="425,16,0,0" Grid.Column="2" HorizontalAlignment="Left" Width="50" Height="22" VerticalAlignment="Top">
+      <Border.Style>
+        <Style TargetType="Border">
+          <Setter Property="Background" Value="#FFFFFF"/>
+          <Style.Triggers>
+            <DataTrigger Binding="{Binding SensorCoverCloseLeft, ElementName=RootControl}" Value="True">
+              <Setter Property="Background" Value="#7CFC00"/>
+            </DataTrigger>
+          </Style.Triggers>
+        </Style>
+      </Border.Style>
+      <TextBlock Text="X57 - 關" FontSize="10" Foreground="#2E993E">
+        <TextBlock.Style>
+          <Style TargetType="TextBlock">
+            <Setter Property="Foreground" Value="#2E993E"/>
+            <Style.Triggers>
+              <DataTrigger Binding="{Binding SensorCoverCloseLeft, ElementName=RootControl}" Value="True">
+                <Setter Property="Foreground" Value="Black"/>
+              </DataTrigger>
+            </Style.Triggers>
+          </Style>
+        </TextBlock.Style>
+      </TextBlock>
+    </Border>
+    <!-- Right PV display bound to PVRight -->
+    <TextBlock Text="{Binding PVRight, StringFormat='{}{0:F2}'}" FontSize="20" Foreground="#333333" TextAlignment="Center" Grid.Column="2" Margin="112,47,0,0" HorizontalAlignment="Left" Width="47" Height="25" VerticalAlignment="Top"/>
+    <TextBlock Text="°C" FontSize="20" Foreground="#333333" TextAlignment="Center" Grid.Column="2" Margin="0,47,300,0" HorizontalAlignment="Right" Width="30" Height="25" VerticalAlignment="Top"/>
+    <TextBlock Text="°C" FontSize="20" Foreground="#333333" TextAlignment="Center" Grid.Column="2" Margin="159,47,0,0" Height="25" VerticalAlignment="Top" HorizontalAlignment="Left" Width="38"/>
+    <Button FontSize="18" Content="開始烘乾" Click="OpenHeaterLeft_Click" Background="#ADD8E6" Grid.Column="2" Margin="480,60,131,0" Height="60" VerticalAlignment="Top"/>
+    <Button FontSize="18" Content="停止烘乾" Click="CloseHeaterLeft_Click" Background="#ADD8E6" Grid.Column="2" Margin="618,60,-7,0" Height="60" VerticalAlignment="Top"/>
+    <Button FontSize="18" Content="開始烘乾" Click="OpenHeaterRight_Click" Background="#ADD8E6" Margin="-138,60,0,0" Height="60" VerticalAlignment="Top" HorizontalAlignment="Left" Width="120"/>
+    <Button FontSize="18" Content="停止烘乾" Click="CloseHeaterRight_Click" Background="#ADD8E6" Grid.Column="1" Margin="0,60,1,0" Height="60" VerticalAlignment="Top"/>
+    <Button FontSize="18" Content="開鼓風機" Click="OpenBlowerLeft_Click" Background="#ADD8E6" Grid.Column="2" Margin="0,126,131,0" HorizontalAlignment="Right" Width="120" Height="60" VerticalAlignment="Top"/>
+    <Button FontSize="18" Content="關鼓風機" Click="CloseBlowerLeft_Click" Background="#ADD8E6" Grid.Column="2" Margin="618,126,-7,0" Height="60" VerticalAlignment="Top"/>
+    <Button FontSize="18" Content="開啟正壓" Click="OpenAirLeft_Click" Background="#ADD8E6" Grid.Column="2" Margin="0,193,131,0" HorizontalAlignment="Right" Width="120" Height="60" VerticalAlignment="Top"/>
+    <Button FontSize="18" Content="關閉正壓" Click="CloseAirLeft_Click" Background="#ADD8E6" Grid.Column="2" Margin="618,193,-7,0" Height="60" VerticalAlignment="Top"/>
+    <Button FontSize="18" Content="開鼓風機" Click="OpenBlowerRight_Click" Background="#ADD8E6" Margin="-137,126,0,0" Height="60" VerticalAlignment="Top" HorizontalAlignment="Left" Width="120"/>
+    <Button FontSize="18" Content="關鼓風機" Click="CloseBlowerRight_Click" Background="#ADD8E6" Margin="0,126,1,0" Grid.ColumnSpan="2" Height="60" VerticalAlignment="Top"/>
+    <Button FontSize="18" Content="開啟正壓" Click="OpenAirRight_Click" Background="#ADD8E6" Margin="-137,193,0,0" Height="60" VerticalAlignment="Top" HorizontalAlignment="Left" Width="120"/>
+    <Button FontSize="18" Content="關閉正壓" Click="CloseAirRight_Click" Background="#ADD8E6" Margin="1,193,0,0" Grid.ColumnSpan="2" Height="60" VerticalAlignment="Top"/>
+    <Button FontSize="18" Content="錯誤重置" Click="ResetAlarmLeft_Click" Background="#ADD8E6" Grid.Column="2" Margin="292,296,291,-75"/>
+    <Button FontSize="18" Content="錯誤重置" Click="ResetAlarmRight_Click" Background="#ADD8E6" Grid.Column="2" Margin="49,296,534,-75"/>
+  </Grid>
+</UserControl>

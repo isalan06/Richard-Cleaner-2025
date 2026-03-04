@@ -37,4 +37,9 @@
     <Folder Include="Modules\Motor\Models\" />
   </ItemGroup>
 
+  <!-- Include all files under Pictures as Resource so XAML pack URIs can load them -->
+  <ItemGroup>
+    <Resource Include="Pictures\**\*.*" />
+  </ItemGroup>
+
 </Project>

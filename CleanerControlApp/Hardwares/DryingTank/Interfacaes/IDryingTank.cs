@@ -29,7 +29,7 @@ namespace CleanerControlApp.Hardwares.DryingTank.Interfacaes
         void SetSV(float value);
 
         bool Auto { get; }
-        bool Pasuing { get; }
+        bool Pausing { get; }
         bool Heating { get; }
         bool Cassette { get; }
         bool Initialized { get; }
