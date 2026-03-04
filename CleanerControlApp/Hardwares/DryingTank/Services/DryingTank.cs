@@ -6,6 +6,7 @@ using CleanerControlApp.Modules.TempatureController.Interfaces;
 using CleanerControlApp.Modules.UltrasonicDevice.Models;
 using CleanerControlApp.Modules.UltrasonicDevice.Services;
 using CleanerControlApp.Utilities;
+using CleanerControlApp.Utilities.Alarm;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -88,6 +89,12 @@ namespace CleanerControlApp.Hardwares.DryingTank.Services
             _temperatureControllers = temperatureControllers;
 
             RefreshTimeoutValue();
+
+            // Alarm
+            AlarmManager.AttachFlagGetter((moduleIndex == 0) ? "ALM401" : "ALM501", () => _PV_Low_Timeout);
+            AlarmManager.AttachFlagGetter((moduleIndex == 0) ? "ALM402" : "ALM502", () => _PV_High_Timeout);
+            AlarmManager.AttachFlagGetter((moduleIndex == 0) ? "ALM403" : "ALM503", () => _Cover_Open_Timeout);
+            AlarmManager.AttachFlagGetter((moduleIndex == 0) ? "ALM404" : "ALM504", () => _Cover_Close_Timeout);
 
             StartLoop();
 
@@ -520,6 +527,9 @@ namespace CleanerControlApp.Hardwares.DryingTank.Services
         {
             RefreshTimeoutValue();
             CheckTimeout();
+            // Ensure AlarmManager polls registered flag getters so changes (like _Cover_Open_Timeout)
+            // are detected and logged.
+            AlarmManager.CheckFlagGetters();
 
             AutoProcedure();
 
