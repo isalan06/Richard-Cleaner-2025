@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using CleanerControlApp.Utilities.Log;
 
 namespace CleanerControlApp.Utilities.Alarm
 {
@@ -94,6 +95,8 @@ namespace CleanerControlApp.Utilities.Alarm
                                 e.HappenTime = now;
                                 e.AlarmSN = GenerateAlarmSN(code, now);
                                 WriteLog(e, "Alarm", now);
+                                // Also write an operation log for the alarm event
+                                OperateLog.Log($"{e.Module}發生錯誤", $"{e.Code}-{e.Description}");
                             }
                         }
                         else
@@ -109,6 +112,7 @@ namespace CleanerControlApp.Utilities.Alarm
                                 };
                                 _entries[code] = entry;
                                 WriteLog(entry, "Alarm", now);
+                                OperateLog.Log($"{entry.Module}發生錯誤", $"{entry.Code}-{entry.Description}");
                             }
                             else
                             {
@@ -120,6 +124,7 @@ namespace CleanerControlApp.Utilities.Alarm
                                 };
                                 _entries[code] = entry;
                                 WriteLog(entry, "Alarm", now);
+                                OperateLog.Log($"{entry.Module}發生錯誤", $"{entry.Code}-{entry.Description}");
                             }
                         }
                     }
@@ -179,6 +184,8 @@ namespace CleanerControlApp.Utilities.Alarm
                     entry.HappenTime = timestamp;
                     entry.AlarmSN = GenerateAlarmSN(code, timestamp.Value);
                     WriteLog(entry, "Alarm", timestamp.Value);
+                    // Also write an operation log for the alarm event
+                    OperateLog.Log($"{entry.Module}發生錯誤", $"{entry.Code}-{entry.Description}");
                 }
                 else
                 {

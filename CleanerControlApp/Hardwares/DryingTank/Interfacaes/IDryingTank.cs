@@ -66,5 +66,7 @@ namespace CleanerControlApp.Hardwares.DryingTank.Interfacaes
         void AutoPause();
         void AlarmReset();
         void ModuleReset();
+
+        void SimHiTemperature(bool pv);
     }
 }

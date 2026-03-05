@@ -7,6 +7,7 @@ using CleanerControlApp.Modules.UltrasonicDevice.Models;
 using CleanerControlApp.Modules.UltrasonicDevice.Services;
 using CleanerControlApp.Utilities;
 using CleanerControlApp.Utilities.Alarm;
+using CleanerControlApp.Utilities.Log;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -69,6 +70,8 @@ namespace CleanerControlApp.Hardwares.DryingTank.Services
         private static int _pvHighTimeoutThreshold_Value = 30;
         private static int _coverOpenTimeoutThreshold_Value = 30;
         private static int _coverCloseTimeoutThreshold_Value = 30;
+
+        private bool _sim_pv = false;
 
         #endregion
 
@@ -327,7 +330,7 @@ namespace CleanerControlApp.Hardwares.DryingTank.Services
         public bool Initialized => _initialized;
         public bool Idle => Sensor_CoverOpen && !_heating && !_cassette & _initialized;
 
-        public bool HighTemperature => PV > PV_Check_High;
+        public bool HighTemperature => (PV > PV_Check_High) || _sim_pv;
         public bool LowTemperature => PV < PV_Check_Low;
         public bool HeatingOP(bool heating)
         {
@@ -350,6 +353,7 @@ namespace CleanerControlApp.Hardwares.DryingTank.Services
             if (!_auto)
             {
                 result = HeatingOP(heating);
+                OperateLog.Log($"烘乾槽#{ModuleIndex + 1} 手動加熱 " + (heating ? "開" : "關"), $"烘乾槽#{ModuleIndex + 1} 手動加熱 " + (heating ? "開" : "關"));
             }
 
             return false;
@@ -373,6 +377,7 @@ namespace CleanerControlApp.Hardwares.DryingTank.Services
             if (_plcService != null)
             {
                 result = AirOP(air);
+                OperateLog.Log($"烘乾槽#{ModuleIndex + 1} 手動氣閥 " + (air ? "開" : "關"), $"烘乾槽#{ModuleIndex + 1} 氣閥 " + (air ? "開" : "關"));
             }
 
             return result;
@@ -396,6 +401,7 @@ namespace CleanerControlApp.Hardwares.DryingTank.Services
             if (_plcService != null)
             {
                 result = BlowerOP(blow);
+                OperateLog.Log($"烘乾槽#{ModuleIndex + 1} 手動風扇 " + (blow ? "開" : "關"), $"烘乾槽#{ModuleIndex + 1} 風扇 " + (blow ? "開" : "關"));
             }
 
             return result;
@@ -419,6 +425,7 @@ namespace CleanerControlApp.Hardwares.DryingTank.Services
             if (_plcService != null)
             {
                 result = CoverClose(close);
+                OperateLog.Log($"烘乾槽#{ModuleIndex + 1} 手動蓋子 " + (close ? "關" : "開"), $"烘乾槽#{ModuleIndex + 1} 蓋子 " + (close ? "關" : "開"));
             }
 
             return result;
@@ -427,8 +434,8 @@ namespace CleanerControlApp.Hardwares.DryingTank.Services
         public bool HS_ClamperMoving { get; set; }
         public bool HS_ClamperPickFinished { get; set; }
         public bool HS_ClamperPlaceFinished { get; set; }
-        public bool HS_InputPermit => Idle && !_pausing && !HS_ClamperMoving;
-        public bool HS_ActFinished => _cassette && Sensor_CoverOpen && !HS_ClamperMoving && !Heating;
+        public bool HS_InputPermit => Idle && !_pausing && !HS_ClamperMoving && _auto;
+        public bool HS_ActFinished => _cassette && Sensor_CoverOpen && !HS_ClamperMoving && !Heating && _heatingFininsh;
 
         public int ElpasedHeatingTime_Seconds => (int)(_elapsedTime != null ? _elapsedTime.Value.TotalSeconds : 0);
         public int RemainingHeatingTime_Seconds => (_moduleSettings.DryingTanks != null) ? _moduleSettings.DryingTanks[_moduleIndex].ActTime_Second - ElpasedHeatingTime_Seconds : 0;
@@ -476,6 +483,11 @@ namespace CleanerControlApp.Hardwares.DryingTank.Services
         public void ModuleReset()
         {
             Initialize();
+        }
+
+        public void SimHiTemperature(bool pv)
+        {
+            _sim_pv = pv;
         }
 
         #endregion
@@ -592,6 +604,13 @@ namespace CleanerControlApp.Hardwares.DryingTank.Services
         {
             if (_auto)
             {
+                if (Idle && _autoStopFlag)
+                {
+                    _autoStopFlag = false;
+                    _auto = false;
+                }
+
+
                 // 未烘乾完成前程序
                 if (!_heatingFininsh)
                 {
@@ -641,6 +660,7 @@ namespace CleanerControlApp.Hardwares.DryingTank.Services
                             _heatingStartTime = DateTime.UtcNow;
                             if (_elapsedTime >= TimeSpan.FromSeconds((double)(_moduleSettings.DryingTanks != null ? _moduleSettings.DryingTanks[_moduleIndex].ActTime_Second : 60.0)))
                             {
+                                HeatingOP(false);
                                 _heatingFininsh = true;
                             }
                         }
@@ -669,7 +689,7 @@ namespace CleanerControlApp.Hardwares.DryingTank.Services
 
                     // 卡匣取出後流程結束
                     if (HS_ClamperPickFinished)
-                    { 
+                    {
                         HS_ClamperPickFinished = false;
                         _cassette = false;
                         _heatingFininsh = false;

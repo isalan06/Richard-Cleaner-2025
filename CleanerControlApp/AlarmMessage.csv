@@ -1,10 +1,9 @@
-﻿"Code","Type","Module","Description","Solution"
-"ALM401","Warning","烘乾槽#1","到達低溫逾時","停機並檢查冷卻與電流ABCDEF"
-"ALM402","Warning","烘乾槽#1","到達高溫逾時","檢查設定與溫度感測元件"
-"ALM403","Warning","烘乾槽#1","上蓋打開逾時","確認蓋子/感測器狀態
-請在檢查"
-"ALM404","Warning","烘乾槽#1","上蓋關閉逾時","確認蓋子/感測器狀態"
-"ALM501","Warning","烘乾槽#2","到達低溫逾時","停機並檢查冷卻與電流"
-"ALM502","Warning","烘乾槽#2","到達高溫逾時","檢查設定與溫度感測元件"
-"ALM503","Warning","烘乾槽#2","上蓋打開逾時","確認蓋子/感測器狀態"
-"ALM504","Warning","烘乾槽#2","上蓋關閉逾時","確認蓋子/感測器狀態"
+﻿Code,Type,Module,Description,Solution
+ALM401,Warning,烘乾槽#1,到達低溫逾時,當TC-2 SV設定為低溫時，PV無法到達所設定的溫度。
+ALM402,Warning,烘乾槽#1,到達高溫逾時,當TC-2 SV設定為高溫時，PV無法到達所設定的溫度。
+ALM403,Warning,烘乾槽#1,上蓋打開逾時,當Y52 - 上蓋關閉 為 OFF，X56 - 上蓋開Sensor沒有反應。
+ALM404,Warning,烘乾槽#1,上蓋關閉逾時,當Y52 - 上蓋關閉 為 ON，X57 - 上蓋關Sensor沒有反應。
+ALM501,Warning,烘乾槽#2,到達低溫逾時,當TC-3 SV設定為低溫時，PV無法到達所設定的溫度。
+ALM502,Warning,烘乾槽#2,到達高溫逾時,當TC-3 SV設定為高溫時，PV無法到達所設定的溫度。
+ALM503,Warning,烘乾槽#2,上蓋打開逾時,當Y53 - 上蓋關閉 為 OFF，X60 - 上蓋開Sensor沒有反應。
+ALM504,Warning,烘乾槽#2,上蓋關閉逾時,當Y53 - 上蓋關閉 為 ON，X61 - 上蓋關Sensor沒有反應。

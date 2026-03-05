@@ -11,7 +11,56 @@
  <RowDefinition Height="*" />
  </Grid.RowDefinitions>
 
- <TextBlock Text="Dev Module Drying Tank View" Grid.Row="0" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="10" FontSize="16" FontWeight="Bold"/>
+ <!-- Header with title and control buttons -->
+ <StackPanel Grid.Row="0" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="10">
+ <TextBlock Text="Dev Module Drying Tank View" VerticalAlignment="Center" FontSize="16" FontWeight="Bold" />
+
+ <!-- spacing -->
+ <StackPanel Width="20" />
+
+ <!-- Tank1 controls grouped vertically -->
+ <StackPanel Orientation="Vertical">
+ <StackPanel Orientation="Horizontal">
+ <Button x:Name="BtnInitialize" Content="#1初始化" VerticalAlignment="Center" Margin="8,0,0,0" Padding="8,4" Click="InitializeButton_Click" />
+ <Button x:Name="BtnAuto" Content="#1自動" VerticalAlignment="Center" Margin="8,0,0,0" Padding="8,4" Click="AutoButton_Click" />
+ <Button x:Name="BtnStop" Content="#1停止" VerticalAlignment="Center" Margin="8,0,0,0" Padding="8,4" Click="StopButton_Click" />
+ <Button x:Name="BtnPause" Content="#1暫停" VerticalAlignment="Center" Margin="8,0,0,0" Padding="8,4" Click="PauseButton_Click" />
+ <Button x:Name="BtnAlarmStop" Content="#1錯誤停止" VerticalAlignment="Center" Margin="8,0,0,0" Padding="8,4" Click="AlarmStopButton_Click" />
+ </StackPanel>
+
+ <!-- second row for tank1 additional controls -->
+ <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
+ <Button x:Name="BtnOpenDrying" Content="#1開啟烘乾" VerticalAlignment="Center" Margin="0,0,8,0" Padding="8,4" Click="OpenDryingButton_Click" />
+ <Button x:Name="BtnCloseDrying" Content="#1關閉烘乾" VerticalAlignment="Center" Margin="0,0,8,0" Padding="8,4" Click="CloseDryingButton_Click" />
+ <Button x:Name="BtnPick" Content="#1Pick" VerticalAlignment="Center" Margin="0,0,8,0" Padding="8,4" Click="PickButton_Click" />
+ <Button x:Name="BtnPlace" Content="#1Place" VerticalAlignment="Center" Margin="0,0,8,0" Padding="8,4" Click="PlaceButton_Click" />
+ <Button x:Name="BtnMove" Content="#1Move" VerticalAlignment="Center" Margin="0,0,8,0" Padding="8,4" Click="MoveButton_Click" />
+ </StackPanel>
+ </StackPanel>
+
+ <!-- spacing between tank groups -->
+ <StackPanel Width="20" />
+
+ <!-- Tank2 controls grouped vertically (mirror of tank1) -->
+ <StackPanel Orientation="Vertical">
+ <StackPanel Orientation="Horizontal">
+ <Button x:Name="Btn2Initialize" Content="#2初始化" VerticalAlignment="Center" Margin="8,0,0,0" Padding="8,4" Click="Initialize2Button_Click" />
+ <Button x:Name="Btn2Auto" Content="#2自動" VerticalAlignment="Center" Margin="8,0,0,0" Padding="8,4" Click="Auto2Button_Click" />
+ <Button x:Name="Btn2Stop" Content="#2停止" VerticalAlignment="Center" Margin="8,0,0,0" Padding="8,4" Click="Stop2Button_Click" />
+ <Button x:Name="Btn2Pause" Content="#2暫停" VerticalAlignment="Center" Margin="8,0,0,0" Padding="8,4" Click="Pause2Button_Click" />
+ <Button x:Name="Btn2AlarmStop" Content="#2錯誤停止" VerticalAlignment="Center" Margin="8,0,0,0" Padding="8,4" Click="AlarmStop2Button_Click" />
+ </StackPanel>
+
+ <!-- second row for tank2 additional controls -->
+ <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
+ <Button x:Name="Btn2OpenDrying" Content="#2開啟烘乾" VerticalAlignment="Center" Margin="0,0,8,0" Padding="8,4" Click="OpenDrying2Button_Click" />
+ <Button x:Name="Btn2CloseDrying" Content="#2關閉烘乾" VerticalAlignment="Center" Margin="0,0,8,0" Padding="8,4" Click="CloseDrying2Button_Click" />
+ <Button x:Name="Btn2Pick" Content="#2Pick" VerticalAlignment="Center" Margin="0,0,8,0" Padding="8,4" Click="Pick2Button_Click" />
+ <Button x:Name="Btn2Place" Content="#2Place" VerticalAlignment="Center" Margin="0,0,8,0" Padding="8,4" Click="Place2Button_Click" />
+ <Button x:Name="Btn2Move" Content="#2Move" VerticalAlignment="Center" Margin="0,0,8,0" Padding="8,4" Click="Move2Button_Click" />
+ </StackPanel>
+ </StackPanel>
+ </StackPanel>
 
  <!-- Template control directly in the content row (no Border) -->
  <template:Template_DryingTank Grid.Row="1" Margin="81,103,-61,-83" />
