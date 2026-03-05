@@ -10,4 +10,4 @@ using System.Reflection;
                                                 // app, or any theme specific resource dictionaries)
 )]
 
-[assembly: AssemblyInformationalVersion("1.0.0")]
+[assembly: AssemblyInformationalVersion("1.0.0.0")]

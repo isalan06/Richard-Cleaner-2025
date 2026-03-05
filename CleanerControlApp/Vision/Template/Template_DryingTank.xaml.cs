@@ -344,6 +344,13 @@ namespace CleanerControlApp.Vision.Template
                     WarningStatusLeft = _dryingTanks[0].HasWarning;
                     AlarmStatusLeft = _dryingTanks[0].HasAlarm;
 
+                    // handshake states
+                    PickFinishedLeft = _dryingTanks[0].HS_ClamperPickFinished;
+                    PlaceFinishedLeft = _dryingTanks[0].HS_ClamperPlaceFinished;
+                    MovingLeft = _dryingTanks[0].HS_ClamperMoving;
+                    InputPermitLeft = _dryingTanks[0].HS_InputPermit;
+                    ActFinishedLeft = _dryingTanks[0].HS_ActFinished;
+
                 }
                 if (_dryingTanks.Length > 1)
                 {
@@ -373,6 +380,13 @@ namespace CleanerControlApp.Vision.Template
                     InitializedStatusRight = _dryingTanks[1].Initialized;
                     WarningStatusRight = _dryingTanks[1].HasWarning;
                     AlarmStatusRight = _dryingTanks[1].HasAlarm;
+
+                    // handshake states
+                    PickFinishedRight = _dryingTanks[1].HS_ClamperPickFinished;
+                    PlaceFinishedRight = _dryingTanks[1].HS_ClamperPlaceFinished;
+                    MovingRight = _dryingTanks[1].HS_ClamperMoving;
+                    InputPermitRight = _dryingTanks[1].HS_InputPermit;
+                    ActFinishedRight = _dryingTanks[1].HS_ActFinished;
                 }
             }
             catch (Exception ex)
@@ -682,8 +696,8 @@ namespace CleanerControlApp.Vision.Template
         {
             get => _autoStatusLeft;
             set
-            { 
-                if(_autoStatusLeft != value)
+            {
+                if (_autoStatusLeft != value)
                 {
                     _autoStatusLeft = value;
                     OnPropertyChanged(nameof(AutoStatusLeft));
@@ -693,11 +707,11 @@ namespace CleanerControlApp.Vision.Template
 
         private bool _pauseStatusLeft = false;
         public bool PauseStatusLeft
-        { 
+        {
             get => _pauseStatusLeft;
             set
             {
-                if(_pauseStatusLeft != value)
+                if (_pauseStatusLeft != value)
                 {
                     _pauseStatusLeft = value;
                     OnPropertyChanged(nameof(PauseStatusLeft));
@@ -707,15 +721,15 @@ namespace CleanerControlApp.Vision.Template
 
         private bool _cassetteStatusLeft = false;
         public bool CassetteStatusLeft
-        { 
+        {
             get => _cassetteStatusLeft;
             set
             {
-                if (_cassetteStatusLeft != value) 
+                if (_cassetteStatusLeft != value)
                 {
                     _cassetteStatusLeft = value;
                     OnPropertyChanged(nameof(CassetteStatusLeft));
-                }  
+                }
             }
         }
 
@@ -777,7 +791,7 @@ namespace CleanerControlApp.Vision.Template
 
         private bool _autoStatusRight = false;
         public bool AutoStatusRight
-        { 
+        {
             get => _autoStatusRight;
             set
             {
@@ -791,13 +805,13 @@ namespace CleanerControlApp.Vision.Template
 
         private bool _pauseStatusRight = false;
         public bool PauseStatusRight
-        { 
+        {
             get => _pauseStatusRight;
             set
             {
                 if (_pauseStatusRight != value)
-                { 
-                    _pauseStatusRight = value;  
+                {
+                    _pauseStatusRight = value;
                     OnPropertyChanged(nameof(PauseStatusRight));
                 }
             }
@@ -805,11 +819,11 @@ namespace CleanerControlApp.Vision.Template
 
         private bool _cassetteStatusRight = false;
         public bool CassetteStatusRight
-        { 
+        {
             get => _cassetteStatusRight;
             set
-            { 
-                if(_cassetteStatusRight != value)
+            {
+                if (_cassetteStatusRight != value)
                 {
                     _cassetteStatusRight = value;
                     OnPropertyChanged(nameof(CassetteStatusRight));
@@ -861,7 +875,7 @@ namespace CleanerControlApp.Vision.Template
 
         private bool _alarmStatusRight = false;
         public bool AlarmStatusRight
-        { 
+        {
             get => _alarmStatusRight;
             set
             {
@@ -869,6 +883,146 @@ namespace CleanerControlApp.Vision.Template
                 {
                     _alarmStatusRight = value;
                     OnPropertyChanged(nameof(AlarmStatusRight));
+                }
+            }
+        }
+
+        private bool _pickFinishedLeft;
+        public bool PickFinishedLeft
+        {
+            get => _pickFinishedLeft;
+            set
+            {
+                if (_pickFinishedLeft != value)
+                {
+                    _pickFinishedLeft = value;
+                    OnPropertyChanged(nameof(PickFinishedLeft));
+                }
+            }
+        }
+
+        private bool _pickFinishedRight;
+        public bool PickFinishedRight
+        {
+            get => _pickFinishedRight;
+            set
+            {
+                if (_pickFinishedRight != value)
+                {
+                    _pickFinishedRight = value;
+                    OnPropertyChanged(nameof(PickFinishedRight));
+                }
+            }
+        }
+
+        private bool _placeFinishedLeft;
+        public bool PlaceFinishedLeft
+        {
+            get => _placeFinishedLeft;
+            set
+            {
+                if (_placeFinishedLeft != value)
+                {
+                    _placeFinishedLeft = value;
+                    OnPropertyChanged(nameof(PlaceFinishedLeft));
+                }
+            }
+        }
+
+        private bool _placeFinishedRight;
+        public bool PlaceFinishedRight
+        {
+            get => _placeFinishedRight;
+            set
+            {
+                if (_placeFinishedRight != value)
+                {
+                    _placeFinishedRight = value;
+                    OnPropertyChanged(nameof(PlaceFinishedRight));
+                }
+            }
+        }
+
+        private bool _movingLeft;
+        public bool MovingLeft
+        {
+            get => _movingLeft;
+            set
+            {
+                if (_movingLeft != value)
+                {
+                    _movingLeft = value;
+                    OnPropertyChanged(nameof(MovingLeft));
+                }
+            }
+        }
+
+        private bool _movingRight;
+        public bool MovingRight
+        {
+            get => _movingRight;
+            set
+            {
+                if (_movingRight != value)
+                {
+                    _movingRight = value;
+                    OnPropertyChanged(nameof(MovingRight));
+                }
+            }
+        }
+
+        private bool _inputPermitLeft;
+        public bool InputPermitLeft
+        {
+            get => _inputPermitLeft;
+            set
+            {
+                if (_inputPermitLeft != value)
+                {
+                    _inputPermitLeft = value;
+                    OnPropertyChanged(nameof(InputPermitLeft));
+                }
+            }
+        }
+
+        private bool _inputPermitRight;
+        public bool InputPermitRight
+        {
+            get => _inputPermitRight;
+            set
+            {
+                if (_inputPermitRight != value)
+                {
+                    _inputPermitRight = value;
+                    OnPropertyChanged(nameof(InputPermitRight));
+                }
+            }
+        }
+
+        private bool _actFinishedLeft;
+        public bool ActFinishedLeft
+        {
+            get => _actFinishedLeft;
+            set
+            {
+                if (_actFinishedLeft != value)
+                {
+                    _actFinishedLeft = value;
+                    OnPropertyChanged(nameof(ActFinishedLeft));
+                }
+            }
+        }
+
+        private bool _actFinishedRight;
+        public bool ActFinishedRight
+        {
+            get => _actFinishedRight;
+            set
+            {
+                if (_actFinishedRight != value)
+                {
+                    _actFinishedRight = value;
+                    OnPropertyChanged(nameof(ActFinishedRight));
                 }
             }
         }

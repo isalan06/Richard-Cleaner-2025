@@ -46,6 +46,12 @@ namespace CleanerControlApp.Hardwares.DryingTank.Interfacaes
         bool CoverClose(bool close);
         bool ManualCoverClose(bool close);
 
+        bool HS_ClamperMoving { get; set; }
+        bool HS_ClamperPickFinished { get; set; }
+        bool HS_ClamperPlaceFinished { get; set; }
+        bool HS_InputPermit { get; }
+        bool HS_ActFinished { get; }
+
         int ElpasedHeatingTime_Seconds { get; }
         int RemainingHeatingTime_Seconds { get; }
 

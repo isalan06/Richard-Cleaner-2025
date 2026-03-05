@@ -13,6 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
 using CleanerControlApp.Modules.UserManagement.Services;
+using CleanerControlApp.Utilities.Log;
 using Microsoft.Extensions.Logging;
 
 
@@ -47,12 +48,14 @@ namespace CleanerControlApp.Vision
             if (_userManager.Login(username, password))
             {
                 _logger.LogInformation($"使用者 '{username}' 登入成功，角色：{_userManager.UserInfo?.CurrentUserRole}");
+                OperateLog.Log("登入成功", $"使用者 '{username}' 登入成功，角色：{_userManager.UserInfo?.CurrentUserRole}");
                 DialogResult = true;
                 Close();
             }
             else
             {
                 _logger.LogWarning($"使用者 '{username}' 登入失敗。");
+                OperateLog.Log("登入失敗", username, "帳號或密碼錯誤");
                 ErrorText.Text = "帳號或密碼錯誤，請重新輸入。";
             }
         }

@@ -1,7 +1,7 @@
 ﻿<Window x:Class="CleanerControlApp.Vision.LoginWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="使用者登入" Height="220" Width="350" WindowStartupLocation="CenterScreen" ResizeMode="NoResize">
+        Title="使用者登入" Height="250" Width="350" WindowStartupLocation="CenterScreen" ResizeMode="NoResize">
     <Grid Margin="20">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>

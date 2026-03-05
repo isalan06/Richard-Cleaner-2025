@@ -1,0 +1,19 @@
+<UserControl x:Class="CleanerControlApp.Vision.Developer.Module.DevModuleDryingTankView"
+ xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+ xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+ xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+ xmlns:template="clr-namespace:CleanerControlApp.Vision.Template"
+ mc:Ignorable="d">
+ <Grid Background="White">
+ <Grid.RowDefinitions>
+ <RowDefinition Height="Auto" />
+ <RowDefinition Height="*" />
+ </Grid.RowDefinitions>
+
+ <TextBlock Text="Dev Module Drying Tank View" Grid.Row="0" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="10" FontSize="16" FontWeight="Bold"/>
+
+ <!-- Template control directly in the content row (no Border) -->
+ <template:Template_DryingTank Grid.Row="1" Margin="81,103,-61,-83" />
+ </Grid>
+</UserControl>

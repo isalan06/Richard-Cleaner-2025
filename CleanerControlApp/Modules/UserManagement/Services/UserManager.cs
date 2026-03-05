@@ -12,6 +12,10 @@ namespace CleanerControlApp.Modules.UserManagement.Services
     {
         public UserInfo? UserInfo { get; internal set; } = null;
 
+        // Static variables to hold current logged-in username and role
+        public static string? CurrentUsername = null;
+        public static UserRole? CurrentUserRole = null;
+
         private string _developer_username = "supervisor";
         private string _developer_password = "9527";
 
@@ -27,12 +31,21 @@ namespace CleanerControlApp.Modules.UserManagement.Services
 
             // if username or password is empty, login fail
             if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
+            {
+                // clear static values on failed login
+                CurrentUsername = null;
+                CurrentUserRole = null;
                 return result;
+            }
 
             if ((username == _developer_username) && (password == _developer_password))
             {
                 UserInfo = new UserInfo(0, _developer_username, _developer_password, UserRole.Developer);
                 result = true;
+
+                // set static values
+                CurrentUsername = _developer_username;
+                CurrentUserRole = UserRole.Developer;
             }
             else
             {
@@ -40,6 +53,16 @@ namespace CleanerControlApp.Modules.UserManagement.Services
                 if(UserInfo != null)
                 {
                     result = true;
+
+                    // set static values from authenticated user
+                    CurrentUsername = UserInfo.Name;
+                    CurrentUserRole = UserInfo.CurrentUserRole;
+                }
+                else
+                {
+                    // clear static values on failed login
+                    CurrentUsername = null;
+                    CurrentUserRole = null;
                 }
             }
 
