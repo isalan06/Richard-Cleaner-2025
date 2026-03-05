@@ -66,6 +66,9 @@ namespace CleanerControlApp.Vision.Developer
  cmbDryingTankIndex.SelectedIndex =0;
  }
  }
+
+ // Populate sink UI
+ LoadSinkToUi();
  }
  catch
  {
@@ -94,9 +97,9 @@ namespace CleanerControlApp.Vision.Developer
  if (_unitSettings != null && cmbDryingTankIndex.SelectedIndex >=0)
  {
  var idx = cmbDryingTankIndex.SelectedIndex;
- var list = _unitSettings.DryingTanks ?? new System.Collections.Generic.List<DryingTanks>();
+ var list = _unitSettings.DryingTanks ?? new System.Collections.Generic.List<US_DryingTanks>();
  // ensure enough items
- while (list.Count <= idx) list.Add(new DryingTanks());
+ while (list.Count <= idx) list.Add(new US_DryingTanks());
 
  var item = list[idx];
 
@@ -135,6 +138,9 @@ namespace CleanerControlApp.Vision.Developer
  }
  }
 
+ // Save sink UI into memory as well
+ SaveSinkUi();
+
  MessageBox.Show("已寫入目前元件參數到記憶體 (尚未寫入檔案)。", "寫入完成", MessageBoxButton.OK, MessageBoxImage.Information);
  }
  catch (Exception ex)
@@ -149,6 +155,8 @@ namespace CleanerControlApp.Vision.Developer
  {
  // First, persist current UI values into the in-memory unit settings
  SaveCurrentUiToIndex(_currentIndex);
+ // Also save sink fields
+ SaveSinkUi();
 
  if (_unitSettings != null)
  {
@@ -162,6 +170,7 @@ namespace CleanerControlApp.Vision.Developer
  if (diUnit != null)
  {
  diUnit.DryingTanks = _unitSettings.DryingTanks;
+ diUnit.Sink = _unitSettings.Sink;
  }
  }
  }
@@ -226,8 +235,8 @@ namespace CleanerControlApp.Vision.Developer
  {
  if (index <0) return;
  if (_unitSettings == null) _unitSettings = new UnitSettings();
- var list = _unitSettings.DryingTanks ?? new System.Collections.Generic.List<DryingTanks>();
- while (list.Count <= index) list.Add(new DryingTanks());
+ var list = _unitSettings.DryingTanks ?? new System.Collections.Generic.List<US_DryingTanks>();
+ while (list.Count <= index) list.Add(new US_DryingTanks());
  var item = list[index];
 
  // try parse and update fields; if parsing fails, keep previous values
@@ -244,6 +253,75 @@ namespace CleanerControlApp.Vision.Developer
  // assign back and mark dirty
  _unitSettings.DryingTanks = list;
  _isDirty = true;
+ }
+ catch
+ {
+ // ignore
+ }
+ }
+
+ // Helper: save sink UI controls into _unitSettings.Sink
+ private void SaveSinkUi()
+ {
+ try
+ {
+ if (_unitSettings == null) _unitSettings = new UnitSettings();
+ if (_unitSettings.Sink == null) _unitSettings.Sink = new US_Sink();
+ var s = _unitSettings.Sink;
+
+ if (float.TryParse(TxtSinkUnitTransfer.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out var ut)) s.UnitTransfer = ut;
+ if (int.TryParse(TxtSinkSVLowLimit.Text, out var svl)) s.SV_Low_Limit = svl;
+ if (int.TryParse(TxtSinkSVHighLimit.Text, out var svh)) s.SV_High_Limit = svh;
+ if (int.TryParse(TxtSinkPVLowTimeout.Text, out var pvl)) s.PV_Low_Timeout_Second = pvl;
+ if (int.TryParse(TxtSinkPVHighTimeout.Text, out var pvh)) s.PV_High_Timeout_Second = pvh;
+ if (int.TryParse(TxtSinkCoverOpenTimeout.Text, out var co)) s.Cover_Open_Timeout_Second = co;
+ if (int.TryParse(TxtSinkCoverCloseTimeout.Text, out var cc)) s.Cover_Close_Timeout_Second = cc;
+ if (int.TryParse(TxtSinkSVCheckOffset.Text, out var sco)) s.SV_CheckOffet = sco;
+ if (int.TryParse(TxtSinkActTimeLimit.Text, out var atl)) s.ActTime_Limit_Second = atl;
+ if (float.TryParse(TxtSinkMotorUnitTransfer.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out var mut)) s.MotorUnitTransfer = mut;
+
+ _unitSettings.Sink = s;
+ _isDirty = true;
+ }
+ catch
+ {
+ // ignore
+ }
+ }
+
+ // Helper: load sink values into UI
+ private void LoadSinkToUi()
+ {
+ try
+ {
+ if (_unitSettings?.Sink != null)
+ {
+ var s = _unitSettings.Sink;
+ TxtSinkUnitTransfer.Text = s.UnitTransfer.ToString(CultureInfo.InvariantCulture);
+ TxtSinkSVLowLimit.Text = s.SV_Low_Limit.ToString();
+ TxtSinkSVHighLimit.Text = s.SV_High_Limit.ToString();
+ TxtSinkPVLowTimeout.Text = s.PV_Low_Timeout_Second.ToString();
+ TxtSinkPVHighTimeout.Text = s.PV_High_Timeout_Second.ToString();
+ TxtSinkCoverOpenTimeout.Text = s.Cover_Open_Timeout_Second.ToString();
+ TxtSinkCoverCloseTimeout.Text = s.Cover_Close_Timeout_Second.ToString();
+ TxtSinkSVCheckOffset.Text = s.SV_CheckOffet.ToString();
+ TxtSinkActTimeLimit.Text = s.ActTime_Limit_Second.ToString();
+ TxtSinkMotorUnitTransfer.Text = s.MotorUnitTransfer.ToString(CultureInfo.InvariantCulture);
+ }
+ else
+ {
+ // clear fields
+ TxtSinkUnitTransfer.Text = string.Empty;
+ TxtSinkSVLowLimit.Text = string.Empty;
+ TxtSinkSVHighLimit.Text = string.Empty;
+ TxtSinkPVLowTimeout.Text = string.Empty;
+ TxtSinkPVHighTimeout.Text = string.Empty;
+ TxtSinkCoverOpenTimeout.Text = string.Empty;
+ TxtSinkCoverCloseTimeout.Text = string.Empty;
+ TxtSinkSVCheckOffset.Text = string.Empty;
+ TxtSinkActTimeLimit.Text = string.Empty;
+ TxtSinkMotorUnitTransfer.Text = string.Empty;
+ }
  }
  catch
  {

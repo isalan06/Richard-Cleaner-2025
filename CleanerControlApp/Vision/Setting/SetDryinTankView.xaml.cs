@@ -124,7 +124,7 @@ namespace CleanerControlApp.Vision.SettingViews
                     try { _unitSettings = App.AppHost.Services.GetService(typeof(UnitSettings)) as UnitSettings; } catch { }
                 }
 
-                if (_unitSettings == null) _unitSettings = new UnitSettings { DryingTanks = new System.Collections.Generic.List<DryingTanks>() };
+                if (_unitSettings == null) _unitSettings = new UnitSettings { DryingTanks = new System.Collections.Generic.List<US_DryingTanks>() };
             }
 
             // ensure at least2 entries
@@ -134,13 +134,13 @@ namespace CleanerControlApp.Vision.SettingViews
             }
             while (_unit_settings_safe(_unitSettings) && _unitSettings.DryingTanks.Count <2)
             {
-                _unitSettings.DryingTanks.Add(new DryingTanks { UnitTransfer =1f });
+                _unitSettings.DryingTanks.Add(new US_DryingTanks { UnitTransfer =1f });
             }
 
             var errors = new StringBuilder();
 
             // Tank1: parse inputs
-            var unit1 = (_unit_settings_safe(_unitSettings) && _unitSettings.DryingTanks.Count >0) ? _unitSettings.DryingTanks[0] : new DryingTanks { UnitTransfer =1f };
+            var unit1 = (_unit_settings_safe(_unitSettings) && _unitSettings.DryingTanks.Count >0) ? _unitSettings.DryingTanks[0] : new US_DryingTanks { UnitTransfer =1f };
             var transfer1 = (unit1 != null && Math.Abs(unit1.UnitTransfer) >0.000001f) ? unit1.UnitTransfer :1f;
 
             bool parsed1_low = float.TryParse(Txt1_SV_Low.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out float input1_low);
@@ -176,7 +176,7 @@ namespace CleanerControlApp.Vision.SettingViews
             }
 
             // Tank2: parse inputs
-            var unit2 = (_unit_settings_safe(_unitSettings) && _unitSettings.DryingTanks.Count >1) ? _unitSettings.DryingTanks[1] : new DryingTanks { UnitTransfer =1f };
+            var unit2 = (_unit_settings_safe(_unitSettings) && _unitSettings.DryingTanks.Count >1) ? _unitSettings.DryingTanks[1] : new US_DryingTanks { UnitTransfer =1f };
             var transfer2 = (unit2 != null && Math.Abs(unit2.UnitTransfer) >0.000001f) ? unit2.UnitTransfer :1f;
 
             bool parsed2_low = float.TryParse(Txt2_SV_Low.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out float input2_low);
