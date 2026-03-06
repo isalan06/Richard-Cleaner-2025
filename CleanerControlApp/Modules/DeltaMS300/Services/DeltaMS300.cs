@@ -17,7 +17,7 @@ namespace CleanerControlApp.Modules.DeltaMS300.Services
     {
         #region Constants
 
-        public static readonly int BUFFER_SIZE = 3;
+        public static readonly int BUFFER_SIZE = 4;
 
         public static readonly int ModuleCount = 2;
         public static readonly int[] ModbusRTUIndex = new int[] { 0, 1 };
@@ -144,6 +144,9 @@ namespace CleanerControlApp.Modules.DeltaMS300.Services
                 }
             }
         }
+        public int ErrorCode => _buffers != null && _buffers.Length >= BUFFER_SIZE ? (_buffers[3] & 0x00FF) : 0; // low byte
+        public int WarningCode => _buffers != null && _buffers.Length >= BUFFER_SIZE ? ((_buffers[3] >> 8) & 0x00FF) : 0; // high byte
+
 
         public void SetData(ushort[]? data)
         {
@@ -168,11 +171,19 @@ namespace CleanerControlApp.Modules.DeltaMS300.Services
             }
         }
 
-        public void SetRead2001(ushort value)
+        public void SetRead2001H(ushort value)
         {
             if (_buffers != null && _buffers.Length >= BUFFER_SIZE)
             {
                 _buffers[2] = value;
+            }
+        }
+
+        public void SetRead2100H(ushort value)
+        {
+            if (_buffers != null && _buffers.Length >= BUFFER_SIZE)
+            {
+                _buffers[3] = value;
             }
         }
 
@@ -306,7 +317,12 @@ namespace CleanerControlApp.Modules.DeltaMS300.Services
                                     else if (_routeProcess[_routeIndex].Id == 2)
                                     {
                                         if (data.Data != null && data.Data.Length >= 1)
-                                            this.SetRead2001(data.Data[0]);
+                                            this.SetRead2001H(data.Data[0]);
+                                    }
+                                    else if(_routeProcess[_routeIndex].Id == 3)
+                                    {
+                                        if (data.Data != null && data.Data.Length >= 1)
+                                            this.SetRead2100H(data.Data[0]);
                                     }
 
                                     _deviceConnected = true;
@@ -414,6 +430,18 @@ namespace CleanerControlApp.Modules.DeltaMS300.Services
                     DataNumber = 1
                 }
             },
+            new DMCommandFrame() 
+            {
+                Id =3,
+                Name = "Read Alarm Code",
+                CommandFrame = new ModbusRTUFrame()
+                {
+                    SlaveAddress =1,
+                    FunctionCode =0x3,
+                    StartAddress =8448, // 2100H
+                    DataNumber = 1
+                }
+            }
         };
 
 

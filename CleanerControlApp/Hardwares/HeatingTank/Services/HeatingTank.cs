@@ -20,7 +20,7 @@ namespace CleanerControlApp.Hardwares
         private Task? _loopTask;
         private readonly TimeSpan _loopInterval = TimeSpan.FromMilliseconds(10);
 
-        private IModbusRTUService? _modbusService;
+        //private IModbusRTUService? _modbusService;
 
         private bool _running;
 

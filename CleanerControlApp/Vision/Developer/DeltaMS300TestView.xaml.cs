@@ -101,7 +101,7 @@ namespace CleanerControlApp.Vision.Developer
                 txtMS1Error.Text = "-";
                 txtMS1Timeout.Text = "-";
 
-                // Clear設備資訊 fields
+                // Clear frequency fields
                 txtMS0FreqCommand.Text = "-";
                 txtMS0FreqOutput.Text = "-";
                 txtMS0FreqSet.Text = "-";
@@ -109,6 +109,12 @@ namespace CleanerControlApp.Vision.Developer
                 txtMS1FreqCommand.Text = "-";
                 txtMS1FreqOutput.Text = "-";
                 txtMS1FreqSet.Text = "-";
+
+                // Clear Error/Warning code fields
+                txtMS0ErrorCode.Text = "-";
+                txtMS0WarningCode.Text = "-";
+                txtMS1ErrorCode.Text = "-";
+                txtMS1WarningCode.Text = "-";
 
                 ellipseMS0DeviceStatus.Fill = Brushes.Gray;
                 ellipseMS1DeviceStatus.Fill = Brushes.Gray;
@@ -138,6 +144,10 @@ namespace CleanerControlApp.Vision.Developer
             var txtFreqCommand = idx ==0 ? txtMS0FreqCommand : txtMS1FreqCommand;
             var txtFreqOutput = idx ==0 ? txtMS0FreqOutput : txtMS1FreqOutput;
             var txtFreqSet = idx ==0 ? txtMS0FreqSet : txtMS1FreqSet;
+
+            // Error/Warning code textblocks
+            var txtErrorCode = idx ==0 ? txtMS0ErrorCode : txtMS1ErrorCode;
+            var txtWarningCode = idx ==0 ? txtMS0WarningCode : txtMS1WarningCode;
 
             // Determine connection status from ModbusRTUService.IsRunning when available
             var svc = module.ModbusRTUService;
@@ -202,12 +212,24 @@ namespace CleanerControlApp.Vision.Developer
                 txtFreqOutput.Text = "-";
                 txtFreqSet.Text = "-";
             }
+
+            // Update ErrorCode and WarningCode (show decimal and hex)
+            try
+            {
+                txtErrorCode.Text = $"{module.ErrorCode} (0x{module.ErrorCode:X2})";
+                txtWarningCode.Text = $"{module.WarningCode} (0x{module.WarningCode:X2})";
+            }
+            catch
+            {
+                txtErrorCode.Text = "-";
+                txtWarningCode.Text = "-";
+            }
         }
 
         #region Button handlers (Module0)
         private void BtnMS0Open_Click(object? sender, RoutedEventArgs e)
         {
-            if (_modules == null || _modules.Length < 1) return;
+            if (_modules == null || _modules.Length <1) return;
             var svc = _modules[0].ModbusRTUService;
             if (svc != null)
             {
@@ -219,22 +241,22 @@ namespace CleanerControlApp.Vision.Developer
 
         private void BtnMS0Close_Click(object? sender, RoutedEventArgs e)
         {
-            if (_modules == null || _modules.Length < 1) return;
+            if (_modules == null || _modules.Length <1) return;
             var svc = _modules[0].ModbusRTUService;
             try { svc?.Close(); } catch { }
-            txtMS0DeviceStatus.Text = "已離線";
+            txtMS0DeviceStatus.Text = "已關閉";
         }
 
         private void BtnMS0Start_Click(object? sender, RoutedEventArgs e)
         {
-            if (_modules == null || _modules.Length < 1) return;
+            if (_modules == null || _modules.Length <1) return;
             try { _modules[0].Start(); } catch { }
             txtMS0SystemStatus.Text = _modules[0].IsRunning ? "執行中" : "停止";
         }
 
         private void BtnMS0Stop_Click(object? sender, RoutedEventArgs e)
         {
-            if (_modules == null || _modules.Length < 1) return;
+            if (_modules == null || _modules.Length <1) return;
             try { _modules[0].Stop(); } catch { }
             txtMS0SystemStatus.Text = _modules[0].IsRunning ? "執行中" : "停止";
         }
@@ -243,7 +265,7 @@ namespace CleanerControlApp.Vision.Developer
         #region Button handlers (Module1)
         private void BtnMS1Open_Click(object? sender, RoutedEventArgs e)
         {
-            if (_modules == null || _modules.Length < 2) return;
+            if (_modules == null || _modules.Length <2) return;
             var svc = _modules[1].ModbusRTUService;
             if (svc != null)
             {
@@ -255,22 +277,22 @@ namespace CleanerControlApp.Vision.Developer
 
         private void BtnMS1Close_Click(object? sender, RoutedEventArgs e)
         {
-            if (_modules == null || _modules.Length < 2) return;
+            if (_modules == null || _modules.Length <2) return;
             var svc = _modules[1].ModbusRTUService;
             try { svc?.Close(); } catch { }
-            txtMS1DeviceStatus.Text = "已離線";
+            txtMS1DeviceStatus.Text = "已關閉";
         }
 
         private void BtnMS1Start_Click(object? sender, RoutedEventArgs e)
         {
-            if (_modules == null || _modules.Length < 2) return;
+            if (_modules == null || _modules.Length <2) return;
             try { _modules[1].Start(); } catch { }
             txtMS1SystemStatus.Text = _modules[1].IsRunning ? "執行中" : "停止";
         }
 
         private void BtnMS1Stop_Click(object? sender, RoutedEventArgs e)
         {
-            if (_modules == null || _modules.Length < 2) return;
+            if (_modules == null || _modules.Length <2) return;
             try { _modules[1].Stop(); } catch { }
             txtMS1SystemStatus.Text = _modules[1].IsRunning ? "執行中" : "停止";
         }

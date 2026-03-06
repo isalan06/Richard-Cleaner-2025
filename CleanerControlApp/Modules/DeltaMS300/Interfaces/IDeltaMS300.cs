@@ -12,10 +12,14 @@ namespace CleanerControlApp.Modules.DeltaMS300.Interfaces
         float Frquency_Command { get; } // unit : Hz
         float Frquency_Output { get; } // unit : Hz
         float Frquency_Set { get; set; } // unit : Hz
+        int ErrorCode { get; }
+        int WarningCode { get; }
 
         void SetData(ushort[]? data);
         void SetRead2102H2103H(ushort value1, ushort value2);
-        void SetRead2001(ushort value);
+        void SetRead2001H(ushort value);
+        void SetRead2100H(ushort value);
+
 
         bool IsRunning { get; }
 
