@@ -602,6 +602,8 @@ namespace CleanerControlApp.Hardwares.DryingTank.Services
 
         private void AutoProcedure()
         {
+            if (_PV_High_Timeout && Heating) HeatingOP(false);
+
             if (_auto)
             {
                 if (Idle && _autoStopFlag)

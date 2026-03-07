@@ -28,6 +28,15 @@ namespace CleanerControlApp.Utilities
             set => MS_Sink = value;
         }
 
+        public MS_HeatingTank? MS_HeatingTank { get; set; }
+
+        [JsonIgnore]
+        public MS_HeatingTank? HeatingTank
+        {
+            get => MS_HeatingTank;
+            set => MS_HeatingTank = value;
+        }
+
     }
 
     public class MS_DryingTanks

@@ -107,6 +107,8 @@ namespace CleanerControlApp.Hardwares.Sink.Services
             AlarmManager.AttachFlagGetter("ALM207", () => _motorAlarmLimitP);
             AlarmManager.AttachFlagGetter("ALM208", () => _motorAlarmHomeTimeout);
             AlarmManager.AttachFlagGetter("ALM209", () => _motorAlarmMoveTimeout);
+            AlarmManager.AttachFlagGetter("ALM210", () => _invErrorAlarm);
+            AlarmManager.AttachFlagGetter("ALM211", () => _invWarningAlarm);
 
             StartLoop();
 

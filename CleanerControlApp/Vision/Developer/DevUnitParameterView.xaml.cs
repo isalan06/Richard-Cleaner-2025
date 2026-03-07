@@ -51,13 +51,12 @@ namespace CleanerControlApp.Vision.Developer
  ConfigLoader.Load();
  _unitSettings = ConfigLoader.GetUnitSettings();
 
- // Populate combo box with indexes (1-based display)
- var count = _unitSettings?.DryingTanks?.Count ??0;
- cmbDryingTankIndex.ItemsSource = Enumerable.Range(0, count).Select(i => i +1).ToList();
- if (count >0)
+ // Populate combo box with exactly two items (per requirement)
+ cmbDryingTankIndex.ItemsSource = Enumerable.Range(0,2).Select(i => i +1).ToList();
+ if (2 >0)
  {
  // try to restore previous selection if still valid, otherwise select first
- if (previousIndex >=0 && previousIndex < count)
+ if (previousIndex >=0 && previousIndex <2)
  {
  cmbDryingTankIndex.SelectedIndex = previousIndex;
  }
@@ -69,6 +68,8 @@ namespace CleanerControlApp.Vision.Developer
 
  // Populate sink UI
  LoadSinkToUi();
+ // Populate heating tank UI
+ LoadHeatingToUi();
  }
  catch
  {
@@ -129,6 +130,8 @@ namespace CleanerControlApp.Vision.Developer
  if (diUnit != null)
  {
  diUnit.DryingTanks = _unitSettings.DryingTanks;
+ // also propagate heating tank if present
+ diUnit.HeatingTank = _unitSettings.HeatingTank;
  }
  }
  }
@@ -140,6 +143,8 @@ namespace CleanerControlApp.Vision.Developer
 
  // Save sink UI into memory as well
  SaveSinkUi();
+ // Save heating UI into memory
+ SaveHeatingUi();
 
  MessageBox.Show("已寫入目前元件參數到記憶體 (尚未寫入檔案)。", "寫入完成", MessageBoxButton.OK, MessageBoxImage.Information);
  }
@@ -157,6 +162,8 @@ namespace CleanerControlApp.Vision.Developer
  SaveCurrentUiToIndex(_currentIndex);
  // Also save sink fields
  SaveSinkUi();
+ // Also save heating fields
+ SaveHeatingUi();
 
  if (_unitSettings != null)
  {
@@ -171,6 +178,7 @@ namespace CleanerControlApp.Vision.Developer
  {
  diUnit.DryingTanks = _unitSettings.DryingTanks;
  diUnit.Sink = _unitSettings.Sink;
+ diUnit.HeatingTank = _unitSettings.HeatingTank;
  }
  }
  }
@@ -205,7 +213,23 @@ namespace CleanerControlApp.Vision.Developer
 
  if (_unitSettings == null || _unitSettings.DryingTanks == null) return;
  var idx = cmbDryingTankIndex.SelectedIndex;
- if (idx <0 || idx >= _unitSettings.DryingTanks.Count) return;
+ if (idx <0) return;
+ // if the list doesn't have this many items, just clear UI
+ if (idx >= _unitSettings.DryingTanks.Count)
+ {
+ TxtUnitTransfer.Text = string.Empty;
+ TxtSVLowLimit.Text = string.Empty;
+ TxtSVHighLimit.Text = string.Empty;
+ TxtPVLowTimeout.Text = string.Empty;
+ TxtPVHighTimeout.Text = string.Empty;
+ TxtCoverOpenTimeout.Text = string.Empty;
+ TxtCoverCloseTimeout.Text = string.Empty;
+ TxtSVCheckOffset.Text = string.Empty;
+ TxtActTimeLimit.Text = string.Empty;
+ _currentIndex = idx;
+ return;
+ }
+
  var item = _unitSettings.DryingTanks[idx];
 
  // populate UI from selected item
@@ -321,6 +345,74 @@ namespace CleanerControlApp.Vision.Developer
  TxtSinkSVCheckOffset.Text = string.Empty;
  TxtSinkActTimeLimit.Text = string.Empty;
  TxtSinkMotorUnitTransfer.Text = string.Empty;
+ }
+ }
+ catch
+ {
+ // ignore
+ }
+ }
+
+ // Helper: save heating tank UI controls into _unitSettings.HeatingTank
+ private void SaveHeatingUi()
+ {
+ try
+ {
+ if (_unitSettings == null) _unitSettings = new UnitSettings();
+ if (_unitSettings.HeatingTank == null) _unitSettings.HeatingTank = new US_HeatingTank();
+ var h = _unitSettings.HeatingTank;
+
+ if (float.TryParse(TxtHeatingUnitTransfer.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out var ut)) h.UnitTransfer = ut;
+ if (int.TryParse(TxtHeatingSVLowLimit.Text, out var svl)) h.SV_Low_Limit = svl;
+ if (int.TryParse(TxtHeatingSVHighLimit.Text, out var svh)) h.SV_High_Limit = svh;
+ if (int.TryParse(TxtHeatingPVLowTimeout.Text, out var pvl)) h.PV_Low_Timeout_Second = pvl;
+ if (int.TryParse(TxtHeatingPVHighTimeout.Text, out var pvh)) h.PV_High_Timeout_Second = pvh;
+ if (int.TryParse(TxtHeatingINVHighTimeout.Text, out var invh)) h.INV_High_Timeout_Second = invh;
+ if (int.TryParse(TxtHeatingINVLowTimeout.Text, out var invl)) h.INV_Low_Timeout_Second = invl;
+ if (int.TryParse(TxtHeatingINVZeroTimeout.Text, out var invz)) h.INV_Zero_Timeout_Second = invz;
+ if (int.TryParse(TxtHeatingSVCheckOffset.Text, out var sco)) h.SV_CheckOffet = sco;
+ if (float.TryParse(TxtHeatingINVCheckOffset.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out var invco)) h.INV_CheckOffset = invco;
+
+ _unitSettings.HeatingTank = h;
+ _isDirty = true;
+ }
+ catch
+ {
+ // ignore
+ }
+ }
+
+ // Helper: load heating tank values into UI
+ private void LoadHeatingToUi()
+ {
+ try
+ {
+ if (_unitSettings?.HeatingTank != null)
+ {
+ var h = _unitSettings.HeatingTank;
+ TxtHeatingUnitTransfer.Text = h.UnitTransfer.ToString(CultureInfo.InvariantCulture);
+ TxtHeatingSVLowLimit.Text = h.SV_Low_Limit.ToString();
+ TxtHeatingSVHighLimit.Text = h.SV_High_Limit.ToString();
+ TxtHeatingPVLowTimeout.Text = h.PV_Low_Timeout_Second.ToString();
+ TxtHeatingPVHighTimeout.Text = h.PV_High_Timeout_Second.ToString();
+ TxtHeatingINVHighTimeout.Text = h.INV_High_Timeout_Second.ToString();
+ TxtHeatingINVLowTimeout.Text = h.INV_Low_Timeout_Second.ToString();
+ TxtHeatingINVZeroTimeout.Text = h.INV_Zero_Timeout_Second.ToString();
+ TxtHeatingSVCheckOffset.Text = h.SV_CheckOffet.ToString();
+ TxtHeatingINVCheckOffset.Text = h.INV_CheckOffset.ToString(CultureInfo.InvariantCulture);
+ }
+ else
+ {
+ TxtHeatingUnitTransfer.Text = string.Empty;
+ TxtHeatingSVLowLimit.Text = string.Empty;
+ TxtHeatingSVHighLimit.Text = string.Empty;
+ TxtHeatingPVLowTimeout.Text = string.Empty;
+ TxtHeatingPVHighTimeout.Text = string.Empty;
+ TxtHeatingINVHighTimeout.Text = string.Empty;
+ TxtHeatingINVLowTimeout.Text = string.Empty;
+ TxtHeatingINVZeroTimeout.Text = string.Empty;
+ TxtHeatingSVCheckOffset.Text = string.Empty;
+ TxtHeatingINVCheckOffset.Text = string.Empty;
  }
  }
  catch

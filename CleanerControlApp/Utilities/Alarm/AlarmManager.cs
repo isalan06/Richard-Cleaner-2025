@@ -149,15 +149,15 @@ namespace CleanerControlApp.Utilities.Alarm
                     // Try to populate from AlarmList first
                     if (AlarmList.TryGetAlarm(code, out var info))
                     {
-                        entry = new AlarmEntry(info.Code, info.Type, info.Module, info.Description);
+                        if (info != null)
+                            entry = new AlarmEntry(info.Code, info.Type, info.Module, info.Description);
                     }
                     else
                     {
                         // Create minimal entry for unknown code
                         entry = new AlarmEntry(code, AlarmType.Warning, string.Empty, string.Empty);
                     }
-                    _entries[code] = entry;
-                }
+                    _entries[code] = (entry != null) ? entry: new AlarmEntry(code, AlarmType.Warning, string.Empty, string.Empty);                }
                 else
                 {
                     // If we have a stored entry but module/description are empty, try to fill from AlarmList

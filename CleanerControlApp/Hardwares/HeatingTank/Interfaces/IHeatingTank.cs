@@ -31,7 +31,6 @@ namespace CleanerControlApp.Hardwares
         bool Auto { get; }
         bool Pausing { get; }
         bool Heating { get; }
-        bool Cassette { get; }
         bool Initialized { get; }
         bool Idle { get; }
 
@@ -39,12 +38,12 @@ namespace CleanerControlApp.Hardwares
         bool LowTemperature { get; }
         bool HeatingOP(bool heating);
         bool ManualHeatingOP(bool heating);
-        bool AirOP(bool air);
-        bool ManualAirOP(bool air);
         bool WaterInOP(bool water);
         bool ManualWaterInOP(bool water);
         bool WaterOutOP(bool water);
         bool ManualWaterOutOP(bool water);
+
+        bool HS_RequestWater { get; set; }
 
         bool HasWarning { get; }
         bool HasAlarm { get; }
@@ -64,15 +63,17 @@ namespace CleanerControlApp.Hardwares
         float InvCommandFrequency { get; }
         float InvActualFrequency { get; }
 
-        bool HighFrequency { get; }
-        bool LowFrequency { get; }
-        bool ZeroFrequency { get; }
         bool IsHighFrequency { get; }
         bool IsLowFrequency { get; }
         bool IsZeroFrequency { get; }
+        bool DoHighFrequency { get; }
+        bool DoLowFrequency { get; }
+        bool DoZeroFrequency { get; }
         bool IsFrequencyRunning { get; }
-        void HighFrequencyOP();
-        void LowFrequencyOP();
-        void ZeroFrequencyOP();
+        bool HighFrequencyOP();
+        bool LowFrequencyOP();
+        bool ZeroFrequencyOP();
+
+        bool ManualFrequencyOP(int freq);
     }
 }
