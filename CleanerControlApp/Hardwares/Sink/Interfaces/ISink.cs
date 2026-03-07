@@ -46,8 +46,10 @@ namespace CleanerControlApp.Hardwares.Sink.Interfaces
         bool HS_ClamperMoving { get; set; }
         bool HS_ClamperPickFinished { get; set; }
         bool HS_ClamperPlaceFinished { get; set; }
+        bool HS_WaterSystemError { get; set; }
         bool HS_InputPermit { get; }
         bool HS_ActFinished { get; }
+        
 
         int ElpasedPressureTime_Seconds { get; }
         int RemainingPressureTime_Seconds { get; }
@@ -64,9 +66,37 @@ namespace CleanerControlApp.Hardwares.Sink.Interfaces
         void AlarmReset();
         void ModuleReset();
 
-        void SimHiPressure(bool pv);
+        void SimHiPressure();
+        void SimMotorPass();
 
 
+        bool MotorServoOn { get; }
+        bool MotorUpLimit { get; }
+        bool MotorDownLimit { get; }
+        bool MotorIdle { get; }
+        bool MotorBusy { get; }
+        bool MotorAlarm { get; }
+        bool MotorHoming { get; }
+        bool MotorMoving { get; }
+        bool MotorHome { get; }
+        int Posiition { get; }
+        float Position_Value { get; }
 
+        void ServoOn(bool servo);
+        void Jog(bool jog, int dir, int speed);
+        void Home();
+        void MoveToPosition(int position, int speed);
+        void MotorStop();
+
+        bool InPos1 { get; }
+        bool InPos2 { get; }
+        bool InPos3 { get; }
+
+        void Teach(int position);
+
+        int InvErrorCode { get; }
+        int InvWarningCode { get; }
+        float InvCommandFrequency { get; }
+        float InvActualFrequency { get; }
     }
 }

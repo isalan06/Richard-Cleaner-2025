@@ -1,11 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
 <UserControl x:Class="CleanerControlApp.Vision.Manual.ManualSinkView"
  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+ xmlns:template="clr-namespace:CleanerControlApp.Vision.Template"
  mc:Ignorable="d"
  d:DesignHeight="400" d:DesignWidth="600">
  <Grid Background="Transparent">
- <TextBlock Text="Manual Sink View" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="24"/>
+ <Grid.RowDefinitions>
+ <RowDefinition Height="Auto" />
+ <RowDefinition Height="*" />
+ </Grid.RowDefinitions>
+
+ <!-- Top title -->
+ <TextBlock Text="&#x6C96;&#x6C34;&#x69FD; &#x624B;&#x52D5;&#x64CD;&#x4F5C;" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,10,0,10" />
+
+ <!-- Embedded Template_Sink below the title (direct UserControl) -->
+ <template:Template_Sink Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
  </Grid>
 </UserControl>

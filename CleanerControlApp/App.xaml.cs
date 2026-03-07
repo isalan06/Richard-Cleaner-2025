@@ -27,6 +27,8 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Windows;
 using CleanerControlApp.Services;
+using CleanerControlApp.Hardwares.Sink.Interfaces;
+using CleanerControlApp.Hardwares.Sink.Services;
 
 namespace CleanerControlApp
 {
@@ -166,7 +168,7 @@ namespace CleanerControlApp
                             return svc as IModbusTCPService;
                         });
                         services.AddSingleton<IPLCService, PLCService>();
-                        // Also register IPLCOperator to resolve to the same PLCService singleton implementation
+                        // Also register IPLCOperator to resolve to the same PLCService singleton
                         services.AddSingleton<IPLCOperator>(sp => (IPLCOperator)sp.GetRequiredService<IPLCService>());
 
                         // Register ModbusRTUService using factory and apply serial settings from configuration
@@ -282,6 +284,24 @@ namespace CleanerControlApp
 
                             return arr;
                         });
+
+
+                        // Register Sink and ISink; resolve DeltaMS300[0] as driver dependency
+                        services.AddSingleton<Sink>(sp =>
+                        {
+                            var logger = sp.GetService<ILogger<Sink>>();
+                            var plc = sp.GetRequiredService<IPLCOperator>();
+                            var tempControllers = sp.GetService<ITemperatureControllers>();
+                            var unitSettings = sp.GetRequiredService<UnitSettings>();
+                            var moduleSettings = sp.GetRequiredService<ModuleSettings>();
+                            var deltaArr = sp.GetRequiredService<IDeltaMS300[]>();
+                            var delta = (deltaArr != null && deltaArr.Length >0) ? deltaArr[Sink.MS300_Index] : null!; // expect at least one
+
+                            return new Sink(logger, plc, tempControllers, unitSettings, moduleSettings, delta);
+                        });
+                        // Also register concrete Sink type for consumers that request it
+                        services.AddSingleton<ISink>(sp => (ISink)sp.GetRequiredService<Sink>());
+
 
                         // Register System background service to run with the host
                         services.AddHostedService<SystemBackgroundService>();

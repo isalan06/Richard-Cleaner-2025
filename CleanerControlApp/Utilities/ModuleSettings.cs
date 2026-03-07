@@ -49,7 +49,20 @@ namespace CleanerControlApp.Utilities
         public int MotorPosition_03 { get; set; }
         public int MotorVelocity_01 { get; set; }
         public int MotorVelocity_02 { get; set; }
+        public int AirKnifeRetryCount { get; set; }
 
+    }
+
+    public class MS_HeatingTank
+    {
+        public int SV_Low { get; set; }
+        public int SV_High { get; set; }
+
+        public float INV_High { get; set; }
+        public float INV_Low { get; set; }
+        public float INV_Zero { get; set; }
+        public int Water_H_CheckDelay_Second { get; set; }
+        public int Water_L_CheckDelay_Second { get; set; }
     }
 
 }

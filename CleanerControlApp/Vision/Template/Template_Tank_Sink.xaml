@@ -1,0 +1,250 @@
+﻿<UserControl x:Class="CleanerControlApp.Vision.Template.Template_Tank_Sink"
+ xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+ xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+ xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+ xmlns:local="clr-namespace:CleanerControlApp.Vision.Template"
+ mc:Ignorable="d" 
+ d:DesignHeight="450" d:DesignWidth="800"
+ x:Name="RootControl">
+
+ <Grid x:Name="MainGrid">
+ <Canvas x:Name="MainCanvas" Background="Transparent" >
+ <!-- Grouped container for rectangle + text so they can be dragged together -->
+ <Canvas x:Name="tankGroup" Canvas.Left="139" Canvas.Top="168"
+ Width="150" Height="220"
+ Cursor="SizeAll"
+ MouseLeftButtonDown="Group_MouseLeftButtonDown"
+ MouseMove="Group_MouseMove"
+ MouseLeftButtonUp="Group_MouseLeftButtonUp" HorizontalAlignment="Left" VerticalAlignment="Top">
+ <Rectangle Canvas.Left="0" Canvas.Top="0" Width="150" Height="220" Stroke="#2B72C2" StrokeThickness="2" Fill="White" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+ <TextBlock Text="沖水槽" FontSize="20" Canvas.Left="45" Canvas.Top="50" Foreground="#333333" TextAlignment="Center" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+ <!-- Use pack URIs for images so they resolve as resources -->
+ <Image Source="/CleanerControlApp;component/Pictures/Cover.png" Canvas.Left="20" Canvas.Top="-40" Width="110" Height="40" RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Left" VerticalAlignment="Top">
+ <Image.RenderTransform>
+ <RotateTransform Angle="0" />
+ </Image.RenderTransform>
+ </Image>
+ <Image Source="/CleanerControlApp;component/Pictures/AirKnife.png" Canvas.Left="26" Canvas.Top="10" Width="57" Height="28" HorizontalAlignment="Left" VerticalAlignment="Center" ToolTip="AirKnife" />
+
+ <!-- Elapsed and Remaining heating time for Drying Tank #2 (bound to ElapsedHeatingRight / RemainingHeatingRight) -->
+ <TextBlock Text="烘乾時間:" FontSize="12" Canvas.Left="11" Canvas.Top="80" Foreground="#333333" TextAlignment="Center" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+ <TextBlock Text="剩餘時間:" FontSize="12" Canvas.Left="10" Canvas.Top="102" Foreground="#333333" TextAlignment="Center" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+ <TextBlock Text="{Binding ElapsedAct, ElementName=RootControl}" FontSize="12" Canvas.Left="75" Canvas.Top="80" Foreground="#333333" />
+ <TextBlock Text="{Binding RemainingAct, ElementName=RootControl}" FontSize="12" Canvas.Left="75" Canvas.Top="102" Foreground="#333333" />
+ <Border Canvas.Left="11" Canvas.Top="122" BorderBrush="Black" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding AutoStatus, ElementName=RootControl}" Height="20" HorizontalAlignment="Left" VerticalAlignment="Top">
+ <Border.Style>
+ <Style TargetType="{x:Type Border}">
+ <Setter Property="Background" Value="#FFFFFF"/>
+ <Style.Triggers>
+ <DataTrigger Binding="{Binding AutoStatus, ElementName=RootControl}" Value="True">
+ <Setter Property="Background" Value="Lime"/>
+ </DataTrigger>
+ </Style.Triggers>
+ </Style>
+ </Border.Style>
+ <TextBlock Text="自動" FontSize="10" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black"/>
+ </Border>
+ <Border Canvas.Left="46" Canvas.Top="122" BorderBrush="Black" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding PauseStatus, ElementName=RootControl}" Height="20" HorizontalAlignment="Left" VerticalAlignment="Top">
+ <Border.Style>
+ <Style TargetType="{x:Type Border}">
+ <Setter Property="Background" Value="#FFFFFF"/>
+ <Style.Triggers>
+ <DataTrigger Binding="{Binding PauseStatus, ElementName=RootControl}" Value="True">
+ <Setter Property="Background" Value="Lime"/>
+ </DataTrigger>
+ </Style.Triggers>
+ </Style>
+ </Border.Style>
+ <TextBlock Text="暫停" FontSize="10" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black"/>
+ </Border>
+ <Border Canvas.Left="81" Canvas.Top="122" BorderBrush="Black" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding CassetteStatus, ElementName=RootControl}" Height="20" HorizontalAlignment="Left" VerticalAlignment="Top">
+ <Border.Style>
+ <Style TargetType="{x:Type Border}">
+ <Setter Property="Background" Value="#FFFFFF"/>
+ <Style.Triggers>
+ <DataTrigger Binding="{Binding CassetteStatus, ElementName=RootControl}" Value="True">
+ <Setter Property="Background" Value="Lime"/>
+ </DataTrigger>
+ </Style.Triggers>
+ </Style>
+ </Border.Style>
+ <TextBlock Text="卡匣" FontSize="10" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black"/>
+ </Border>
+ <Border Canvas.Left="11" Canvas.Top="147" BorderBrush="Black" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding IdleStatus, ElementName=RootControl}" Height="20" HorizontalAlignment="Left" VerticalAlignment="Top">
+ <Border.Style>
+ <Style TargetType="{x:Type Border}">
+ <Setter Property="Background" Value="#FFFFFF"/>
+ <Style.Triggers>
+ <DataTrigger Binding="{Binding IdleStatus, ElementName=RootControl}" Value="True">
+ <Setter Property="Background" Value="Lime"/>
+ </DataTrigger>
+ </Style.Triggers>
+ </Style>
+ </Border.Style>
+ <TextBlock Text="閒置" FontSize="10" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black"/>
+ </Border>
+ <Border Canvas.Left="46" Canvas.Top="147" BorderBrush="Black" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding InitializedStatus, ElementName=RootControl}" Height="20" HorizontalAlignment="Left" VerticalAlignment="Top">
+ <Border.Style>
+ <Style TargetType="{x:Type Border}">
+ <Setter Property="Background" Value="#FFFFFF"/>
+ <Style.Triggers>
+ <DataTrigger Binding="{Binding InitializedStatus, ElementName=RootControl}" Value="True">
+ <Setter Property="Background" Value="Lime"/>
+ </DataTrigger>
+ </Style.Triggers>
+ </Style>
+ </Border.Style>
+ <TextBlock Text="初始" FontSize="10" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black"/>
+ </Border>
+ <Border Canvas.Left="11" Canvas.Top="172" BorderBrush="Black" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding WarningStatus, ElementName=RootControl}" Height="20" HorizontalAlignment="Left" VerticalAlignment="Top">
+ <Border.Style>
+ <Style TargetType="{x:Type Border}">
+ <Setter Property="Background" Value="#FFFFFF"/>
+ <Style.Triggers>
+ <DataTrigger Binding="{Binding WarningStatus, ElementName=RootControl}" Value="True">
+ <Setter Property="Background" Value="Yellow"/>
+ </DataTrigger>
+ </Style.Triggers>
+ </Style>
+ </Border.Style>
+ <TextBlock Text="警告" FontSize="10" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black"/>
+ </Border>
+ <Border Canvas.Left="46" Canvas.Top="172" BorderBrush="Black" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding AlarmStatus, ElementName=RootControl}" Height="20" HorizontalAlignment="Left" VerticalAlignment="Top">
+ <Border.Style>
+ <Style TargetType="{x:Type Border}">
+ <Setter Property="Background" Value="#FFFFFF"/>
+ <Style.Triggers>
+ <DataTrigger Binding="{Binding AlarmStatus, ElementName=RootControl}" Value="True">
+ <Setter Property="Background" Value="Red"/>
+ </DataTrigger>
+ </Style.Triggers>
+ </Style>
+ </Border.Style>
+ <TextBlock Text="錯誤" FontSize="10" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black"/>
+ </Border>
+ <Border BorderBrush="#2E993E" BorderThickness="1" CornerRadius="3" Padding="4" Canvas.Left="-11" Canvas.Top="-40" HorizontalAlignment="Left" VerticalAlignment="Top">
+ <Border.Style>
+ <Style TargetType="{x:Type Border}">
+ <Setter Property="Background" Value="#FFFFFF"/>
+ <Style.Triggers>
+ <DataTrigger Binding="{Binding CommandCoverClose, ElementName=RootControl}" Value="True">
+ <Setter Property="Background" Value="#FF0000"/>
+ </DataTrigger>
+ </Style.Triggers>
+ </Style>
+ </Border.Style>
+ <TextBlock Text="Y50 - 關" FontSize="10" Foreground="Black" />
+ </Border>
+ <Border BorderBrush="#2E993E" BorderThickness="1" CornerRadius="3" Padding="4" Width="51" Height="22" Canvas.Left="130" Canvas.Top="-42" HorizontalAlignment="Center" VerticalAlignment="Top">
+ <Border.Style>
+ <Style TargetType="{x:Type Border}">
+ <Setter Property="Background" Value="#FFFFFF"/>
+ <Style.Triggers>
+ <DataTrigger Binding="{Binding SensorCoverOpen, ElementName=RootControl}" Value="True">
+ <Setter Property="Background" Value="#7CFC00"/>
+ </DataTrigger>
+ </Style.Triggers>
+ </Style>
+ </Border.Style>
+ <TextBlock Text="X50 - 開" FontSize="10" Foreground="Black" />
+
+ </Border>
+ <Border Canvas.Left="130" Canvas.Top="-20" Width="50" Height="22" BorderBrush="#2E993E" BorderThickness="1" CornerRadius="3" Padding="4" HorizontalAlignment="Left" VerticalAlignment="Top">
+ <Border.Style>
+ <Style TargetType="{x:Type Border}">
+ <Setter Property="Background" Value="#FFFFFF"/>
+ <Style.Triggers>
+ <DataTrigger Binding="{Binding SensorCoverClose, ElementName=RootControl}" Value="True">
+ <Setter Property="Background" Value="#7CFC00"/>
+ </DataTrigger>
+ </Style.Triggers>
+ </Style>
+ </Border.Style>
+ <TextBlock Text="X51 - 關" FontSize="10" Foreground="Black" />
+
+ </Border>
+ <Border BorderBrush="#2E993E" BorderThickness="1" CornerRadius="3" Padding="4" Canvas.Left="86" Canvas.Top="10" HorizontalAlignment="Left" VerticalAlignment="Top">
+ <Border.Style>
+ <Style TargetType="{x:Type Border}">
+ <Setter Property="Background" Value="#FFFFFF"/>
+ <Style.Triggers>
+ <DataTrigger Binding="{Binding CommandAirOpen, ElementName=RootControl}" Value="True">
+ <Setter Property="Background" Value="#FF0000"/>
+ </DataTrigger>
+ </Style.Triggers>
+ </Style>
+ </Border.Style>
+ <TextBlock Text="Y54 - 開" FontSize="10" Foreground="Black" />
+ </Border>
+ <Border BorderBrush="Black" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding PickFinished, ElementName=RootControl}" Width="82" Height="22" Canvas.Left="86" Canvas.Top="-122" HorizontalAlignment="Left" VerticalAlignment="Top">
+ <Border.Style>
+ <Style TargetType="{x:Type Border}">
+ <Setter Property="Background" Value="White"/>
+ <Style.Triggers>
+ <DataTrigger Binding="{Binding PickFinished, ElementName=RootControl}" Value="True">
+ <Setter Property="Background" Value="Lime"/>
+ </DataTrigger>
+ </Style.Triggers>
+ </Style>
+ </Border.Style>
+ <TextBlock Text="Pick Finished" FontSize="10" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black"/>
+ </Border>
+ <Border BorderBrush="Black" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding PlaceFinished, ElementName=RootControl}" Width="82" Height="22" HorizontalAlignment="Center" Canvas.Left="86" Canvas.Top="-96" VerticalAlignment="Top">
+ <Border.Style>
+ <Style TargetType="{x:Type Border}">
+ <Setter Property="Background" Value="White"/>
+ <Style.Triggers>
+ <DataTrigger Binding="{Binding PlaceFinished, ElementName=RootControl}" Value="True">
+ <Setter Property="Background" Value="Lime"/>
+ </DataTrigger>
+ </Style.Triggers>
+ </Style>
+ </Border.Style>
+ <TextBlock Text="Place Finished" FontSize="10" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black"/>
+ </Border>
+ <Border BorderBrush="Black" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding Moving, ElementName=RootControl}" Width="82" Height="22" HorizontalAlignment="Left" Canvas.Left="86" Canvas.Top="-69" VerticalAlignment="Top">
+ <Border.Style>
+ <Style TargetType="{x:Type Border}">
+ <Setter Property="Background" Value="White"/>
+ <Style.Triggers>
+ <DataTrigger Binding="{Binding Moving, ElementName=RootControl}" Value="True">
+ <Setter Property="Background" Value="Lime"/>
+ </DataTrigger>
+ </Style.Triggers>
+ </Style>
+ </Border.Style>
+ <TextBlock Text="Moving" FontSize="10" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black"/>
+ </Border>
+ <Border BorderBrush="Black" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding InputPermit, ElementName=RootControl}" Width="82" Height="22" HorizontalAlignment="Left" Canvas.Left="-7" Canvas.Top="-96" VerticalAlignment="Top">
+ <Border.Style>
+ <Style TargetType="{x:Type Border}">
+ <Setter Property="Background" Value="White"/>
+ <Style.Triggers>
+ <DataTrigger Binding="{Binding InputPermit, ElementName=RootControl}" Value="True">
+ <Setter Property="Background" Value="Lime"/>
+ </DataTrigger>
+ </Style.Triggers>
+ </Style>
+ </Border.Style>
+ <TextBlock Text="Input Permit" FontSize="10" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black"/>
+ </Border>
+ <Border BorderBrush="Black" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding ActFinished, ElementName=RootControl}" Width="82" Height="22" HorizontalAlignment="Left" Canvas.Left="-7" Canvas.Top="-69" VerticalAlignment="Top">
+ <Border.Style>
+ <Style TargetType="{x:Type Border}">
+ <Setter Property="Background" Value="White"/>
+ <Style.Triggers>
+ <DataTrigger Binding="{Binding ActFinished, ElementName=RootControl}" Value="True">
+ <Setter Property="Background" Value="Lime"/>
+ </DataTrigger>
+ </Style.Triggers>
+ </Style>
+ </Border.Style>
+ <TextBlock Text="Act Finished" FontSize="10" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black"/>
+ </Border>
+ </Canvas>
+
+ </Canvas>
+ <!--其他控制項在這裡 -->
+ </Grid>
+</UserControl>

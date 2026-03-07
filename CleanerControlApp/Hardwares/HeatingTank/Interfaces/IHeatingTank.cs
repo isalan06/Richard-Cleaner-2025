@@ -11,5 +11,68 @@ namespace CleanerControlApp.Hardwares
         bool IsRunning { get; }
         void Start();
         void Stop();
+
+        bool Sensor_Liquid_HH { get; }
+        bool Sensor_Liquid_H { get; }
+        bool Sensor_Liquid_L { get; }
+        bool Sensor_Liquid_LL { get; }
+
+        bool Command_WaterIn { get; set; }
+        bool Command_WaterOut { get; set; }
+
+        int PV { get; }
+        int SV { get; }
+        float PV_Value { get; }
+        float SV_Value { get; }
+
+        void SetSV(int value);
+        void SetSV(float value);
+
+        bool Auto { get; }
+        bool Pausing { get; }
+        bool Heating { get; }
+        bool Cassette { get; }
+        bool Initialized { get; }
+        bool Idle { get; }
+
+        bool HighTemperature { get; }
+        bool LowTemperature { get; }
+        bool HeatingOP(bool heating);
+        bool ManualHeatingOP(bool heating);
+        bool AirOP(bool air);
+        bool ManualAirOP(bool air);
+        bool WaterInOP(bool water);
+        bool ManualWaterInOP(bool water);
+        bool WaterOutOP(bool water);
+        bool ManualWaterOutOP(bool water);
+
+        bool HasWarning { get; }
+        bool HasAlarm { get; }
+        bool IsNormalStatus { get; }
+        void AutoStop();
+        void WarningStop();
+        void AlarmStop();
+        void AutoStart();
+        void AutoPause();
+        void AlarmReset();
+        void ModuleReset();
+
+        void SimHiTemperature(bool pv);
+
+        int InvErrorCode { get; }
+        int InvWarningCode { get; }
+        float InvCommandFrequency { get; }
+        float InvActualFrequency { get; }
+
+        bool HighFrequency { get; }
+        bool LowFrequency { get; }
+        bool ZeroFrequency { get; }
+        bool IsHighFrequency { get; }
+        bool IsLowFrequency { get; }
+        bool IsZeroFrequency { get; }
+        bool IsFrequencyRunning { get; }
+        void HighFrequencyOP();
+        void LowFrequencyOP();
+        void ZeroFrequencyOP();
     }
 }

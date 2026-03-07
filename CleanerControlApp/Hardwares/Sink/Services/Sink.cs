@@ -1,4 +1,5 @@
 ﻿using CleanerControlApp.Hardwares.Sink.Interfaces;
+using CleanerControlApp.Modules.DeltaMS300.Interfaces;
 using CleanerControlApp.Modules.MitsubishiPLC.Interfaces;
 using CleanerControlApp.Modules.MitsubishiPLC.Services;
 using CleanerControlApp.Modules.Modbus.Interfaces;
@@ -38,6 +39,7 @@ namespace CleanerControlApp.Hardwares.Sink.Services
         private readonly TimeSpan _loopInterval = TimeSpan.FromMilliseconds(10);
 
         private IModbusRTUService? _modbusService;
+        private IDeltaMS300? _deltaMS300;
 
         private bool _running;
 
@@ -69,11 +71,16 @@ namespace CleanerControlApp.Hardwares.Sink.Services
         private bool _sim_pv = false;
         private bool _sim_pass_motor = false;
 
+        private bool _motor_commanding = false;
+        private int _motor_air_retry_count = 0;
+        private bool _motor_air_up_flag = false;
+        private bool RetryAirFinished => _moduleSettings.Sink != null && _moduleSettings.Sink.AirKnifeRetryCount == _motor_air_retry_count;
+
         #endregion
 
         #region constructor
 
-        public Sink(ILogger<Sink>? logger, IPLCOperator ? plcService, ITemperatureControllers? temperatureControllers, UnitSettings unitSettings, ModuleSettings moduleSettings)
+        public Sink(ILogger<Sink>? logger, IPLCOperator ? plcService, ITemperatureControllers? temperatureControllers, UnitSettings unitSettings, ModuleSettings moduleSettings, IDeltaMS300 deltaMS300)
         {
             _unitSettings = unitSettings;
             _moduleSettings = moduleSettings;
@@ -81,9 +88,12 @@ namespace CleanerControlApp.Hardwares.Sink.Services
             _logger = logger;
 
             _plcService = plcService;
+            _deltaMS300 = deltaMS300;
 
             _temperatureController = temperatureControllers?[TC_Index]; // 這裡是用在做壓力控制
             _temperatureControllers = temperatureControllers;
+
+            
 
             RefreshTimeoutValue();
 
@@ -232,7 +242,7 @@ namespace CleanerControlApp.Hardwares.Sink.Services
         public bool Pausing => _pausing;
         public bool Pressure => _pressure;
         public bool Cassette => _cassette;
-        public bool Initialized => _initialized;
+        public bool Initialized => _initialized && (_sim_pass_motor || MotorHome);
         public bool Idle => Sensor_CoverOpen && !_pressure && !_cassette && _initialized && IsNormalStatus && (_sim_pass_motor || (MotorServoOn && MotorIdle && MotorHome));
 
         public bool HighPressure => (PV > PV_Check_High) || _sim_pv;
@@ -244,6 +254,8 @@ namespace CleanerControlApp.Hardwares.Sink.Services
 
             if (_moduleSettings.Sink != null)
             {
+                if (HS_WaterSystemError && pressure) pressure = false;
+
                 SetSV(pressure ? _moduleSettings.Sink.SV_High : _moduleSettings.Sink.SV_Low);
                 _pressure = pressure;
                 result = true;
@@ -316,14 +328,15 @@ namespace CleanerControlApp.Hardwares.Sink.Services
         public bool HS_ClamperMoving { get; set; }
         public bool HS_ClamperPickFinished { get; set; }
         public bool HS_ClamperPlaceFinished { get; set; }
-        public bool HS_InputPermit => Idle && !_pausing && !HS_ClamperMoving && _auto;
-        public bool HS_ActFinished => _cassette && Sensor_CoverOpen && !HS_ClamperMoving && !Pressure && _actFinished;
+        public bool HS_WaterSystemError { get; set; }
+        public bool HS_InputPermit => Idle && !_pausing && !HS_ClamperMoving && _auto && InPos1;
+        public bool HS_ActFinished => _cassette && Sensor_CoverOpen && !HS_ClamperMoving && !Pressure && _actFinished && InPos1 && RetryAirFinished;
 
         public int ElpasedPressureTime_Seconds => (int)(_elapsedTime != null ? _elapsedTime.Value.TotalSeconds : 0);
         public int RemainingPressureTime_Seconds => (_moduleSettings.Sink != null) ? _moduleSettings.Sink.ActTime_Second - ElpasedPressureTime_Seconds : 0;
 
         public bool ModulePass { get; set; }
-        public bool HasWarning => _PV_Low_Timeout || _PV_High_Timeout || _Cover_Open_Timeout || _Cover_Close_Timeout || _motorAlarmHomeTimeout || _motorAlarmMoveTimeout;
+        public bool HasWarning => _PV_Low_Timeout || _PV_High_Timeout || _Cover_Open_Timeout || _Cover_Close_Timeout || _motorAlarmHomeTimeout || _motorAlarmMoveTimeout || _invErrorAlarm;
         public bool HasAlarm => _motorAlarm || _motorAlarmLimitN || _motorAlarmLimitP;
         public bool IsNormalStatus => !HasWarning && !HasAlarm;
         public void AutoStop()
@@ -368,16 +381,20 @@ namespace CleanerControlApp.Hardwares.Sink.Services
             Initialize();
         }
 
-        public void SimHiPressure(bool pv)
+        public void SimHiPressure()
         {
-            _sim_pv = pv;
+            _sim_pv = !_sim_pv;
+        }
+        public void SimMotorPass()
+        {
+            _sim_pass_motor = !_sim_pass_motor;
         }
 
-        public bool MotorServoOn => _plcService != null && _plcService.Command_Axis3ServoOn;
+        public bool MotorServoOn => _plcService != null && _plcService.CleanerZServoServoOn;
         public bool MotorUpLimit => _plcService != null && _plcService.CleanerZLimitN;
         public bool MotorDownLimit => _plcService != null && _plcService.CleanerZLimitP;
         public bool MotorIdle => _plcService != null && _plcService.CleanerZIdle && !_plcService.Axis3CommandDriving && !_plcService.Axis3CommandProcedure && !_plcService.Axis3HomeProcedure;
-        public bool MotorBusy => !MotorIdle;
+        public bool MotorBusy => !MotorIdle && _plcService != null && MotorServoOn;
         public bool MotorAlarm => _plcService != null && _plcService.CleanerZAlarm;
         public bool MotorHoming => _plcService != null && _plcService.Axis3HomeProcedure;
         public bool MotorMoving => _plcService != null && _plcService.Axis3CommandProcedure;
@@ -470,6 +487,9 @@ namespace CleanerControlApp.Hardwares.Sink.Services
                     _plcService.Command_Axis3Speed = setVel;
                     _plcService.Command_Axis3Command = true;
                     // fire-and-forget task to reset the command after a delay
+
+                    _motor_commanding = true;
+
                     _ = Task.Run(async () =>
                     {
                         try
@@ -477,6 +497,8 @@ namespace CleanerControlApp.Hardwares.Sink.Services
                             await Task.Delay(TimeSpan.FromSeconds(3)).ConfigureAwait(false);
                             if (_plcService != null)
                                 _plcService.Command_Axis3Command = false;
+
+                            _motor_commanding = false;
                         }
                         catch
                         {
@@ -514,8 +536,31 @@ namespace CleanerControlApp.Hardwares.Sink.Services
 
             }
         }
-        
 
+        public bool InPos1 => ((_plcService != null) && (Posiition == (_moduleSettings.Sink != null ? _moduleSettings.Sink.MotorPosition_01 : 0))) || _sim_pass_motor;
+        public bool InPos2 => ((_plcService != null) && (Posiition == (_moduleSettings.Sink != null ? _moduleSettings.Sink.MotorPosition_02 : 0))) || _sim_pass_motor;
+        public bool InPos3 => ((_plcService != null) && (Posiition == (_moduleSettings.Sink != null ? _moduleSettings.Sink.MotorPosition_03 : 0))) || _sim_pass_motor;
+
+        public void Teach(int position)
+        {
+            if (_plcService != null && _moduleSettings.Sink != null)
+            {
+                if (position == 0)
+                    _moduleSettings.Sink.MotorPosition_01 = Posiition;
+                else if (position == 1)
+                    _moduleSettings.Sink.MotorPosition_02 = Posiition;
+                else if (position == 2)
+                    _moduleSettings.Sink.MotorPosition_03 = Posiition;
+
+                if(position >= 0 && position < 3)
+                    ConfigLoader.SetModuleSettings(_moduleSettings);
+            }
+        }
+
+        public int InvErrorCode => _deltaMS300 != null ? _deltaMS300.ErrorCode : 0;
+        public int InvWarningCode => _deltaMS300 != null ? _deltaMS300.WarningCode : 0;
+        public float InvCommandFrequency => _deltaMS300 != null ? _deltaMS300.Frquency_Command : 0f;
+        public float InvActualFrequency => _deltaMS300 != null ? _deltaMS300.Frquency_Output : 0f;
         #endregion
 
         #region Function
@@ -566,6 +611,11 @@ namespace CleanerControlApp.Hardwares.Sink.Services
             RefreshTimeoutValue();
             CheckTimeout();
 
+            if (HS_WaterSystemError)
+            {
+                if (Pressure) PressureOP(false);
+            }
+
             AutoProcedure();
 
             await Task.Yield();
@@ -588,12 +638,15 @@ namespace CleanerControlApp.Hardwares.Sink.Services
 
         private void Initialize()
         {
+            ServoOn(true);
             ActStartStatus();
 
             _auto = false;
             _cassette = false;
             _pausing = false;
             _autoStopFlag = false;
+            _motor_commanding = false;
+            _motor_air_retry_count = 0;
 
             ResetTimeoutFlag();
             _initialized = true;
@@ -644,11 +697,23 @@ namespace CleanerControlApp.Hardwares.Sink.Services
                         CoverClose(false);
                     }
 
+                    // 卡匣放入前確認蓋子打開且馬達在上方位置，若不在原點位置則移動到上方位置
+                    if (!_cassette && Sensor_CoverOpen && MotorIdle && !_pausing && !_motor_commanding && !InPos1)
+                    {
+                        MoveToPosition(0, 0);
+                    }
+
                     //卡匣放入後蓋子關閉
                     if (_cassette && !Command_CleanerCoverClose)
                     {
-                        CoverClose(true);
+                        if(!InPos3 && !_motor_commanding && !_pausing)
+                            MoveToPosition(2, 0);
+
+                        if (InPos3)
+                            CoverClose(true);
                     }
+
+
 
                     // 有卡匣且蓋子關閉後開始加熱
                     if (_cassette && Sensor_CoverClose)
@@ -658,9 +723,9 @@ namespace CleanerControlApp.Hardwares.Sink.Services
                             PressureOP(true);
                         }
 
-                        if (Pressure) // 加熱過程
+                        if (Pressure) // 沖水過程
                         {
-                            if (_pausing) // 加熱過程中暫停
+                            if (_pausing) // 沖水過程中暫停
                             {
                                 PressureOP(false);
                             }
@@ -668,7 +733,7 @@ namespace CleanerControlApp.Hardwares.Sink.Services
                         }
                     }
 
-                    // 加熱時間計算
+                    // 沖水時間計算
                     if (Pressure && !_pausing && Sensor_CoverClose)
                     {
                         // start timer when condition becomes true
@@ -678,12 +743,25 @@ namespace CleanerControlApp.Hardwares.Sink.Services
                         }
                         else
                         {
+                            // 馬達往復搖擺流程
+                            if(InPos3 && MotorIdle && !_motor_commanding && !_pausing)
+                            {
+                                MoveToPosition(2, 0);
+                            }
+                            else if(InPos2 && MotorIdle && !_motor_commanding && !_pausing)
+                            {
+                                MoveToPosition(1, 0);
+                            }
+
+
+                            // 計算時間
                             _elapsedTime += DateTime.UtcNow - _heatingStartTime.Value;
                             _heatingStartTime = DateTime.UtcNow;
                             if (_elapsedTime >= TimeSpan.FromSeconds((double)(_moduleSettings.Sink != null ? _moduleSettings.Sink.ActTime_Second : 60.0)))
                             {
                                 PressureOP(false);
                                 _actFinished = true;
+                                MotorStop();
                             }
                         }
                     }
@@ -691,6 +769,7 @@ namespace CleanerControlApp.Hardwares.Sink.Services
                     {
                         // reset timer when condition no longer holds
                         _heatingStartTime = null;
+                        MotorStop();
                     }
 
 
@@ -706,7 +785,26 @@ namespace CleanerControlApp.Hardwares.Sink.Services
                     // 蓋子打開等待卡匣取出
                     if (_cassette && Command_CleanerCoverClose && !_pressure)
                     {
+                        _motor_air_retry_count = 0;
+                        _motor_air_up_flag = false;
                         CoverClose(false);
+                        AirOP(true);
+                    }
+
+                    // 卡匣取出前確認蓋子打開且馬達在上方位置，若不在原點位置則移動到上方位置
+                    if (_cassette && Sensor_CoverOpen && !InPos1 && !_motor_commanding && MotorIdle)
+                    { 
+                        MoveToPosition(0, 0);
+                    }
+
+                    // 風刀反覆吹氣流程
+                    if (_cassette && InPos1 && MotorIdle && !_motor_commanding)
+                    {
+                        if (!RetryAirFinished)
+                        {
+                            MoveToPosition(2, 0);
+                            _motor_air_retry_count++;
+                        }
                     }
 
                     // 卡匣取出後流程結束
@@ -716,6 +814,7 @@ namespace CleanerControlApp.Hardwares.Sink.Services
                         _cassette = false;
                         _actFinished = false;
                         _elapsedTime = new TimeSpan();
+                        AirOP(false);
                     }
                 }
             }
@@ -879,7 +978,8 @@ namespace CleanerControlApp.Hardwares.Sink.Services
         private bool _motorAlarmHomeTimeout => (_plcService != null) && _plcService.Axis1ErrorHomeTimeout;
         private bool _motorAlarmMoveTimeout => (_plcService != null) && _plcService.Axis1ErrorCommandTimeout;
 
-
+        private bool _invErrorAlarm => (_deltaMS300 != null) && (_deltaMS300.ErrorCode != 0);
+        private bool _invWarningAlarm => (_deltaMS300 != null) && (_deltaMS300.WarningCode != 0);
 
         #endregion
     }

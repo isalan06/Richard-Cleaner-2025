@@ -25,8 +25,8 @@
     </Border>
 
     <!-- Right content area: ContentControl placeholder -->
-    <Border Grid.Column="1" Margin="8" Padding="0" BorderBrush="LightGray" BorderThickness="1" CornerRadius="4" Background="#FAFAFA" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-      <ContentControl x:Name="ModuleContentPlaceholder" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" Margin="-1,0,0,0" />
+    <Border Grid.Column="1" Margin="8" Padding="0" BorderBrush="#BDBDBD" BorderThickness="1" CornerRadius="4" Background="#FAFAFA" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" >
+      <ContentControl x:Name="ModuleContentPlaceholder" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" Margin="0" />
     </Border>
   </Grid>
 </UserControl>

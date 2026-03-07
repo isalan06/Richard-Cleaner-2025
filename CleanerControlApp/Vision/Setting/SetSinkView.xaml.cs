@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 
 namespace CleanerControlApp.Vision.SettingViews
 {
@@ -44,6 +45,15 @@ namespace CleanerControlApp.Vision.SettingViews
             }
 
             LoadToUI();
+
+            // attach simple validation handlers for the numeric textbox
+            var tbAir = GetTextBox("Txt_AirKnifeRetryCount");
+            if (tbAir != null)
+            {
+                tbAir.PreviewTextInput += Txt_AirKnifeRetryCount_PreviewTextInput;
+                tbAir.LostFocus += Txt_AirKnifeRetryCount_LostFocus;
+                DataObject.AddPastingHandler(tbAir, OnAirRetryPaste);
+            }
         }
 
         // helper to safely assign unit fields
@@ -75,6 +85,7 @@ namespace CleanerControlApp.Vision.SettingViews
             var tbMPos3 = GetTextBox("Txt_MotorPos3");
             var tbMVel1 = GetTextBox("Txt_MotorVel1");
             var tbMVel2 = GetTextBox("Txt_MotorVel2");
+            var tbAirRetry = GetTextBox("Txt_AirKnifeRetryCount");
 
             if (tbLow != null) tbLow.Text = displaySVLow.ToString(CultureInfo.InvariantCulture);
             if (tbHigh != null) tbHigh.Text = displaySVHigh.ToString(CultureInfo.InvariantCulture);
@@ -85,6 +96,8 @@ namespace CleanerControlApp.Vision.SettingViews
             if (tbMPos3 != null) tbMPos3.Text = (m.MotorPosition_03 * motorTransfer).ToString(CultureInfo.InvariantCulture);
             if (tbMVel1 != null) tbMVel1.Text = (m.MotorVelocity_01 * motorTransfer).ToString(CultureInfo.InvariantCulture);
             if (tbMVel2 != null) tbMVel2.Text = (m.MotorVelocity_02 * motorTransfer).ToString(CultureInfo.InvariantCulture);
+
+            if (tbAirRetry != null) tbAirRetry.Text = m.AirKnifeRetryCount.ToString(CultureInfo.InvariantCulture);
         }
 
         private void BtnRead_Click(object sender, RoutedEventArgs e)
@@ -160,6 +173,7 @@ namespace CleanerControlApp.Vision.SettingViews
             var tbMPos3 = GetTextBox("Txt_MotorPos3");
             var tbMVel1 = GetTextBox("Txt_MotorVel1");
             var tbMVel2 = GetTextBox("Txt_MotorVel2");
+            var tbAirRetry = GetTextBox("Txt_AirKnifeRetryCount");
 
             var errors = new StringBuilder();
 
@@ -170,6 +184,7 @@ namespace CleanerControlApp.Vision.SettingViews
             // 將 input_low, input_high, input_time, input_mpos1, input_mpos2, input_mpos3, input_mvel1, input_mvel2 預先宣告並初始化
             float input_low =0, input_high =0, input_mpos1 =0, input_mpos2 =0, input_mpos3 =0, input_mvel1 =0, input_mvel2 =0;
             int input_time =0;
+            int input_airRetry =0;
 
             bool parsed_low = tbLow != null && float.TryParse(tbLow.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out input_low);
             bool parsed_high = tbHigh != null && float.TryParse(tbHigh.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out input_high);
@@ -180,6 +195,7 @@ namespace CleanerControlApp.Vision.SettingViews
             bool parsed_mpos3 = tbMPos3 != null && float.TryParse(tbMPos3.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out input_mpos3);
             bool parsed_mvel1 = tbMVel1 != null && float.TryParse(tbMVel1.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out input_mvel1);
             bool parsed_mvel2 = tbMVel2 != null && float.TryParse(tbMVel2.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out input_mvel2);
+            bool parsed_airRetry = tbAirRetry != null && int.TryParse(tbAirRetry.Text, NumberStyles.Integer, CultureInfo.InvariantCulture, out input_airRetry);
 
             if (!parsed_low) errors.AppendLine("沖水槽:低設定值格式錯誤");
             if (!parsed_high) errors.AppendLine("沖水槽:高設定值格式錯誤");
@@ -189,6 +205,7 @@ namespace CleanerControlApp.Vision.SettingViews
             if (!parsed_mpos3) errors.AppendLine("沖水槽:馬達位置 #3 格式錯誤");
             if (!parsed_mvel1) errors.AppendLine("沖水槽:馬達速度 #1 格式錯誤");
             if (!parsed_mvel2) errors.AppendLine("沖水槽:馬達速度 #2 格式錯誤");
+            if (!parsed_airRetry) errors.AppendLine("沖水槽:風刀往復次數格式錯誤");
 
             int conv_low = parsed_low ? (int)Math.Round(input_low / transfer) :0;
             int conv_high = parsed_high ? (int)Math.Round(input_high / transfer) :0;
@@ -216,6 +233,12 @@ namespace CleanerControlApp.Vision.SettingViews
                 if (input_time > limTime) errors.AppendLine($"沖水槽: 動作時間 ({input_time}) 大於上限 ({limTime}) 秒");
             }
 
+            // validate air retry count is non-negative
+            if (parsed_airRetry)
+            {
+                if (input_airRetry <0) errors.AppendLine("沖水槽:風刀往復次數不能為負數");
+            }
+
             // motor positions/vel converted to int by rounding after dividing by motorTransfer
             int conv_mpos1 = parsed_mpos1 ? (int)Math.Round(input_mpos1 / motorTransfer) :0;
             int conv_mpos2 = parsed_mpos2 ? (int)Math.Round(input_mpos2 / motorTransfer) :0;
@@ -241,6 +264,9 @@ namespace CleanerControlApp.Vision.SettingViews
             _moduleSettings.Sink.MotorVelocity_01 = conv_mvel1;
             _moduleSettings.Sink.MotorVelocity_02 = conv_mvel2;
 
+            // assign air retry count
+            _moduleSettings.Sink.AirKnifeRetryCount = parsed_airRetry ? input_airRetry : _moduleSettings.Sink.AirKnifeRetryCount;
+
             try
             {
                 ConfigLoader.SetModuleSettings(_moduleSettings);
@@ -263,6 +289,75 @@ namespace CleanerControlApp.Vision.SettingViews
             catch (Exception ex)
             {
                 MessageBox.Show($"寫入失敗: {ex.Message}", "錯誤", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        // +/- button handlers for AirKnifeRetryCount
+        private void Btn_AirInc_Click(object sender, RoutedEventArgs e)
+        {
+            var tb = GetTextBox("Txt_AirKnifeRetryCount");
+            if (tb == null) return;
+            if (!int.TryParse(tb.Text, NumberStyles.Integer, CultureInfo.InvariantCulture, out int v)) v =0;
+            v++;
+            tb.Text = v.ToString(CultureInfo.InvariantCulture);
+        }
+
+        private void Btn_AirDec_Click(object sender, RoutedEventArgs e)
+        {
+            var tb = GetTextBox("Txt_AirKnifeRetryCount");
+            if (tb == null) return;
+            if (!int.TryParse(tb.Text, NumberStyles.Integer, CultureInfo.InvariantCulture, out int v)) v =0;
+            v = Math.Max(0, v -1);
+            tb.Text = v.ToString(CultureInfo.InvariantCulture);
+        }
+
+        // restrict input to digits
+        private void Txt_AirKnifeRetryCount_PreviewTextInput(object sender, TextCompositionEventArgs e)
+        {
+            foreach (char c in e.Text)
+            {
+                if (!char.IsDigit(c))
+                {
+                    e.Handled = true;
+                    return;
+                }
+            }
+        }
+
+        // sanitize pasted text
+        private void OnAirRetryPaste(object sender, DataObjectPastingEventArgs e)
+        {
+            if (e.DataObject.GetDataPresent(typeof(string)))
+            {
+                var text = (string)e.DataObject.GetData(typeof(string));
+                if (!int.TryParse(text, out _))
+                {
+                    e.CancelCommand();
+                }
+            }
+            else
+            {
+                e.CancelCommand();
+            }
+        }
+
+        // ensure textbox has at least zero
+        private void Txt_AirKnifeRetryCount_LostFocus(object sender, RoutedEventArgs e)
+        {
+            var tb = sender as TextBox;
+            if (tb == null) return;
+            if (!int.TryParse(tb.Text, NumberStyles.Integer, CultureInfo.InvariantCulture, out int v)) v =0;
+            if (v <0) v =0;
+            tb.Text = v.ToString(CultureInfo.InvariantCulture);
+        }
+
+        // helper to avoid inlining multiple assignments (keeps edits clearer)
+        private void _module_settings_assign_motor_vel(ref MS_Sink sink, int v1, int v2)
+        {
+            if (sink != null)
+            {
+                sink.MotorVelocity_01 = v1;
+                sink.MotorVelocity_02 = v2;
             }
         }
     }

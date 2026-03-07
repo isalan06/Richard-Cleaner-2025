@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace CleanerControlApp.Hardwares
 {
-    public class HeatingTank: IHeatingTank, IDisposable
+    public class HeatingTank//: IHeatingTank, IDisposable
     {
         #region attribute
 

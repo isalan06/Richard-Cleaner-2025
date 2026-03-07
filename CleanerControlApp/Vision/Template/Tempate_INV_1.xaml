@@ -1,0 +1,63 @@
+﻿<UserControl x:Class="CleanerControlApp.Vision.Template.Tempate_INV_1"
+ xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+ xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+ xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+ xmlns:local="clr-namespace:CleanerControlApp.Vision.Template"
+ mc:Ignorable="d"
+ d:DesignHeight="455" d:DesignWidth="939">
+
+    <Grid Margin="0,0,48,38">
+        <Canvas x:Name="MainCanvas"
+ Background="Transparent"
+ Width="421"
+ Height="253"
+ HorizontalAlignment="Left"
+ VerticalAlignment="Top"
+ Margin="0,0,0,0">
+
+            <!-- Pump image placed at (0,0) -->
+            <Image x:Name="PumpImage"
+ Canvas.Left="82"
+ Canvas.Top="41"
+ Width="85"
+ Height="42"
+ Stretch="Uniform"
+ Source="/CleanerControlApp;component/Pictures/Pump.png" HorizontalAlignment="Left" VerticalAlignment="Top" />
+
+            <!-- INV image placed at (200,0) -->
+            <Image x:Name="INVImage"
+ Canvas.Left="61"
+ Canvas.Top="88"
+ Width="88"
+ Height="68"
+ Stretch="Uniform"
+ Source="/CleanerControlApp;component/Pictures/INV.png" />
+            <Border Canvas.Left="133" Canvas.Top="41" Background="White" BorderBrush="Black" BorderThickness="1" CornerRadius="3" Padding="4" Height="25" HorizontalAlignment="Center" VerticalAlignment="Top" Width="110">
+
+                <TextBlock Text="INV-1" FontSize="18" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black"/>
+            </Border>
+
+            <!-- Info rows under INV-1 -->
+            <StackPanel Canvas.Left="131" Canvas.Top="71" Orientation="Vertical" Width="180" Background="Transparent">
+                <StackPanel Orientation="Horizontal" Margin="0,2,0,2">
+                    <TextBlock Text="命令頻率(Hz): " FontSize="12" Foreground="Black" Width="90" />
+                    <TextBlock x:Name="txtCmdFreq" Text="0.00" FontSize="12" Foreground="Black" />
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,2,0,2">
+                    <TextBlock Text="輸出頻率(Hz): " FontSize="12" Foreground="Black" Width="90" />
+                    <TextBlock x:Name="txtActFreq" Text="0.00" FontSize="12" Foreground="Black" />
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,2,0,2">
+                    <TextBlock Text="錯誤碼: " FontSize="12" Foreground="Black" Width="90" />
+                    <TextBlock x:Name="txtErrCode" Text="0" FontSize="12" Foreground="Black" />
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,2,0,2">
+                    <TextBlock Text="警告碼: " FontSize="12" Foreground="Black" Width="90" />
+                    <TextBlock x:Name="txtWarnCode" Text="0" FontSize="12" Foreground="Black" />
+                </StackPanel>
+            </StackPanel>
+
+        </Canvas>
+    </Grid>
+</UserControl>
