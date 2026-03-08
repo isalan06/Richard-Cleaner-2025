@@ -38,6 +38,7 @@
 
   <ItemGroup>
     <Folder Include="Hardwares\DryingTank\Models\" />
+    <Folder Include="Hardwares\Shuttle\" />
     <Folder Include="Modules\Motor\Models\" />
   </ItemGroup>
 

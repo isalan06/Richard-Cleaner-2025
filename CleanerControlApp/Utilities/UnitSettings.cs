@@ -97,6 +97,7 @@ namespace CleanerControlApp.Utilities
         public int Cover_Close_Timeout_Second { get; set; }
         public int ActTime_Limit_Second { get; set; }
         public float MotorUnitTransfer { get; set; }
+        public float UltrasonicCurrentMaxLimit { get; set; }
 
     }
 }

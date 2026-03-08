@@ -10,7 +10,7 @@ namespace CleanerControlApp.Modules.UltrasonicDevice.Interfaces
     public interface IUltrasonicDevice
     {
         bool UltrasonicEnabled { get; set; }
-        float SettingCurrent { get; set; } // Unit : A
+        float SettingCurrent { get; set; } // Unit : A 
         float Frequency { get; } // Unit : kHz
         int Time { get; } // Unit : second
         int Power { get; } // Unit : %

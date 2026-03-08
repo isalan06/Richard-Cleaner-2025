@@ -94,6 +94,7 @@ namespace CleanerControlApp.Utilities
         public int MotorVelocity_01 { get; set; }
         public int MotorVelocity_02 { get; set; }
         public int AirKnifeRetryCount { get; set; }
+        public float UltrasonicSetCurrent { get; set; }
 
     }
 

@@ -38,7 +38,7 @@ namespace CleanerControlApp.Hardwares.Sink.Services
         private Task? _loopTask;
         private readonly TimeSpan _loopInterval = TimeSpan.FromMilliseconds(10);
 
-        private IModbusRTUService? _modbusService;
+        //private IModbusRTUService? _modbusService;
         private IDeltaMS300? _deltaMS300;
 
         private bool _running;
@@ -170,7 +170,7 @@ namespace CleanerControlApp.Hardwares.Sink.Services
 
         #endregion
 
-        #region IDryingTank
+        #region ISink implementation
 
 
         public bool IsRunning => _running;
@@ -196,7 +196,6 @@ namespace CleanerControlApp.Hardwares.Sink.Services
                     _plcService.Command_CleanerCoverOpen = value;
             }
         }
-
         public bool Command_CleanerAirOpen
         {
             get => (_plcService != null) && _plcService.Command_CleanerAirKnifeOpen;
@@ -402,7 +401,7 @@ namespace CleanerControlApp.Hardwares.Sink.Services
         public bool MotorMoving => _plcService != null && _plcService.Axis3CommandProcedure;
         public bool MotorHome => _plcService != null && _plcService.Axis3HomeComplete;
         public int Posiition => _plcService != null ? _plcService.Axis3Pos : 0;
-        public float Position_Value => (_plcService != null && _unitSettings.Sink != null) ? ((float)_plcService.Axis3Pos * _unitSettings.Sink.MotorUnitTransfer) : 0f;
+        public float Position_Value => (_plcService != null && _unitSettings.Sink != null) ? ((float)_plcService.Axis3Pos * _unitSettings.Sink.MotorUnitTransfer) : 1f;
 
         public void ServoOn(bool servo)
         {
@@ -974,11 +973,11 @@ namespace CleanerControlApp.Hardwares.Sink.Services
             }
         }
 
-        private bool _motorAlarm => (_plcService != null) && _plcService.Axis1ErrorAlarm;
-        private bool _motorAlarmLimitN => (_plcService != null) && _plcService.Axis1ErrorLimitN;
-        private bool _motorAlarmLimitP => (_plcService != null) && _plcService.Axis1ErrorLimitP;
-        private bool _motorAlarmHomeTimeout => (_plcService != null) && _plcService.Axis1ErrorHomeTimeout;
-        private bool _motorAlarmMoveTimeout => (_plcService != null) && _plcService.Axis1ErrorCommandTimeout;
+        private bool _motorAlarm => (_plcService != null) && _plcService.Axis3ErrorAlarm;
+        private bool _motorAlarmLimitN => (_plcService != null) && _plcService.Axis3ErrorLimitN;
+        private bool _motorAlarmLimitP => (_plcService != null) && _plcService.Axis3ErrorLimitP;
+        private bool _motorAlarmHomeTimeout => (_plcService != null) && _plcService.Axis3ErrorHomeTimeout;
+        private bool _motorAlarmMoveTimeout => (_plcService != null) && _plcService.Axis3ErrorCommandTimeout;
 
         private bool _invErrorAlarm => (_deltaMS300 != null) && (_deltaMS300.ErrorCode != 0);
         private bool _invWarningAlarm => (_deltaMS300 != null) && (_deltaMS300.WarningCode != 0);
