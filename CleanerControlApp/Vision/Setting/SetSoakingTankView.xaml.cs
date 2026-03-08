@@ -27,6 +27,7 @@ namespace CleanerControlApp.Vision.SettingViews
             if (this.FindName("TB_MotorVel1_Label") is TextBlock l7) l7.Text = "馬達速度 #1-升降(mm/s):";
             if (this.FindName("TB_MotorVel2_Label") is TextBlock l8) l8.Text = "馬達速度 #2-搖擺(mm/s):";
             if (this.FindName("TB_AirRetry_Label") is TextBlock l9) l9.Text = "風刀往復次數:";
+            if (this.FindName("TB_UltrasonicSet_Label") is TextBlock lu) lu.Text = "超音波設定電流 (mA):";
 
             if (App.AppHost != null)
             {
@@ -62,6 +63,14 @@ namespace CleanerControlApp.Vision.SettingViews
                 tbAir.LostFocus += Txt_AirKnifeRetryCount_LostFocus;
                 DataObject.AddPastingHandler(tbAir, OnAirRetryPaste);
             }
+
+            // allow numeric input for ultrasonic textbox
+            var tbUl = GetTextBox("Txt_UltrasonicSetCurrent");
+            if (tbUl != null)
+            {
+                tbUl.PreviewTextInput += Txt_Ultrasonic_PreviewTextInput;
+                DataObject.AddPastingHandler(tbUl, OnUltrasonicPaste);
+            }
         }
 
         // helper to safely assign unit fields
@@ -88,6 +97,7 @@ namespace CleanerControlApp.Vision.SettingViews
             var tbMVel1 = GetTextBox("Txt_MotorVel1");
             var tbMVel2 = GetTextBox("Txt_MotorVel2");
             var tbAirRetry = GetTextBox("Txt_AirKnifeRetryCount");
+            var tbUltrasonic = GetTextBox("Txt_UltrasonicSetCurrent");
 
             if (tbTime != null) tbTime.Text = m.ActTime_Second.ToString(CultureInfo.InvariantCulture);
 
@@ -98,6 +108,8 @@ namespace CleanerControlApp.Vision.SettingViews
             if (tbMVel2 != null) tbMVel2.Text = (m.MotorVelocity_02 * motorTransfer).ToString(CultureInfo.InvariantCulture);
 
             if (tbAirRetry != null) tbAirRetry.Text = m.AirKnifeRetryCount.ToString(CultureInfo.InvariantCulture);
+
+            if (tbUltrasonic != null) tbUltrasonic.Text = m.UltrasonicSetCurrent.ToString(CultureInfo.InvariantCulture);
         }
 
         private void BtnRead_Click(object sender, RoutedEventArgs e)
@@ -170,6 +182,7 @@ namespace CleanerControlApp.Vision.SettingViews
             var tbMVel1 = GetTextBox("Txt_MotorVel1");
             var tbMVel2 = GetTextBox("Txt_MotorVel2");
             var tbAirRetry = GetTextBox("Txt_AirKnifeRetryCount");
+            var tbUltrasonic = GetTextBox("Txt_UltrasonicSetCurrent");
 
             var errors = new StringBuilder();
 
@@ -180,6 +193,7 @@ namespace CleanerControlApp.Vision.SettingViews
             int input_time =0;
             int input_airRetry =0;
             float input_mpos1 =0, input_mpos2 =0, input_mpos3 =0, input_mvel1 =0, input_mvel2 =0;
+            float input_ultrasonic =0f;
 
             bool parsed_time = tbTime != null && int.TryParse(tbTime.Text, NumberStyles.Integer, CultureInfo.InvariantCulture, out input_time);
             bool parsed_mpos1 = tbMPos1 != null && float.TryParse(tbMPos1.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out input_mpos1);
@@ -188,6 +202,7 @@ namespace CleanerControlApp.Vision.SettingViews
             bool parsed_mvel1 = tbMVel1 != null && float.TryParse(tbMVel1.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out input_mvel1);
             bool parsed_mvel2 = tbMVel2 != null && float.TryParse(tbMVel2.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out input_mvel2);
             bool parsed_airRetry = tbAirRetry != null && int.TryParse(tbAirRetry.Text, NumberStyles.Integer, CultureInfo.InvariantCulture, out input_airRetry);
+            bool parsed_ultrasonic = tbUltrasonic != null && float.TryParse(tbUltrasonic.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out input_ultrasonic);
 
             if (!parsed_time) errors.AppendLine("錯誤: 浸泡時間輸入錯誤");
             if (!parsed_mpos1) errors.AppendLine("錯誤: 馬達位置 #1 輸入錯誤");
@@ -196,10 +211,35 @@ namespace CleanerControlApp.Vision.SettingViews
             if (!parsed_mvel1) errors.AppendLine("錯誤: 馬達速度 #1 輸入錯誤");
             if (!parsed_mvel2) errors.AppendLine("錯誤: 馬達速度 #2 輸入錯誤");
             if (!parsed_airRetry) errors.AppendLine("錯誤:風刀往復次數輸入錯誤");
+            if (!parsed_ultrasonic) errors.AppendLine("錯誤: 超音波設定電流輸入錯誤");
 
             if (parsed_airRetry)
             {
                 if (input_airRetry <0) errors.AppendLine("錯誤:風刀往復次數不能為負數");
+            }
+
+            // determine ultrasonic max limit via reflection to avoid direct dependency
+            float ultrasonicMax = float.MaxValue;
+            if (u != null)
+            {
+                try
+                {
+                    var prop = u.GetType().GetProperty("UltrasonicCurrentMaxLimit");
+                    if (prop != null)
+                    {
+                        var val = prop.GetValue(u);
+                        if (val is float f) ultrasonicMax = f;
+                        else if (val is double d) ultrasonicMax = (float)d;
+                        else if (val is int i) ultrasonicMax = i;
+                    }
+                }
+                catch { }
+            }
+
+            if (parsed_ultrasonic)
+            {
+                if (input_ultrasonic <0f) errors.AppendLine("錯誤: 超音波設定電流不能為負值");
+                else if (input_ultrasonic > ultrasonicMax) errors.AppendLine($"錯誤: 超音波設定電流({input_ultrasonic}) 超過上限 ({ultrasonicMax})");
             }
 
             int conv_mpos1 = parsed_mpos1 ? (int)Math.Round(input_mpos1 / motorTransfer) :0;
@@ -225,6 +265,12 @@ namespace CleanerControlApp.Vision.SettingViews
             _moduleSettings.SoakingTank.MotorVelocity_02 = conv_mvel2;
 
             _moduleSettings.SoakingTank.AirKnifeRetryCount = parsed_airRetry ? input_airRetry : _moduleSettings.SoakingTank.AirKnifeRetryCount;
+
+            // assign ultrasonic value
+            if (parsed_ultrasonic)
+            {
+                _moduleSettings.SoakingTank.UltrasonicSetCurrent = input_ultrasonic;
+            }
 
             try
             {
@@ -308,6 +354,35 @@ namespace CleanerControlApp.Vision.SettingViews
             if (!int.TryParse(tb.Text, NumberStyles.Integer, CultureInfo.InvariantCulture, out int v)) v =0;
             if (v <0) v =0;
             tb.Text = v.ToString(CultureInfo.InvariantCulture);
+        }
+
+        // ultrasonic input handlers
+        private void Txt_Ultrasonic_PreviewTextInput(object sender, TextCompositionEventArgs e)
+        {
+            foreach (char c in e.Text)
+            {
+                if (!(char.IsDigit(c) || c == '.' || c == ','))
+                {
+                    e.Handled = true;
+                    return;
+                }
+            }
+        }
+
+        private void OnUltrasonicPaste(object sender, DataObjectPastingEventArgs e)
+        {
+            if (e.DataObject.GetDataPresent(typeof(string)))
+            {
+                var text = (string)e.DataObject.GetData(typeof(string));
+                if (!float.TryParse(text, NumberStyles.Float, CultureInfo.InvariantCulture, out _))
+                {
+                    e.CancelCommand();
+                }
+            }
+            else
+            {
+                e.CancelCommand();
+            }
         }
 
         // helper to avoid inlining multiple assignments (keeps edits clearer)

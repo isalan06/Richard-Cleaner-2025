@@ -32,11 +32,13 @@
  <ColumnDefinition Width="480" />
  </Grid.ColumnDefinitions>
 
- <Border Grid.Column="0" Padding="12" BorderBrush="LightGray" BorderThickness="1" CornerRadius="4" Background="White" Height="320" VerticalAlignment="Top" Margin="0,0,-2,0">
+ <Border Grid.Column="0" Padding="12" BorderBrush="LightGray" BorderThickness="1" CornerRadius="4" Background="White" Height="360" VerticalAlignment="Top" Margin="0,0,-2,0">
  <StackPanel>
  <TextBlock x:Name="HdrSoaking" Text="浸泡槽" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,8" />
  <Grid>
  <Grid.RowDefinitions>
+ <RowDefinition Height="Auto" />
+ <RowDefinition Height="Auto" />
  <RowDefinition Height="Auto" />
  <RowDefinition Height="Auto" />
  <RowDefinition Height="Auto" />
@@ -68,9 +70,13 @@
  <TextBlock x:Name="TB_MotorVel2_Label" Text="馬達速度 #2-搖擺(mm/s):" Grid.Row="5" Grid.Column="0" VerticalAlignment="Center" Height="15" />
  <TextBox x:Name="Txt_MotorVel2" Grid.Row="5" Grid.Column="1" Margin="4,4,0,4" />
 
+ <!-- Ultrasonic Set Current -->
+ <TextBlock x:Name="TB_UltrasonicSet_Label" Text="超音波設定電流 (mA):" Grid.Row="6" Grid.Column="0" VerticalAlignment="Center" Height="15" />
+ <TextBox x:Name="Txt_UltrasonicSetCurrent" Grid.Row="6" Grid.Column="1" Margin="4,4,0,4" />
+
  <!-- NumericUpDown-like control for AirKnifeRetryCount -->
- <TextBlock x:Name="TB_AirRetry_Label" Text="風刀往復次數:" Grid.Row="6" Grid.Column="0" VerticalAlignment="Center" Height="15" />
- <Grid Grid.Row="6" Grid.Column="1" Margin="4,4,0,4">
+ <TextBlock x:Name="TB_AirRetry_Label" Text="風刀往復次數:" Grid.Row="7" Grid.Column="0" VerticalAlignment="Center" Height="15" />
+ <Grid Grid.Row="7" Grid.Column="1" Margin="4,4,0,4">
  <Grid.ColumnDefinitions>
  <ColumnDefinition Width="Auto" />
  <ColumnDefinition Width="*" />

@@ -136,6 +136,8 @@
  <!-- Cover Close -->
  <RowDefinition Height="Auto" />
  <!-- ActTime -->
+ <RowDefinition Height="Auto" />
+ <!-- Ultrasonic Current Max Limit -->
  </Grid.RowDefinitions>
 
  <!-- Motor UnitTransfer -->
@@ -153,6 +155,10 @@
  <!-- ActTime Limit -->
  <TextBlock Grid.Row="3" Grid.Column="0" Text="ActTime Limit (s):" VerticalAlignment="Center" Margin="4,0,4,0" Height="15" />
  <TextBox Grid.Row="3" Grid.Column="1" x:Name="TxtSoakActTimeLimit" Width="120" HorizontalAlignment="Center" Margin="0,4,0,4" />
+
+ <!-- Ultrasonic Current Max Limit -->
+ <TextBlock Grid.Row="4" Grid.Column="0" Text="超音波電流上限 (A):" VerticalAlignment="Center" Margin="4,0,4,0" Height="15" />
+ <TextBox Grid.Row="4" Grid.Column="1" x:Name="TxtSoakUltrasonicCurrentMaxLimit" Width="120" HorizontalAlignment="Center" Margin="0,4,0,4" />
 
  </Grid>
  </StackPanel>
