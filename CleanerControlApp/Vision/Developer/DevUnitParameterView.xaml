@@ -28,6 +28,10 @@
 
  <!-- Three parameter boxes side by side: DryingTanks, Sink, HeatingTank -->
  <Grid Grid.Row="1" Margin="8,4,8,6">
+ <Grid.RowDefinitions>
+ <RowDefinition Height="Auto" />
+ <RowDefinition Height="Auto" />
+ </Grid.RowDefinitions>
  <Grid.ColumnDefinitions>
  <ColumnDefinition Width="300" />
  <ColumnDefinition Width="16" />
@@ -38,7 +42,7 @@
  </Grid.ColumnDefinitions>
 
  <!-- DryingTanks box (existing) -->
- <Border Grid.Column="0" Background="#FFF8F8F8" BorderBrush="#FFBDBDBD" BorderThickness="1" CornerRadius="6" Padding="8" HorizontalAlignment="Left">
+ <Border Grid.Row="0" Grid.Column="0" Background="#FFF8F8F8" BorderBrush="#FFBDBDBD" BorderThickness="1" CornerRadius="6" Padding="8" HorizontalAlignment="Left">
  <StackPanel>
  <TextBlock Text="烘乾槽參數" FontWeight="Bold" FontSize="14" Margin="0,0,0,6" />
  <Grid>
@@ -114,8 +118,48 @@
  </StackPanel>
  </Border>
 
+ <!-- Soaking Tank box (new) placed under DryingTanks) -->
+ <Border Grid.Row="1" Grid.Column="0" Background="#FFF8F8F8" BorderBrush="#FFBDBDBD" BorderThickness="1" CornerRadius="6" Padding="8" HorizontalAlignment="Left" Margin="0,8,0,0">
+ <StackPanel>
+ <TextBlock Text="浸泡槽參數" FontWeight="Bold" FontSize="14" Margin="0,0,0,6" />
+ <Grid>
+ <Grid.ColumnDefinitions>
+ <ColumnDefinition Width="150" />
+ <ColumnDefinition />
+ </Grid.ColumnDefinitions>
+ <Grid.RowDefinitions>
+ <RowDefinition Height="Auto" />
+ <!-- Motor UnitTransfer -->
+ <RowDefinition Height="Auto" />
+ <!-- Cover Open -->
+ <RowDefinition Height="Auto" />
+ <!-- Cover Close -->
+ <RowDefinition Height="Auto" />
+ <!-- ActTime -->
+ </Grid.RowDefinitions>
+
+ <!-- Motor UnitTransfer -->
+ <TextBlock Grid.Column="0" Text="Motor UnitTransfer:" VerticalAlignment="Center" Margin="4,0,4,0" Height="15" />
+ <TextBox Grid.Row="0" Grid.Column="1" x:Name="TxtSoakMotorUnitTransfer" Width="120" HorizontalAlignment="Center" Margin="0,4,0,4" />
+
+ <!-- Cover Open Timeout -->
+ <TextBlock Grid.Row="1" Grid.Column="0" Text="Cover Open Timeout (s):" VerticalAlignment="Center" Margin="4,0,4,0" Height="16" />
+ <TextBox Grid.Row="1" Grid.Column="1" x:Name="TxtSoakCoverOpenTimeout" Width="120" HorizontalAlignment="Center" Margin="0,4,0,4" />
+
+ <!-- Cover Close Timeout -->
+ <TextBlock Grid.Row="2" Grid.Column="0" Text="Cover Close Timeout (s):" VerticalAlignment="Center" Margin="4,0,4,0" Height="15" />
+ <TextBox Grid.Row="2" Grid.Column="1" x:Name="TxtSoakCoverCloseTimeout" Width="120" HorizontalAlignment="Center" Margin="0,4,0,4" />
+
+ <!-- ActTime Limit -->
+ <TextBlock Grid.Row="3" Grid.Column="0" Text="ActTime Limit (s):" VerticalAlignment="Center" Margin="4,0,4,0" Height="15" />
+ <TextBox Grid.Row="3" Grid.Column="1" x:Name="TxtSoakActTimeLimit" Width="120" HorizontalAlignment="Center" Margin="0,4,0,4" />
+
+ </Grid>
+ </StackPanel>
+ </Border>
+
  <!-- Sink box (copied from drying tank, no Select Tank) -->
- <Border Grid.Column="2" Background="#FFF8F8F8" BorderBrush="#FFBDBDBD" BorderThickness="1" CornerRadius="6" Padding="8" HorizontalAlignment="Left">
+ <Border Grid.Row="0" Grid.Column="2" Background="#FFF8F8F8" BorderBrush="#FFBDBDBD" BorderThickness="1" CornerRadius="6" Padding="8" HorizontalAlignment="Left">
  <StackPanel>
  <TextBlock Text="沖水槽參數" FontWeight="Bold" FontSize="14" Margin="0,0,0,6" />
  <Grid>
@@ -191,7 +235,7 @@
  </Border>
 
  <!-- Heating Tank box (new) -->
- <Border Grid.Column="4" Background="#FFF8F8F8" BorderBrush="#FFBDBDBD" BorderThickness="1" CornerRadius="6" Padding="8" HorizontalAlignment="Left">
+ <Border Grid.Row="0" Grid.Column="4" Background="#FFF8F8F8" BorderBrush="#FFBDBDBD" BorderThickness="1" CornerRadius="6" Padding="8" HorizontalAlignment="Left">
  <StackPanel>
  <TextBlock Text="加熱槽參數" FontWeight="Bold" FontSize="14" Margin="0,0,0,6" />
  <Grid>

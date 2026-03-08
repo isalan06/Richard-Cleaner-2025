@@ -37,6 +37,15 @@ namespace CleanerControlApp.Utilities
             set => MS_HeatingTank = value;
         }
 
+        public MS_SoakingTank? MS_SoakingTank { get; set; }
+
+        [JsonIgnore]
+        public MS_SoakingTank? SoakingTank
+        {
+            get => MS_SoakingTank;
+            set => MS_SoakingTank = value;
+        }
+
     }
 
     public class MS_DryingTanks
@@ -72,6 +81,20 @@ namespace CleanerControlApp.Utilities
         public float INV_Zero { get; set; }
         public int Water_H_CheckDelay_Second { get; set; }
         public int Water_L_CheckDelay_Second { get; set; }
+    }
+
+    public class MS_SoakingTank
+    {
+        public int ActTime_Second { get; set; }
+
+        // Property names aligned with JSON keys in appsettings.json
+        public int MotorPosition_01 { get; set; }
+        public int MotorPosition_02 { get; set; }
+        public int MotorPosition_03 { get; set; }
+        public int MotorVelocity_01 { get; set; }
+        public int MotorVelocity_02 { get; set; }
+        public int AirKnifeRetryCount { get; set; }
+
     }
 
 }

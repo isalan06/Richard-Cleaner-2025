@@ -29,8 +29,7 @@ namespace CleanerControlApp.Vision.Developer
  // If we have unsaved in-memory changes, confirm with user before discarding
  if (_isDirty)
  {
- var result = MessageBox.Show("有未儲存的變更。您要放棄變更並從設定檔重新讀取嗎？\n選 Yes = 放棄變更並重新讀取；No = 保留記憶體中的變更。",
- "未儲存變更", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+ var result = MessageBox.Show("目前有未儲存的變更，是否要放棄？\nYes = 放棄記憶體變更，No = 保留", "未儲存變更", MessageBoxButton.YesNo, MessageBoxImage.Warning);
  if (result == MessageBoxResult.No)
  {
  // keep current in-memory values
@@ -70,6 +69,8 @@ namespace CleanerControlApp.Vision.Developer
  LoadSinkToUi();
  // Populate heating tank UI
  LoadHeatingToUi();
+ // Populate soaking tank UI
+ LoadSoakingToUi();
  }
  catch
  {
@@ -82,11 +83,11 @@ namespace CleanerControlApp.Vision.Developer
  try
  {
  LoadUnitSettings();
- MessageBox.Show("已讀取參數。", "讀取完成", MessageBoxButton.OK, MessageBoxImage.Information);
+ MessageBox.Show("讀取完成", "讀取結果", MessageBoxButton.OK, MessageBoxImage.Information);
  }
  catch (Exception ex)
  {
- MessageBox.Show("讀取元件參數失敗: " + ex.Message, "錯誤", MessageBoxButton.OK, MessageBoxImage.Error);
+ MessageBox.Show("讀取參數失敗: " + ex.Message, "錯誤", MessageBoxButton.OK, MessageBoxImage.Error);
  }
  }
 
@@ -120,6 +121,13 @@ namespace CleanerControlApp.Vision.Developer
  // mark as dirty (in-memory changes not yet saved to file)
  _isDirty = true;
 
+ // Save sink UI into memory as well
+ SaveSinkUi();
+ // Save heating UI into memory
+ SaveHeatingUi();
+ // Save soaking UI into memory
+ SaveSoakingUi();
+
  // Also update DI singleton (if available) so runtime consumers see changes immediately
  try
  {
@@ -130,8 +138,10 @@ namespace CleanerControlApp.Vision.Developer
  if (diUnit != null)
  {
  diUnit.DryingTanks = _unitSettings.DryingTanks;
- // also propagate heating tank if present
+ // also propagate heating tank, sink and soaking tank if present
  diUnit.HeatingTank = _unitSettings.HeatingTank;
+ diUnit.Sink = _unitSettings.Sink;
+ diUnit.SoakingTank = _unitSettings.SoakingTank;
  }
  }
  }
@@ -141,16 +151,11 @@ namespace CleanerControlApp.Vision.Developer
  }
  }
 
- // Save sink UI into memory as well
- SaveSinkUi();
- // Save heating UI into memory
- SaveHeatingUi();
-
- MessageBox.Show("已寫入目前元件參數到記憶體 (尚未寫入檔案)。", "寫入完成", MessageBoxButton.OK, MessageBoxImage.Information);
+ MessageBox.Show("已寫入記憶體參數 (尚未寫入檔案)", "寫入記憶體", MessageBoxButton.OK, MessageBoxImage.Information);
  }
  catch (Exception ex)
  {
- MessageBox.Show("寫入元件參數失敗: " + ex.Message, "錯誤", MessageBoxButton.OK, MessageBoxImage.Error);
+ MessageBox.Show("寫入記憶體參數失敗: " + ex.Message, "錯誤", MessageBoxButton.OK, MessageBoxImage.Error);
  }
  }
 
@@ -164,6 +169,8 @@ namespace CleanerControlApp.Vision.Developer
  SaveSinkUi();
  // Also save heating fields
  SaveHeatingUi();
+ // Also save soaking fields
+ SaveSoakingUi();
 
  if (_unitSettings != null)
  {
@@ -179,6 +186,7 @@ namespace CleanerControlApp.Vision.Developer
  diUnit.DryingTanks = _unitSettings.DryingTanks;
  diUnit.Sink = _unitSettings.Sink;
  diUnit.HeatingTank = _unitSettings.HeatingTank;
+ diUnit.SoakingTank = _unitSettings.SoakingTank;
  }
  }
  }
@@ -191,16 +199,16 @@ namespace CleanerControlApp.Vision.Developer
  ConfigLoader.SetUnitSettings(_unitSettings);
  // persisted to file, clear dirty flag
  _isDirty = false;
- MessageBox.Show("已將元件參數寫入 appsettings.json 並同步到 DI singleton。", "儲存完成", MessageBoxButton.OK, MessageBoxImage.Information);
+ MessageBox.Show("已儲存設定到 appsettings.json 並更新 DI singleton", "儲存完成", MessageBoxButton.OK, MessageBoxImage.Information);
  }
  else
  {
- MessageBox.Show("沒有可儲存的元件參數。請先讀取參數。", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
+ MessageBox.Show("沒有可儲存的設定", "警告", MessageBoxButton.OK, MessageBoxImage.Warning);
  }
  }
  catch (Exception ex)
  {
- MessageBox.Show("儲存元件參數失敗: " + ex.Message, "錯誤", MessageBoxButton.OK, MessageBoxImage.Error);
+ MessageBox.Show("儲存設定失敗: " + ex.Message, "錯誤", MessageBoxButton.OK, MessageBoxImage.Error);
  }
  }
 
@@ -413,6 +421,56 @@ namespace CleanerControlApp.Vision.Developer
  TxtHeatingINVZeroTimeout.Text = string.Empty;
  TxtHeatingSVCheckOffset.Text = string.Empty;
  TxtHeatingINVCheckOffset.Text = string.Empty;
+ }
+ }
+ catch
+ {
+ // ignore
+ }
+ }
+
+ // Helper: save soaking tank UI controls into _unitSettings.SoakingTank
+ private void SaveSoakingUi()
+ {
+ try
+ {
+ if (_unitSettings == null) _unitSettings = new UnitSettings();
+ if (_unitSettings.SoakingTank == null) _unitSettings.SoakingTank = new US_SoakingTank();
+ var s = _unitSettings.SoakingTank;
+
+ if (float.TryParse(TxtSoakMotorUnitTransfer.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out var mut)) s.MotorUnitTransfer = mut;
+ if (int.TryParse(TxtSoakCoverOpenTimeout.Text, out var co)) s.Cover_Open_Timeout_Second = co;
+ if (int.TryParse(TxtSoakCoverCloseTimeout.Text, out var cc)) s.Cover_Close_Timeout_Second = cc;
+ if (int.TryParse(TxtSoakActTimeLimit.Text, out var atl)) s.ActTime_Limit_Second = atl;
+
+ _unitSettings.SoakingTank = s;
+ _isDirty = true;
+ }
+ catch
+ {
+ // ignore
+ }
+ }
+
+ // Helper: load soaking tank values into UI
+ private void LoadSoakingToUi()
+ {
+ try
+ {
+ if (_unitSettings?.SoakingTank != null)
+ {
+ var s = _unitSettings.SoakingTank;
+ TxtSoakMotorUnitTransfer.Text = s.MotorUnitTransfer.ToString(CultureInfo.InvariantCulture);
+ TxtSoakCoverOpenTimeout.Text = s.Cover_Open_Timeout_Second.ToString();
+ TxtSoakCoverCloseTimeout.Text = s.Cover_Close_Timeout_Second.ToString();
+ TxtSoakActTimeLimit.Text = s.ActTime_Limit_Second.ToString();
+ }
+ else
+ {
+ TxtSoakMotorUnitTransfer.Text = string.Empty;
+ TxtSoakCoverOpenTimeout.Text = string.Empty;
+ TxtSoakCoverCloseTimeout.Text = string.Empty;
+ TxtSoakActTimeLimit.Text = string.Empty;
  }
  }
  catch
