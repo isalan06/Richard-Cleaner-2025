@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CleanerControlApp.Hardwares
+namespace CleanerControlApp.Hardwares.HeatingTank.Interfaces
 {
     public interface IHeatingTank
     {
@@ -57,6 +57,8 @@ namespace CleanerControlApp.Hardwares
         void ModuleReset();
 
         void SimHiTemperature(bool pv);
+        void SimTemperature();
+        void SimFrequency(int freq);
 
         int InvErrorCode { get; }
         int InvWarningCode { get; }

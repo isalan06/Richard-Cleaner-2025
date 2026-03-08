@@ -1,4 +1,5 @@
-﻿using CleanerControlApp.Modules.DeltaMS300.Interfaces;
+﻿using CleanerControlApp.Hardwares.HeatingTank.Interfaces;
+using CleanerControlApp.Modules.DeltaMS300.Interfaces;
 using CleanerControlApp.Modules.DeltaMS300.Services;
 using CleanerControlApp.Modules.MitsubishiPLC.Interfaces;
 using CleanerControlApp.Modules.MitsubishiPLC.Services;
@@ -16,7 +17,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CleanerControlApp.Hardwares
+namespace CleanerControlApp.Hardwares.HeatingTank.Services
 {
     public class HeatingTank : IHeatingTank, IDisposable
     {
@@ -302,7 +303,7 @@ namespace CleanerControlApp.Hardwares
         {
             bool result = false;
 
-            if (_plcService != null && !_tankHHAlarm && !_tankLLAlarm && !_private_waste_HAlarm)
+            if (_plcService != null && !_tankHHAlarm && (!_tankLLAlarm || !_auto) && !_private_waste_HAlarm)
             {
                 Command_WaterOut = water;
                 result = true;
@@ -374,6 +375,10 @@ namespace CleanerControlApp.Hardwares
         {
             _sim_pv = pv;
         }
+        public void SimTemperature()
+        {
+            _sim_pv = !_sim_pv;
+        }
 
         /// <summary>
         /// 
@@ -392,9 +397,9 @@ namespace CleanerControlApp.Hardwares
         public float InvCommandFrequency => _deltaMS300 != null ? _deltaMS300.Frquency_Command : 0f;
         public float InvActualFrequency => _deltaMS300 != null ? _deltaMS300.Frquency_Output : 0f;
 
-        public bool IsHighFrequency => _deltaMS300 != null && _deltaMS300.Frquency_Output > INV_Check_High;
-        public bool IsLowFrequency => _deltaMS300 != null && _deltaMS300.Frquency_Output < INV_Check_Low_H && _deltaMS300.Frquency_Output > INV_Check_Low_L;
-        public bool IsZeroFrequency => _deltaMS300 != null && _deltaMS300.Frquency_Output < INV_Check_Zero;
+        public bool IsHighFrequency => (_deltaMS300 != null && _deltaMS300.Frquency_Output > INV_Check_High) || _sim_inv_high;
+        public bool IsLowFrequency => (_deltaMS300 != null && _deltaMS300.Frquency_Output < INV_Check_Low_H && _deltaMS300.Frquency_Output > INV_Check_Low_L) || _sim_inv_low;
+        public bool IsZeroFrequency => _deltaMS300 != null && _deltaMS300.Frquency_Output < INV_Check_Zero && !_sim_inv_low && !_sim_inv_high;
         public bool DoHighFrequency => _inv_op_index == 2;
         public bool DoLowFrequency => _inv_op_index == 1;
         public bool DoZeroFrequency => _inv_op_index == 0;
@@ -560,13 +565,13 @@ namespace CleanerControlApp.Hardwares
                 {
                     WaterInOP(false);
                 }
-                else if (_tankLLAlarm)
+                else if (_tankLLAlarm && _auto)
                 {
                     WaterOutOP(false);
                 }
             }
 
-            if (!_private_waste_HAlarm && !_tankHHAlarm)
+            if (!_private_waste_HAlarm && !_tankHHAlarm && _auto)
             {
                 if (!Sensor_Liquid_L && !Command_WaterIn) WaterInOP(true);
 
@@ -575,6 +580,11 @@ namespace CleanerControlApp.Hardwares
                 if (Command_WaterOut && !IsHighFrequency) HighFrequencyOP();
 
                 if (!Command_WaterOut && IsHighFrequency) LowFrequencyOP();
+
+                if(!Heating && Sensor_Liquid_L) HeatingOP(true);
+
+                if (HS_RequestWater && !Command_WaterOut) WaterOutOP(true);
+                else if (!HS_RequestWater && Command_WaterOut) WaterOutOP(false);
             }
 
             if (_PV_High_Timeout && Heating) HeatingOP(false);

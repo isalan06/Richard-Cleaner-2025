@@ -1,0 +1,194 @@
+﻿<UserControl x:Class="CleanerControlApp.Vision.Template.Template_HeatingTank"
+ xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+ xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+ xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+ xmlns:local="clr-namespace:CleanerControlApp.Vision.Template"
+ mc:Ignorable="d" Height="925" Width="1228" x:Name="RootControl">
+    <UserControl.Resources>
+        <Storyboard x:Key="WaterInStoryboard">
+            <DoubleAnimation Storyboard.TargetName="WaterInGradientTransform"
+ Storyboard.TargetProperty="X"
+ From="-1" To="1" Duration="0:0:1.0" RepeatBehavior="Forever" />
+        </Storyboard>
+
+        <Storyboard x:Key="RightFlowStoryboard">
+            <DoubleAnimation Storyboard.TargetName="RightGradientTransform"
+ Storyboard.TargetProperty="X"
+ From="-1" To="1" Duration="0:0:1.0" RepeatBehavior="Forever" />
+        </Storyboard>
+
+        <Storyboard x:Key="LeftFlowStoryboard">
+            <DoubleAnimation Storyboard.TargetName="LeftGradientTransform"
+ Storyboard.TargetProperty="X"
+ From="1" To="-1" Duration="0:0:1.0" RepeatBehavior="Forever" />
+        </Storyboard>
+
+        <Storyboard x:Key="UpFlowStoryboard">
+            <DoubleAnimation Storyboard.TargetName="UpGradientTransform"
+ Storyboard.TargetProperty="Y"
+ From="1" To="-1" Duration="0:0:1.0" RepeatBehavior="Forever" />
+        </Storyboard>
+
+        <!-- New storyboard for the WaterOut up-arrow gradient animation -->
+        <Storyboard x:Key="UpOutFlowStoryboard">
+            <DoubleAnimation Storyboard.TargetName="UpOutGradientTransform"
+ Storyboard.TargetProperty="Y"
+ From="1" To="-1" Duration="0:0:1.0" RepeatBehavior="Forever" />
+        </Storyboard>
+    </UserControl.Resources>
+    <Grid>
+        <Canvas x:Name="HeatingTankCanvas" Background="Transparent">
+            <!-- Label for the tank -->
+            <TextBlock Text="浸泡槽" FontSize="18" FontWeight="Bold" Foreground="Black" Canvas.Left="538" Canvas.Top="103" />
+
+            <!-- Add visual elements for the heating tank here -->
+            <local:Template_INV_2 x:Name="INV2Control" Canvas.Left="386" Canvas.Top="251" />
+            <local:Template_Tank_Heating x:Name="TankHeatingControl" Canvas.Left="10" Canvas.Top="42" Height="52" Width="93" />
+
+            <!-- Water flow icons -->
+            <Image x:Name="WaterInImage"
+ Source="/CleanerControlApp;component/Pictures/WaterIn.png"
+ Width="48" Height="48"
+ Canvas.Left="42" Canvas.Top="260"
+ Stretch="Uniform"
+ IsHitTestVisible="False"/>
+
+            <Image x:Name="WaterOutImage"
+ Source="/CleanerControlApp;component/Pictures/WaterOut.png"
+ Width="48" Height="48"
+ Canvas.Left="534" Canvas.Top="191"
+ Stretch="Uniform"
+ IsHitTestVisible="False"/>
+
+            <!-- Water-in arrow: moving gradient rectangle clipped to arrow shape -->
+            <!-- Outline for arrow -->
+            <Path x:Name="WaterInArrowOutline" Canvas.Left="103" Canvas.Top="268" Stroke="#00AEEF" StrokeThickness="1" Fill="Transparent" Data="M0,10 L80,10 L80,0 L120,20 L80,40 L80,30 L0,30 Z" IsHitTestVisible="False" />
+
+            <!-- Animated gradient showing flow; clipped to arrow geometry -->
+            <Rectangle x:Name="WaterInFlowRect" Canvas.Left="103" Canvas.Top="268" Width="120" Height="40" IsHitTestVisible="False" HorizontalAlignment="Left" VerticalAlignment="Center">
+                <Rectangle.Fill>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                        <GradientStop Color="#B3E5FF" Offset="0"/>
+                        <GradientStop Color="#00AEEF" Offset="0.5"/>
+                        <GradientStop Color="#B3E5FF" Offset="1"/>
+                        <!-- Move the brush using RelativeTransform so the gradient scrolls inside the fixed arrow -->
+                        <LinearGradientBrush.RelativeTransform>
+                            <TranslateTransform x:Name="WaterInGradientTransform" X="0" />
+                        </LinearGradientBrush.RelativeTransform>
+                    </LinearGradientBrush>
+                </Rectangle.Fill>
+                <!-- Remove rectangle RenderTransform so arrow stays fixed -->
+                <Rectangle.Clip>
+                    <PathGeometry Figures="M0,10 L80,10 L80,0 L120,20 L80,40 L80,30 L0,30 Z" />
+                </Rectangle.Clip>
+            </Rectangle>
+
+            <!-- Right-pointing arrow (for e.g., outflow) with internal gradient animation -->
+            <Path x:Name="RightArrowOutline" Canvas.Left="425" Canvas.Top="324.197" Stroke="#00AEEF" StrokeThickness="1" Fill="Transparent" Data="M0,10 L60,10 L60,0 L90,20 L60,40 L60,30 L0,30 Z" IsHitTestVisible="False" HorizontalAlignment="Center" VerticalAlignment="Top" />
+            <Rectangle x:Name="RightFlowRect" Canvas.Left="425" Canvas.Top="324" Width="90" Height="40" IsHitTestVisible="False">
+                <Rectangle.Fill>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                        <GradientStop Color="#B3E5FF" Offset="0"/>
+                        <GradientStop Color="#00AEEF" Offset="0.5"/>
+                        <GradientStop Color="#B3E5FF" Offset="1"/>
+                        <LinearGradientBrush.RelativeTransform>
+                            <TranslateTransform x:Name="RightGradientTransform" X="0" />
+                        </LinearGradientBrush.RelativeTransform>
+                    </LinearGradientBrush>
+                </Rectangle.Fill>
+                <Rectangle.Clip>
+                    <PathGeometry Figures="M0,10 L60,10 L60,0 L90,20 L60,40 L60,30 L0,30 Z" />
+                </Rectangle.Clip>
+            </Rectangle>
+
+            <!-- Left-pointing arrow (animated when Command_WaterOut == false) -->
+            <Path x:Name="LeftArrowOutline" Canvas.Left="425.165" Canvas.Top="191.165" Stroke="#00AEEF" StrokeThickness="1" Fill="Transparent" Data="M90,10 L30,10 L30,0 L0,20 L30,40 L30,30 L90,30 Z" IsHitTestVisible="False" HorizontalAlignment="Center" VerticalAlignment="Top" />
+            <Rectangle x:Name="LeftFlowRect" Canvas.Left="425" Canvas.Top="191" Width="90" Height="40" IsHitTestVisible="False">
+                <Rectangle.Fill>
+                    <LinearGradientBrush StartPoint="1,0" EndPoint="0,0">
+                        <GradientStop Color="#B3E5FF" Offset="0"/>
+                        <GradientStop Color="#00AEEF" Offset="0.5"/>
+                        <GradientStop Color="#B3E5FF" Offset="1"/>
+                        <LinearGradientBrush.RelativeTransform>
+                            <TranslateTransform x:Name="LeftGradientTransform" X="0" />
+                        </LinearGradientBrush.RelativeTransform>
+                    </LinearGradientBrush>
+                </Rectangle.Fill>
+                <Rectangle.Clip>
+                    <PathGeometry Figures="M90,10 L30,10 L30,0 L0,20 L30,40 L30,30 L90,30 Z" />
+                </Rectangle.Clip>
+            </Rectangle>
+
+            <!-- Up-pointing arrow with internal vertical gradient animation -->
+            <!-- Up arrow: top wider, bottom shaft narrow (existing) -->
+            <Path x:Name="UpArrowOutline" Canvas.Left="550" Canvas.Top="247.75" Stroke="#00AEEF" StrokeThickness="1" Fill="Transparent" Data="M12,68 L12,40 L4,40 L18,0 L32,40 L24,40 L24,68 Z" IsHitTestVisible="False" />
+            <Rectangle x:Name="UpFlowRect" Canvas.Left="550" Canvas.Top="248" Width="36" Height="68" IsHitTestVisible="False" HorizontalAlignment="Left" VerticalAlignment="Top">
+                <Rectangle.Fill>
+                    <LinearGradientBrush StartPoint="0,1" EndPoint="0,0">
+                        <GradientStop Color="#B3E5FF" Offset="0"/>
+                        <GradientStop Color="#00AEEF" Offset="0.5"/>
+                        <GradientStop Color="#B3E5FF" Offset="1"/>
+                        <LinearGradientBrush.RelativeTransform>
+                            <TranslateTransform x:Name="UpGradientTransform" Y="0" />
+                        </LinearGradientBrush.RelativeTransform>
+                    </LinearGradientBrush>
+                </Rectangle.Fill>
+                <Rectangle.Clip>
+                    <PathGeometry Figures="M12,68 L12,40 L4,40 L18,0 L32,40 L24,40 L24,68 Z" />
+                </Rectangle.Clip>
+            </Rectangle>
+
+            <!-- New Up arrow for WaterOut (animated when Command_WaterOut is true) -->
+            <Path x:Name="UpOutArrowOutline" Canvas.Left="555" Canvas.Top="130.5" Stroke="#00AEEF" StrokeThickness="1" Fill="Transparent" Data="M7,46 L7,18 L0,18 L11,0 L22,18 L15,18 L15,46 Z" IsHitTestVisible="False" />
+            <Rectangle x:Name="UpOutFlowRect" Canvas.Left="555" Canvas.Top="131" Width="22" Height="46" IsHitTestVisible="False">
+                <Rectangle.Fill>
+                    <LinearGradientBrush StartPoint="0,1" EndPoint="0,0">
+                        <GradientStop Color="#B3E5FF" Offset="0"/>
+                        <GradientStop Color="#00AEEF" Offset="0.5"/>
+                        <GradientStop Color="#B3E5FF" Offset="1"/>
+                        <LinearGradientBrush.RelativeTransform>
+                            <TranslateTransform x:Name="UpOutGradientTransform" Y="0" />
+                        </LinearGradientBrush.RelativeTransform>
+                    </LinearGradientBrush>
+                </Rectangle.Fill>
+                <Rectangle.Clip>
+                    <PathGeometry Figures="M7,46 L7,18 L0,18 L11,0 L22,18 L15,18 L15,46 Z" />
+                </Rectangle.Clip>
+            </Rectangle>
+
+            <Button x:Name="btnOpenWaterIn" FontSize="18" Content="開啟進水" Click="OpenWaterIn_Click" Background="#ADD8E6" Height="46" Canvas.Left="23" Canvas.Top="318" VerticalAlignment="Top" Width="115"/>
+            <Button x:Name="btnCloseWaterIn" FontSize="18" Content="關閉進水" Click="CloseWaterIn_Click" Background="#ADD8E6" Height="46" Canvas.Left="23" Canvas.Top="369" Width="115" HorizontalAlignment="Center" VerticalAlignment="Top"/>
+            <Border BorderBrush="#2E993E" BorderThickness="1" CornerRadius="3" Padding="4" Canvas.Left="42" Canvas.Top="237" HorizontalAlignment="Left" VerticalAlignment="Top">
+                <Border.Style>
+                    <Style TargetType="{x:Type Border}">
+                        <Setter Property="Background" Value="#FFFFFF"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Command_WaterIn, ElementName=RootControl}" Value="True">
+                                <Setter Property="Background" Value="#FF0000"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Border.Style>
+                <TextBlock Text="Y42 - 入" FontSize="10" Foreground="Black" />
+            </Border>
+            <Border BorderBrush="#2E993E" BorderThickness="1" CornerRadius="3" Padding="4" Canvas.Left="583" Canvas.Top="200" HorizontalAlignment="Center" VerticalAlignment="Center">
+                <Border.Style>
+                    <Style TargetType="{x:Type Border}">
+                        <Setter Property="Background" Value="#FFFFFF"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Command_WaterOut, ElementName=RootControl}" Value="True">
+                                <Setter Property="Background" Value="#FF0000"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Border.Style>
+                <TextBlock Text="Y44 - 出" FontSize="10" Foreground="Black" />
+            </Border>
+            <Button x:Name="btnOpenWaterOut" FontSize="18" Content="開啟出水" Click="OpenWaterOut_Click" Background="#ADD8E6" Height="46" Canvas.Left="649" Canvas.Top="167" Width="115" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+            <Button x:Name="btnCloseWaterOut" FontSize="18" Content="關閉出水" Click="CloseWaterOut_Click" Background="#ADD8E6" Height="46" Canvas.Left="649" Canvas.Top="218" Width="115" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+            <Button FontSize="18" Content="錯誤重置" Click="ResetAlarm_Click" Background="#ADD8E6" Height="60" Width="121" Canvas.Left="260" Canvas.Top="432" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+
+        </Canvas>
+    </Grid>
+</UserControl>

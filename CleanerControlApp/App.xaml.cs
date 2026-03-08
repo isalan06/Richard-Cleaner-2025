@@ -29,6 +29,9 @@ using System.Windows;
 using CleanerControlApp.Services;
 using CleanerControlApp.Hardwares.Sink.Interfaces;
 using CleanerControlApp.Hardwares.Sink.Services;
+using CleanerControlApp.Hardwares.HeatingTank.Interfaces;
+using CleanerControlApp.Hardwares.HeatingTank.Services;
+using CleanerControlApp.Hardwares;
 
 namespace CleanerControlApp
 {
@@ -301,6 +304,23 @@ namespace CleanerControlApp
                         });
                         // Also register concrete Sink type for consumers that request it
                         services.AddSingleton<ISink>(sp => (ISink)sp.GetRequiredService<Sink>());
+
+                        // Register HeatingTank and IHeatingTank (resolve DeltaMS300 instance by index)
+                        services.AddSingleton<HeatingTank>(sp =>
+                        {
+                            var logger = sp.GetService<ILogger<HeatingTank>>();
+                            var plc = sp.GetRequiredService<IPLCOperator>();
+                            var tempControllers = sp.GetService<ITemperatureControllers>();
+                            var unitSettings = sp.GetRequiredService<UnitSettings>();
+                            var moduleSettings = sp.GetRequiredService<ModuleSettings>();
+                            var deltaArr = sp.GetRequiredService<IDeltaMS300[]>();
+                            var delta = (deltaArr != null && deltaArr.Length > HeatingTank.MS300_Index) ? deltaArr[HeatingTank.MS300_Index] : null!;
+
+                            return new HeatingTank(logger, plc, tempControllers, unitSettings, moduleSettings, delta);
+                        });
+                        
+                        // Expose interface mapping to the same singleton
+                        services.AddSingleton<IHeatingTank>(sp => (IHeatingTank)sp.GetRequiredService<HeatingTank>());
 
 
                         // Register System background service to run with the host
