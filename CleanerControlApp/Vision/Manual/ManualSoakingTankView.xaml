@@ -1,3 +1,4 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
 <UserControl x:Class="CleanerControlApp.Vision.Manual.ManualSoakingTankView"
  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -6,6 +7,15 @@
  mc:Ignorable="d"
  d:DesignHeight="400" d:DesignWidth="600">
  <Grid Background="Transparent">
- <TextBlock Text="Manual Soaking Tank View" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="24"/>
+ <Grid.RowDefinitions>
+ <RowDefinition Height="Auto" />
+ <RowDefinition Height="*" />
+ </Grid.RowDefinitions>
+
+ <!-- Top title -->
+ <TextBlock Text="浸泡槽 手動操作" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,10,0,10" />
+
+ <!-- Placeholder for Template_SoakingTank; created in code-behind -->
+ <ContentControl x:Name="TemplateHost" Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
  </Grid>
 </UserControl>

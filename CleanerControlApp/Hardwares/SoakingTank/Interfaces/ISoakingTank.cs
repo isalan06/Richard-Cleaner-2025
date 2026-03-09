@@ -49,12 +49,16 @@ namespace CleanerControlApp.Hardwares.SoakingTank.Interfaces
         bool UltrasonicOP(bool ultrasonic);
         bool ManualUltrasonicOP(bool ultrasonic);
 
+        bool WaterInOP(bool water);
+        bool ManualWaterInOP(bool water);
+
         bool HS_ClamperMoving { get; set; }
         bool HS_ClamperPickFinished { get; set; }
         bool HS_ClamperPlaceFinished { get; set; }
         bool HS_WaterSystemError { get; set; }
         bool HS_InputPermit { get; }
         bool HS_ActFinished { get; }
+        bool HS_RequestWater { get; }
 
 
         int ElpasedPressureTime_Seconds { get; }

@@ -328,12 +328,37 @@ namespace CleanerControlApp.Hardwares.SoakingTank.Services
             return result;
         }
 
+        public bool WaterInOP(bool water)
+        {
+            bool result = false;
+
+            if (_heatingTank != null)
+            {
+                _heatingTank.HS_RequestWater = water;
+                return result;
+            }
+
+            return result;
+        }
+        public bool ManualWaterInOP(bool water)
+        {
+            bool result = false;
+
+            if (_heatingTank != null)
+            {
+                result = WaterInOP(water);
+                OperateLog.Log($"浸泡槽 手動注水 " + (water ? "開" : "關"), $"浸泡槽 手動注水 " + (water ? "開" : "關"));
+            }
+
+            return result;
+        }
         public bool HS_ClamperMoving { get; set; }
         public bool HS_ClamperPickFinished { get; set; }
         public bool HS_ClamperPlaceFinished { get; set; }
         public bool HS_WaterSystemError { get; set; }
         public bool HS_InputPermit => Idle && !_pausing && !HS_ClamperMoving && _auto && InPos1;
         public bool HS_ActFinished => _cassette && Sensor_CoverOpen && !HS_ClamperMoving && !Ultrasonic && _actFinished && InPos1 && RetryAirFinished;
+        public bool HS_RequestWater => _heatingTank != null && _heatingTank.HS_RequestWater;
 
         public int ElpasedPressureTime_Seconds => (int)(_elapsedTime != null ? _elapsedTime.Value.TotalSeconds : 0);
         public int RemainingPressureTime_Seconds => (_moduleSettings.Sink != null) ? _moduleSettings.Sink.ActTime_Second - ElpasedPressureTime_Seconds : 0;
@@ -667,6 +692,7 @@ namespace CleanerControlApp.Hardwares.SoakingTank.Services
             UltrasonicOP(false);
             AirOP(false);
             WaterOutputOP(false);
+            WaterInOP(false);
 
             _auto = false;
             _initialized = false;
@@ -679,9 +705,9 @@ namespace CleanerControlApp.Hardwares.SoakingTank.Services
         {
             if (_private_waste_HAlarm || HS_WaterSystemError)
             {
-                if(_heatingTank != null && _heatingTank.HS_RequestWater) _heatingTank.HS_RequestWater = false;
+                if (HS_RequestWater) WaterInOP(false);
                 if (Ultrasonic) UltrasonicOP(false);
-                if(Command_CleanerWaterOutputOpen) Command_CleanerWaterOutputOpen = false;
+                if(Command_CleanerWaterOutputOpen) WaterOutputOP(false);
             }
 
             if (_auto)
@@ -692,6 +718,13 @@ namespace CleanerControlApp.Hardwares.SoakingTank.Services
                     _auto = false;
                 }
 
+                if (Ultrasonic) // 沖水過程
+                {
+                    if (_pausing || !Sensor_Liquid_H) // 沖水過程中暫停
+                    {
+                        UltrasonicOP(false);
+                    }
+                }
 
                 // 未烘乾完成前程序
                 if (!_actFinished)
@@ -723,19 +756,19 @@ namespace CleanerControlApp.Hardwares.SoakingTank.Services
                     {
                         if (Command_CleanerWaterOutputOpen)
                             WaterOutputOP(false);
-                        if (_heatingTank != null && !Command_CleanerWaterOutputOpen && !_heatingTank.HS_RequestWater)
-                            _heatingTank.HS_RequestWater = true;
+                        if (!HS_RequestWater && !Command_CleanerWaterOutputOpen)
+                            WaterInOP(true);
                     }
                     else
                     {
-                        if (_heatingTank != null && _heatingTank.HS_RequestWater)
+                        if (HS_RequestWater)
                         {
                             await Task.Delay(TimeSpan.FromSeconds(1)).ConfigureAwait(false); // delay to ensure water level sensor updates
-                            _heatingTank.HS_RequestWater = false;
+                            WaterInOP(false);
                         }
 
                         if (Command_CleanerWaterOutputOpen)
-                            Command_CleanerWaterOutputOpen = false;
+                            WaterOutputOP(false);
                     }
 
                     // 有卡匣及滿水位且蓋子關閉後開始
@@ -746,14 +779,7 @@ namespace CleanerControlApp.Hardwares.SoakingTank.Services
                             UltrasonicOP(true);
                         }
 
-                        if (Ultrasonic) // 沖水過程
-                        {
-                            if (_pausing || !Sensor_Liquid_H) // 沖水過程中暫停
-                            {
-                                UltrasonicOP(false);
-                            }
-
-                        }
+                        
                     }
 
                     // 沖水時間計算
@@ -805,8 +831,8 @@ namespace CleanerControlApp.Hardwares.SoakingTank.Services
                 }
                 else // 超音波完成程序 
                 {
-                    if(Sensor_Liquid_L && !Command_CleanerWaterOutputOpen) 
-                        Command_CleanerWaterOutputOpen = true;
+                    if (Sensor_Liquid_L && !Command_CleanerWaterOutputOpen)
+                        WaterOutputOP(true);
 
                     // 蓋子打開等待卡匣取出
                     if (_cassette && Command_CleanerCoverClose && !Ultrasonic && !Sensor_Liquid_L)

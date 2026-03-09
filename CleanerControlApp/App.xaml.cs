@@ -32,6 +32,8 @@ using CleanerControlApp.Hardwares.Sink.Services;
 using CleanerControlApp.Hardwares.HeatingTank.Interfaces;
 using CleanerControlApp.Hardwares.HeatingTank.Services;
 using CleanerControlApp.Hardwares;
+using CleanerControlApp.Hardwares.SoakingTank.Interfaces;
+using CleanerControlApp.Hardwares.SoakingTank.Services;
 
 namespace CleanerControlApp
 {
@@ -310,7 +312,7 @@ namespace CleanerControlApp
                         {
                             var logger = sp.GetService<ILogger<HeatingTank>>();
                             var plc = sp.GetRequiredService<IPLCOperator>();
-                            var tempControllers = sp.GetService<ITemperatureControllers>();
+                            var tempControllers = sp.GetRequiredService<ITemperatureControllers>();
                             var unitSettings = sp.GetRequiredService<UnitSettings>();
                             var moduleSettings = sp.GetRequiredService<ModuleSettings>();
                             var deltaArr = sp.GetRequiredService<IDeltaMS300[]>();
@@ -321,6 +323,22 @@ namespace CleanerControlApp
                         
                         // Expose interface mapping to the same singleton
                         services.AddSingleton<IHeatingTank>(sp => (IHeatingTank)sp.GetRequiredService<HeatingTank>());
+
+                        // Register SoakingTank and ISoakingTank (singleton)
+                        services.AddSingleton<SoakingTank>(sp =>
+                        {
+                            var logger = sp.GetService<ILogger<SoakingTank>>();
+                            var plc = sp.GetRequiredService<IPLCOperator>();
+                            var unitSettings = sp.GetRequiredService<UnitSettings>();
+                            var moduleSettings = sp.GetRequiredService<ModuleSettings>();
+                            // heating tank is optional for soaking tank; resolve if available
+                            var heatingTank = sp.GetService<IHeatingTank>();
+                            var ultrasonic = sp.GetRequiredService<IUltrasonicDevice>();
+
+                            return new SoakingTank(logger, plc, unitSettings, moduleSettings, heatingTank, ultrasonic);
+                        });
+                        services.AddSingleton<ISoakingTank>(sp => (ISoakingTank)sp.GetRequiredService<SoakingTank>());
+
 
 
                         // Register System background service to run with the host
