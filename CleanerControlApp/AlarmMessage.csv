@@ -1,4 +1,18 @@
 ﻿Code,Type,Module,Description,Solution
+ALM101,Warning,移載組,前夾爪打開逾時,當Y40 - 開啟夾爪 為 ON，X32 - 前夾爪開Sensor沒有反應。
+ALM102,Warning,移載組,前夾爪關閉逾時,當Y41 - 關閉夾爪 為 ON，X33 - 前夾爪關Sensor沒有反應。
+ALM103,Warning,移載組,後夾爪打開逾時,當Y40 - 開啟夾爪 為 ON，X34 - 後夾爪開Sensor沒有反應。
+ALM104,Warning,移載組,後夾爪關閉逾時,當Y41 - 關閉夾爪 為 ON，X35 - 後夾爪關Sensor沒有反應。
+ALM105,Alarm,移載組,X軸馬達異常,請確認軸1的驅動器上所顯示的資訊。
+ALM106,Alarm,移載組,X軸馬達移動到負極限,請查詢軸1所設定位置是否有誤。
+ALM107,Alarm,移載組,X軸馬達移動到正極限,請查詢軸1所設定位置是否有誤。
+ALM108,Warning,移載組,X軸馬達原點復歸逾時,請查詢軸1狀態。
+ALM109,Warning,移載組,X軸馬達移動逾時,請查詢軸1狀態。
+ALM110,Alarm,移載組,Z軸馬達異常,請確認軸2的驅動器上所顯示的資訊。
+ALM111,Alarm,移載組,Z軸馬達移動到負極限,請查詢軸2所設定位置是否有誤。
+ALM112,Alarm,移載組,Z軸馬達移動到正極限,請查詢軸2所設定位置是否有誤。
+ALM113,Warning,移載組,Z軸馬達原點復歸逾時,請查詢軸2狀態。
+ALM114,Warning,移載組,Z軸馬達移動逾時,請查詢軸2狀態。
 ALM201,Warning,沖水槽,到達低壓逾時,當TC-4 SV設定為低壓時，PV無法到達所設定的壓力。
 ALM202,Warning,沖水槽,到達高壓逾時,當TC-4 SV設定為高壓時，PV無法到達所設定的壓力。
 ALM203,Warning,沖水槽,上蓋打開逾時,當Y50 - 上蓋關閉 為 OFF，X50 - 上蓋開Sensor沒有反應。
@@ -10,6 +24,13 @@ ALM208,Warning,沖水槽,馬達原點復歸逾時,請查詢軸3狀態。
 ALM209,Warning,沖水槽,馬達移動逾時,請查詢軸3狀態。
 ALM210,Warning,沖水槽,MS300-1 變頻器出現 Error, 請查看。
 ALM211,Warning,沖水槽,MS300-1 變頻器出現 Warning, 請查看。
+ALM301,Warning,浸泡槽,上蓋打開逾時,當Y51 - 上蓋關閉 為 OFF，X52 - 上蓋開Sensor沒有反應。
+ALM302,Warning,浸泡槽,上蓋關閉逾時,當Y51 - 上蓋關閉 為 ON，X53 - 上蓋關Sensor沒有反應。
+ALM303,Alarm,沖水槽,馬達異常,請確認軸4的驅動器上所顯示的資訊。
+ALM304,Alarm,沖水槽,馬達移動到負極限,請查詢軸4所設定位置是否有誤。
+ALM305,Alarm,沖水槽,馬達移動到正極限,請查詢軸4所設定位置是否有誤。
+ALM306,Warning,沖水槽,馬達原點復歸逾時,請查詢軸4狀態。
+ALM307,Warning,沖水槽,馬達移動逾時,請查詢軸4狀態。
 ALM401,Warning,烘乾槽#1,到達低溫逾時,當TC-2 SV設定為低溫時，PV無法到達所設定的溫度。
 ALM402,Warning,烘乾槽#1,到達高溫逾時,當TC-2 SV設定為高溫時，PV無法到達所設定的溫度。
 ALM403,Warning,烘乾槽#1,上蓋打開逾時,當Y52 - 上蓋關閉 為 OFF，X56 - 上蓋開Sensor沒有反應。

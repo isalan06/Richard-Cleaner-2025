@@ -46,6 +46,23 @@ namespace CleanerControlApp.Utilities
             set => MS_SoakingTank = value;
         }
 
+        public MS_Shuttle? MS_Shuttle { get; set; }
+
+        [JsonIgnore]
+        public MS_Shuttle? Shuttle
+        {
+            get => MS_Shuttle;
+            set => MS_Shuttle = value;
+        }
+
+        public List<MS_Motor>? MS_Motors { get; set; }
+        [JsonIgnore]
+        public List<MS_Motor>? Motors
+        {
+            get => MS_Motors;
+            set => MS_Motors = value;
+        }
+
     }
 
     public class MS_DryingTanks
@@ -96,6 +113,17 @@ namespace CleanerControlApp.Utilities
         public int AirKnifeRetryCount { get; set; }
         public float UltrasonicSetCurrent { get; set; }
 
+    }
+
+    public class MS_Shuttle
+    {
+
+    }
+
+    public class MS_Motor
+    { 
+        public List<int>? Positions { get; set; }
+        public List<int>? Velocities { get; set; }
     }
 
 }

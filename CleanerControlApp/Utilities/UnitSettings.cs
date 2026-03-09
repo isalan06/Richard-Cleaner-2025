@@ -14,8 +14,10 @@ namespace CleanerControlApp.Utilities
         public List<US_DryingTanks>? DryingTanks { get; set; }
         public US_Sink? Sink { get; set; }
         public US_HeatingTank? HeatingTank { get; set; }
-
         public US_SoakingTank? SoakingTank { get; set; }
+        public US_Shuttle? Shuttle { get; set; }
+        public List<US_Motor>? Motors { get; set; }
+
 
         // JSON uses keys like 'US_DryingTanks', 'US_Sink', 'US_HeatingTank'
         // provide passthrough properties so binding from appsettings.json works
@@ -45,6 +47,20 @@ namespace CleanerControlApp.Utilities
         {
             get => SoakingTank;
             set => SoakingTank = value;
+        }
+
+        [JsonPropertyName("US_Shuttle")]
+        public US_Shuttle? US_Shuttle
+        {
+            get => Shuttle;
+            set => Shuttle = value;
+        }
+
+        [JsonPropertyName("US_Motors")]
+        public List<US_Motor>? US_Motors
+        { 
+            get => Motors;
+            set => Motors = value;
         }
     }
 
@@ -99,5 +115,16 @@ namespace CleanerControlApp.Utilities
         public float MotorUnitTransfer { get; set; }
         public float UltrasonicCurrentMaxLimit { get; set; }
 
+    }
+
+    public class US_Shuttle
+    { 
+        public int Clamper_Timeout_Second { get; set; }
+
+    }
+
+    public class US_Motor
+    { 
+        public float UnitTransfer { get; set; }
     }
 }

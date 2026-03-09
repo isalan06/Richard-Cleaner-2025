@@ -34,6 +34,10 @@ using CleanerControlApp.Hardwares.HeatingTank.Services;
 using CleanerControlApp.Hardwares;
 using CleanerControlApp.Hardwares.SoakingTank.Interfaces;
 using CleanerControlApp.Hardwares.SoakingTank.Services;
+using CleanerControlApp.Modules.Motor.Services;
+using CleanerControlApp.Modules.Motor.Interfaces;
+using CleanerControlApp.Hardwares.Shuttle.Interfaces;
+using CleanerControlApp.Hardwares.Shuttle.Services;
 
 namespace CleanerControlApp
 {
@@ -259,6 +263,28 @@ namespace CleanerControlApp
 
                         // Also register as IDeltaMS300[] so consumers can request the interface array
                         services.AddSingleton<IDeltaMS300[]>(sp => (IDeltaMS300[])sp.GetRequiredService<DeltaMS300[]>());
+
+                        // Register SingleAxisMotor instances (2 modules) and expose as arrays for injection
+                        services.AddSingleton<SingleAxisMotor[]>(sp =>
+                        {
+                            var loggerFactory = sp.GetService<ILoggerFactory>();
+                            var plc = sp.GetRequiredService<IPLCOperator>();
+                            var unitSettingsLocal = sp.GetRequiredService<UnitSettings>();
+                            var moduleSettingsLocal = sp.GetRequiredService<ModuleSettings>();
+
+                            var arr = new SingleAxisMotor[2];
+                            for (int i =0; i < arr.Length; i++)
+                            {
+                                var logger = loggerFactory?.CreateLogger<SingleAxisMotor>();
+                                arr[i] = new SingleAxisMotor(i, logger, unitSettingsLocal, moduleSettingsLocal, plc);
+                            }
+
+                            return arr;
+                        });
+
+                        // Also register as ISingleAxisMotor[] so consumers can request the interface array
+                        services.AddSingleton<ISingleAxisMotor[]>(sp => sp.GetRequiredService<SingleAxisMotor[]>().Cast<ISingleAxisMotor>().ToArray());
+
                         // Register TemperatureControllers using a factory so dependencies are resolved explicitly
                         services.AddSingleton<ITemperatureControllers>(sp =>
                         new TemperatureControllers(
@@ -339,6 +365,22 @@ namespace CleanerControlApp
                         });
                         services.AddSingleton<ISoakingTank>(sp => (ISoakingTank)sp.GetRequiredService<SoakingTank>());
 
+
+
+                        // Register Shuttle and IShuttle
+                        services.AddSingleton<Shuttle>(sp =>
+                        {
+                            var logger = sp.GetService<ILogger<Shuttle>>();
+                            var unitSettingsLocal = sp.GetRequiredService<UnitSettings>();
+                            var moduleSettingsLocal = sp.GetRequiredService<ModuleSettings>();
+                            var plc = sp.GetRequiredService<IPLCOperator>();
+                            var motors = sp.GetRequiredService<ISingleAxisMotor[]>();
+                            ISingleAxisMotor? motorX = (motors != null && motors.Length >0) ? motors[0] : null;
+                            ISingleAxisMotor? motorZ = (motors != null && motors.Length >1) ? motors[1] : null;
+
+                            return new Shuttle(logger, unitSettingsLocal, moduleSettingsLocal, plc, motorX, motorZ);
+                        });
+                        services.AddSingleton<IShuttle>(sp => (IShuttle)sp.GetRequiredService<Shuttle>());
 
 
                         // Register System background service to run with the host
