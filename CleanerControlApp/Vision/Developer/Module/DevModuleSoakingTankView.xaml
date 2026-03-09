@@ -3,14 +3,40 @@
  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+ xmlns:tpl="clr-namespace:CleanerControlApp.Vision.Template"
  mc:Ignorable="d"
- d:DesignHeight="400" d:DesignWidth="600">
+ HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
  <Grid Background="White">
- <TextBlock Text="Dev Module Soaking Tank View" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="10" FontSize="16" FontWeight="Bold"/>
- <Border Margin="10,44,10,10" BorderBrush="Gray" BorderThickness="1" CornerRadius="4" Background="#FFF8F8F8">
- <StackPanel Margin="8">
- <TextBlock Text="Soaking tank controls go here." Foreground="Gray" />
+ <Grid.RowDefinitions>
+ <RowDefinition Height="Auto" />
+ <RowDefinition Height="*" />
+ </Grid.RowDefinitions>
+
+ <!-- Top row: title and buttons -->
+ <Grid Grid.Row="0" Margin="10">
+ <Grid.ColumnDefinitions>
+ <ColumnDefinition Width="*" />
+ </Grid.ColumnDefinitions>
+
+ <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Left">
+ <TextBlock Text="Dev Module Soaking Tank View" VerticalAlignment="Center" FontSize="16" FontWeight="Bold" />
+ <StackPanel Orientation="Horizontal" Margin="12,0,0,0" VerticalAlignment="Center">
+ <Button x:Name="Btn_Init" Content="初始" Width="80" Height="26" Margin="6,0,0,0" Click="Btn_Init_Click" />
+ <Button x:Name="Btn_Auto" Content="自動" Width="60" Height="26" Margin="6,0,0,0" Click="Btn_Auto_Click" />
+ <Button x:Name="Btn_Stop" Content="停止" Width="60" Height="26" Margin="6,0,0,0" Click="Btn_Stop_Click" />
+ <Button x:Name="Btn_Pause" Content="暫停" Width="60" Height="26" Margin="6,0,0,0" Click="Btn_Pause_Click" />
+ <Button x:Name="Btn_AlarmStop" Content="錯誤停止" Width="80" Height="26" Margin="6,0,0,0" Click="Btn_AlarmStop_Click" />
+ <Button x:Name="Btn_MotorPass" Content="馬達Pass" Width="90" Height="26" Margin="6,0,0,0" Click="Btn_MotorPass_Click" />
+ <Button x:Name="Btn_Pick" Content="Pick" Width="60" Height="26" Margin="6,0,0,0" Click="Btn_Pick_Click" />
+ <Button x:Name="Btn_Place" Content="Place" Width="60" Height="26" Margin="6,0,0,0" Click="Btn_Place_Click" />
+ <Button x:Name="Btn_Move" Content="Move" Width="60" Height="26" Margin="6,0,0,0" Click="Btn_Move_Click" />
  </StackPanel>
- </Border>
+ </StackPanel>
+ </Grid>
+
+ <!-- Canvas area with embedded soaking tank template -->
+ <Canvas x:Name="SoakingCanvas" Grid.Row="1" Background="Transparent" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="10">
+ <tpl:Template_SoakingTank Canvas.Left="0" Canvas.Top="0" Width="{Binding ActualWidth, ElementName=SoakingCanvas}" Height="{Binding ActualHeight, ElementName=SoakingCanvas}" />
+ </Canvas>
  </Grid>
 </UserControl>

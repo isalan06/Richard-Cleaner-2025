@@ -5,22 +5,73 @@
  xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
  xmlns:local="clr-namespace:CleanerControlApp.Vision.Template"
  mc:Ignorable="d" 
- d:DesignHeight="450" d:DesignWidth="800">
-    <Grid Margin="0,0,-337,-256">
-        <Canvas x:Name="MainCanvas" Background="Transparent" Margin="0,0,-205,-218">
-            <!-- Embed motor and soaking tank templates -->
-            <local:Template_Motor_4 x:Name="MotorTemplate" Canvas.Left="26" Canvas.Top="10" />
-            <local:Template_Tank_Soaking x:Name="SoakingTankTemplate" Canvas.Left="451" />
-            <Button FontSize="18" Content="開啟上蓋" Click="OpenCover_Click" Background="#ADD8E6" Height="60" Canvas.Left="868" Canvas.Top="119" Width="120"/>
-            <Button Canvas.Left="1012" Canvas.Top="119" Width="120" Height="60" FontSize="18" Content="關閉上蓋" Click="CloseCover_Click" Background="#ADD8E6" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-            <Button FontSize="18" Content="開啟風刀" Click="OpenAir_Click" Background="#ADD8E6" Height="60" Canvas.Left="868" Canvas.Top="184" Width="120" HorizontalAlignment="Center" VerticalAlignment="Top"/>
-            <Button FontSize="18" Content="關閉風刀" Click="CloseAir_Click" Background="#ADD8E6" Height="60" Canvas.Left="1012" Canvas.Top="184" Width="121" HorizontalAlignment="Center" VerticalAlignment="Top"/>
-            <Button FontSize="18" Content="開啟注水" Click="OpenWaterIn_Click" Background="#ADD8E6" Height="60" Canvas.Left="868" Canvas.Top="249" Width="120" HorizontalAlignment="Center" VerticalAlignment="Top"/>
-            <Button FontSize="18" Content="關閉注水" Click="CloseWaterIn_Click" Background="#ADD8E6" Height="60" Canvas.Left="1012" Canvas.Top="249" Width="121" HorizontalAlignment="Center" VerticalAlignment="Top"/>
-            <Button FontSize="18" Content="開啟超音波" Click="OpenUltrasonic_Click" Background="#ADD8E6" Height="60" Canvas.Left="868" Canvas.Top="314" Width="120" HorizontalAlignment="Center" VerticalAlignment="Top"/>
-            <Button FontSize="18" Content="關閉超音波" Click="CloseUltrasonic_Click" Background="#ADD8E6" Height="60" Canvas.Left="1012" Canvas.Top="314" Width="121" HorizontalAlignment="Center" VerticalAlignment="Top"/>
-            <Button FontSize="18" Content="開啟排水" Click="OpenWaterOut_Click" Background="#ADD8E6" Height="60" Canvas.Left="868" Canvas.Top="379" Width="120" HorizontalAlignment="Center" VerticalAlignment="Top"/>
-            <Button FontSize="18" Content="關閉排水" Click="CloseWaterOut_Click" Background="#ADD8E6" Height="60" Canvas.Left="1012" Canvas.Top="379" Width="121" HorizontalAlignment="Center" VerticalAlignment="Top"/>
-        </Canvas>
-    </Grid>
+ d:DesignHeight="450" d:DesignWidth="800" x:Name="RootControl">
+ <Grid Margin="0,0,-337,-256">
+ <Canvas x:Name="MainCanvas" Background="Transparent" Margin="0,0,-205,-218">
+ <!-- Embed motor and soaking tank templates -->
+ <local:Template_Motor_4 x:Name="MotorTemplate" Canvas.Left="26" Canvas.Top="10" />
+ <local:Template_Tank_Soaking x:Name="SoakingTankTemplate" Canvas.Left="451" />
+ <Button FontSize="18" Content="開啟上蓋" Click="OpenCover_Click" Background="#ADD8E6" Height="60" Canvas.Left="868" Canvas.Top="119" Width="120"/>
+ <Button Canvas.Left="1012" Canvas.Top="119" Width="120" Height="60" FontSize="18" Content="關閉上蓋" Click="CloseCover_Click" Background="#ADD8E6" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+ <Button FontSize="18" Content="開啟風刀" Click="OpenAir_Click" Background="#ADD8E6" Height="60" Canvas.Left="868" Canvas.Top="184" Width="120" HorizontalAlignment="Center" VerticalAlignment="Top"/>
+ <Button FontSize="18" Content="關閉風刀" Click="CloseAir_Click" Background="#ADD8E6" Height="60" Canvas.Left="1012" Canvas.Top="184" Width="121" HorizontalAlignment="Center" VerticalAlignment="Top"/>
+ <Button FontSize="18" Content="開啟注水" Click="OpenWaterIn_Click" Background="#ADD8E6" Height="60" Canvas.Left="868" Canvas.Top="249" Width="120" HorizontalAlignment="Center" VerticalAlignment="Top"/>
+ <Button FontSize="18" Content="關閉注水" Click="CloseWaterIn_Click" Background="#ADD8E6" Height="60" Canvas.Left="1012" Canvas.Top="249" Width="121" HorizontalAlignment="Center" VerticalAlignment="Top"/>
+ <Button FontSize="18" Content="開啟超音波" Click="OpenUltrasonic_Click" Background="#ADD8E6" Height="60" Canvas.Left="868" Canvas.Top="314" Width="120" HorizontalAlignment="Center" VerticalAlignment="Top"/>
+ <Button FontSize="18" Content="關閉超音波" Click="CloseUltrasonic_Click" Background="#ADD8E6" Height="60" Canvas.Left="1012" Canvas.Top="314" Width="121" HorizontalAlignment="Center" VerticalAlignment="Top"/>
+ <Button FontSize="18" Content="開啟排水" Click="OpenWaterOut_Click" Background="#ADD8E6" Height="60" Canvas.Left="868" Canvas.Top="379" Width="120" HorizontalAlignment="Center" VerticalAlignment="Top"/>
+ <Button FontSize="18" Content="關閉排水" Click="CloseWaterOut_Click" Background="#ADD8E6" Height="60" Canvas.Left="1012" Canvas.Top="379" Width="121" HorizontalAlignment="Center" VerticalAlignment="Top"/>
+ <ComboBox x:Name="cmbSpeedMode" FontSize="18" Canvas.Left="191" Canvas.Top="323" Width="115" Height="30" SelectedIndex="0" SelectedValuePath="Tag" HorizontalAlignment="Left" VerticalAlignment="Top">
+ <ComboBoxItem Tag="0" Content="移動速度"/>
+ <ComboBoxItem Tag="1" Content="搖擺速度"/>
+ </ComboBox>
+ <TextBlock Text="速度選擇" FontSize="20" Foreground="#333333" TextAlignment="Center" Width="89" Height="25" Canvas.Left="96" Canvas.Top="325" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+ <Button x:Name="btnMoveToP1" Canvas.Left="193" Canvas.Top="374" Width="113" Height="48" Content="Move" Click="btnMoveToP1_Click" Background="LightSeaGreen" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+ <Button x:Name="btnMoveToP2" Content="Move" Click="btnMoveToP2_Click" Background="LightSeaGreen" Height="48" Canvas.Left="193" Canvas.Top="433" Width="113" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+ <Button x:Name="btnMoveToP3" Content="Move" Click="btnMoveToP3_Click" Background="LightSeaGreen" Height="48" Canvas.Left="193" Canvas.Top="494" Width="113" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+ <Border Canvas.Left="65" Canvas.Top="376" Width="120" Height="40" BorderBrush="#2E993E" BorderThickness="1" CornerRadius="4" Padding="4" ToolTip="P1 - 上位" HorizontalAlignment="Left" VerticalAlignment="Top">
+ <Border.Style>
+ <Style TargetType="{x:Type Border}">
+ <Setter Property="Background" Value="#FFFFFF" />
+ <Style.Triggers>
+ <DataTrigger Binding="{Binding InPos1, RelativeSource={RelativeSource AncestorType={x:Type local:Template_SoakingTank}}}" Value="True">
+ <Setter Property="Background" Value="#7CFC00" />
+ </DataTrigger>
+ </Style.Triggers>
+ </Style>
+ </Border.Style>
+ <TextBlock Text="P1 - 上位" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="14" Foreground="Black" />
+ </Border>
+ <Border Canvas.Left="65" Canvas.Top="437" Width="120" Height="40" BorderBrush="#2E993E" BorderThickness="1" CornerRadius="4" Padding="4" ToolTip="P1 - 上位" HorizontalAlignment="Left" VerticalAlignment="Top">
+ <Border.Style>
+ <Style TargetType="{x:Type Border}">
+ <Setter Property="Background" Value="#FFFFFF" />
+ <Style.Triggers>
+ <DataTrigger Binding="{Binding InPos2, RelativeSource={RelativeSource AncestorType={x:Type local:Template_SoakingTank}}}" Value="True">
+ <Setter Property="Background" Value="#7CFC00" />
+ </DataTrigger>
+ </Style.Triggers>
+ </Style>
+ </Border.Style>
+ <TextBlock Text="P2 - 中位" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="14" Foreground="Black" />
+ </Border>
+ <Border Canvas.Left="65" Canvas.Top="498" Width="120" Height="40" BorderBrush="#2E993E" BorderThickness="1" CornerRadius="4" Padding="4" ToolTip="P1 - 上位" HorizontalAlignment="Left" VerticalAlignment="Top">
+ <Border.Style>
+ <Style TargetType="{x:Type Border}">
+ <Setter Property="Background" Value="#FFFFFF" />
+ <Style.Triggers>
+ <DataTrigger Binding="{Binding InPos3, RelativeSource={RelativeSource AncestorType={x:Type local:Template_SoakingTank}}}" Value="True">
+ <Setter Property="Background" Value="#7CFC00" />
+ </DataTrigger>
+ </Style.Triggers>
+ </Style>
+ </Border.Style>
+ <TextBlock Text="P3 - 下位" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="14" Foreground="Black" />
+ </Border>
+ <Button x:Name="btnTeachP1" Content="Teach" Click="btnTeachP1_Click" Background="LightSeaGreen" Height="48" Canvas.Left="327" Canvas.Top="374" Width="113" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+ <Button x:Name="btnTeachP2" Content="Teach" Click="btnTeachP2_Click" Background="LightSeaGreen" Height="48" Canvas.Left="327" Canvas.Top="433" Width="113" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+ <Button x:Name="btnTeachP3" Content="Teach" Click="btnTeachP3_Click" Background="LightSeaGreen" Height="48" Canvas.Left="327" Canvas.Top="494" Width="113" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+ <Button FontSize="18" Content="錯誤重置" Click="ResetAlarm_Click" Background="#ADD8E6" Height="60" Width="121" Canvas.Left="868" Canvas.Top="444" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+ </Canvas>
+ </Grid>
 </UserControl>
