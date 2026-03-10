@@ -66,5 +66,19 @@ namespace CleanerControlApp.Hardwares.Shuttle.Interfaces
         bool MotorMoving { get; }
         bool MotorHome { get; }
 
+        bool HasCassette { get; }
+        bool IsEmpty { get; }
+
+        bool PickCassette(int position);
+        bool PlaceCassette(int position);
+        bool CheckTankCassetteExist();
+
+        bool HS_Check_SinkCassetteExist { get; set; }
+        bool HS_Check_SoakingTankCassetteExist { get; set; }
+        bool HS_Check_DryingTank1CassetteExist { get; set; }
+        bool HS_Check_DryingTank2CassetteExist { get; set; }
+
+        bool HS_Check_Cassette_Finished { get; set; }
+
     }
 }
