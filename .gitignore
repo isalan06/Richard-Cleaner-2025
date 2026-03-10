@@ -364,3 +364,5 @@ FodyWeavers.xsd
 
 # MAC OS
 *.DS_Store
+/CleanerControlApp/Vision/Template/Template_Clamper.xaml
+/CleanerControlApp/Vision/Template
