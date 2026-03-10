@@ -117,7 +117,7 @@ namespace CleanerControlApp.Utilities
 
     public class MS_Shuttle
     {
-
+        public int Shuttle_ZAxis_StableTime_Second { get; set; }
     }
 
     public class MS_Motor

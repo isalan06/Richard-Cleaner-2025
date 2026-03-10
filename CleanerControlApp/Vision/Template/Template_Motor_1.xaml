@@ -1,0 +1,168 @@
+﻿<UserControl x:Class="CleanerControlApp.Vision.Template.Template_Motor_1"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:CleanerControlApp.Vision.Template"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800"
+             x:Name="RootControl">
+
+    <Grid>
+        <Canvas x:Name="MainCanvasMotor1"
+                Background="Transparent"
+                Width="464"
+                Height="292"
+                Canvas.Left="0"
+                Canvas.Top="0"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Top"
+                Margin="0">
+
+            <!-- Motor image at (0,0) -->
+            <Image x:Name="MotorImage"
+                   Canvas.Left="192"
+                   Canvas.Top="76"
+                   Width="93"
+                   Height="86"
+                   Stretch="Uniform"
+                   Source="/CleanerControlApp;component/Pictures/Motor.png" RenderTransformOrigin="0.5,0.5" >
+                <Image.RenderTransform>
+                    <TransformGroup>
+                        <ScaleTransform/>
+                        <SkewTransform/>
+                        <RotateTransform Angle="90"/>
+                        <TranslateTransform/>
+                    </TransformGroup>
+                </Image.RenderTransform>
+            </Image>
+            <Border Canvas.Left="166" Canvas.Top="30" Background="White" BorderBrush="Black" BorderThickness="1" CornerRadius="3" Padding="4" Height="31" Width="102" HorizontalAlignment="Center" VerticalAlignment="Top">
+
+                <TextBlock Text="X軸 馬達-1" FontSize="18" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black"/>
+            </Border>
+            <Border Canvas.Left="139" Canvas.Top="66" BorderBrush="#2E993E" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding LimitN, ElementName=RootControl}" HorizontalAlignment="Center" VerticalAlignment="Center" Width="50">
+                <Border.Style>
+                    <Style TargetType="{x:Type Border}">
+                        <Setter Property="Background" Value="#FFFFFF"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding LimitN, ElementName=RootControl}" Value="True">
+                                <Setter Property="Background" Value="Red"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Border.Style>
+                <TextBlock Text="Limit -" FontSize="12" Foreground="Black" />
+
+            </Border>
+            <Border Canvas.Left="139" Canvas.Top="127" BorderBrush="#2E993E" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding LimitP, ElementName=RootControl}" Width="50" HorizontalAlignment="Center" VerticalAlignment="Center">
+                <Border.Style>
+                    <Style TargetType="{x:Type Border}">
+                        <Setter Property="Background" Value="#FFFFFF"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding LimitP, ElementName=RootControl}" Value="True">
+                                <Setter Property="Background" Value="Red"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Border.Style>
+                <TextBlock Text="Limit +" FontSize="12" Foreground="Black"/>
+            </Border>
+            <Border Canvas.Left="139" Canvas.Top="97" BorderBrush="#2E993E" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding ServoOn, ElementName=RootControl}" Width="50" HorizontalAlignment="Center" VerticalAlignment="Top">
+                <Border.Style>
+                    <Style TargetType="{x:Type Border}">
+                        <Setter Property="Background" Value="#FFFFFF"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding ServoOn, ElementName=RootControl}" Value="True">
+                                <Setter Property="Background" Value="Lime"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Border.Style>
+                <TextBlock Text="Servo" FontSize="12" Foreground="Black"/>
+            </Border>
+
+            <!-- Position display below MotorImage -->
+            <TextBlock x:Name="txtPositionValue" Canvas.Left="220" Canvas.Top="169" Text="0.00" FontSize="16" Foreground="Blue" HorizontalAlignment="Left" VerticalAlignment="Center" Width="80" />
+
+            <!-- Jog speed selector -->
+            <TextBlock Canvas.Left="258" Canvas.Top="70" Text="Jog速率:" FontSize="12" Foreground="Black" />
+            <ComboBox x:Name="cmbJogSpeed" Canvas.Left="309" Canvas.Top="67" Width="120" Height="24" SelectedIndex="0" SelectedValuePath="Tag">
+                <ComboBoxItem Tag="0">Jog低速</ComboBoxItem>
+                <ComboBoxItem Tag="1">Jog中速</ComboBoxItem>
+                <ComboBoxItem Tag="2">Jog高速</ComboBoxItem>
+            </ComboBox>
+
+            <!-- Jog buttons -->
+            <Button x:Name="btnJogMinus" Tag="1" Canvas.Left="362" Canvas.Top="102" Width="68" Height="88" Content="JOG -" Background="Aquamarine"
+                    PreviewMouseLeftButtonDown="JogButton_PreviewMouseLeftButtonDown" 
+                    PreviewMouseLeftButtonUp="JogButton_PreviewMouseLeftButtonUp" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+            <Button x:Name="btnJogPlus" Tag="0" Canvas.Left="289" Canvas.Top="102" Width="68" Height="88" Content="JOG +" Background="Aquamarine"
+                    PreviewMouseLeftButtonDown="JogButton_PreviewMouseLeftButtonDown" 
+                    PreviewMouseLeftButtonUp="JogButton_PreviewMouseLeftButtonUp" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+            <TextBlock Canvas.Left="139" Canvas.Top="169" Text="位置(mm):" FontSize="16" Foreground="Black" HorizontalAlignment="Left" VerticalAlignment="Center" />
+            <Border Canvas.Left="29" Canvas.Top="65" BorderBrush="#2E993E" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding Alarm, ElementName=RootControl}" Width="50" HorizontalAlignment="Center" VerticalAlignment="Top">
+                <Border.Style>
+                    <Style TargetType="{x:Type Border}">
+                        <Setter Property="Background" Value="#FFFFFF"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Alarm, ElementName=RootControl}" Value="True">
+                                <Setter Property="Background" Value="Red"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Border.Style>
+                <TextBlock Text="Alarm" FontSize="12" Foreground="Black" />
+
+            </Border>
+            <Border Canvas.Left="84" Canvas.Top="65" BorderBrush="#2E993E" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding Home, ElementName=RootControl}" Width="50" HorizontalAlignment="Center" VerticalAlignment="Top">
+                <Border.Style>
+                    <Style TargetType="{x:Type Border}">
+                        <Setter Property="Background" Value="#FFFFFF"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Home, ElementName=RootControl}" Value="True">
+                                <Setter Property="Background" Value="Lime"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Border.Style>
+                <TextBlock Text="Home" FontSize="12" Foreground="Black"/>
+            </Border>
+            <Border Canvas.Left="29" Canvas.Top="95" BorderBrush="#2E993E" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding Busy, ElementName=RootControl}" Width="50" HorizontalAlignment="Center" VerticalAlignment="Top">
+                <Border.Style>
+                    <Style TargetType="{x:Type Border}">
+                        <Setter Property="Background" Value="#FFFFFF"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Busy, ElementName=RootControl}" Value="True">
+                                <Setter Property="Background" Value="Red"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Border.Style>
+                <TextBlock Text="Busy" FontSize="12" Foreground="Black" />
+
+            </Border>
+
+            <!-- Control buttons placed at bottom -->
+            <Button x:Name="btnServoOn" Canvas.Left="29" Canvas.Top="225" Width="114" Height="48" Content="Servo On" Click="btnServoOn_Click" HorizontalAlignment="Left" VerticalAlignment="Top" Background="LightSeaGreen" />
+            <Button x:Name="btnHome" Canvas.Left="166" Canvas.Top="225" Width="113" Height="48" Content="Home" Click="btnHome_Click" HorizontalAlignment="Left" VerticalAlignment="Center" Background="LightSeaGreen"/>
+            <Button x:Name="btnStop" Canvas.Left="312" Canvas.Top="225" Width="114" Height="48" Content="Stop" Click="btnStop_Click" Background="LightSeaGreen"/>
+
+            <!-- Idle indicator moved inside Canvas so it is visible when embedded -->
+            <Border Canvas.Left="84" Canvas.Top="96" BorderBrush="#2E993E" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding Idle, ElementName=RootControl}" Width="50">
+                <Border.Style>
+                    <Style TargetType="{x:Type Border}">
+                        <Setter Property="Background" Value="#FFFFFF"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Idle, ElementName=RootControl}" Value="True">
+                                <Setter Property="Background" Value="Lime"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Border.Style>
+                <TextBlock Text="Idle" FontSize="12" Foreground="Black"/>
+            </Border>
+
+        </Canvas>
+
+    </Grid>
+</UserControl>

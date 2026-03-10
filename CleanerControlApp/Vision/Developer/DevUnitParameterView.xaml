@@ -318,9 +318,77 @@
 
  </Grid>
 
- <!-- Placeholder for rest of content -->
+ <!-- Shuttle and Motor parameter boxes (third row) -->
  <Grid Grid.Row="2" Margin="8">
- <!-- Empty for now; additional UI can be added later -->
+ <Grid.ColumnDefinitions>
+ <ColumnDefinition Width="300" />
+ <ColumnDefinition Width="16" />
+ <ColumnDefinition Width="300" />
+ <ColumnDefinition Width="16" />
+ <ColumnDefinition Width="300" />
+ <ColumnDefinition />
+ </Grid.ColumnDefinitions>
+
+ <!-- Shuttle box -->
+ <Border Grid.Column="0" Background="#FFF8F8F8" BorderBrush="#FFBDBDBD" BorderThickness="1" CornerRadius="6" Padding="8" HorizontalAlignment="Left">
+ <StackPanel>
+ <TextBlock Text="移載組參數" FontWeight="Bold" FontSize="14" Margin="0,0,0,6" />
+ <Grid>
+ <Grid.ColumnDefinitions>
+ <ColumnDefinition Width="150" />
+ <ColumnDefinition />
+ </Grid.ColumnDefinitions>
+ <Grid.RowDefinitions>
+ <RowDefinition Height="Auto" />
+ </Grid.RowDefinitions>
+
+ <!-- Clamper Timeout -->
+ <TextBlock Grid.Column="0" Text="Clamper Timeout (s):" VerticalAlignment="Center" Margin="4,0,4,0" Height="15" />
+ <TextBox Grid.Column="1" x:Name="TxtShuttleClamperTimeout" Width="120" HorizontalAlignment="Center" Margin="0,4,0,4" />
+ </Grid>
+ </StackPanel>
+ </Border>
+
+ <!-- Motor X box -->
+ <Border Grid.Column="2" Background="#FFF8F8F8" BorderBrush="#FFBDBDBD" BorderThickness="1" CornerRadius="6" Padding="8" HorizontalAlignment="Left">
+ <StackPanel>
+ <TextBlock Text="移載組X軸參數" FontWeight="Bold" FontSize="14" Margin="0,0,0,6" />
+ <Grid>
+ <Grid.ColumnDefinitions>
+ <ColumnDefinition Width="150" />
+ <ColumnDefinition />
+ </Grid.ColumnDefinitions>
+ <Grid.RowDefinitions>
+ <RowDefinition Height="Auto" />
+ </Grid.RowDefinitions>
+
+ <!-- UnitTransfer -->
+ <TextBlock Grid.Column="0" Text="UnitTransfer:" VerticalAlignment="Center" Margin="4,0,4,0" Height="15" />
+ <TextBox Grid.Column="1" x:Name="TxtMotorXUnitTransfer" Width="120" HorizontalAlignment="Center" Margin="0,4,0,4" />
+ </Grid>
+ </StackPanel>
+ </Border>
+
+ <!-- Motor Z box -->
+ <Border Grid.Column="4" Background="#FFF8F8F8" BorderBrush="#FFBDBDBD" BorderThickness="1" CornerRadius="6" Padding="8" HorizontalAlignment="Left">
+ <StackPanel>
+ <TextBlock Text="移載組Z軸參數" FontWeight="Bold" FontSize="14" Margin="0,0,0,6" />
+ <Grid>
+ <Grid.ColumnDefinitions>
+ <ColumnDefinition Width="150" />
+ <ColumnDefinition />
+ </Grid.ColumnDefinitions>
+ <Grid.RowDefinitions>
+ <RowDefinition Height="Auto" />
+ </Grid.RowDefinitions>
+
+ <!-- UnitTransfer -->
+ <TextBlock Grid.Column="0" Text="UnitTransfer:" VerticalAlignment="Center" Margin="4,0,4,0" Height="15" />
+ <TextBox Grid.Column="1" x:Name="TxtMotorZUnitTransfer" Width="120" HorizontalAlignment="Center" Margin="0,4,0,4" />
+ </Grid>
+ </StackPanel>
+ </Border>
+
  </Grid>
  </Grid>
 </UserControl>

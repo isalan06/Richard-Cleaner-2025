@@ -120,7 +120,6 @@ namespace CleanerControlApp.Utilities
     public class US_Shuttle
     { 
         public int Clamper_Timeout_Second { get; set; }
-
     }
 
     public class US_Motor

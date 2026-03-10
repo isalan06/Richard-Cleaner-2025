@@ -21,6 +21,9 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
 {
     public class Shuttle : IShuttle, IDisposable
     {
+
+
+
         #region attribute
 
         private readonly ILogger<Shuttle>? _logger;

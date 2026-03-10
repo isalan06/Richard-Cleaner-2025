@@ -71,6 +71,10 @@ namespace CleanerControlApp.Vision.Developer
  LoadHeatingToUi();
  // Populate soaking tank UI
  LoadSoakingToUi();
+ // Populate shuttle UI
+ LoadShuttleToUi();
+ // Populate motor UI (X=motors[0], Z=motors[1])
+ LoadMotorsToUi();
  }
  catch
  {
@@ -127,6 +131,9 @@ namespace CleanerControlApp.Vision.Developer
  SaveHeatingUi();
  // Save soaking UI into memory
  SaveSoakingUi();
+ // Save shuttle and motors into memory
+ SaveShuttleUi();
+ SaveMotorsUi();
 
  // Also update DI singleton (if available) so runtime consumers see changes immediately
  try
@@ -142,6 +149,8 @@ namespace CleanerControlApp.Vision.Developer
  diUnit.HeatingTank = _unitSettings.HeatingTank;
  diUnit.Sink = _unitSettings.Sink;
  diUnit.SoakingTank = _unitSettings.SoakingTank;
+ diUnit.Shuttle = _unitSettings.Shuttle;
+ diUnit.Motors = _unitSettings.Motors;
  }
  }
  }
@@ -171,6 +180,9 @@ namespace CleanerControlApp.Vision.Developer
  SaveHeatingUi();
  // Also save soaking fields
  SaveSoakingUi();
+ // Also save shuttle and motor fields
+ SaveShuttleUi();
+ SaveMotorsUi();
 
  if (_unitSettings != null)
  {
@@ -187,6 +199,8 @@ namespace CleanerControlApp.Vision.Developer
  diUnit.Sink = _unitSettings.Sink;
  diUnit.HeatingTank = _unitSettings.HeatingTank;
  diUnit.SoakingTank = _unitSettings.SoakingTank;
+ diUnit.Shuttle = _unitSettings.Shuttle;
+ diUnit.Motors = _unitSettings.Motors;
  }
  }
  }
@@ -442,6 +456,7 @@ namespace CleanerControlApp.Vision.Developer
  if (int.TryParse(TxtSoakCoverOpenTimeout.Text, out var co)) s.Cover_Open_Timeout_Second = co;
  if (int.TryParse(TxtSoakCoverCloseTimeout.Text, out var cc)) s.Cover_Close_Timeout_Second = cc;
  if (int.TryParse(TxtSoakActTimeLimit.Text, out var atl)) s.ActTime_Limit_Second = atl;
+ if (float.TryParse(TxtSoakUltrasonicCurrentMaxLimit.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out var ucm)) s.UltrasonicCurrentMaxLimit = ucm;
 
  _unitSettings.SoakingTank = s;
  _isDirty = true;
@@ -464,6 +479,7 @@ namespace CleanerControlApp.Vision.Developer
  TxtSoakCoverOpenTimeout.Text = s.Cover_Open_Timeout_Second.ToString();
  TxtSoakCoverCloseTimeout.Text = s.Cover_Close_Timeout_Second.ToString();
  TxtSoakActTimeLimit.Text = s.ActTime_Limit_Second.ToString();
+ TxtSoakUltrasonicCurrentMaxLimit.Text = s.UltrasonicCurrentMaxLimit.ToString(CultureInfo.InvariantCulture);
  }
  else
  {
@@ -471,7 +487,94 @@ namespace CleanerControlApp.Vision.Developer
  TxtSoakCoverOpenTimeout.Text = string.Empty;
  TxtSoakCoverCloseTimeout.Text = string.Empty;
  TxtSoakActTimeLimit.Text = string.Empty;
+ TxtSoakUltrasonicCurrentMaxLimit.Text = string.Empty;
  }
+ }
+ catch
+ {
+ // ignore
+ }
+ }
+
+ // Helper: save shuttle UI controls into _unitSettings.Shuttle
+ private void SaveShuttleUi()
+ {
+ try
+ {
+ if (_unitSettings == null) _unitSettings = new UnitSettings();
+ if (_unitSettings.Shuttle == null) _unitSettings.Shuttle = new US_Shuttle();
+ var sh = _unitSettings.Shuttle;
+
+ if (int.TryParse(TxtShuttleClamperTimeout.Text, out var ct)) sh.Clamper_Timeout_Second = ct;
+
+ _unitSettings.Shuttle = sh;
+ _isDirty = true;
+ }
+ catch
+ {
+ // ignore
+ }
+ }
+
+ // Helper: load shuttle UI
+ private void LoadShuttleToUi()
+ {
+ try
+ {
+ if (_unitSettings?.Shuttle != null)
+ {
+ var sh = _unitSettings.Shuttle;
+ TxtShuttleClamperTimeout.Text = sh.Clamper_Timeout_Second.ToString();
+ }
+ else
+ {
+ TxtShuttleClamperTimeout.Text = string.Empty;
+ }
+ }
+ catch
+ {
+ // ignore
+ }
+ }
+
+ // Helper: save motor X/Z UI into _unitSettings.Motors
+ private void SaveMotorsUi()
+ {
+ try
+ {
+ if (_unitSettings == null) _unitSettings = new UnitSettings();
+ var list = _unitSettings.Motors ?? new System.Collections.Generic.List<US_Motor>();
+ // ensure at least2 motors
+ while (list.Count <2) list.Add(new US_Motor());
+
+ if (float.TryParse(TxtMotorXUnitTransfer.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out var xut)) list[0].UnitTransfer = xut;
+ if (float.TryParse(TxtMotorZUnitTransfer.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out var zut)) list[1].UnitTransfer = zut;
+
+ _unitSettings.Motors = list;
+ _isDirty = true;
+ }
+ catch
+ {
+ // ignore
+ }
+ }
+
+ // Helper: load motors into UI (X = index0, Z = index1)
+ private void LoadMotorsToUi()
+ {
+ try
+ {
+ if (_unitSettings?.Motors != null && _unitSettings.Motors.Count >=1)
+ {
+ TxtMotorXUnitTransfer.Text = _unitSettings.Motors[0].UnitTransfer.ToString(CultureInfo.InvariantCulture);
+ }
+ else TxtMotorXUnitTransfer.Text = string.Empty;
+
+ if (_unitSettings?.Motors != null && _unitSettings.Motors.Count >=2)
+ {
+ TxtMotorZUnitTransfer.Text = _unitSettings.Motors[1].UnitTransfer.ToString(CultureInfo.InvariantCulture);
+ }
+ else TxtMotorZUnitTransfer.Text = string.Empty;
  }
  catch
  {
