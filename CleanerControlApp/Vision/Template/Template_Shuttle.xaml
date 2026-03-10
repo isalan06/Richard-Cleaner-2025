@@ -4,12 +4,155 @@
  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
  xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
  xmlns:local="clr-namespace:CleanerControlApp.Vision.Template"
- mc:Ignorable="d" Height="933" Width="1630">
+ mc:Ignorable="d" Height="933" Width="1630" x:Name="RootControl">
     <Grid>
         <Canvas x:Name="canvasShuttle">
             <local:Template_Clamper x:Name="Clamper" Canvas.Left="326" Canvas.Top="49" Height="311" Width="333" />
             <local:Template_Motor_1 x:Name="Motor1" Canvas.Left="766" Canvas.Top="49" HorizontalAlignment="Left" VerticalAlignment="Center" />
             <local:Template_Motor_2 x:Name="Motor2" Canvas.Top="49" HorizontalAlignment="Left" VerticalAlignment="Top" />
+            <Button FontSize="18" Content="錯誤重置" Click="ResetAlarm_Click" Background="#ADD8E6" Height="75" Canvas.Left="505" Canvas.Top="373" Width="121"/>
+            <Button FontSize="18" Content="開啟夾爪" Click="OpenClamper_Click" Background="#ADD8E6" Height="74" Canvas.Left="641" Canvas.Top="86" Width="120" HorizontalAlignment="Center" VerticalAlignment="Top"/>
+            <Button FontSize="18" Content="關閉夾爪" Click="CloseClamper_Click" Background="#ADD8E6" Height="75" Canvas.Left="641" Canvas.Top="167" Width="120" HorizontalAlignment="Center" VerticalAlignment="Top"/>
+
+            <!-- X axis controls -->
+            <ComboBox x:Name="cmbXSpeedMode" FontSize="18" Canvas.Left="906" Canvas.Top="371" Width="146" Height="30" SelectedIndex="0" SelectedValuePath="Tag" HorizontalAlignment="Left" VerticalAlignment="Center">
+                <ComboBoxItem Tag="0" Content="低移動速度"/>
+                <ComboBoxItem Tag="1" Content="高移動速度"/>
+            </ComboBox>
+            <TextBlock Text="速度選擇" FontSize="20" Foreground="#333333" TextAlignment="Center" Width="89" Height="25" Canvas.Left="793" Canvas.Top="373" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+            <TextBlock Text="位置選擇" FontSize="20" Foreground="#333333" TextAlignment="Center" Height="25" Canvas.Left="793" Canvas.Top="341" Width="89"/>
+            <ComboBox x:Name="cmbXPositionSelect" FontSize="18" Canvas.Left="906" Canvas.Top="336" Width="291" Height="30" SelectedIndex="0" SelectedValuePath="Tag" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+            <Button x:Name="btnMoveX" Canvas.Left="937" Canvas.Top="419" Width="113" Height="48" Content="Move" Click="btnMoveToP1_Click" Background="LightSeaGreen" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+            <Border Canvas.Left="809" Canvas.Top="421" Width="120" Height="40" BorderBrush="#2E993E" BorderThickness="1" CornerRadius="4" Padding="4" ToolTip="P1 - 上位" HorizontalAlignment="Left" VerticalAlignment="Top">
+                <Border.Style>
+                    <Style TargetType="{x:Type Border}">
+                        <Setter Property="Background" Value="#FFFFFF" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding InPosX, ElementName=RootControl}" Value="True">
+                                <Setter Property="Background" Value="#7CFC00" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Border.Style>
+                <TextBlock Text="定位" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="14" Foreground="Black" />
+            </Border>
+            <Button x:Name="btnTeachX" Content="Teach" Background="LightSeaGreen" Height="48" Canvas.Left="1071" Canvas.Top="419" Width="113" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+
+            <!-- Z axis controls -->
+            <ComboBox x:Name="cmbZSpeedMode" FontSize="18" Canvas.Left="135" Canvas.Top="373" Width="146" Height="30" SelectedIndex="0" SelectedValuePath="Tag" HorizontalAlignment="Left" VerticalAlignment="Top">
+                <ComboBoxItem Tag="0" Content="低移動速度"/>
+                <ComboBoxItem Tag="1" Content="高移動速度"/>
+            </ComboBox>
+            <TextBlock Text="速度選擇" FontSize="20" Foreground="#333333" TextAlignment="Center" Width="89" Height="25" Canvas.Left="22" Canvas.Top="375" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+            <TextBlock Text="位置選擇" FontSize="20" Foreground="#333333" TextAlignment="Center" Height="25" Canvas.Left="22" Canvas.Top="343" Width="89"/>
+            <ComboBox x:Name="cmbZPositionSelect" FontSize="18" Canvas.Left="135" Canvas.Top="338" Width="291" Height="30" SelectedIndex="0" SelectedValuePath="Tag" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+            <Button x:Name="btnMoveZ" Canvas.Left="166" Canvas.Top="421" Width="113" Height="48" Content="Move" Click="btnMoveToPZ_Click" Background="LightSeaGreen" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+            <Border Canvas.Left="38" Canvas.Top="423" Width="120" Height="40" BorderBrush="#2E993E" BorderThickness="1" CornerRadius="4" Padding="4" ToolTip="Z 定位" HorizontalAlignment="Left" VerticalAlignment="Top">
+                <Border.Style>
+                    <Style TargetType="{x:Type Border}">
+                        <Setter Property="Background" Value="#FFFFFF" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding InPosZ, ElementName=RootControl}" Value="True">
+                                <Setter Property="Background" Value="#7CFC00" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Border.Style>
+                <TextBlock Text="定位" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="14" Foreground="Black" />
+            </Border>
+            <Button x:Name="btnTeachZ" Content="Teach" Background="LightSeaGreen" Height="48" Canvas.Left="300" Canvas.Top="421" Width="113" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+            <Border Canvas.Left="516" Canvas.Top="467" BorderBrush="Black" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding AutoStatus, ElementName=RootControl}" Height="20" HorizontalAlignment="Left" VerticalAlignment="Top">
+                <Border.Style>
+                    <Style TargetType="{x:Type Border}">
+                        <Setter Property="Background" Value="#FFFFFF"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding AutoStatus, ElementName=RootControl}" Value="True">
+                                <Setter Property="Background" Value="Lime"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Border.Style>
+                <TextBlock Text="自動" FontSize="10" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black"/>
+            </Border>
+            <Border Canvas.Left="551" Canvas.Top="467" BorderBrush="Black" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding PauseStatus, ElementName=RootControl}" Height="20" HorizontalAlignment="Left" VerticalAlignment="Top">
+                <Border.Style>
+                    <Style TargetType="{x:Type Border}">
+                        <Setter Property="Background" Value="#FFFFFF"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding PauseStatus, ElementName=RootControl}" Value="True">
+                                <Setter Property="Background" Value="Lime"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Border.Style>
+                <TextBlock Text="暫停" FontSize="10" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black"/>
+            </Border>
+            <Border Canvas.Left="586" Canvas.Top="467" BorderBrush="Black" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding CassetteStatus, ElementName=RootControl}" Height="20" HorizontalAlignment="Left" VerticalAlignment="Top">
+                <Border.Style>
+                    <Style TargetType="{x:Type Border}">
+                        <Setter Property="Background" Value="#FFFFFF"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding CassetteStatus, ElementName=RootControl}" Value="True">
+                                <Setter Property="Background" Value="Lime"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Border.Style>
+                <TextBlock Text="卡匣" FontSize="10" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black"/>
+            </Border>
+            <Border Canvas.Left="516" Canvas.Top="492" BorderBrush="Black" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding IdleStatus, ElementName=RootControl}" Height="20" HorizontalAlignment="Left" VerticalAlignment="Top">
+                <Border.Style>
+                    <Style TargetType="{x:Type Border}">
+                        <Setter Property="Background" Value="#FFFFFF"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IdleStatus, ElementName=RootControl}" Value="True">
+                                <Setter Property="Background" Value="Lime"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Border.Style>
+                <TextBlock Text="閒置" FontSize="10" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black"/>
+            </Border>
+            <Border Canvas.Left="551" Canvas.Top="492" BorderBrush="Black" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding InitializedStatus, ElementName=RootControl}" Height="20" HorizontalAlignment="Left" VerticalAlignment="Top">
+                <Border.Style>
+                    <Style TargetType="{x:Type Border}">
+                        <Setter Property="Background" Value="#FFFFFF"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding InitializedStatus, ElementName=RootControl}" Value="True">
+                                <Setter Property="Background" Value="Lime"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Border.Style>
+                <TextBlock Text="初始" FontSize="10" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black"/>
+            </Border>
+            <Border Canvas.Left="516" Canvas.Top="517" BorderBrush="Black" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding WarningStatus, ElementName=RootControl}" Height="20" HorizontalAlignment="Left" VerticalAlignment="Top">
+                <Border.Style>
+                    <Style TargetType="{x:Type Border}">
+                        <Setter Property="Background" Value="#FFFFFF"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding WarningStatus, ElementName=RootControl}" Value="True">
+                                <Setter Property="Background" Value="Yellow"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Border.Style>
+                <TextBlock Text="警告" FontSize="10" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black"/>
+            </Border>
+            <Border Canvas.Left="551" Canvas.Top="517" BorderBrush="Black" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding AlarmStatus, ElementName=RootControl}" Height="20" HorizontalAlignment="Left" VerticalAlignment="Top">
+                <Border.Style>
+                    <Style TargetType="{x:Type Border}">
+                        <Setter Property="Background" Value="#FFFFFF"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding AlarmStatus, ElementName=RootControl}" Value="True">
+                                <Setter Property="Background" Value="Red"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Border.Style>
+                <TextBlock Text="錯誤" FontSize="10" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black"/>
+            </Border>
+
         </Canvas>
     </Grid>
 </UserControl>

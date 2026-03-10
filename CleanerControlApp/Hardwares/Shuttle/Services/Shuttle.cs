@@ -594,11 +594,13 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
                         case 40: // Check Cassette Exist
                             if (HasCassette)
                             {
+                                _cassette = true;
                                 _pickTrigger = false;
                                 _pickCase = 0;
                             }
                             else 
                             {
+                                _cassette = false;
                                 _pickCase = -99;
                             }
                             break;
@@ -658,6 +660,7 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
                         case 40: // Check Cassette Exist
                             if (IsEmpty)
                             {
+                                _cassette = false;
                                 _placeTrigger = false;
                                 _placeCase = 0;
                             }
