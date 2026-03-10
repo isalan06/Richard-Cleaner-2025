@@ -3,9 +3,18 @@
  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
- mc:Ignorable="d"
- d:DesignHeight="400" d:DesignWidth="600">
+ xmlns:template="clr-namespace:CleanerControlApp.Vision.Template"
+ mc:Ignorable="d" Height="773" Width="1218">
  <Grid Background="Transparent">
- <TextBlock Text="Manual Shuttle View" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="24"/>
+ <Grid.RowDefinitions>
+ <RowDefinition Height="Auto" />
+ <RowDefinition Height="*" />
+ </Grid.RowDefinitions>
+
+ <!-- Top title (aligned like ManualSinkView) -->
+ <TextBlock Text="移載組 手動操作" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,10,0,10" />
+
+ <!-- Embedded Template_Shuttle below the title (direct UserControl) -->
+ <template:Template_Shuttle Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
  </Grid>
 </UserControl>

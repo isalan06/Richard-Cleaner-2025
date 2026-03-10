@@ -6,7 +6,7 @@
  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
  xmlns:template="clr-namespace:CleanerControlApp.Vision.Template"
  mc:Ignorable="d"
- d:DesignHeight="400" d:DesignWidth="600">
+ d:DesignHeight="400" d:DesignWidth="600" >
  <Grid Background="Transparent">
  <Grid.RowDefinitions>
  <RowDefinition Height="Auto" />
