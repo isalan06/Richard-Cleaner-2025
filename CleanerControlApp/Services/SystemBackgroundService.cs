@@ -1,4 +1,6 @@
+using CleanerControlApp.Hardwares;
 using CleanerControlApp.Utilities.Alarm;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System;
@@ -15,13 +17,15 @@ namespace CleanerControlApp.Services
     {
         private readonly ILogger<SystemBackgroundService> _logger;
         private readonly IServiceProvider _services;
+        private readonly HardwareManager _hardwareManager;
 
         public TimeSpan PollInterval { get; set; } = TimeSpan.FromSeconds(5);
 
-        public SystemBackgroundService(ILogger<SystemBackgroundService> logger, IServiceProvider services)
+        public SystemBackgroundService(ILogger<SystemBackgroundService> logger, IServiceProvider services, HardwareManager hardwareManager)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _services = services ?? throw new ArgumentNullException(nameof(services));
+            _hardwareManager = hardwareManager ?? throw new ArgumentNullException(nameof(hardwareManager));
         }
 
         public override async Task StartAsync(CancellationToken cancellationToken)
@@ -45,11 +49,42 @@ namespace CleanerControlApp.Services
         /// </summary>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        protected virtual Task InitializeAsync(CancellationToken cancellationToken)
+        protected virtual async Task InitializeAsync(CancellationToken cancellationToken)
         {
             // TODO: add initialization logic here
             _logger.LogDebug("InitializeAsync - put startup code here.");
-            return Task.CompletedTask;
+
+            // Use asynchronous HardwareManager methods to avoid blocking the startup thread
+            try
+            {
+                // Fire-and-forget: kick off connect but do not await here so startup proceeds immediately.
+                Task.Run(async () =>
+                {
+                    try
+                    {
+                        await _hardwareManager.CommunicationConnectAsync(true).ConfigureAwait(false);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "Exception thrown by HardwareManager.CommunicationConnectAsync(true) (fire-and-forget). Continue startup.");
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Exception thrown by HardwareManager.CommunicationConnectAsync(true). Continue startup.");
+            }
+
+            try
+            {
+                await _hardwareManager.ModuleRunningAsync(true).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Exception thrown by HardwareManager.ModuleRunningAsync(true). Continue startup.");
+            }
+
+            return;
         }
 
         /// <summary>

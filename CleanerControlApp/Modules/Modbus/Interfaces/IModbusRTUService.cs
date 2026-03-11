@@ -27,5 +27,9 @@ namespace CleanerControlApp.Modules.Modbus.Interfaces
         Task<ModbusRTUFrame?> Act(ModbusRTUFrame? coammand);
 
         void RefreshSerialPortSettings(CommunicationSettings? settings);
+
+        // Added for compatibility with callers that expect Start/Stop
+        void Start();
+        void Stop();
     }
 }

@@ -519,6 +519,16 @@ namespace CleanerControlApp.Vision.Developer
             {
                 // Dummy implementation: do nothing
             }
+
+            public void Start()
+            {
+                Open();
+            }
+
+            public void Stop()
+            {
+                Close();
+            }
         }
         #endregion
     }

@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using CleanerControlApp.Utilities.Log;
+using CleanerControlApp.Modules.UserManagement.Services;
 
 namespace CleanerControlApp.Utilities.Alarm
 {
@@ -50,6 +51,23 @@ namespace CleanerControlApp.Utilities.Alarm
         /// </summary>
         public static string LogBaseDirectory { get; set; } = Path.Combine(AppContext.BaseDirectory ?? AppDomain.CurrentDomain.BaseDirectory, "AlarmLog");
 
+        /// <summary>
+        /// Event raised when alarm entries change (added/updated/removed). UI can subscribe to refresh bindings.
+        /// </summary>
+        public static event Action? AlarmsChanged;
+
+        private static void RaiseAlarmsChanged()
+        {
+            try
+            {
+                AlarmsChanged?.Invoke();
+            }
+            catch
+            {
+                // swallow exceptions from subscribers
+            }
+        }
+
         private static string MakeCompositeKey(string code, string? instanceId)
         {
             if (string.IsNullOrEmpty(instanceId))
@@ -62,6 +80,11 @@ namespace CleanerControlApp.Utilities.Alarm
             var idx = compositeKey.IndexOf(':');
             if (idx < 0) return compositeKey;
             return compositeKey.Substring(0, idx);
+        }
+
+        private static string GetLogUserName()
+        {
+            return UserManager.CurrentUsername ?? "System";
         }
 
         /// <summary>
@@ -96,7 +119,7 @@ namespace CleanerControlApp.Utilities.Alarm
                                 e.AlarmSN = GenerateAlarmSN(code, now);
                                 WriteLog(e, "Alarm", now);
                                 // Also write an operation log for the alarm event
-                                OperateLog.Log($"{e.Module}發生錯誤", $"{e.Code}-{e.Description}");
+                                OperateLog.Log($"{e.Module}發生錯誤", GetLogUserName(), $"{e.Code}-{e.Description}");
                             }
                         }
                         else
@@ -112,7 +135,7 @@ namespace CleanerControlApp.Utilities.Alarm
                                 };
                                 _entries[code] = entry;
                                 WriteLog(entry, "Alarm", now);
-                                OperateLog.Log($"{entry.Module}發生錯誤", $"{entry.Code}-{entry.Description}");
+                                OperateLog.Log($"{entry.Module}發生錯誤", GetLogUserName(), $"{entry.Code}-{entry.Description}");
                             }
                             else
                             {
@@ -124,12 +147,15 @@ namespace CleanerControlApp.Utilities.Alarm
                                 };
                                 _entries[code] = entry;
                                 WriteLog(entry, "Alarm", now);
-                                OperateLog.Log($"{entry.Module}發生錯誤", $"{entry.Code}-{entry.Description}");
+                                OperateLog.Log($"{entry.Module}發生錯誤", GetLogUserName(), $"{entry.Code}-{entry.Description}");
                             }
                         }
                     }
                 }
             }
+
+            // notify listeners that initial set changed
+            RaiseAlarmsChanged();
         }
 
         /// <summary>
@@ -141,6 +167,8 @@ namespace CleanerControlApp.Utilities.Alarm
                 return;
 
             timestamp ??= DateTime.Now; // use local time
+
+            bool changed = false;
 
             lock (_lock)
             {
@@ -185,7 +213,8 @@ namespace CleanerControlApp.Utilities.Alarm
                     entry.AlarmSN = GenerateAlarmSN(code, timestamp.Value);
                     WriteLog(entry, "Alarm", timestamp.Value);
                     // Also write an operation log for the alarm event
-                    OperateLog.Log($"{entry.Module}發生錯誤", $"{entry.Code}-{entry.Description}");
+                    OperateLog.Log($"{entry.Module}發生錯誤", GetLogUserName(), $"{entry.Code}-{entry.Description}");
+                    changed = true;
                 }
                 else
                 {
@@ -198,7 +227,13 @@ namespace CleanerControlApp.Utilities.Alarm
                     entry.IsAlarm = false;
                     entry.HappenTime = null;
                     entry.AlarmSN = null;
+                    changed = true;
                 }
+            }
+
+            if (changed)
+            {
+                RaiseAlarmsChanged();
             }
         }
 
@@ -386,6 +421,8 @@ namespace CleanerControlApp.Utilities.Alarm
                 });
 
                 File.AppendAllText(file, line + Environment.NewLine, Encoding.UTF8);
+
+                // removed duplicate OperateLog call here to avoid double entries
             }
             catch
             {
@@ -404,6 +441,8 @@ namespace CleanerControlApp.Utilities.Alarm
                 _flagGetters.Clear();
                 _previousFlagValues.Clear();
             }
+
+            RaiseAlarmsChanged();
         }
     }
 }

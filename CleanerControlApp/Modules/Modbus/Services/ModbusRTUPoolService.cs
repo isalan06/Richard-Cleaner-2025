@@ -189,6 +189,12 @@ namespace CleanerControlApp.Modules.Modbus.Services
             }
         }
 
+        public List<IModbusRTUService> ToList()
+        {
+            if (_services == null) return new List<IModbusRTUService>();
+            return _services.Cast<IModbusRTUService>().ToList();
+        }
+
         #endregion
 
     }

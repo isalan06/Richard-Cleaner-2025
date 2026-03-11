@@ -20,5 +20,10 @@ namespace CleanerControlApp.Modules.Modbus.Interfaces
         int Count { get; }
 
         void RefreshSerialPortSettings(CommunicationSettings? settings);
+
+        /// <summary>
+        /// Returns a List of the pooled Modbus RTU services. Useful when you need to call List.ForEach.
+        /// </summary>
+        List<IModbusRTUService> ToList();
     }
 }

@@ -9,6 +9,7 @@ using System.Windows.Media;
 using System.Collections.Generic;
 using CleanerControlApp.Utilities.Alarm;
 using Microsoft.Win32;
+using System.Windows.Data;
 
 namespace CleanerControlApp.Vision
 {
@@ -25,6 +26,49 @@ namespace CleanerControlApp.Vision
             InitializeComponent();
             // ensure download button disabled until a file is loaded
             try { btnDownload.IsEnabled = false; } catch { }
+
+            // Subscribe to alarm changes to refresh UI
+            try
+            {
+                AlarmManager.AlarmsChanged += OnAlarmsChanged;
+                this.Unloaded += AlarmView_Unloaded;
+            }
+            catch { }
+        }
+
+        private void AlarmView_Unloaded(object? sender, RoutedEventArgs e)
+        {
+            try
+            {
+                AlarmManager.AlarmsChanged -= OnAlarmsChanged;
+                this.Unloaded -= AlarmView_Unloaded;
+            }
+            catch { }
+        }
+
+        private void OnAlarmsChanged()
+        {
+            // Ensure UI thread
+            try
+            {
+                Dispatcher.Invoke(() =>
+                {
+                    try
+                    {
+                        if (Resources["AllAlarms"] is ObjectDataProvider odp)
+                        {
+                            odp.Refresh();
+                        }
+                        else
+                        {
+                            // fallback: rebind ItemsSource directly
+                            realTimeGrid.ItemsSource = AlarmManager.GetAllEntries();
+                        }
+                    }
+                    catch { }
+                });
+            }
+            catch { }
         }
 
         private void RealTimeGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)

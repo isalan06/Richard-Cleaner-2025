@@ -309,6 +309,32 @@ namespace CleanerControlApp.Modules.Modbus.Services
 
         }
 
+        // Start/Stop methods to satisfy IModbusRTUService
+        public void Start()
+        {
+            try
+            {
+                // prefer Open which sets IsRunning and starts background task
+                Open();
+            }
+            catch
+            {
+                // swallow to keep callers simple; logging already done in Open
+            }
+        }
+
+        public void Stop()
+        {
+            try
+            {
+                Close();
+            }
+            catch
+            {
+                // swallow
+            }
+        }
+
         #endregion
 
         public async Task<ModbusRTUFrame?> Act(ModbusRTUFrame? command)

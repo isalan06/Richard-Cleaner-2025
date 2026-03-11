@@ -47,60 +47,67 @@ namespace CleanerControlApp.Utilities.Alarm
         {
             try
             {
-                var baseDir = AppContext.BaseDirectory ?? AppDomain.CurrentDomain.BaseDirectory;
-                var file = Path.Combine(baseDir, "AlarmMessage.csv");
-
-                if (File.Exists(file))
-                {
-                    // Load from file, replacing the in-memory defaults
-                    var content = File.ReadAllText(file, Encoding.UTF8);
-                    var records = ParseCsvRecords(content);
-                    var entries = new Dictionary<string, AlarmInfo>(StringComparer.OrdinalIgnoreCase);
-
-                    // Expect header at first record, skip it
-                    foreach (var fields in records.Skip(1))
-                    {
-                        if (fields == null || fields.Length ==0)
-                            continue;
-
-                        var code = fields.ElementAtOrDefault(0)?.Trim() ?? string.Empty;
-                        if (string.IsNullOrEmpty(code))
-                            continue;
-
-                        var typeStr = fields.ElementAtOrDefault(1)?.Trim() ?? string.Empty;
-                        if (!Enum.TryParse<AlarmType>(typeStr, true, out var type))
-                            type = AlarmType.Warning;
-
-                        var module = fields.ElementAtOrDefault(2) ?? string.Empty;
-                        var desc = fields.ElementAtOrDefault(3) ?? string.Empty;
-                        var solution = fields.ElementAtOrDefault(4) ?? string.Empty;
-
-                        entries[code] = new AlarmInfo(code, type, module, desc, solution);
-                    }
-
-                    if (entries.Count >0)
-                    {
-                        _alarms.Clear();
-                        foreach (var kv in entries)
-                            _alarms[kv.Key] = kv.Value;
-                    }
-                }
-                else
-                {
-                    // File does not exist - write current defaults to file for editing
-                    var sb = new StringBuilder();
-                    sb.AppendLine("Code,Type,Module,Description,Solution");
-                    foreach (var kv in _alarms.Values)
-                    {
-                        sb.AppendLine(string.Join(",", EscapeCsv(kv.Code), EscapeCsv(kv.Type.ToString()), EscapeCsv(kv.Module), EscapeCsv(kv.Description), EscapeCsv(kv.Solution)));
-                    }
-
-                    File.WriteAllText(file, sb.ToString(), Encoding.UTF8);
-                }
+                LoadFromFile();
             }
             catch
             {
                 // Ignore errors - fallback to built-in defaults
+            }
+        }
+
+        // Extracted file loading logic so it can be retried at runtime
+        private static void LoadFromFile()
+        {
+            lock (_fileLock)
+            {
+                var baseDir = AppContext.BaseDirectory ?? AppDomain.CurrentDomain.BaseDirectory;
+                var file = Path.Combine(baseDir, "AlarmMessage.csv");
+
+                if (!File.Exists(file))
+                {
+                    // write current defaults to file for editing
+                    var sbDef = new StringBuilder();
+                    sbDef.AppendLine("Code,Type,Module,Description,Solution");
+                    foreach (var kv in _alarms.Values)
+                    {
+                        sbDef.AppendLine(string.Join(",", EscapeCsv(kv.Code), EscapeCsv(kv.Type.ToString()), EscapeCsv(kv.Module), EscapeCsv(kv.Description), EscapeCsv(kv.Solution)));
+                    }
+
+                    File.WriteAllText(file, sbDef.ToString(), Encoding.UTF8);
+                    return;
+                }
+
+                var content = File.ReadAllText(file, Encoding.UTF8);
+                var records = ParseCsvRecords(content);
+                var entries = new Dictionary<string, AlarmInfo>(StringComparer.OrdinalIgnoreCase);
+
+                // Expect header at first record, skip it
+                foreach (var fields in records.Skip(1))
+                {
+                    if (fields == null || fields.Length ==0)
+                        continue;
+
+                    var code = fields.ElementAtOrDefault(0)?.Trim() ?? string.Empty;
+                    if (string.IsNullOrEmpty(code))
+                        continue;
+
+                    var typeStr = fields.ElementAtOrDefault(1)?.Trim() ?? string.Empty;
+                    if (!Enum.TryParse<AlarmType>(typeStr, true, out var type))
+                        type = AlarmType.Warning;
+
+                    var module = fields.ElementAtOrDefault(2) ?? string.Empty;
+                    var desc = fields.ElementAtOrDefault(3) ?? string.Empty;
+                    var solution = fields.ElementAtOrDefault(4) ?? string.Empty;
+
+                    entries[code] = new AlarmInfo(code, type, module, desc, solution);
+                }
+
+                if (entries.Count >0)
+                {
+                    _alarms.Clear();
+                    foreach (var kv in entries)
+                        _alarms[kv.Key] = kv.Value;
+                }
             }
         }
 
@@ -233,7 +240,24 @@ namespace CleanerControlApp.Utilities.Alarm
                 return false;
             }
 
-            return _alarms.TryGetValue(code.Trim(), out info);
+            code = code.Trim();
+
+            // first try
+            if (_alarms.TryGetValue(code, out info))
+                return true;
+
+            // attempt to reload from file in case AlarmMessage.csv was changed after startup
+            try
+            {
+                LoadFromFile();
+            }
+            catch
+            {
+                // ignore
+            }
+
+            // retry
+            return _alarms.TryGetValue(code, out info);
         }
 
         /// <summary>

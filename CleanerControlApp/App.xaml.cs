@@ -382,7 +382,38 @@ namespace CleanerControlApp
                         });
                         services.AddSingleton<IShuttle>(sp => (IShuttle)sp.GetRequiredService<Shuttle>());
 
+                        
 
+
+                        // Register HardwareManager as singleton and resolve its dependencies from the container
+                        services.AddSingleton<HardwareManager>(sp =>
+                        {
+                            var logger = sp.GetRequiredService<ILogger<HardwareManager>>();
+                            var unitSettingsLocal = sp.GetRequiredService<UnitSettings>();
+                            var moduleSettingsLocal = sp.GetRequiredService<ModuleSettings>();
+
+                            // optional hardware components
+                            var sink = sp.GetService<ISink>();
+                            var soaking = sp.GetService<ISoakingTank>();
+                            var drying = sp.GetService<IDryingTank[]>();
+                            var shuttle = sp.GetService<IShuttle>();
+
+                            // communication services (some may be optional)
+                            var modbusTcp = sp.GetService<IModbusTCPService>();
+                            var modbusRtuPoll = sp.GetService<IModbusRTUPollService>();
+
+                            // required components
+                            var delta = sp.GetRequiredService<IDeltaMS300[]>();
+                            var plcService = sp.GetRequiredService<IPLCService>();
+                            var tempControllers = sp.GetRequiredService<ITemperatureControllers>();
+                            var ultrasonic = sp.GetRequiredService<IUltrasonicDevice>();
+
+                            return new HardwareManager(logger, unitSettingsLocal, moduleSettingsLocal,
+                            sink, soaking, drying, shuttle,
+                            modbusTcp, modbusRtuPoll,
+                            delta, plcService, tempControllers, ultrasonic);
+                        });
+                        
                         // Register System background service to run with the host
                         services.AddHostedService<SystemBackgroundService>();
 

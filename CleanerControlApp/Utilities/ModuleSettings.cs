@@ -63,6 +63,13 @@ namespace CleanerControlApp.Utilities
             set => MS_Motors = value;
         }
 
+        public MS_System? MS_System { get; set; }
+        public MS_System System
+        {
+            get => MS_System;
+            set => MS_System = value;
+        }
+
     }
 
     public class MS_DryingTanks
@@ -124,6 +131,11 @@ namespace CleanerControlApp.Utilities
     { 
         public List<int>? Positions { get; set; }
         public List<int>? Velocities { get; set; }
+    }
+
+    public class MS_System
+    { 
+    
     }
 
 }

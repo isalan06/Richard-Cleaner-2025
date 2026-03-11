@@ -15,6 +15,7 @@ using System.Windows.Shapes;
 using CleanerControlApp.Modules.UserManagement.Services;
 using CleanerControlApp.Utilities.Log;
 using Microsoft.Extensions.Logging;
+using CleanerControlApp.Hardwares;
 
 
 namespace CleanerControlApp.Vision
@@ -26,11 +27,13 @@ namespace CleanerControlApp.Vision
     {
         private readonly UserManager _userManager;
         private readonly ILogger<LoginWindow> _logger;
-        public LoginWindow(UserManager userManager, ILogger<LoginWindow> logger)
+        private readonly HardwareManager _hardwareManager;
+        public LoginWindow(UserManager userManager, ILogger<LoginWindow> logger, HardwareManager hardwareManager)
         {
             InitializeComponent();
             _userManager = userManager;
             _logger = logger;
+            _hardwareManager = hardwareManager;
 
             // Pre-fill credentials for testing to avoid repeatedly typing them.
             // TODO: Remove these defaults before production.
@@ -50,6 +53,12 @@ namespace CleanerControlApp.Vision
                 _logger.LogInformation($"使用者 '{username}' 登入成功，角色：{_userManager.UserInfo?.CurrentUserRole}");
                 OperateLog.Log("登入成功", $"使用者 '{username}' 登入成功，角色：{_userManager.UserInfo?.CurrentUserRole}");
                 DialogResult = true;
+                // If the application is not configured to bypass hardware checks, ensure communication is connected.
+                //if (UserManager.CanPassCheck)
+                //{
+                //    _hardwareManager.CommunicationConnect(false);
+                //    _hardwareManager.ModuleRunning(false);
+                //}
                 Close();
             }
             else

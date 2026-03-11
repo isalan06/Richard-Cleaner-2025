@@ -19,6 +19,10 @@ namespace CleanerControlApp.Modules.UserManagement.Services
         private string _developer_username = "supervisor";
         private string _developer_password = "9527";
 
+        private static bool _login = false;
+        public static bool IsLogin => _login;
+        public static bool CanPassCheck => !_login || CurrentUserRole == UserRole.Developer;
+
         /// <summary>
         /// Login with username and password
         /// </summary>
@@ -65,6 +69,8 @@ namespace CleanerControlApp.Modules.UserManagement.Services
                     CurrentUserRole = null;
                 }
             }
+
+            _login = result;
 
             return result;
         }

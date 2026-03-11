@@ -328,7 +328,7 @@ namespace CleanerControlApp.Hardwares.HeatingTank.Services
 
         public bool ModulePass { get; set; }
         public bool HasWarning => _PV_Low_Timeout || _PV_High_Timeout || _INV_Zero_Timeout || _INV_High_Timeout || _INV_Low_Timeout || _invErrorAlarm;
-        public bool HasAlarm => false;
+        public bool HasAlarm => _tankHHAlarm || _tankLLAlarm;
         public bool IsNormalStatus => !HasWarning && !HasAlarm;
         public void AutoStop()
         {

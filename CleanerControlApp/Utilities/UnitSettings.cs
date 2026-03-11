@@ -18,6 +18,8 @@ namespace CleanerControlApp.Utilities
         public US_Shuttle? Shuttle { get; set; }
         public List<US_Motor>? Motors { get; set; }
 
+        public US_System? System { get; set; }
+
 
         // JSON uses keys like 'US_DryingTanks', 'US_Sink', 'US_HeatingTank'
         // provide passthrough properties so binding from appsettings.json works
@@ -61,6 +63,13 @@ namespace CleanerControlApp.Utilities
         { 
             get => Motors;
             set => Motors = value;
+        }
+
+        [JsonPropertyName("US_System")]
+        public US_System? US_System
+        { 
+            get=> System;
+            set => System = value;
         }
     }
 
@@ -125,5 +134,10 @@ namespace CleanerControlApp.Utilities
     public class US_Motor
     { 
         public float UnitTransfer { get; set; }
+    }
+
+    public class US_System
+    { 
+    
     }
 }
