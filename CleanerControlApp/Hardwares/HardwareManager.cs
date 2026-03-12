@@ -16,12 +16,14 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using CleanerControlApp.Utilities.Alarm;
 using System.Security.Policy;
 using CleanerControlApp.Hardwares.HeatingTank.Interfaces;
 using System.Windows.Media.Animation;
 using System.Numerics;
+using CleanerControlApp.Utilities.Log;
 
 namespace CleanerControlApp.Hardwares
 {
@@ -68,6 +70,8 @@ namespace CleanerControlApp.Hardwares
         { 
             _logger = logger;
 
+            try
+            {
             _unitSettings = unitSettings;
             _modbusSettings = modbusSettings;
 
@@ -98,6 +102,14 @@ namespace CleanerControlApp.Hardwares
             StartLoop();
 
             Start();
+            }
+            catch (Exception ex)
+            {
+                // Log and show a message to aid debugging during startup
+                try { _logger?.LogError(ex, "HardwareManager constructor failed"); } catch { }
+                try { System.Windows.MessageBox.Show($"HardwareManager ctor exception: {ex}", "Startup Error", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error); } catch { }
+                throw;
+            }
         }
 
         #endregion
@@ -411,6 +423,8 @@ namespace CleanerControlApp.Hardwares
             AlarmTriggerToModule();
             WanringTriggerToModule();
 
+            InitializedProcedure();
+
             await Task.Yield();
         }
 
@@ -449,6 +463,8 @@ namespace CleanerControlApp.Hardwares
 
         private async Task AlarmReset()
         {
+            OperateLog.Log("錯誤重置", "按下 [錯誤重置] 後會對系統進行清除錯誤狀態及下達錯誤重置命令給各個模組。");
+
             if (_shuttle != null) _shuttle.AlarmReset();
             if (_sink != null) _sink.AlarmReset();
             if (_soakingTank != null) _soakingTank.AlarmReset();
@@ -468,6 +484,13 @@ namespace CleanerControlApp.Hardwares
             _buzzer_stop = false;
         }
 
+        // Expose AlarmReset as public async method for UI to call
+        public Task AlarmResetAsync()
+        {
+            // Call the private AlarmReset method and return the Task
+            return AlarmReset();
+        }
+
         private bool _firstAlarm = false;
         private bool _firstWarning = false;
 
@@ -479,6 +502,7 @@ namespace CleanerControlApp.Hardwares
         {
             if (!_firstAlarm && HasSystemAlarm)
             {
+                _initializing = false;
                 _firstAlarm = true;
                 if (_shuttle != null) _shuttle.AlarmStop();
                 if (_sink != null) _sink.AlarmStop();
@@ -576,6 +600,8 @@ namespace CleanerControlApp.Hardwares
 
         public bool SystemAuto => ShuttleAuto && SinkAuto && SoakingTankAuto && DryingTank1Auto && DryingTank2Auto && HeatingTankAuto;
 
+        public bool HasAutoStatus => ShuttleAuto || SinkAuto || SoakingTankAuto || DryingTank1Auto || DryingTank2Auto || HeatingTankAuto;
+
         #endregion
 
         #region Initial
@@ -585,17 +611,74 @@ namespace CleanerControlApp.Hardwares
 
         private bool _initializingTimeout = false;
 
+        public void AllMotorStop()
+        {
+            if (_sink != null) _sink.MotorStop();
+            if(_soakingTank != null) _soakingTank.MotorStop();
+            if (_shuttle != null) _shuttle.AllMotorStop();
+        }
+
+        public int CheckCanInitialize(out string status)
+        {
+            int result = 0; // Can Initialize
+            status = "可以初始化";
+
+            if (HasAutoStatus)
+            {
+                status = "設備中還有模組正處理自動狀態，因此無法初始化";
+                result = 1; // one or more module has auto status
+                OperateLog.Log("自動狀態下無法初始化", status);
+            }
+            if (HasSystemAlarm)
+            {
+                status = "設備中還有錯誤狀態發生，因此無法初始化，請先將錯誤狀態解除";
+                result = 2; // there are alarms in the system
+                OperateLog.Log("錯誤狀態下無法初始化", status);
+            }
+            if (_initializing)
+            {
+                status = "設備正在初始化，請勿重複進行初始化";
+                result = 3; // the system is running initializing
+                OperateLog.Log("初始化狀態下無法初始化", status);
+            }
+
+           
+
+            return result;
+        }
         public bool Initialize(bool force = false)
         {
             bool result = false;
 
-            if (!HasSystemAlarm || force)
+            if ((!HasSystemAlarm && !HasAutoStatus && _initializing ) || force)
             {
-                if (_shuttle != null) _shuttle.ModuleReset();
+                if (force)
+                {
+                    AllMotorStop();
+                    OperateLog.Log("強制初始化", "按下 [強制初始化] 後會無視警報狀態對系統進行初始化，請確認狀態後再使用此功能。");
+                }
+                else
+                    OperateLog.Log("開始初始化", "開始進行初始化動作");
+
+                _initializing = true;
+
+                result = true;
             }
 
 
             return result;
+        }
+
+        private void InitializedProcedure()
+        {
+            if (_initializing)
+            {
+
+            }
+            else
+            { 
+            
+            }
         }
 
         #endregion
@@ -603,6 +686,8 @@ namespace CleanerControlApp.Hardwares
         #region Light Tower
 
         private bool _buzzer_stop = false;
+
+        public bool BuzzerStop => _buzzer_stop;
 
         public void CheckLightTower()
         {
@@ -613,7 +698,9 @@ namespace CleanerControlApp.Hardwares
         }
         public void Buzzer_Stop()
         {
+            if(!_buzzer_stop) OperateLog.Log("停止蜂鳴器", "按下 [停止蜂鳴器] 後停止蜂鳴等待，按下 [錯誤重置] 可以解除該狀態。");
             _buzzer_stop = true;
+            
         }
 
         #endregion

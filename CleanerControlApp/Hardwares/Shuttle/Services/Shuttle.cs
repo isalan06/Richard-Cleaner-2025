@@ -83,36 +83,45 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
             )
         {
             _logger = logger;
-            _unitSettings = unitSettings;
-            _moduleSettings = moduleSettings;
-            _plcService = plcService;
-            _motorXAxis = motorXAxis;
-            _motorZAxis = motorZAxis;
+            try
+            {
+                _unitSettings = unitSettings;
+                _moduleSettings = moduleSettings;
+                _plcService = plcService;
+                _motorXAxis = motorXAxis;
+                _motorZAxis = motorZAxis;
 
-            RefreshTimeoutValue();
+                RefreshTimeoutValue();
 
-            // Alarm
-            AlarmManager.AttachFlagGetter("ALM101", () => _ClamperF_Open_Timeout);
-            AlarmManager.AttachFlagGetter("ALM102", () => _ClamperF_Close_Timeout);
-            AlarmManager.AttachFlagGetter("ALM103", () => _ClamperB_Open_Timeout);
-            AlarmManager.AttachFlagGetter("ALM104", () => _ClamperB_Close_Timeout);
-            AlarmManager.AttachFlagGetter("ALM105", () => _motorXAlarm);
-            AlarmManager.AttachFlagGetter("ALM106", () => _motorXAlarmLimitN);
-            AlarmManager.AttachFlagGetter("ALM107", () => _motorXAlarmLimitP);
-            AlarmManager.AttachFlagGetter("ALM108", () => _motorXAlarmHomeTimeout);
-            AlarmManager.AttachFlagGetter("ALM109", () => _motorXAlarmMoveTimeout);
-            AlarmManager.AttachFlagGetter("ALM110", () => _motorXAlarm);
-            AlarmManager.AttachFlagGetter("ALM111", () => _motorXAlarmLimitN);
-            AlarmManager.AttachFlagGetter("ALM112", () => _motorXAlarmLimitP);
-            AlarmManager.AttachFlagGetter("ALM113", () => _motorXAlarmHomeTimeout);
-            AlarmManager.AttachFlagGetter("ALM114", () => _motorXAlarmMoveTimeout);
-            AlarmManager.AttachFlagGetter("ALM115", () => _pickProcedureError);
-            AlarmManager.AttachFlagGetter("ALM116", () => _placeProcedureError);
-            AlarmManager.AttachFlagGetter("ALM117", () => _checkCassetteProcedureError);
+                // Alarm
+                AlarmManager.AttachFlagGetter("ALM101", () => _ClamperF_Open_Timeout);
+                AlarmManager.AttachFlagGetter("ALM102", () => _ClamperF_Close_Timeout);
+                AlarmManager.AttachFlagGetter("ALM103", () => _ClamperB_Open_Timeout);
+                AlarmManager.AttachFlagGetter("ALM104", () => _ClamperB_Close_Timeout);
+                AlarmManager.AttachFlagGetter("ALM105", () => _motorXAlarm);
+                AlarmManager.AttachFlagGetter("ALM106", () => _motorXAlarmLimitN);
+                AlarmManager.AttachFlagGetter("ALM107", () => _motorXAlarmLimitP);
+                AlarmManager.AttachFlagGetter("ALM108", () => _motorXAlarmHomeTimeout);
+                AlarmManager.AttachFlagGetter("ALM109", () => _motorXAlarmMoveTimeout);
+                AlarmManager.AttachFlagGetter("ALM110", () => _motorXAlarm);
+                AlarmManager.AttachFlagGetter("ALM111", () => _motorXAlarmLimitN);
+                AlarmManager.AttachFlagGetter("ALM112", () => _motorXAlarmLimitP);
+                AlarmManager.AttachFlagGetter("ALM113", () => _motorXAlarmHomeTimeout);
+                AlarmManager.AttachFlagGetter("ALM114", () => _motorXAlarmMoveTimeout);
+                AlarmManager.AttachFlagGetter("ALM115", () => _pickProcedureError);
+                AlarmManager.AttachFlagGetter("ALM116", () => _placeProcedureError);
+                AlarmManager.AttachFlagGetter("ALM117", () => _checkCassetteProcedureError);
 
-            StartLoop();
+                StartLoop();
 
-            Start();
+                Start();
+            }
+            catch (Exception ex)
+            {
+                try { _logger?.LogError(ex, "Shuttle constructor failed"); } catch { }
+                try { System.Windows.MessageBox.Show($"Shuttle ctor exception: {ex}", "Startup Error", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error); } catch { }
+                throw;
+            }
         }
 
         #endregion
@@ -310,6 +319,11 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
         public void SimMotorPass()
         {
             _sim_pass_motor = !_sim_pass_motor;
+        }
+
+        public void AllMotorStop()
+        {
+            MotorStop();
         }
 
 
