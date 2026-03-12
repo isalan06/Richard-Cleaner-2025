@@ -183,8 +183,11 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
         public bool Sensor_ClamperFrontClose => _plcService != null && _plcService.ShuttleZFClamperClose;
         public bool Sensor_ClamperBackOpen => _plcService != null && _plcService.ShuttleZBClamperOpen;
         public bool Sensor_ClamperBackClose => _plcService != null && _plcService.ShuttleZBClamperClose;
-        public bool Check_ClamperOpen => Sensor_ClamperFrontOpen && Sensor_ClamperBackOpen;
-        public bool Check_ClamperClose => Sensor_ClamperFrontClose && Sensor_ClamperBackClose;
+        public bool Sensor_ClamperOpen => _plcService != null && _plcService.ShuttleZClampOpen;
+        public bool Sensor_ClamperClose => _plcService != null && _plcService.ShuttleZClampClose;
+
+        public bool Check_ClamperOpen => Sensor_ClamperFrontOpen && Sensor_ClamperBackOpen && Sensor_ClamperOpen;
+        public bool Check_ClamperClose => Sensor_ClamperFrontClose && Sensor_ClamperBackClose && Sensor_ClamperClose;
 
         public bool Sensor_CassetteExist1 => _plcService != null && _plcService.ShuttleZClamperExist1;
         public bool Sensor_CassetteExist2 => _plcService != null && _plcService.ShuttleZClamperExist2;

@@ -71,10 +71,31 @@ namespace CleanerControlApp.Vision.Developer
                         }
                     }
                 }
+
+                // Populate right-side DataGrid with all alarms
+                try
+                {
+                    var list = AlarmList.Alarms.Values.OrderBy(a => a.Code).ToList();
+                    dgAlarmList.ItemsSource = list;
+                    dgAlarmList.SelectionChanged += DgAlarmList_SelectionChanged;
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine("Error populating alarm DataGrid: " + ex.Message);
+                }
             }
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine("Error loading alarm CSV: " + ex.Message);
+            }
+        }
+
+        private void DgAlarmList_SelectionChanged(object? sender, SelectionChangedEventArgs e)
+        {
+            if (dgAlarmList.SelectedItem is AlarmInfo info)
+            {
+                txtAlarmSearch.Text = info.Code;
+                UpdateSelectedAlarmInfo(info.Code);
             }
         }
 
@@ -178,6 +199,14 @@ namespace CleanerControlApp.Vision.Developer
                     var para = new Paragraph(new Run(info.Solution));
                     rtbSolution.Document.Blocks.Add(para);
                 }
+
+                // update selection in DataGrid to match
+                try
+                {
+                    dgAlarmList.SelectedItem = AlarmList.Alarms.Values.FirstOrDefault(a => string.Equals(a.Code, code, StringComparison.OrdinalIgnoreCase));
+                    dgAlarmList.ScrollIntoView(dgAlarmList.SelectedItem);
+                }
+                catch { }
             }
             else
             {
@@ -238,6 +267,14 @@ namespace CleanerControlApp.Vision.Developer
                 if (ok)
                 {
                     MessageBox.Show("說明已儲存", "完成", MessageBoxButton.OK, MessageBoxImage.Information);
+
+                    // refresh DataGrid to reflect updated solution
+                    try
+                    {
+                        var list = AlarmList.Alarms.Values.OrderBy(a => a.Code).ToList();
+                        dgAlarmList.ItemsSource = list;
+                    }
+                    catch { }
                 }
                 else
                 {

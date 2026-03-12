@@ -20,6 +20,8 @@ namespace CleanerControlApp.Hardwares.Shuttle.Interfaces
         bool Sensor_ClamperFrontClose { get; }
         bool Sensor_ClamperBackOpen { get; }
         bool Sensor_ClamperBackClose { get; }
+        bool Sensor_ClamperOpen { get; }
+        bool Sensor_ClamperClose { get; }
         bool Check_ClamperOpen { get; }
         bool Check_ClamperClose { get; }
         

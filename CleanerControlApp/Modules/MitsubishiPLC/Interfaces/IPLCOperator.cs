@@ -78,7 +78,7 @@ namespace CleanerControlApp.Modules.MitsubishiPLC.Interfaces
         public bool MaintainSign { get; }
         public bool ShuttleZClamperOpenSign { get; }
         public bool ShuttleZClamperCloseSign { get; }
-        public bool MainPowerSign { get; }
+        public bool MainAirSign { get; }
         public bool FrontDoor1 { get; }
         public bool FrontDoor2 { get; }
         public bool FrontDoor3 { get; }

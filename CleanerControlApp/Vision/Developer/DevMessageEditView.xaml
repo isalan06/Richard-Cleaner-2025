@@ -59,5 +59,27 @@
 
  </StackPanel>
  </Border>
+
+ <!-- Right side: Alarm list table -->
+ <Border Grid.Column="1" Margin="5,44,10,10" BorderBrush="Gray" BorderThickness="1" CornerRadius="4" Background="#FFFFFFFF">
+ <Grid Margin="8">
+ <Grid.RowDefinitions>
+ <RowDefinition Height="Auto" />
+ <RowDefinition Height="*" />
+ </Grid.RowDefinitions>
+
+ <TextBlock Text="Alarm List" FontWeight="Bold" Margin="0,0,0,8" />
+
+ <DataGrid x:Name="dgAlarmList" Grid.Row="1" AutoGenerateColumns="False" IsReadOnly="True" CanUserAddRows="False" HeadersVisibility="Column" 
+ AlternatingRowBackground="#FFF0F0F0" RowHeaderWidth="0" SelectionMode="Single">
+ <DataGrid.Columns>
+ <DataGridTextColumn Header="Code" Binding="{Binding Code}" Width="90" />
+ <DataGridTextColumn Header="Type" Binding="{Binding Type}" Width="100" />
+ <DataGridTextColumn Header="Module" Binding="{Binding Module}" Width="120" />
+ <DataGridTextColumn Header="Description" Binding="{Binding Description}" Width="*" />
+ </DataGrid.Columns>
+ </DataGrid>
+ </Grid>
+ </Border>
  </Grid>
 </UserControl>

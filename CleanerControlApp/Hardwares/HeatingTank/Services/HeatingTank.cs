@@ -571,7 +571,7 @@ namespace CleanerControlApp.Hardwares.HeatingTank.Services
                 }
             }
 
-            if (!_private_waste_HAlarm && !_tankHHAlarm && _auto)
+            if (!_private_waste_HAlarm && !_tankHHAlarm && _initialized)
             {
                 if (!Sensor_Liquid_L && !Command_WaterIn) WaterInOP(true);
 

@@ -558,7 +558,7 @@ namespace CleanerControlApp.Modules.MitsubishiPLC.Services
         public bool MaintainSign => _dioX[3].Bit9 || _dioX_Sim[3].Bit9;
         public bool ShuttleZClamperOpenSign => _dioX[3].Bit10 || _dioX_Sim[3].Bit10;
         public bool ShuttleZClamperCloseSign => _dioX[3].Bit11 || _dioX_Sim[3].Bit11;
-        public bool MainPowerSign => _dioX[3].Bit12 || _dioX_Sim[3].Bit12;
+        public bool MainAirSign => _dioX[3].Bit12 || _dioX_Sim[3].Bit12;
         public bool FrontDoor1 => _dioX[3].Bit13 || _dioX_Sim[3].Bit13;
         public bool FrontDoor2 => _dioX[3].Bit14 || _dioX_Sim[3].Bit14;
         public bool FrontDoor3 => _dioX[3].Bit15 || _dioX_Sim[3].Bit15;

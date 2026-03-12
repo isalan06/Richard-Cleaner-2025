@@ -150,6 +150,25 @@ namespace CleanerControlApp.Vision.Template
             private set => SetValue(ClamperCloseProperty, value);
         }
 
+        // NEW: DependencyProperties for Sensor_ClamperOpen and Sensor_ClamperClose
+        public static readonly DependencyProperty Sensor_ClamperOpenProperty = DependencyProperty.Register(
+            "Sensor_ClamperOpen", typeof(bool), typeof(Template_Clamper), new PropertyMetadata(false));
+
+        public bool Sensor_ClamperOpen
+        {
+            get => (bool)GetValue(Sensor_ClamperOpenProperty);
+            private set => SetValue(Sensor_ClamperOpenProperty, value);
+        }
+
+        public static readonly DependencyProperty Sensor_ClamperCloseProperty = DependencyProperty.Register(
+            "Sensor_ClamperClose", typeof(bool), typeof(Template_Clamper), new PropertyMetadata(false));
+
+        public bool Sensor_ClamperClose
+        {
+            get => (bool)GetValue(Sensor_ClamperCloseProperty);
+            private set => SetValue(Sensor_ClamperCloseProperty, value);
+        }
+
         private void Timer_Tick(object? sender, EventArgs e)
         {
             UpdateFromShuttle();
@@ -166,6 +185,10 @@ namespace CleanerControlApp.Vision.Template
                     Sensor_ClamperBOpen = _shuttle.Sensor_ClamperBackOpen;
                     Sensor_ClamperBClose = _shuttle.Sensor_ClamperBackClose;
 
+                    // Populate combined sensor properties used by XAML
+                    Sensor_ClamperOpen = _shuttle.Sensor_ClamperOpen;
+                    Sensor_ClamperClose = _shuttle.Sensor_ClamperClose;
+
                     Sensor_Exist1 = _shuttle.Sensor_CassetteExist1;
                     Sensor_Exist2 = _shuttle.Sensor_CassetteExist2;
 
@@ -178,6 +201,9 @@ namespace CleanerControlApp.Vision.Template
                     Sensor_ClamperFClose = false;
                     Sensor_ClamperBOpen = false;
                     Sensor_ClamperBClose = false;
+
+                    Sensor_ClamperOpen = false;
+                    Sensor_ClamperClose = false;
 
                     Sensor_Exist1 = false;
                     Sensor_Exist2 = false;

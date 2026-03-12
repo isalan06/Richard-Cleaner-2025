@@ -1,5 +1,10 @@
 ﻿Code,Type,Module,Description,Solution
 ALM001,Alarm,系統,系統與PLC或Gateway通訊異常,請確認PLC及Gateway的電源是否開啟，並檢查PLC及Gateway與電腦之間的連線及通訊協定。
+ALM002,Alarm,系統,緊急停止,EMO按鈕被按下，請確認整台設備是否有異常，並在處理完成後解除EMO按鈕，並重新初始化。
+ALM003,Warning,系統,主氣源系統異常,請確認主氣源系統。
+ALM004,Warning,系統,門被開啟,請關好門。
+ALM005,Alarm,系統,系統發現漏液,請確認所有液體管路。
+ALM006,Alarm,系統,廢水槽水位已溢出,請手動排水。
 ALM101,Warning,移載組,前夾爪打開逾時,當Y40 - 開啟夾爪 為 ON，X32 - 前夾爪開Sensor沒有反應。
 ALM102,Warning,移載組,前夾爪關閉逾時,當Y41 - 關閉夾爪 為 ON，X33 - 前夾爪關Sensor沒有反應。
 ALM103,Warning,移載組,後夾爪打開逾時,當Y40 - 開啟夾爪 為 ON，X34 - 後夾爪開Sensor沒有反應。
@@ -50,6 +55,6 @@ ALM604,Warning,加熱槽,MS300-2 變頻器設定低頻無法到達,請檢查MS30
 ALM605,Warning,加熱槽,MS300-2 變頻器設定停止(0)無法到達,請檢查MS300-2 變頻器。
 ALM606,Alarm,加熱槽,MS300-2 變頻器出現 Error, 請查看。
 ALM607,Warning,加熱槽,MS300-2 變頻器出現 Warning, 請查看。
-ALM608,Warning,加熱槽,加熱槽中水已見底,當X62 - 加熱槽LL沒有偵測到水，表示水已經見底，請檢查入水的管線是否有水進入。
+ALM608,Alarm,加熱槽,加熱槽中水已見底,當X62 - 加熱槽LL沒有偵測到水，表示水已經見底，請檢查入水的管線是否有水進入。
 ALM609,Alarm,加熱槽,加熱槽中水已溢出,加熱槽HH偵測到水，表示水已經過高，請手動排水以降低水位。
 

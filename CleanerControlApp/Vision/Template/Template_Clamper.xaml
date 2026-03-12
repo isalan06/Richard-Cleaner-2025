@@ -171,6 +171,48 @@
                 <TextBlock Text="Y41 - 夾爪關" FontSize="12" Foreground="Black" />
 
             </Border>
+            <Border Canvas.Left="282" Canvas.Top="265" BorderBrush="#2E993E" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding Sensor_ClamperOpen, ElementName=RootControl}" Width="82" RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Left" VerticalAlignment="Center">
+                <Border.RenderTransform>
+                    <TransformGroup>
+                        <ScaleTransform/>
+                        <SkewTransform/>
+                        <RotateTransform Angle="0"/>
+                        <TranslateTransform/>
+                    </TransformGroup>
+                </Border.RenderTransform>
+                <Border.Style>
+                    <Style TargetType="{x:Type Border}">
+                        <Setter Property="Background" Value="#FFFFFF"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Sensor_ClamperOpen, ElementName=RootControl}" Value="True">
+                                <Setter Property="Background" Value="Lime"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Border.Style>
+                <TextBlock Text="X72 - 夾爪開" FontSize="12" Foreground="Black"/>
+            </Border>
+            <Border Canvas.Left="189" Canvas.Top="307" BorderBrush="#2E993E" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding Sensor_ClamperClose, ElementName=RootControl}" Width="82" RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Left" VerticalAlignment="Top">
+                <Border.RenderTransform>
+                    <TransformGroup>
+                        <ScaleTransform/>
+                        <SkewTransform/>
+                        <RotateTransform Angle="0"/>
+                        <TranslateTransform/>
+                    </TransformGroup>
+                </Border.RenderTransform>
+                <Border.Style>
+                    <Style TargetType="{x:Type Border}">
+                        <Setter Property="Background" Value="#FFFFFF"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Sensor_ClamperClose, ElementName=RootControl}" Value="True">
+                                <Setter Property="Background" Value="Lime"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Border.Style>
+                <TextBlock Text="X73 - 夾爪關" FontSize="12" Foreground="Black"/>
+            </Border>
         </Canvas>
     </Grid>
 </UserControl>

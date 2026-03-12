@@ -1,4 +1,5 @@
 using CleanerControlApp.Hardwares;
+using CleanerControlApp.Modules.UserManagement.Services;
 using CleanerControlApp.Utilities.Alarm;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Hosting;
@@ -141,6 +142,8 @@ namespace CleanerControlApp.Services
             // Ensure AlarmManager polls registered flag getters so changes 
             // are detected and logged.
             AlarmManager.CheckFlagGetters();
+
+            if (!UserManager.CanPassCheck) _hardwareManager.CheckLightTower();
 
             return Task.CompletedTask;
         }

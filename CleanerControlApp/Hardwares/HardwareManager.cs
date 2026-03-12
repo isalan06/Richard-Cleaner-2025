@@ -18,6 +18,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using CleanerControlApp.Utilities.Alarm;
+using System.Security.Policy;
+using CleanerControlApp.Hardwares.HeatingTank.Interfaces;
+using System.Windows.Media.Animation;
+using System.Numerics;
 
 namespace CleanerControlApp.Hardwares
 {
@@ -35,19 +39,21 @@ namespace CleanerControlApp.Hardwares
         private readonly ISoakingTank? _soakingTank;
         private readonly IDryingTank[]? _dryingTanks;
         private readonly IShuttle? _shuttle;
+        private readonly IHeatingTank? _heatingTank;
 
         private readonly IModbusTCPService? _modbusTCPService;
         private readonly IModbusRTUPollService? _modbusRTUPollService;
 
         private readonly IDeltaMS300[]? _deltaMS300s;
         private readonly IPLCService? _plcService;
+        private readonly IPLCOperator? _plcOperator;
         private readonly ITemperatureControllers? _temperatureControllers;
         private readonly IUltrasonicDevice? _ultrasonicDevice;
 
         // background loop
         private CancellationTokenSource? _cts;
         private Task? _loopTask;
-        private readonly TimeSpan _loopInterval = TimeSpan.FromMilliseconds(10);
+        private readonly TimeSpan _loopInterval = TimeSpan.FromSeconds(1);
 
         private bool _running;
 
@@ -56,9 +62,9 @@ namespace CleanerControlApp.Hardwares
         #region constructor
 
         public HardwareManager(ILogger<HardwareManager> logger, UnitSettings unitSettings, ModuleSettings modbusSettings,
-            ISink? sink, ISoakingTank? soakingTank, IDryingTank[]? dryingTanks, IShuttle? shuttle,
+            ISink? sink, ISoakingTank? soakingTank, IDryingTank[]? dryingTanks, IShuttle? shuttle, IHeatingTank? heatingTank,
             IModbusTCPService? modbusTCPService, IModbusRTUPollService? modbusRTUPollService,
-            IDeltaMS300[]? deltaMS300s, IPLCService? plcService, ITemperatureControllers temperatureControllers, IUltrasonicDevice ultrasonicDevice)
+            IDeltaMS300[]? deltaMS300s, IPLCService? plcService, IPLCOperator? plcOperator, ITemperatureControllers? temperatureControllers, IUltrasonicDevice? ultrasonicDevice)
         { 
             _logger = logger;
 
@@ -69,18 +75,25 @@ namespace CleanerControlApp.Hardwares
             _soakingTank = soakingTank;
             _dryingTanks = dryingTanks;
             _shuttle = shuttle;
+            _heatingTank = heatingTank;
 
             _modbusTCPService = modbusTCPService;
             _modbusRTUPollService = modbusRTUPollService;
 
             _deltaMS300s = deltaMS300s;
             _plcService = plcService;
+            _plcOperator = plcOperator;
             _temperatureControllers = temperatureControllers;
             _ultrasonicDevice = ultrasonicDevice;
 
 
             // Alarm
             AlarmManager.AttachFlagGetter("ALM001", () => _communication_alarm);
+            AlarmManager.AttachFlagGetter("ALM002", () => _emo_alarm);
+            AlarmManager.AttachFlagGetter("ALM003", () => _main_air_alarm);
+            AlarmManager.AttachFlagGetter("ALM004", () => _door_alarm);
+            AlarmManager.AttachFlagGetter("ALM005", () => _leakage_alarm);
+            AlarmManager.AttachFlagGetter("ALM006", () => _wasteTankH_alarm);
 
             StartLoop();
 
@@ -297,6 +310,55 @@ namespace CleanerControlApp.Hardwares
 
         #endregion
 
+        #region IO
+
+        public bool LoaderCassetteInPosition1 => _plcOperator != null && _plcOperator.InSlotExist1;
+        public bool LoaderCassetteInPosition2 => _plcOperator != null && _plcOperator.InSlotExist2;
+        public bool LoaderCassetteInPosition3 => _plcOperator != null && _plcOperator.InSlotExist3;
+        public bool LoaderCassetteInPosition4 => _plcOperator != null && _plcOperator.InSlotExist4;
+        public bool LoaderCassetteInPosition5 => _plcOperator != null && _plcOperator.InSlotExist5;
+        public bool UnloadCassetteInPosition1 => _plcOperator != null && _plcOperator.OutSlotExist1;
+        public bool UnloadCassetteInPosition2 => _plcOperator != null && _plcOperator.OutSlotExist2;
+        public bool UnloadCassetteInPosition3 => _plcOperator != null && _plcOperator.OutSlotExist3;
+        public bool UnloadCassetteInPosition4 => _plcOperator != null && _plcOperator.OutSlotExist4;
+        public bool UnloadCassetteInPosition5 => _plcOperator != null && _plcOperator.OutSlotExist5;
+
+        public bool EMOSign => _plcOperator != null && _plcOperator.EMOSign;
+        public bool MainAirSign => _plcOperator != null && _plcOperator.MainAirSign;
+        public bool FrontDoor1Sign => _plcOperator != null && _plcOperator.FrontDoor1;
+        public bool FrontDoor2Sign => _plcOperator != null && _plcOperator.FrontDoor2;
+        public bool FrontDoor3Sign => _plcOperator != null && _plcOperator.FrontDoor3;
+        public bool FrontDoor4Sign => _plcOperator != null && _plcOperator.FrontDoor4;
+        public bool SideDoor1Sign => _plcOperator != null && _plcOperator.SideDoor1;
+        public bool SideDoor2Sign => _plcOperator != null && _plcOperator.SideDoor2;
+        public bool Leakage1Sign => _plcOperator != null && _plcOperator.Leakage1;
+        public bool Leakage2Sign => _plcOperator != null && _plcOperator.Leakage2;
+
+        public bool WasteTankH => _plcOperator != null && _plcOperator.WasteWaterPosH;
+
+        public bool Tower_Red
+        {
+            get => _plcOperator != null && _plcOperator.Command_LighterRed;
+            set { if (_plcOperator != null) _plcOperator.Command_LighterRed = value; }
+        }
+        public bool Tower_Yellow
+        {
+            get => _plcOperator != null && _plcOperator.Command_LighterYellow;
+            set { if (_plcOperator != null) _plcOperator.Command_LighterYellow = value; }
+        }
+        public bool Tower_Green
+        {
+            get => _plcOperator != null && _plcOperator.Command_LighterGreen;
+            set { if (_plcOperator != null) _plcOperator.Command_LighterGreen = value; }
+        }
+        public bool Tower_Buzzer
+        {
+            get => _plcOperator != null && _plcOperator.Command_LighterBuzzer;
+            set { if (_plcOperator != null) _plcOperator.Command_LighterBuzzer = value; }
+        }
+
+        #endregion
+
         #region Task
 
         public bool IsRunning => _running;
@@ -346,6 +408,8 @@ namespace CleanerControlApp.Hardwares
 
         private async Task PollFunctionAsync(CancellationToken token)
         {
+            AlarmTriggerToModule();
+            WanringTriggerToModule();
 
             await Task.Yield();
         }
@@ -354,7 +418,203 @@ namespace CleanerControlApp.Hardwares
 
         #region Alarm
 
-        private bool _communication_alarm => !Check_All_Modbus_Connected; 
+        private bool _communication_alarm => !Check_All_Modbus_Connected;
+        private bool _emo_alarm => !EMOSign;
+        private bool _main_air_alarm => !MainAirSign;
+        private bool _door_alarm => FrontDoor1Sign || FrontDoor2Sign || FrontDoor3Sign || FrontDoor4Sign || SideDoor1Sign || SideDoor2Sign;
+        private bool _leakage_alarm => Leakage1Sign || Leakage2Sign;
+        private bool _wasteTankH_alarm => WasteTankH;
+
+        public bool HasAlarm => _communication_alarm || _emo_alarm || _leakage_alarm || _wasteTankH_alarm;
+        public bool HasWarning => _main_air_alarm || _door_alarm;
+
+        public bool HasShuttleAlarm => _shuttle != null && _shuttle.HasAlarm;
+        public bool HasSinkAlarm => _sink != null && _sink.HasAlarm;
+        public bool HasSoakingTankAlarm => _soakingTank != null && _soakingTank.HasAlarm;
+        public bool HasDryingTank1Alarm => _dryingTanks != null && _dryingTanks.Length > 0 && _dryingTanks[0].HasAlarm;
+        public bool HasDryingTank2Alarm => _dryingTanks != null && _dryingTanks.Length > 1 && _dryingTanks[1].HasAlarm;
+        public bool HasHeatingTankAlarm => _heatingTank != null && _heatingTank.HasAlarm;
+
+        public bool HasShuttleWarning => _shuttle != null && _shuttle.HasWarning;
+        public bool HasSinkWarning => _sink != null && _sink.HasWarning;
+        public bool HasSoakingTankWarning => _soakingTank != null && _soakingTank.HasWarning;
+        public bool HasDryingTank1Warning => _dryingTanks != null && _dryingTanks.Length > 0 && _dryingTanks[0].HasWarning;
+        public bool HasDryingTank2Warning => _dryingTanks != null && _dryingTanks.Length > 1 && _dryingTanks[1].HasWarning;
+        public bool HasHeatingTankWarning => _heatingTank != null && _heatingTank.HasWarning;
+
+        public bool HasSystemAlarm => HasAlarm || HasShuttleAlarm || HasSinkAlarm || HasSoakingTankAlarm || HasDryingTank1Alarm || HasDryingTank2Alarm || HasHeatingTankAlarm || IsAlarm;
+        public bool HasSystemWarning => HasWarning || HasShuttleWarning || HasSinkWarning || HasSoakingTankWarning || HasDryingTank1Warning || HasDryingTank2Warning || HasHeatingTankWarning || IsWarning;
+        
+        
+
+        private async Task AlarmReset()
+        {
+            if (_shuttle != null) _shuttle.AlarmReset();
+            if (_sink != null) _sink.AlarmReset();
+            if (_soakingTank != null) _soakingTank.AlarmReset();
+            if (_dryingTanks != null)
+            {
+                foreach (var tank in _dryingTanks)
+                {
+                    tank.AlarmReset();
+                }
+            }
+            if (_heatingTank != null) _heatingTank.AlarmReset();
+
+            await Task.Delay(_loopInterval);
+
+            _firstAlarm = false;
+            _firstWarning = false;
+            _buzzer_stop = false;
+        }
+
+        private bool _firstAlarm = false;
+        private bool _firstWarning = false;
+
+
+        public bool IsAlarm => _firstAlarm;
+        public bool IsWarning => _firstWarning;
+
+        private void AlarmTriggerToModule()
+        {
+            if (!_firstAlarm && HasSystemAlarm)
+            {
+                _firstAlarm = true;
+                if (_shuttle != null) _shuttle.AlarmStop();
+                if (_sink != null) _sink.AlarmStop();
+                if (_soakingTank != null) _soakingTank.AlarmStop();
+                if (_dryingTanks != null)
+                {
+                    foreach (var tank in _dryingTanks)
+                    {
+                        tank.AlarmStop();
+                    }
+                }
+                if (_heatingTank != null) _heatingTank.AlarmStop();
+            }
+        }
+
+        private void WanringTriggerToModule()
+        {
+            if (!_firstWarning && HasWarning)
+            {
+                _firstWarning = true;
+            }
+
+            if (_shuttle != null && !_shuttle.Pausing && _shuttle.HasWarning) _shuttle.WarningStop();
+            if (_sink != null && !_sink.Pausing && _sink.HasWarning) _sink.WarningStop();
+            if (_soakingTank != null && !_soakingTank.Pausing && _soakingTank.HasWarning) _soakingTank.WarningStop();
+            if (_dryingTanks != null && _dryingTanks.Length > 1)
+            {
+                foreach (var tank in _dryingTanks)
+                {
+                    if (!tank.Pausing && tank.HasWarning)
+                        tank.WarningStop();
+                }
+            }
+            if (_heatingTank != null && !_heatingTank.Pausing && _heatingTank.HasWarning) _heatingTank.WarningStop();
+        }
+
+        #endregion
+
+        #region Loader & Unloader & Module Status
+
+        public int LoaderCassetteCount
+        {
+            get
+            {
+                int result = 0;
+
+                if (LoaderCassetteInPosition1) result++;
+                if (LoaderCassetteInPosition2) result++;
+                if (LoaderCassetteInPosition3) result++;
+                if (LoaderCassetteInPosition4) result++;
+                if (LoaderCassetteInPosition5) result++;
+
+                return result;
+            }
+        }
+
+        public int UnloaderCassetteCount
+        {
+            get
+            {
+                int result = 0;
+
+                if (UnloadCassetteInPosition1) result++;
+                if (UnloadCassetteInPosition2) result++;
+                if (UnloadCassetteInPosition3) result++;
+                if (UnloadCassetteInPosition4) result++;
+                if (UnloadCassetteInPosition5) result++;
+
+                return result;
+            }
+        }
+
+        public bool ShuttleIdle => _shuttle != null && _shuttle.Idle;
+        public bool SinkIdle => _sink != null && _sink.Idle;
+        public bool SoakingTankIdle => _soakingTank != null && _soakingTank.Idle;
+        public bool DryingTank1Idle => _dryingTanks != null && _dryingTanks.Length > 0 && _dryingTanks[0].Idle;
+        public bool DryingTank2Idle => _dryingTanks != null && _dryingTanks.Length > 1 && _dryingTanks[1].Idle;
+        public bool HeatingTankIdle => _heatingTank != null && _heatingTank.Idle;
+
+        public bool ShuttleInitialized => _shuttle != null && _shuttle.Initialized;
+        public bool SinkInitialized => _sink != null && _sink.Initialized;
+        public bool SoakingTankInitialized => _soakingTank != null && _soakingTank.Initialized;
+        public bool DryingTank1Initialized => _dryingTanks != null && _dryingTanks.Length > 0 && _dryingTanks[0].Initialized;
+        public bool DryingTank2Initialized => _dryingTanks != null && _dryingTanks.Length > 1 && _dryingTanks[1].Initialized;
+        public bool HeatingTankInitialized => _heatingTank != null && _heatingTank.Initialized;
+
+        public bool SystemInitialized => ShuttleInitialized && SinkInitialized && SoakingTankInitialized && DryingTank1Initialized && DryingTank2Initialized && HeatingTankInitialized;
+
+        public bool ShuttleAuto => _shuttle != null && _shuttle.Auto;
+        public bool SinkAuto => _sink != null && _sink.Auto;
+        public bool SoakingTankAuto => _soakingTank != null && _soakingTank.Auto;
+        public bool DryingTank1Auto => _dryingTanks != null && _dryingTanks.Length > 0 && _dryingTanks[0].Auto;
+        public bool DryingTank2Auto => _dryingTanks != null && _dryingTanks.Length > 1 && _dryingTanks[1].Auto;
+        public bool HeatingTankAuto => _heatingTank != null && _heatingTank.Auto;
+
+        public bool SystemAuto => ShuttleAuto && SinkAuto && SoakingTankAuto && DryingTank1Auto && DryingTank2Auto && HeatingTankAuto;
+
+        #endregion
+
+        #region Initial
+
+        private bool _initializing = false;
+        public bool Initializing => _initializing;
+
+        private bool _initializingTimeout = false;
+
+        public bool Initialize(bool force = false)
+        {
+            bool result = false;
+
+            if (!HasSystemAlarm || force)
+            {
+                if (_shuttle != null) _shuttle.ModuleReset();
+            }
+
+
+            return result;
+        }
+
+        #endregion
+
+        #region Light Tower
+
+        private bool _buzzer_stop = false;
+
+        public void CheckLightTower()
+        {
+            Tower_Red = HasSystemAlarm;
+            Tower_Yellow = HasSystemWarning;
+            Tower_Green = SystemAuto;
+            Tower_Buzzer = !_buzzer_stop && HasSystemAlarm;
+        }
+        public void Buzzer_Stop()
+        {
+            _buzzer_stop = true;
+        }
 
         #endregion
     }

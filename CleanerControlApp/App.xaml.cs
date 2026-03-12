@@ -397,6 +397,7 @@ namespace CleanerControlApp
                             var soaking = sp.GetService<ISoakingTank>();
                             var drying = sp.GetService<IDryingTank[]>();
                             var shuttle = sp.GetService<IShuttle>();
+                            var heating = sp.GetService<IHeatingTank>();
 
                             // communication services (some may be optional)
                             var modbusTcp = sp.GetService<IModbusTCPService>();
@@ -405,13 +406,14 @@ namespace CleanerControlApp
                             // required components
                             var delta = sp.GetRequiredService<IDeltaMS300[]>();
                             var plcService = sp.GetRequiredService<IPLCService>();
+                            var plcOperator = sp.GetRequiredService<IPLCOperator>(); 
                             var tempControllers = sp.GetRequiredService<ITemperatureControllers>();
                             var ultrasonic = sp.GetRequiredService<IUltrasonicDevice>();
 
                             return new HardwareManager(logger, unitSettingsLocal, moduleSettingsLocal,
-                            sink, soaking, drying, shuttle,
+                            sink, soaking, drying, shuttle, heating,
                             modbusTcp, modbusRtuPoll,
-                            delta, plcService, tempControllers, ultrasonic);
+                            delta, plcService, plcOperator, tempControllers, ultrasonic);
                         });
                         
                         // Register System background service to run with the host

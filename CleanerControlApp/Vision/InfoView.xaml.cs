@@ -11,23 +11,106 @@ using System.Windows.Controls.Primitives;
 using System.Windows.Media;
 using System.Diagnostics;
 using Microsoft.Win32;
+using System.ComponentModel;
+using System.Windows.Threading;
+using CleanerControlApp.Hardwares;
 
 namespace CleanerControlApp.Vision
 {
     /// <summary>
     /// InfoView.xaml 的互動邏輯
     /// </summary>
-    public partial class InfoView : UserControl
+    public partial class InfoView : UserControl, INotifyPropertyChanged
     {
         private string? _lastLoadedLogFile;
+
+        // Communication status brushes (bound in XAML)
+        private Brush _modbusTcpBrush = Brushes.Red;
+        private Brush _modbusRtu1Brush = Brushes.Red;
+        private Brush _modbusRtu2Brush = Brushes.Red;
+        private Brush _modbusRtu3Brush = Brushes.Red;
+        private Brush _modbusRtu4Brush = Brushes.Red;
+
+        public Brush ModbusTcpBrush { get => _modbusTcpBrush; set { _modbusTcpBrush = value; RaisePropertyChanged(nameof(ModbusTcpBrush)); } }
+        public Brush ModbusRtu1Brush { get => _modbusRtu1Brush; set { _modbusRtu1Brush = value; RaisePropertyChanged(nameof(ModbusRtu1Brush)); } }
+        public Brush ModbusRtu2Brush { get => _modbusRtu2Brush; set { _modbusRtu2Brush = value; RaisePropertyChanged(nameof(ModbusRtu2Brush)); } }
+        public Brush ModbusRtu3Brush { get => _modbusRtu3Brush; set { _modbusRtu3Brush = value; RaisePropertyChanged(nameof(ModbusRtu3Brush)); } }
+        public Brush ModbusRtu4Brush { get => _modbusRtu4Brush; set { _modbusRtu4Brush = value; RaisePropertyChanged(nameof(ModbusRtu4Brush)); } }
+
+        private readonly DispatcherTimer _statusTimer;
+        private readonly HardwareManager? _hardwareManager;
 
         public InfoView()
         {
             InitializeComponent();
+
+            // set DataContext for bindings in XAML
+            DataContext = this;
+
             LoadSystemInfo();
             dpLogDate.SelectedDate = DateTime.Today;
             LoadLogForDate(DateTime.Today);
+
+            // resolve HardwareManager from DI host if available
+            _hardwareManager = App.AppHost?.Services.GetService(typeof(HardwareManager)) as HardwareManager;
+
+            // timer to update comm status
+            _statusTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
+            _statusTimer.Tick += (s, e) => UpdateCommStatus();
+            _statusTimer.Start();
+
+            this.Unloaded += InfoView_Unloaded;
         }
+
+        private void InfoView_Unloaded(object? sender, RoutedEventArgs e)
+        {
+            try
+            {
+                _statusTimer.Stop();
+                this.Unloaded -= InfoView_Unloaded;
+            }
+            catch { }
+        }
+
+        private void UpdateCommStatus()
+        {
+            try
+            {
+                // try to obtain manager if it wasn't available at construction
+                if (_hardwareManager == null && App.AppHost != null)
+                {
+                    var hm = App.AppHost.Services.GetService(typeof(HardwareManager)) as HardwareManager;
+                    if (hm != null)
+                    {
+                        // assign via reflection to private readonly field isn't possible here; so just use local variable path
+                    }
+                }
+
+                var hmLocal = App.AppHost?.Services.GetService(typeof(HardwareManager)) as HardwareManager ?? _hardwareManager;
+                if (hmLocal != null)
+                {
+                    ModbusTcpBrush = hmLocal.ModbusTCPConnected ? Brushes.Lime : Brushes.Red;
+                    ModbusRtu1Brush = hmLocal.ModbusRTU1Connected ? Brushes.Lime : Brushes.Red;
+                    ModbusRtu2Brush = hmLocal.ModbusRTU2Connected ? Brushes.Lime : Brushes.Red;
+                    ModbusRtu3Brush = hmLocal.ModbusRTU3Connected ? Brushes.Lime : Brushes.Red;
+                    ModbusRtu4Brush = hmLocal.ModbusRTU4Connected ? Brushes.Lime : Brushes.Red;
+                }
+                else
+                {
+                    ModbusTcpBrush = Brushes.Red;
+                    ModbusRtu1Brush = Brushes.Red;
+                    ModbusRtu2Brush = Brushes.Red;
+                    ModbusRtu3Brush = Brushes.Red;
+                    ModbusRtu4Brush = Brushes.Red;
+                }
+            }
+            catch { }
+        }
+
+        #region INotifyPropertyChanged
+        public event PropertyChangedEventHandler? PropertyChanged;
+        private void RaisePropertyChanged(string name) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+        #endregion
 
         private void LoadSystemInfo()
         {

@@ -10,6 +10,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Collections.Generic;
+using System.Windows.Threading;
 
 using Microsoft.Extensions.Logging;
 using CleanerControlApp.Vision;
@@ -18,6 +19,7 @@ using System.Reflection;
 using CleanerControlApp.Modules.UserManagement.Services;
 using Microsoft.Extensions.DependencyInjection;
 using CleanerControlApp.Modules.UserManagement.Models;
+using CleanerControlApp.Hardwares;
 
 namespace CleanerControlApp
 {
@@ -30,6 +32,7 @@ namespace CleanerControlApp
         private readonly IConfiguration _configuration;
         private readonly UserManager _userManager;
         private readonly IServiceProvider _services;
+        private readonly HardwareManager _hardwareManager;
 
         // Navigation buttons list and original backgrounds
         private List<Button>? _navButtons;
@@ -37,17 +40,21 @@ namespace CleanerControlApp
         private Brush _selectedBackground = new SolidColorBrush(Color.FromRgb(0x33,0x99,0xFF));
         private Brush _selectedForeground = Brushes.White;
 
+        // timer for polling hardware manager status
+        private DispatcherTimer? _statusTimer;
+
         /// <summary>
         /// 建構式，注入 Logger
         /// </summary>
         /// <param name="logger"></param>
-        public MainWindow(ILogger<MainWindow> logger, IConfiguration configuration, UserManager userManager, IServiceProvider services)
+        public MainWindow(ILogger<MainWindow> logger, IConfiguration configuration, UserManager userManager, IServiceProvider services, HardwareManager hardwareManager)
         {
             InitializeComponent();
             _logger = logger; // 注入的 Logger
             _configuration = configuration;
             _userManager = userManager;
             _services = services;
+            _hardwareManager = hardwareManager;
         }
 
         /// <summary>
@@ -100,6 +107,54 @@ namespace CleanerControlApp
 
             // Mark Home as active
             SetActiveButton(BtnHome);
+
+            // start timer to update status indicators from HardwareManager
+            _statusTimer = new DispatcherTimer(DispatcherPriority.Background)
+            {
+                Interval = TimeSpan.FromMilliseconds(500)
+            };
+            _statusTimer.Tick += (s, ev) => UpdateStatusIndicators();
+            _statusTimer.Start();
+
+            // run initial update
+            UpdateStatusIndicators();
+        }
+
+        private void UpdateStatusIndicators()
+        {
+            if (_hardwareManager == null) return;
+
+            // Auto -> Lime when true
+            if (AutoIndicator != null)
+            {
+                AutoIndicator.Background = _hardwareManager.SystemAuto ? Brushes.Lime : new SolidColorBrush(Color.FromRgb(0xB0,0xB0,0xB0));
+            }
+
+            // Warning -> Yellow when true
+            if (WarningIndicator != null)
+            {
+                WarningIndicator.Background = _hardwareManager.HasSystemWarning ? Brushes.Yellow : new SolidColorBrush(Color.FromRgb(0xB0,0xB0,0xB0));
+            }
+
+            // Alarm -> Red when true
+            if (AlarmIndicator != null)
+            {
+                AlarmIndicator.Background = _hardwareManager.HasSystemAlarm ? Brushes.Red : new SolidColorBrush(Color.FromRgb(0xB0,0xB0,0xB0));
+            }
+        }
+
+        protected override void OnClosed(EventArgs e)
+        {
+            base.OnClosed(e);
+            try
+            {
+                if (_statusTimer != null)
+                {
+                    _statusTimer.Stop();
+                    _statusTimer = null;
+                }
+            }
+            catch { }
         }
 
         private void UpdateCurrentUserDisplay()
