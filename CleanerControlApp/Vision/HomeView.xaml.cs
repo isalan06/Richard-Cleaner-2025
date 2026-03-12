@@ -36,6 +36,10 @@ namespace CleanerControlApp.Vision
  private CancellationTokenSource? _initCts;
  private DateTime _initHoldStart;
 
+ // track original Init visuals so we can restore
+ private Brush? _btnInitOriginalBackground;
+ private Style? _btnInitOriginalStyle;
+
  public HomeView()
  {
  try
@@ -52,6 +56,10 @@ namespace CleanerControlApp.Vision
  // capture original button background and style to restore later
  _btnResetOriginalBackground = BtnResetError.Background;
  _btnResetOriginalStyle = BtnResetError.Style;
+
+ // capture init originals
+ _btnInitOriginalBackground = BtnInit.Background;
+ _btnInitOriginalStyle = BtnInit.Style;
 
  // capture stop buzzer original background
  _btnStopBuzzerOriginalBackground = BtnStopBuzzer.Background;
@@ -206,6 +214,35 @@ namespace CleanerControlApp.Vision
  catch { }
  }
 
+ // Added: ShowInitProgress to fix CS0103 when BtnInit_PreviewMouseLeftButtonDown calls it
+ private void ShowInitProgress()
+ {
+ // Ensure UI thread
+ if (!Dispatcher.CheckAccess())
+ {
+ Dispatcher.Invoke(() => ShowInitProgress());
+ return;
+ }
+
+ // switch to no-hover style if available to avoid hover color covering progress
+ try
+ {
+ var noHover = TryFindResource("ResetButtonNoHoverStyle") as Style;
+ if (noHover != null)
+ {
+ BtnInit.Style = noHover;
+ }
+ }
+ catch { }
+
+ // ensure rect is visible and zero width
+ try
+ {
+ InitProgressRect.Width =0;
+ }
+ catch { }
+ }
+
  private void HideResetProgress()
  {
  // Ensure UI thread
@@ -266,15 +303,30 @@ namespace CleanerControlApp.Vision
  if (_btnResetOriginalStyle != null)
  BtnResetError.Style = _btnResetOriginalStyle;
  }
+
+ // also restore Init visuals if they were changed
+ if (!Dispatcher.CheckAccess())
+ {
+ Dispatcher.Invoke(() =>
+ {
+ if (_btnInitOriginalBackground != null)
+ BtnInit.Background = _btnInitOriginalBackground;
+ if (_btnInitOriginalStyle != null)
+ BtnInit.Style = _btnInitOriginalStyle;
+ });
+ }
+ else
+ {
+ if (_btnInitOriginalBackground != null)
+ BtnInit.Background = _btnInitOriginalBackground;
+ if (_btnInitOriginalStyle != null)
+ BtnInit.Style = _btnInitOriginalStyle;
+ }
  }
 
  private void ProgressTimer_Tick(object? sender, EventArgs e)
  {
- var elapsed = (DateTime.Now - _holdStart).TotalMilliseconds;
- var progress = Math.Max(0, Math.Min(1, elapsed / (double)HoldMilliseconds));
- UpdateResetButtonProgress(progress);
-
- // update rectangle width based on current actual width, start from the button outer edge
+ // Use UI thread immediately
  if (!Dispatcher.CheckAccess())
  {
  Dispatcher.Invoke(() => ProgressTimer_Tick(sender, e));
@@ -283,13 +335,46 @@ namespace CleanerControlApp.Vision
 
  try
  {
+ // Update Reset button progress only when reset hold is active
+ if (_resetCts != null && !_resetCts.IsCancellationRequested)
+ {
+ var elapsed = (DateTime.Now - _holdStart).TotalMilliseconds;
+ var progress = Math.Max(0, Math.Min(1, elapsed / (double)HoldMilliseconds));
+
+ // make reset button background transparent so rectangle is visible
+ BtnResetError.Background = Brushes.Transparent;
+
  double full = BtnResetError.ActualWidth; // full control width including borders
  double newWidth = full * progress;
-
- // Move rectangle to start from outer left edge of the Button by using a negative left margin
  var leftBorder = BtnResetError.BorderThickness.Left;
  ResetProgressRect.Width = newWidth;
  ResetProgressRect.Margin = new Thickness(-leftBorder,0,0,0);
+ }
+
+ // Update Init button progress only when init hold is active
+ if (_initCts != null && !_initCts.IsCancellationRequested)
+ {
+ double initElapsed = (DateTime.Now - _initHoldStart).TotalMilliseconds;
+ var initProgress = Math.Max(0, Math.Min(1, initElapsed / (double)HoldMilliseconds));
+
+ // make Init background transparent so rectangle visible and apply no-hover style
+ BtnInit.Background = Brushes.Transparent;
+ double initFull = BtnInit.ActualWidth;
+ double initNewWidth = initFull * initProgress;
+ var initLeftBorder = BtnInit.BorderThickness.Left;
+ InitProgressRect.Width = initNewWidth;
+ InitProgressRect.Margin = new Thickness(-initLeftBorder,0,0,0);
+
+ try
+ {
+ var noHover = TryFindResource("ResetButtonNoHoverStyle") as Style;
+ if (noHover != null)
+ {
+ BtnInit.Style = noHover;
+ }
+ }
+ catch { }
+ }
  }
  catch { }
  }
@@ -350,6 +435,11 @@ namespace CleanerControlApp.Vision
  _initCts = new CancellationTokenSource();
  var token = _initCts.Token;
  _initHoldStart = DateTime.Now;
+
+ // start visuals for init without touching reset start
+ ShowInitProgress();
+ StartProgressTimer();
+
  try
  {
  await Task.Run(async () =>
@@ -358,7 +448,23 @@ namespace CleanerControlApp.Vision
  {
  await Task.Delay(HoldMilliseconds, token).ConfigureAwait(false);
  // after hold elapsed, perform initialization logic on UI thread
- Dispatcher.Invoke(async () => await PerformInitializeAsync());
+ await Dispatcher.InvokeAsync(async () =>
+ {
+ try
+ {
+ await PerformInitializeAsync();
+ }
+ finally
+ {
+ // ensure init visuals are hidden after execution
+ HideInitProgress();
+ // if reset is not active, stop shared timer
+ if (_resetCts == null || _resetCts.IsCancellationRequested)
+ {
+ StopProgressTimer();
+ }
+ }
+ });
  }
  catch (OperationCanceledException) { }
  }, token).ConfigureAwait(false);
@@ -366,18 +472,55 @@ namespace CleanerControlApp.Vision
  catch { }
  finally
  {
- // nothing to hide
+ // nothing here; visuals handled above or on cancel
  }
  }
 
  private void BtnInit_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
  {
+ // cancel hold
  _initCts?.Cancel();
+ // hide init visuals
+ HideInitProgress();
+ // if reset not active, stop shared timer
+ if (_resetCts == null || _resetCts.IsCancellationRequested)
+ {
+ StopProgressTimer();
+ }
  }
 
  private void BtnInit_LostMouseCapture(object sender, MouseEventArgs e)
  {
  _initCts?.Cancel();
+ HideInitProgress();
+ if (_resetCts == null || _resetCts.IsCancellationRequested)
+ {
+ StopProgressTimer();
+ }
+ }
+
+ private void HideInitProgress()
+ {
+ // Ensure UI thread
+ if (!Dispatcher.CheckAccess())
+ {
+ Dispatcher.Invoke(() => HideInitProgress());
+ return;
+ }
+
+ try
+ {
+ InitProgressRect.Width =0;
+ }
+ catch { }
+
+ // restore original background
+ if (_btnInitOriginalBackground != null)
+ BtnInit.Background = _btnInitOriginalBackground;
+
+ // restore original style
+ if (_btnInitOriginalStyle != null)
+ BtnInit.Style = _btnInitOriginalStyle;
  }
 
  private async Task PerformInitializeAsync()

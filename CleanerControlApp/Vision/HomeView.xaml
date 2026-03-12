@@ -41,10 +41,23 @@
  <Button x:Name="BtnStart" Content="啟動" Margin="0,6,0,6" Padding="12" Height="72" HorizontalAlignment="Stretch" FontSize="16" FontWeight="Bold" />
  <Button x:Name="BtnStop" Content="停止" Margin="0,6,0,6" Padding="12" Height="72" HorizontalAlignment="Stretch" FontSize="16" FontWeight="Bold" />
  <Button x:Name="BtnPause" Content="暫停" Margin="0,6,0,6" Padding="12" Height="72" HorizontalAlignment="Stretch" FontSize="16" FontWeight="Bold" />
- <Button x:Name="BtnInit" Content="初始化" Margin="0,6,0,6" Padding="12" Height="72" HorizontalAlignment="Stretch" FontSize="16" FontWeight="Bold"
+ <Button x:Name="BtnInit" Margin="0,6,0,6" Padding="0" Height="72" HorizontalAlignment="Stretch" FontSize="16" FontWeight="Bold"
  PreviewMouseLeftButtonDown="BtnInit_PreviewMouseLeftButtonDown"
  PreviewMouseLeftButtonUp="BtnInit_PreviewMouseLeftButtonUp"
- LostMouseCapture="BtnInit_LostMouseCapture" />
+ LostMouseCapture="BtnInit_LostMouseCapture">
+ <Grid x:Name="BtnInitGrid" Width="146" Height="72">
+ <Rectangle x:Name="InitProgressRect" HorizontalAlignment="Left" Width="0" VerticalAlignment="Stretch" Height="{Binding ActualHeight, RelativeSource={RelativeSource AncestorType=Button}}" IsHitTestVisible="False" Panel.ZIndex="0">
+ <Rectangle.Fill>
+ <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+ <GradientStop Color="#FF1E90FF" Offset="0.0" />
+ <GradientStop Color="#FF66B2FF" Offset="0.6" />
+ <GradientStop Color="#FFBFE9FF" Offset="1.0" />
+ </LinearGradientBrush>
+ </Rectangle.Fill>
+ </Rectangle>
+ <TextBlock Text="初始化" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black" FontWeight="Bold" Panel.ZIndex="1" Margin="12,0" />
+ </Grid>
+ </Button>
  <Button x:Name="BtnResetError" Style="{StaticResource ResetButtonDefaultStyle}" Margin="0,6,0,6" Padding="0" Height="72" HorizontalAlignment="Stretch" FontSize="16" FontWeight="Bold"
  PreviewMouseLeftButtonDown="BtnResetError_PreviewMouseLeftButtonDown"
  PreviewMouseLeftButtonUp="BtnResetError_PreviewMouseLeftButtonUp"
