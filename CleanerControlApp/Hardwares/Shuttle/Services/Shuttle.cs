@@ -333,7 +333,7 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
         public bool MotorAlarm => _motorXAlarm || _motorZAlarm;
         public bool MotorHoming => (_motorXAxis != null && _motorXAxis.MotorHoming) || (_motorZAxis != null && _motorZAxis.MotorHoming);
         public bool MotorMoving => (_motorXAxis != null && _motorXAxis.MotorMoving) || (_motorZAxis != null && _motorZAxis.MotorMoving);
-        public bool MotorHome => _motorXAxis != null && _motorXAxis.MotorHome && _motorZAxis != null && _motorZAxis.MotorHome;
+        public bool MotorHome => (_motorXAxis != null && _motorXAxis.MotorHome && _motorZAxis != null && _motorZAxis.MotorHome) || _sim_pass_motor;
 
         public bool ZInIdlePosition => _motorZAxis != null && _motorZAxis.GetInPos(0);
 
@@ -489,7 +489,9 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
             _placeTrigger = false;
 
             ResetTimeoutFlag();
-            
+
+            ClamperOpenOP(true);
+
             await Home();
 
             if(!MotorAlarm && MotorHome)
@@ -502,7 +504,7 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
             { 
                 _motorZAxis.Home();
 
-                while (!_motorZAxis.MotorHome && !_motorZAxis.ErrorHomeTimeout && !_motorZAxis.MotorAlarm)
+                while (!_motorZAxis.MotorHome && !_motorZAxis.ErrorHomeTimeout && !_motorZAxis.MotorAlarm && !_sim_pass_motor)
                 { 
                     await Task.Delay(500);
                 }
@@ -510,14 +512,14 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
                 if (!_motorZAxis.ErrorHomeTimeout && !_motorZAxis.MotorAlarm && !_motorZAxis.ErrorCommandTimeout)
                 { 
                     _motorXAxis.Home();
-                    while (!_motorXAxis.MotorHome && !_motorXAxis.ErrorHomeTimeout && !_motorXAxis.MotorAlarm)
+                    while (!_motorXAxis.MotorHome && !_motorXAxis.ErrorHomeTimeout && !_motorXAxis.MotorAlarm && !_sim_pass_motor)
                     {
                         await Task.Delay(500);
                     }
 
                     _motorZAxis.MoveToPosition(0, 0);
 
-                    while (!_motorZAxis.GetInPos(0))
+                    while (!_motorZAxis.GetInPos(0) && !_motorXAxis.ErrorHomeTimeout && !_motorXAxis.MotorAlarm && !_sim_pass_motor)
                     {
                         await Task.Delay(500);
                     }
@@ -528,7 +530,7 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
 
         private void ActStartStatus()
         {
-
+           
         }
 
         private void EMOStop()
@@ -615,7 +617,7 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
                                 _pickTrigger = false;
                                 _pickCase = 0;
                             }
-                            else 
+                            else
                             {
                                 _cassette = false;
                                 _pickCase = -99;
@@ -696,8 +698,20 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
                     }
                 }
 
-                // Check Cassette of Tank Procedure
-                if (_checkCassetteTrigger && !_pausing && _motorXAxis != null && _motorZAxis != null)
+                
+            }
+
+            // Check Cassette of Tank Procedure
+            if (_checkCassetteTrigger && !_pausing && _motorXAxis != null && _motorZAxis != null)
+            {
+
+
+                if (_sim_pass_motor)
+                {
+                    HS_Check_Cassette_Finished = true;
+                    _checkCassetteTrigger = false;
+                }
+                else
                 {
                     switch (_checkCassetteCase)
                     {

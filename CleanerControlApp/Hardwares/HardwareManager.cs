@@ -98,6 +98,8 @@ namespace CleanerControlApp.Hardwares
             AlarmManager.AttachFlagGetter("ALM004", () => _door_alarm);
             AlarmManager.AttachFlagGetter("ALM005", () => _leakage_alarm);
             AlarmManager.AttachFlagGetter("ALM006", () => _wasteTankH_alarm);
+            AlarmManager.AttachFlagGetter("ALM007", () => _checkCassette_alarm);
+            AlarmManager.AttachFlagGetter("ALM008", () => _initializingTimeout_alarm);
 
             StartLoop();
 
@@ -438,8 +440,12 @@ namespace CleanerControlApp.Hardwares
         private bool _door_alarm => FrontDoor1Sign || FrontDoor2Sign || FrontDoor3Sign || FrontDoor4Sign || SideDoor1Sign || SideDoor2Sign;
         private bool _leakage_alarm => Leakage1Sign || Leakage2Sign;
         private bool _wasteTankH_alarm => WasteTankH;
+        private bool _checkCassette_alarm { get; set; }
 
-        public bool HasAlarm => _communication_alarm || _emo_alarm || _leakage_alarm || _wasteTankH_alarm;
+        private bool _initializingTimeout_alarm { get; set; }
+
+
+        public bool HasAlarm => _communication_alarm || _emo_alarm || _leakage_alarm || _wasteTankH_alarm || _checkCassette_alarm || _initializingTimeout_alarm;
         public bool HasWarning => _main_air_alarm || _door_alarm;
 
         public bool HasShuttleAlarm => _shuttle != null && _shuttle.HasAlarm;
@@ -464,6 +470,9 @@ namespace CleanerControlApp.Hardwares
         private async Task AlarmReset()
         {
             OperateLog.Log("錯誤重置", "按下 [錯誤重置] 後會對系統進行清除錯誤狀態及下達錯誤重置命令給各個模組。");
+
+            _checkCassette_alarm = false;
+            _initializingTimeout_alarm = false;
 
             if (_shuttle != null) _shuttle.AlarmReset();
             if (_sink != null) _sink.AlarmReset();
@@ -589,7 +598,7 @@ namespace CleanerControlApp.Hardwares
         public bool DryingTank2Initialized => _dryingTanks != null && _dryingTanks.Length > 1 && _dryingTanks[1].Initialized;
         public bool HeatingTankInitialized => _heatingTank != null && _heatingTank.Initialized;
 
-        public bool SystemInitialized => ShuttleInitialized && SinkInitialized && SoakingTankInitialized && DryingTank1Initialized && DryingTank2Initialized && HeatingTankInitialized;
+        public bool SystemInitialized => ShuttleInitialized && SinkInitialized && SoakingTankInitialized && DryingTank1Initialized && DryingTank2Initialized && HeatingTankInitialized && !_initializing;
 
         public bool ShuttleAuto => _shuttle != null && _shuttle.Auto;
         public bool SinkAuto => _sink != null && _sink.Auto;
@@ -609,7 +618,28 @@ namespace CleanerControlApp.Hardwares
         private bool _initializing = false;
         public bool Initializing => _initializing;
 
-        private bool _initializingTimeout = false;
+        
+
+        private bool _shuttle_initialized_trigger = false;
+        private bool _sink_initialized_trigger = false;
+        private bool _soakingTank_initialized_trigger = false;
+        private bool _dryingTank1_initialized_trigger = false;
+        private bool _dryingTank2_initialized_trigger = false;
+        private bool _heatingTank_initialized_trigger = false;
+        private bool _shuttle_check_cassette_trigger = false;
+
+        private bool _clamperCloseExist => _shuttle != null && _shuttle.HasCassette;
+
+        private void ResetInitializedTrigger()
+        {
+            _shuttle_initialized_trigger = false;
+            _sink_initialized_trigger = false;
+            _soakingTank_initialized_trigger = false;
+            _dryingTank1_initialized_trigger = false;
+            _dryingTank2_initialized_trigger = false;
+            _heatingTank_initialized_trigger = false;
+            _shuttle_check_cassette_trigger = false;
+        }
 
         public void AllMotorStop()
         {
@@ -641,7 +671,13 @@ namespace CleanerControlApp.Hardwares
                 result = 3; // the system is running initializing
                 OperateLog.Log("初始化狀態下無法初始化", status);
             }
-
+            if (_clamperCloseExist)
+            {
+                status = "設備夾爪上有卡匣存在，請先將卡匣取出";
+                result = 4; // the clamper close and cassette exist
+                OperateLog.Log("夾爪有卡匣狀態下無法初始化", status);
+            }
+            
            
 
             return result;
@@ -660,6 +696,8 @@ namespace CleanerControlApp.Hardwares
                 else
                     OperateLog.Log("開始初始化", "開始進行初始化動作");
 
+                ResetInitializedTrigger();
+
                 _initializing = true;
 
                 result = true;
@@ -674,11 +712,120 @@ namespace CleanerControlApp.Hardwares
             if (_initializing)
             {
 
+                if (_shuttle_initialized_trigger && _shuttle != null && _shuttle.Initialized && _sink != null && _soakingTank != null)
+                {
+                    if (_sink_initialized_trigger && _soakingTank_initialized_trigger)
+                    {
+                        if (_sink.Initialized && _shuttle.Initialized)
+                        {
+                            // Check Procedure
+                            if (!_shuttle_check_cassette_trigger)
+                            {
+                                _shuttle_check_cassette_trigger = true;
+                                _shuttle.CheckTankCassetteExist();
+                            }
+
+                            if (_shuttle_check_cassette_trigger && _shuttle.HS_Check_Cassette_Finished)
+                            {
+                                bool cassetteExist = _shuttle.HS_Check_SinkCassetteExist || _shuttle.HS_Check_SoakingTankCassetteExist || _shuttle.HS_Check_DryingTank1CassetteExist || _shuttle.HS_Check_DryingTank2CassetteExist || _shuttle.HS_Check_DryingTank2CassetteExist;
+                                _checkCassette_alarm = cassetteExist;
+                                _initializing = false;
+                            }
+                        }
+                    }
+
+                    if (!_sink_initialized_trigger) { _sink_initialized_trigger = true; _sink.ModuleReset(); }
+                    if (!_soakingTank_initialized_trigger) { _soakingTank_initialized_trigger = true; _soakingTank.ModuleReset(); }
+
+                   
+                }
+
+                if (_heatingTank != null && !_heatingTank_initialized_trigger) { _heatingTank_initialized_trigger = true; _heatingTank.ModuleReset(); }
+                if (_dryingTanks != null && _dryingTanks.Length > 0 && !_dryingTank1_initialized_trigger) { _dryingTank1_initialized_trigger = true; _dryingTanks[0].ModuleReset(); }
+                if (_dryingTanks != null && _dryingTanks.Length > 1 && !_dryingTank2_initialized_trigger) { _dryingTank2_initialized_trigger = true; _dryingTanks[1].ModuleReset(); }
+                if(_shuttle != null && !_shuttle_initialized_trigger) { _shuttle_initialized_trigger = true; _shuttle.ModuleReset(); }
             }
             else
             { 
             
             }
+        }
+
+        #endregion
+
+        #region Auto & Stop & Pause
+
+        public bool AutoStart()
+        {
+            bool result = false;
+
+            if (SystemInitialized)
+            {
+                if (_shuttle != null && _sink != null && _soakingTank != null && _dryingTanks != null && _dryingTanks.Length > 1 && _heatingTank != null)
+                {
+                    _shuttle.AutoStart();
+                    _sink.AutoStart();
+                    _soakingTank.AutoStart();
+                    _dryingTanks[0].AutoStart();
+                    _dryingTanks[1].AutoStart();
+                    _heatingTank.AutoStart();
+                }
+            }
+
+            return result;
+        }
+
+        public bool AutoStop(bool force=false)
+        {
+            bool result = false;
+
+            if (SystemInitialized)
+            {
+                if (_shuttle != null && _sink != null && _soakingTank != null && _dryingTanks != null && _dryingTanks.Length > 1 && _heatingTank != null)
+                {
+                    if (force)
+                    {
+                        _shuttle.AlarmStop();
+                        _sink.AlarmStop();
+                        _soakingTank.AlarmStop();
+                        _dryingTanks[0].AlarmStop();
+                        _dryingTanks[1].AlarmStop();
+                        _heatingTank.AlarmStop();
+                    }
+                    else
+                    {
+                        _shuttle.AutoStop();
+                        _sink.AutoStop();
+                        _soakingTank.AutoStop();
+                        _dryingTanks[0].AutoStop();
+                        _dryingTanks[1].AutoStop();
+                        _heatingTank.AutoStop();
+                    }
+                }
+            }
+
+            return result;
+        }
+
+        public bool AutoPause()
+        {
+            bool result = false;
+
+            if (SystemInitialized)
+            {
+                if (_shuttle != null && _sink != null && _soakingTank != null && _dryingTanks != null && _dryingTanks.Length > 1 && _heatingTank != null)
+                {
+                    _shuttle.AutoPause();
+                    _sink.AutoPause();
+                    _soakingTank.AutoPause();
+                    _dryingTanks[0].AutoPause();
+                    _dryingTanks[1].AutoPause();
+                    _heatingTank.AutoPause();
+                    result = true; // indicate action performed
+                }
+            }
+
+            return result;
         }
 
         #endregion

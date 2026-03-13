@@ -32,6 +32,12 @@ namespace CleanerControlApp.Vision
  private DispatcherTimer? _hwStatusTimer;
  private bool? _lastBuzzerStopState;
  private Brush? _btnStopBuzzerOriginalBackground;
+ // track init/system states to update Init button visuals
+ private bool? _lastInitializingState;
+ private bool? _lastSystemInitializedState;
+ // flash timer for Init button when hardware.Initializing == true
+ private DispatcherTimer? _initFlashTimer;
+ private bool _initFlashState = false;
 
  private CancellationTokenSource? _initCts;
  private DateTime _initHoldStart;
@@ -39,6 +45,9 @@ namespace CleanerControlApp.Vision
  // track original Init visuals so we can restore
  private Brush? _btnInitOriginalBackground;
  private Style? _btnInitOriginalStyle;
+
+ // New: cancellation token source for Stop button long press
+ private CancellationTokenSource? _stopCts;
 
  public HomeView()
  {
@@ -66,23 +75,76 @@ namespace CleanerControlApp.Vision
 
  // Wire button handlers
  BtnStopBuzzer.Click += BtnStopBuzzer_Click;
-
- // Populate initial data
- LoadLatestOperateLog();
- PopulateCurrentAlarms();
-
- // Subscribe to alarm changes
- AlarmManager.AlarmsChanged += OnAlarmsChanged;
-
- // Start polling hardware status
- StartHardwareStatusTimer();
-
- // Unsubscribe when unloaded to avoid leaks
- this.Unloaded += (s, e) =>
+ BtnStart.Click += BtnStart_Click;
+ BtnPause.Click += BtnPause_Click;
+ // Stop: short click -> AutoStop(), long-press3s -> AutoStop(true)
+ try
  {
- AlarmManager.AlarmsChanged -= OnAlarmsChanged;
- StopHardwareStatusTimer();
+ if (BtnStop != null)
+ {
+ BtnStop.Click += (s, e) =>
+ {
+ try
+ {
+ var hw = App.AppHost?.Services?.GetService<HardwareManager>();
+ if (hw == null)
+ {
+ MessageBox.Show("HardwareManager not available.", "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
+ return;
+ }
+ bool stopped = hw.AutoStop();
+ if (!stopped)
+ MessageBox.Show("設備尚未初始化，請先進行 初始化", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
+ }
+ catch (Exception ex)
+ {
+ MessageBox.Show($"停止失敗:\n{ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+ }
  };
+
+ BtnStop.PreviewMouseLeftButtonDown += (s, e) =>
+ {
+ _stopCts?.Cancel();
+ _stopCts = new CancellationTokenSource();
+ var token = _stopCts.Token;
+
+ _ = Task.Run(async () =>
+ {
+ try
+ {
+ await Task.Delay(HoldMilliseconds, token).ConfigureAwait(false);
+ await Dispatcher.InvokeAsync(() =>
+ {
+ try
+ {
+ var hw = App.AppHost?.Services?.GetService<HardwareManager>();
+ if (hw == null)
+ {
+ MessageBox.Show("HardwareManager not available.", "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
+ return;
+ }
+ bool forced = hw.AutoStop(true);
+ if (forced)
+ MessageBox.Show("已強制停止 (長按)", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
+ else
+ MessageBox.Show("強制停止失敗。", "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
+ }
+ catch (Exception ex)
+ {
+ MessageBox.Show($"強制停止失敗:\n{ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+ }
+ });
+ }
+ catch (OperationCanceledException) { }
+ catch { }
+ }, token);
+ };
+
+ BtnStop.PreviewMouseLeftButtonUp += (s, e) => _stopCts?.Cancel();
+ BtnStop.LostMouseCapture += (s, e) => _stopCts?.Cancel();
+ }
+ }
+ catch { }
  }
 
  private void StartHardwareStatusTimer()
@@ -114,6 +176,15 @@ namespace CleanerControlApp.Vision
  _lastBuzzerStopState = buzzerStopped;
  UpdateBuzzerButtonVisual(buzzerStopped);
  }
+
+ // Update Init button visuals based on hardware initializing/system initialized state
+ bool initializing = hw.Initializing;
+ bool systemInit = hw.SystemInitialized;
+
+ // Always update visuals each tick so flashing continues while initializing
+ _lastInitializingState = initializing;
+ _lastSystemInitializedState = systemInit;
+ UpdateInitButtonVisual(initializing, systemInit);
  }
  catch { }
  }
@@ -139,6 +210,95 @@ namespace CleanerControlApp.Vision
  BtnStopBuzzer.Background = _btnStopBuzzerOriginalBackground;
  BtnStopBuzzer.Foreground = Brushes.Black;
  }
+ }
+
+ private void UpdateInitButtonVisual(bool initializing, bool systemInitialized)
+ {
+ if (!Dispatcher.CheckAccess())
+ {
+ Dispatcher.Invoke(() => UpdateInitButtonVisual(initializing, systemInitialized));
+ return;
+ }
+
+ // If init hold/progress is active, do not override visuals
+ if (_initCts != null && !_initCts.IsCancellationRequested)
+ return;
+
+ if (systemInitialized)
+ {
+ // lighter blue background to indicate system initialized (better contrast with black text)
+ StopInitFlashTimer();
+ BtnInit.Background = new SolidColorBrush(Color.FromRgb(0xB3,0xD9,0xFF)); // light blue
+ BtnInit.Foreground = Brushes.Black;
+ }
+ else if (initializing)
+ {
+ // start flashing light-blue while initializing
+ StartInitFlashTimer();
+ }
+ else
+ {
+ // restore original visuals
+ StopInitFlashTimer();
+ if (_btnInitOriginalBackground != null)
+ BtnInit.Background = _btnInitOriginalBackground;
+ if (_btnInitOriginalStyle != null)
+ BtnInit.Style = _btnInitOriginalStyle;
+ BtnInit.Foreground = Brushes.Black;
+ }
+ }
+
+ private void StartInitFlashTimer()
+ {
+ if (_initFlashTimer != null) return;
+
+ // ensure original background captured
+ if (_btnInitOriginalBackground == null)
+ _btnInitOriginalBackground = BtnInit.Background;
+
+ _initFlashTimer = new DispatcherTimer(DispatcherPriority.Background) { Interval = TimeSpan.FromMilliseconds(400) };
+ _initFlashTimer.Tick += (s, e) =>
+ {
+ try
+ {
+ // do not override visuals if user is holding Init
+ if (_initCts != null && !_initCts.IsCancellationRequested) return;
+
+ _initFlashState = !_initFlashState;
+ if (_initFlashState)
+ {
+ // light blue flash
+ BtnInit.Background = Brushes.LightBlue;
+ BtnInit.Foreground = Brushes.Black;
+ }
+ else
+ {
+ // restore original background
+ if (_btnInitOriginalBackground != null)
+ BtnInit.Background = _btnInitOriginalBackground;
+ BtnInit.Foreground = Brushes.Black;
+ }
+ }
+ catch { }
+ };
+ // set initial flash immediately for responsiveness
+ _initFlashState = true;
+ BtnInit.Background = Brushes.LightBlue;
+ BtnInit.Foreground = Brushes.Black;
+ _initFlashTimer.Start();
+ }
+
+ private void StopInitFlashTimer()
+ {
+ if (_initFlashTimer == null) return;
+ try
+ {
+ _initFlashTimer.Stop();
+ // no direct handler detach needed for anonymous handler; allow GC to collect
+ }
+ catch { }
+ _initFlashTimer = null;
+ _initFlashState = false;
  }
 
  private async void BtnResetError_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -429,6 +589,54 @@ namespace CleanerControlApp.Vision
  }
  }
 
+ private void BtnStart_Click(object? sender, RoutedEventArgs e)
+ {
+ try
+ {
+ var hw = App.AppHost?.Services?.GetService<HardwareManager>();
+ if (hw == null)
+ {
+ MessageBox.Show("HardwareManager not available.", "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
+ return;
+ }
+ 
+ bool started = hw.AutoStart();
+ if (!started)
+ {
+ // AutoStart returned false -> likely system not initialized
+ MessageBox.Show("設備尚未初始化，請先進行 初始化", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
+ }
+ }
+ catch (Exception ex)
+ {
+ MessageBox.Show($"啟動失敗:\n{ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+ }
+ }
+
+ private void BtnPause_Click(object? sender, RoutedEventArgs e)
+ {
+ try
+ {
+ var hw = App.AppHost?.Services?.GetService<HardwareManager>();
+ if (hw == null)
+ {
+ MessageBox.Show("HardwareManager not available.", "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
+ return;
+ }
+ 
+ bool paused = hw.AutoPause();
+ if (!paused)
+ {
+ // AutoStop returned false -> likely system not initialized
+ MessageBox.Show("設備尚未初始化，請先進行 初始化", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
+ }
+ }
+ catch (Exception ex)
+ {
+ MessageBox.Show($"暫停失敗:\n{ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+ }
+ }
+
  private async void BtnInit_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
  {
  _initCts?.Cancel();
@@ -521,6 +729,9 @@ namespace CleanerControlApp.Vision
  // restore original style
  if (_btnInitOriginalStyle != null)
  BtnInit.Style = _btnInitOriginalStyle;
+ 
+ // stop any flashing when hiding init progress
+ StopInitFlashTimer();
  }
 
  private async Task PerformInitializeAsync()
