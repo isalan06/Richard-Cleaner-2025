@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Threading;
-using CleanerControlApp.Hardwares.DryingTank.Interfacaes;
+using CleanerControlApp.Hardwares.DryingTank.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace CleanerControlApp.Vision.Template

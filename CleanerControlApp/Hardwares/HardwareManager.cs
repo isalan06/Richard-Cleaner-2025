@@ -1,4 +1,4 @@
-﻿using CleanerControlApp.Hardwares.DryingTank.Interfacaes;
+﻿using CleanerControlApp.Hardwares.DryingTank.Interfaces;
 using CleanerControlApp.Hardwares.Shuttle.Interfaces;
 using CleanerControlApp.Hardwares.Sink.Interfaces;
 using CleanerControlApp.Hardwares.SoakingTank.Interfaces;

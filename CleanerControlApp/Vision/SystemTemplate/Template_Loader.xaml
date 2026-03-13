@@ -1,0 +1,125 @@
+﻿<UserControl x:Class="CleanerControlApp.Vision.SystemTemplate.Template_Loader"
+ xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+ xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+ xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+ xmlns:local="clr-namespace:CleanerControlApp.Vision.SystemTemplate"
+ mc:Ignorable="d" 
+ x:Name="RootControl"
+ d:DesignHeight="220" d:DesignWidth="150">
+ <Grid>
+        <Canvas x:Name="LoaderCanvas" Background="Transparent" Canvas.Left="0" Canvas.Top="0" Width="150" Height="220" >
+            <Canvas x:Name="TankCanvas" Background="Transparent" Canvas.Left="0" Canvas.Top="0" Width="150" Height="220">
+ <Rectangle Canvas.Left="0" Canvas.Top="0" Width="150" Height="220" Stroke="#2B72C2" StrokeThickness="2" Fill="White" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+ <TextBlock Text="Loader" FontSize="20" Canvas.Left="43" Canvas.Top="48" Foreground="#333333" TextAlignment="Center" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+ <Border Canvas.Left="103" Canvas.Top="171" BorderBrush="#2E993E" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding LoaderCassetteInPosition1}" Width="58" RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Left" VerticalAlignment="Top">
+ <Border.RenderTransform>
+ <TransformGroup>
+ <ScaleTransform/>
+ <SkewTransform/>
+ <RotateTransform Angle="90"/>
+ <TranslateTransform/>
+ </TransformGroup>
+ </Border.RenderTransform>
+ <Border.Style>
+ <Style TargetType="{x:Type Border}">
+ <Setter Property="Background" Value="#FFFFFF"/>
+ <Style.Triggers>
+ <DataTrigger Binding="{Binding LoaderCassetteInPosition1}" Value="True">
+ <Setter Property="Background" Value="Lime"/>
+ </DataTrigger>
+ </Style.Triggers>
+ </Style>
+ </Border.Style>
+ <TextBlock Text="X36 - #1" FontSize="12" Foreground="Black"/>
+ </Border>
+ <Border Canvas.Left="75" Canvas.Top="171" BorderBrush="#2E993E" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding LoaderCassetteInPosition2}" Width="58" RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Left" VerticalAlignment="Top">
+ <Border.RenderTransform>
+ <TransformGroup>
+ <ScaleTransform/>
+ <SkewTransform/>
+ <RotateTransform Angle="90"/>
+ <TranslateTransform/>
+ </TransformGroup>
+ </Border.RenderTransform>
+ <Border.Style>
+ <Style TargetType="{x:Type Border}">
+ <Setter Property="Background" Value="#FFFFFF"/>
+ <Style.Triggers>
+ <DataTrigger Binding="{Binding LoaderCassetteInPosition2}" Value="True">
+ <Setter Property="Background" Value="Lime"/>
+ </DataTrigger>
+ </Style.Triggers>
+ </Style>
+ </Border.Style>
+ <TextBlock Text="X37 - #2" FontSize="12" Foreground="Black"/>
+ </Border>
+ <Border Canvas.Left="47" Canvas.Top="171" BorderBrush="#2E993E" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding LoaderCassetteInPosition3}" Width="58" RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Left" VerticalAlignment="Top">
+ <Border.RenderTransform>
+ <TransformGroup>
+ <ScaleTransform/>
+ <SkewTransform/>
+ <RotateTransform Angle="90"/>
+ <TranslateTransform/>
+ </TransformGroup>
+ </Border.RenderTransform>
+ <Border.Style>
+ <Style TargetType="{x:Type Border}">
+ <Setter Property="Background" Value="#FFFFFF"/>
+ <Style.Triggers>
+ <DataTrigger Binding="{Binding LoaderCassetteInPosition3}" Value="True">
+ <Setter Property="Background" Value="Lime"/>
+ </DataTrigger>
+ </Style.Triggers>
+ </Style>
+ </Border.Style>
+ <TextBlock Text="X40 - #3" FontSize="12" Foreground="Black"/>
+ </Border>
+ <Border Canvas.Left="19" Canvas.Top="171" BorderBrush="#2E993E" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding LoaderCassetteInPosition4}" Width="58" RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Left" VerticalAlignment="Top">
+ <Border.RenderTransform>
+ <TransformGroup>
+ <ScaleTransform/>
+ <SkewTransform/>
+ <RotateTransform Angle="90"/>
+ <TranslateTransform/>
+ </TransformGroup>
+ </Border.RenderTransform>
+ <Border.Style>
+ <Style TargetType="{x:Type Border}">
+ <Setter Property="Background" Value="#FFFFFF"/>
+ <Style.Triggers>
+ <DataTrigger Binding="{Binding LoaderCassetteInPosition4}" Value="True">
+ <Setter Property="Background" Value="Lime"/>
+ </DataTrigger>
+ </Style.Triggers>
+ </Style>
+ </Border.Style>
+ <TextBlock Text="X41 - #4" FontSize="12" Foreground="Black"/>
+ </Border>
+ <Border Canvas.Left="-9" Canvas.Top="171" BorderBrush="#2E993E" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding LoaderCassetteInPosition5}" Width="58" RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Left" VerticalAlignment="Top">
+ <Border.RenderTransform>
+ <TransformGroup>
+ <ScaleTransform/>
+ <SkewTransform/>
+ <RotateTransform Angle="90"/>
+ <TranslateTransform/>
+ </TransformGroup>
+ </Border.RenderTransform>
+ <Border.Style>
+ <Style TargetType="{x:Type Border}">
+ <Setter Property="Background" Value="#FFFFFF"/>
+ <Style.Triggers>
+ <DataTrigger Binding="{Binding LoaderCassetteInPosition5}" Value="True">
+ <Setter Property="Background" Value="Lime"/>
+ </DataTrigger>
+ </Style.Triggers>
+ </Style>
+ </Border.Style>
+ <TextBlock Text="X42 - #5" FontSize="12" Foreground="Black"/>
+ </Border>
+ <TextBlock Text="{Binding LoaderCassetteCount, StringFormat=\{0:N0\}}" FontSize="20" Foreground="#333333" TextAlignment="Center" Width="47" Height="25" HorizontalAlignment="Left" Canvas.Left="76" Canvas.Top="88" VerticalAlignment="Top"/>
+ <TextBlock Text="數量:" FontSize="20" Foreground="#333333" TextAlignment="Center" Height="25" Width="46" HorizontalAlignment="Left" Canvas.Left="28" Canvas.Top="88" VerticalAlignment="Top"/>
+ </Canvas>
+ </Canvas>
+ </Grid>
+</UserControl>

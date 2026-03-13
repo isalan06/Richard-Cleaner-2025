@@ -28,7 +28,7 @@
  <Image Source="/CleanerControlApp;component/Pictures/AirKnife.png" Canvas.Left="26" Canvas.Top="10" Width="57" Height="28" HorizontalAlignment="Left" VerticalAlignment="Center" ToolTip="AirKnife" />
 
  <!-- Elapsed and Remaining heating time for Drying Tank #2 (bound to ElapsedHeatingRight / RemainingHeatingRight) -->
- <TextBlock Text="烘乾時間:" FontSize="12" Canvas.Left="11" Canvas.Top="80" Foreground="#333333" TextAlignment="Center" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+ <TextBlock Text="沖水時間:" FontSize="12" Canvas.Left="11" Canvas.Top="80" Foreground="#333333" TextAlignment="Center" HorizontalAlignment="Left" VerticalAlignment="Top"/>
  <TextBlock Text="剩餘時間:" FontSize="12" Canvas.Left="10" Canvas.Top="102" Foreground="#333333" TextAlignment="Center" HorizontalAlignment="Left" VerticalAlignment="Top"/>
  <TextBlock Text="{Binding ElapsedAct, ElementName=RootControl}" FontSize="12" Canvas.Left="75" Canvas.Top="80" Foreground="#333333" />
  <TextBlock Text="{Binding RemainingAct, ElementName=RootControl}" FontSize="12" Canvas.Left="75" Canvas.Top="102" Foreground="#333333" />

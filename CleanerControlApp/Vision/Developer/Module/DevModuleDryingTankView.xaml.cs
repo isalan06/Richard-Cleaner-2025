@@ -2,7 +2,7 @@ using System.Windows.Controls;
 using System;
 using System.Diagnostics;
 using System.Windows;
-using CleanerControlApp.Hardwares.DryingTank.Interfacaes;
+using CleanerControlApp.Hardwares.DryingTank.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace CleanerControlApp.Vision.Developer.Module

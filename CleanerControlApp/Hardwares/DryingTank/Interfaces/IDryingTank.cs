@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CleanerControlApp.Hardwares.DryingTank.Interfacaes
+namespace CleanerControlApp.Hardwares.DryingTank.Interfaces
 {
     public interface IDryingTank
     {

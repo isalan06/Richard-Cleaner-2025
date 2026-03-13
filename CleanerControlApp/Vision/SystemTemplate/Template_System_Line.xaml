@@ -1,0 +1,26 @@
+﻿<UserControl x:Class="CleanerControlApp.Vision.SystemTemplate.Template_System_Line"
+ xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+ xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+ xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+ xmlns:local="clr-namespace:CleanerControlApp.Vision.SystemTemplate"
+ mc:Ignorable="d" 
+ d:DesignHeight="450" d:DesignWidth="1150">
+    <Grid>
+        <Canvas x:Name="MainCanvas" Background="Transparent" Canvas.Left="0" Canvas.Top="0" Width="1150" Height="450">
+            <Canvas x:Name="LineCanvas" Background="Transparent" Canvas.Left="0" Canvas.Top="0" Width="1150" Height="450" >
+                <!-- System controls placed on the line -->
+
+                <local:Template_Loader x:Name="LoaderControl" Canvas.Left="944" Canvas.Top="115" HorizontalAlignment="Left" VerticalAlignment="Center" />
+                <local:Template_Unloader x:Name="UnloaderControl" Canvas.Left="66" Canvas.Top="115" HorizontalAlignment="Left" VerticalAlignment="Center" />
+
+                <local:Template_System_Sink x:Name="SystemSinkControl" Canvas.Left="768" Canvas.Top="115" HorizontalAlignment="Left" VerticalAlignment="Center" />
+                <local:Template_System_SoakingTank x:Name="SystemSoakingControl" Canvas.Left="592" Canvas.Top="115" HorizontalAlignment="Left" VerticalAlignment="Center" />
+
+                <local:Template_System_DryingTank1 x:Name="DryingTank1Control" Canvas.Left="420" Canvas.Top="115" HorizontalAlignment="Left" VerticalAlignment="Center" />
+                <local:Template_System_DryingTank2 x:Name="DryingTank1Contro2" Canvas.Left="240" Canvas.Top="115" HorizontalAlignment="Left" VerticalAlignment="Center" />
+            </Canvas>
+        </Canvas>
+
+    </Grid>
+</UserControl>

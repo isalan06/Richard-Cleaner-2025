@@ -1,4 +1,4 @@
-﻿using CleanerControlApp.Hardwares.DryingTank.Interfacaes;
+﻿using CleanerControlApp.Hardwares.DryingTank.Interfaces;
 using CleanerControlApp.Hardwares.DryingTank.Services;
 using CleanerControlApp.Modules.DeltaMS300.Interfaces;
 using CleanerControlApp.Modules.DeltaMS300.Services;

@@ -1,4 +1,4 @@
-﻿using CleanerControlApp.Hardwares.DryingTank.Interfacaes;
+﻿using CleanerControlApp.Hardwares.DryingTank.Interfaces;
 using CleanerControlApp.Modules.MitsubishiPLC.Interfaces;
 using CleanerControlApp.Modules.Modbus.Interfaces;
 using CleanerControlApp.Modules.Modbus.Models;
