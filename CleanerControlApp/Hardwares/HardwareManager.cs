@@ -67,43 +67,43 @@ namespace CleanerControlApp.Hardwares
             ISink? sink, ISoakingTank? soakingTank, IDryingTank[]? dryingTanks, IShuttle? shuttle, IHeatingTank? heatingTank,
             IModbusTCPService? modbusTCPService, IModbusRTUPollService? modbusRTUPollService,
             IDeltaMS300[]? deltaMS300s, IPLCService? plcService, IPLCOperator? plcOperator, ITemperatureControllers? temperatureControllers, IUltrasonicDevice? ultrasonicDevice)
-        { 
+        {
             _logger = logger;
 
             try
             {
-            _unitSettings = unitSettings;
-            _modbusSettings = modbusSettings;
+                _unitSettings = unitSettings;
+                _modbusSettings = modbusSettings;
 
-            _sink = sink;
-            _soakingTank = soakingTank;
-            _dryingTanks = dryingTanks;
-            _shuttle = shuttle;
-            _heatingTank = heatingTank;
+                _sink = sink;
+                _soakingTank = soakingTank;
+                _dryingTanks = dryingTanks;
+                _shuttle = shuttle;
+                _heatingTank = heatingTank;
 
-            _modbusTCPService = modbusTCPService;
-            _modbusRTUPollService = modbusRTUPollService;
+                _modbusTCPService = modbusTCPService;
+                _modbusRTUPollService = modbusRTUPollService;
 
-            _deltaMS300s = deltaMS300s;
-            _plcService = plcService;
-            _plcOperator = plcOperator;
-            _temperatureControllers = temperatureControllers;
-            _ultrasonicDevice = ultrasonicDevice;
+                _deltaMS300s = deltaMS300s;
+                _plcService = plcService;
+                _plcOperator = plcOperator;
+                _temperatureControllers = temperatureControllers;
+                _ultrasonicDevice = ultrasonicDevice;
 
 
-            // Alarm
-            AlarmManager.AttachFlagGetter("ALM001", () => _communication_alarm);
-            AlarmManager.AttachFlagGetter("ALM002", () => _emo_alarm);
-            AlarmManager.AttachFlagGetter("ALM003", () => _main_air_alarm);
-            AlarmManager.AttachFlagGetter("ALM004", () => _door_alarm);
-            AlarmManager.AttachFlagGetter("ALM005", () => _leakage_alarm);
-            AlarmManager.AttachFlagGetter("ALM006", () => _wasteTankH_alarm);
-            AlarmManager.AttachFlagGetter("ALM007", () => _checkCassette_alarm);
-            AlarmManager.AttachFlagGetter("ALM008", () => _initializingTimeout_alarm);
+                // Alarm
+                AlarmManager.AttachFlagGetter("ALM001", () => _communication_alarm);
+                AlarmManager.AttachFlagGetter("ALM002", () => _emo_alarm);
+                AlarmManager.AttachFlagGetter("ALM003", () => _main_air_alarm);
+                AlarmManager.AttachFlagGetter("ALM004", () => _door_alarm);
+                AlarmManager.AttachFlagGetter("ALM005", () => _leakage_alarm);
+                AlarmManager.AttachFlagGetter("ALM006", () => _wasteTankH_alarm);
+                AlarmManager.AttachFlagGetter("ALM007", () => _checkCassette_alarm);
+                AlarmManager.AttachFlagGetter("ALM008", () => _initializingTimeout_alarm);
 
-            StartLoop();
+                StartLoop();
 
-            Start();
+                Start();
             }
             catch (Exception ex)
             {
@@ -281,9 +281,9 @@ namespace CleanerControlApp.Hardwares
         public void ModuleRunning(bool run)
         {
             _deltaMS300s?.ToList().ForEach(m => { if (run) m.Start(); else m.Stop(); });
-            if(run) _temperatureControllers?.Start(); else _temperatureControllers?.Stop();
-            if(run) _ultrasonicDevice?.Start(); else _ultrasonicDevice?.Stop();
-            if(run) _plcService?.Start(); else _plcService?.Stop();
+            if (run) _temperatureControllers?.Start(); else _temperatureControllers?.Stop();
+            if (run) _ultrasonicDevice?.Start(); else _ultrasonicDevice?.Stop();
+            if (run) _plcService?.Start(); else _plcService?.Stop();
 
         }
 
@@ -308,7 +308,7 @@ namespace CleanerControlApp.Hardwares
             }
 
             if (_plcService != null)
-            { 
+            {
                 tasks.Add(Task.Run(() => { try { if (run) _plcService.Start(); else _plcService.Stop(); } catch (Exception ex) { _logger?.LogError(ex, "Error starting/stopping PLC service"); } }));
             }
 
@@ -464,8 +464,8 @@ namespace CleanerControlApp.Hardwares
 
         public bool HasSystemAlarm => HasAlarm || HasShuttleAlarm || HasSinkAlarm || HasSoakingTankAlarm || HasDryingTank1Alarm || HasDryingTank2Alarm || HasHeatingTankAlarm || IsAlarm;
         public bool HasSystemWarning => HasWarning || HasShuttleWarning || HasSinkWarning || HasSoakingTankWarning || HasDryingTank1Warning || HasDryingTank2Warning || HasHeatingTankWarning || IsWarning;
-        
-        
+
+
 
         private async Task AlarmReset()
         {
@@ -617,8 +617,10 @@ namespace CleanerControlApp.Hardwares
 
         private bool _initializing = false;
         public bool Initializing => _initializing;
+        // track when initialization started to support timeout
+        private DateTime? _initializingStartTime = null;
 
-        
+
 
         private bool _shuttle_initialized_trigger = false;
         private bool _sink_initialized_trigger = false;
@@ -644,7 +646,7 @@ namespace CleanerControlApp.Hardwares
         public void AllMotorStop()
         {
             if (_sink != null) _sink.MotorStop();
-            if(_soakingTank != null) _soakingTank.MotorStop();
+            if (_soakingTank != null) _soakingTank.MotorStop();
             if (_shuttle != null) _shuttle.AllMotorStop();
         }
 
@@ -677,8 +679,8 @@ namespace CleanerControlApp.Hardwares
                 result = 4; // the clamper close and cassette exist
                 OperateLog.Log("夾爪有卡匣狀態下無法初始化", status);
             }
-            
-           
+
+
 
             return result;
         }
@@ -686,7 +688,7 @@ namespace CleanerControlApp.Hardwares
         {
             bool result = false;
 
-            if ((!HasSystemAlarm && !HasAutoStatus && _initializing ) || force)
+            if ((!HasSystemAlarm && !HasAutoStatus && _initializing) || force)
             {
                 if (force)
                 {
@@ -699,6 +701,7 @@ namespace CleanerControlApp.Hardwares
                 ResetInitializedTrigger();
 
                 _initializing = true;
+                try { _initializingStartTime = DateTime.UtcNow; } catch { _initializingStartTime = null; }
 
                 result = true;
             }
@@ -711,6 +714,27 @@ namespace CleanerControlApp.Hardwares
         {
             if (_initializing)
             {
+                // Timeout check: if initialization takes longer than configured threshold, cancel
+                try
+                {
+                    int timeoutSec = 0;
+                    try { timeoutSec = _unitSettings?.System?.Initialization_Timeout_Second ?? 0; } catch { timeoutSec = 0; }
+                    if (timeoutSec > 0 && _initializingStartTime.HasValue)
+                    {
+                        var elapsed = DateTime.UtcNow - _initializingStartTime.Value;
+                        if (elapsed.TotalSeconds >= timeoutSec)
+                        {
+                            // initialization timed out -> cancel and raise alarm
+                            _initializing = false;
+                            _initializingStartTime = null;
+                            _initializingTimeout_alarm = true;
+                            OperateLog.Log("初始化逾時", $"Initialization timed out after {timeoutSec} seconds.");
+                            return;
+                        }
+                    }
+                }
+                catch { }
+
 
                 if (_shuttle_initialized_trigger && _shuttle != null && _shuttle.Initialized && _sink != null && _soakingTank != null)
                 {
@@ -730,6 +754,7 @@ namespace CleanerControlApp.Hardwares
                                 bool cassetteExist = _shuttle.HS_Check_SinkCassetteExist || _shuttle.HS_Check_SoakingTankCassetteExist || _shuttle.HS_Check_DryingTank1CassetteExist || _shuttle.HS_Check_DryingTank2CassetteExist || _shuttle.HS_Check_DryingTank2CassetteExist;
                                 _checkCassette_alarm = cassetteExist;
                                 _initializing = false;
+                                _initializingStartTime = null;
                             }
                         }
                     }
@@ -737,17 +762,17 @@ namespace CleanerControlApp.Hardwares
                     if (!_sink_initialized_trigger) { _sink_initialized_trigger = true; _sink.ModuleReset(); }
                     if (!_soakingTank_initialized_trigger) { _soakingTank_initialized_trigger = true; _soakingTank.ModuleReset(); }
 
-                   
+
                 }
 
                 if (_heatingTank != null && !_heatingTank_initialized_trigger) { _heatingTank_initialized_trigger = true; _heatingTank.ModuleReset(); }
                 if (_dryingTanks != null && _dryingTanks.Length > 0 && !_dryingTank1_initialized_trigger) { _dryingTank1_initialized_trigger = true; _dryingTanks[0].ModuleReset(); }
                 if (_dryingTanks != null && _dryingTanks.Length > 1 && !_dryingTank2_initialized_trigger) { _dryingTank2_initialized_trigger = true; _dryingTanks[1].ModuleReset(); }
-                if(_shuttle != null && !_shuttle_initialized_trigger) { _shuttle_initialized_trigger = true; _shuttle.ModuleReset(); }
+                if (_shuttle != null && !_shuttle_initialized_trigger) { _shuttle_initialized_trigger = true; _shuttle.ModuleReset(); }
             }
             else
-            { 
-            
+            {
+
             }
         }
 
@@ -769,13 +794,15 @@ namespace CleanerControlApp.Hardwares
                     _dryingTanks[0].AutoStart();
                     _dryingTanks[1].AutoStart();
                     _heatingTank.AutoStart();
+                    OperateLog.Log("開始自動", "按下 [自動] 後會對系統進行啟動自動。");
+                    result = true;
                 }
             }
 
             return result;
         }
 
-        public bool AutoStop(bool force=false)
+        public bool AutoStop(bool force = false)
         {
             bool result = false;
 
@@ -791,6 +818,7 @@ namespace CleanerControlApp.Hardwares
                         _dryingTanks[0].AlarmStop();
                         _dryingTanks[1].AlarmStop();
                         _heatingTank.AlarmStop();
+                        OperateLog.Log("強制停止自動", "按下 [強制停止] 後會對系統進行強制停止，所有元件都需要再重新初始化。");
                     }
                     else
                     {
@@ -800,7 +828,9 @@ namespace CleanerControlApp.Hardwares
                         _dryingTanks[0].AutoStop();
                         _dryingTanks[1].AutoStop();
                         _heatingTank.AutoStop();
+                        OperateLog.Log("停止自動", "按下 [停止] 後會對系統進行停止，需要等所有模組進行完流程才會解除自動狀態。");
                     }
+                    result = true;
                 }
             }
 
@@ -822,6 +852,7 @@ namespace CleanerControlApp.Hardwares
                     _dryingTanks[1].AutoPause();
                     _heatingTank.AutoPause();
                     result = true; // indicate action performed
+                    OperateLog.Log("動作暫停", "按下 [暫停] 後會對系統進行暫停，所有正在進行的動作會暫停在當前狀態，直到再次按下 [自動] 後才會繼續。");
                 }
             }
 
@@ -845,9 +876,9 @@ namespace CleanerControlApp.Hardwares
         }
         public void Buzzer_Stop()
         {
-            if(!_buzzer_stop) OperateLog.Log("停止蜂鳴器", "按下 [停止蜂鳴器] 後停止蜂鳴等待，按下 [錯誤重置] 可以解除該狀態。");
+            if (!_buzzer_stop) OperateLog.Log("停止蜂鳴器", "按下 [停止蜂鳴器] 後停止蜂鳴等待，按下 [錯誤重置] 可以解除該狀態。");
             _buzzer_stop = true;
-            
+
         }
 
         #endregion
