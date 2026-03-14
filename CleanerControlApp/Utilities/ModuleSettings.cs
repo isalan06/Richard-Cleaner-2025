@@ -135,7 +135,10 @@ namespace CleanerControlApp.Utilities
 
     public class MS_System
     { 
-    
+        public int SinkModulePass { get; set; }
+        public int SoakingTankModulePass { get; set; }
+        public int DryingTank1ModulePass { get; set; }
+        public int DryingTank2ModulePass { get; set; }
     }
 
 }

@@ -10,7 +10,7 @@
             <local:Template_Clamper x:Name="Clamper" Canvas.Left="326" Canvas.Top="49" Height="311" Width="333" />
             <local:Template_Motor_1 x:Name="Motor1" Canvas.Left="766" Canvas.Top="49" HorizontalAlignment="Left" VerticalAlignment="Center" />
             <local:Template_Motor_2 x:Name="Motor2" Canvas.Top="49" HorizontalAlignment="Left" VerticalAlignment="Top" />
-            <Button FontSize="18" Content="錯誤重置" Click="ResetAlarm_Click" Background="#ADD8E6" Height="75" Canvas.Left="505" Canvas.Top="373" Width="121"/>
+            <Button FontSize="18" Content="錯誤重置" Click="ResetAlarm_Click" Background="#ADD8E6" Height="75" Canvas.Left="505" Canvas.Top="385" Width="121" HorizontalAlignment="Center" VerticalAlignment="Top"/>
             <Button FontSize="18" Content="開啟夾爪" Click="OpenClamper_Click" Background="#ADD8E6" Height="74" Canvas.Left="641" Canvas.Top="86" Width="120" HorizontalAlignment="Center" VerticalAlignment="Top"/>
             <Button FontSize="18" Content="關閉夾爪" Click="CloseClamper_Click" Background="#ADD8E6" Height="75" Canvas.Left="641" Canvas.Top="167" Width="120" HorizontalAlignment="Center" VerticalAlignment="Top"/>
 

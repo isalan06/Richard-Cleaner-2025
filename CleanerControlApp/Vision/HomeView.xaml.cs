@@ -145,6 +145,26 @@ namespace CleanerControlApp.Vision
  }
  }
  catch { }
+ 
+ // Subscribe to alarm changes and populate initial UI
+ try
+ {
+ AlarmManager.AlarmsChanged += OnAlarmsChanged;
+ }
+ catch { }
+
+ try
+ {
+ PopulateCurrentAlarms();
+ LoadLatestOperateLog();
+ }
+ catch { }
+
+ // Start hardware status timer for buzzer/init visuals
+ try { StartHardwareStatusTimer(); } catch { }
+
+ // Ensure cleanup on unload
+ this.Unloaded += HomeView_Unloaded;
  }
 
  private void StartHardwareStatusTimer()
@@ -834,6 +854,17 @@ namespace CleanerControlApp.Vision
  {
  PopulateCurrentAlarms();
  }
+ }
+
+ private void HomeView_Unloaded(object? sender, RoutedEventArgs e)
+ {
+ try
+ {
+ AlarmManager.AlarmsChanged -= OnAlarmsChanged;
+ StopHardwareStatusTimer();
+ this.Unloaded -= HomeView_Unloaded;
+ }
+ catch { }
  }
  }
 }
