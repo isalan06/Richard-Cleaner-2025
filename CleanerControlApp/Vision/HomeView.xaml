@@ -4,161 +4,167 @@
  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
  xmlns:alarm="clr-namespace:CleanerControlApp.Utilities.Alarm"
+ xmlns:template="clr-namespace:CleanerControlApp.Vision.Template"
  mc:Ignorable="d"
  d:DesignHeight="600" d:DesignWidth="800">
- <UserControl.Resources>
- <!-- Global button style: sets a subtle hover background and uniform border for all buttons in this view -->
- <Style x:Key="{x:Type Button}" TargetType="Button">
- <Setter Property="BorderBrush" Value="#FFBDBDBD"/>
- <!-- subtle hover: very light translucent overlay -->
- <Style.Triggers>
- <Trigger Property="IsMouseOver" Value="True">
- <Setter Property="Background" Value="#11CCCCCC"/>
- </Trigger>
- </Style.Triggers>
- </Style>
+    <UserControl.Resources>
+        <!-- Global button style: sets a subtle hover background and uniform border for all buttons in this view -->
+        <Style x:Key="{x:Type Button}" TargetType="Button">
+            <Setter Property="BorderBrush" Value="#FFBDBDBD"/>
+            <!-- subtle hover: very light translucent overlay -->
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#11CCCCCC"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
 
- <!-- Default reset button style: based on the global Button style -->
- <Style x:Key="ResetButtonDefaultStyle" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
- <!-- no extra setters - inherit hover behavior from global style -->
- </Style>
+        <!-- Default reset button style: based on the global Button style -->
+        <Style x:Key="ResetButtonDefaultStyle" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+            <!-- no extra setters - inherit hover behavior from global style -->
+        </Style>
 
- <!-- No-hover style used during progress (prevents hover color covering progress) -->
- <Style x:Key="ResetButtonNoHoverStyle" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
- <Setter Property="Background" Value="Transparent"/>
- <Setter Property="BorderBrush" Value="#FFBDBDBD"/>
- </Style>
- </UserControl.Resources>
- <Grid Background="White">
- <Grid.ColumnDefinitions>
- <ColumnDefinition Width="200" />
- <ColumnDefinition Width="*" />
- </Grid.ColumnDefinitions>
+        <!-- No-hover style used during progress (prevents hover color covering progress) -->
+        <Style x:Key="ResetButtonNoHoverStyle" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="#FFBDBDBD"/>
+        </Style>
+    </UserControl.Resources>
+    <Grid Background="White">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="200" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
 
- <!-- Left: control buttons stack -->
- <Border Grid.Column="0" Margin="16" Background="#FFF8F8F8" BorderBrush="#FFBDBDBD" BorderThickness="1" CornerRadius="6">
- <StackPanel Margin="10" VerticalAlignment="Top" HorizontalAlignment="Stretch">
- <Button x:Name="BtnStart" Content="啟動" Margin="0,6,0,6" Padding="12" Height="72" HorizontalAlignment="Stretch" FontSize="16" FontWeight="Bold" />
- <Button x:Name="BtnStop" Content="停止" Margin="0,6,0,6" Padding="12" Height="72" HorizontalAlignment="Stretch" FontSize="16" FontWeight="Bold" />
- <Button x:Name="BtnPause" Content="暫停" Margin="0,6,0,6" Padding="12" Height="72" HorizontalAlignment="Stretch" FontSize="16" FontWeight="Bold" />
- <Button x:Name="BtnInit" Margin="0,6,0,6" Padding="0" Height="72" HorizontalAlignment="Stretch" FontSize="16" FontWeight="Bold"
+        <!-- Left: control buttons stack -->
+        <Border Grid.Column="0" Margin="16" Background="#FFF8F8F8" BorderBrush="#FFBDBDBD" BorderThickness="1" CornerRadius="6">
+            <StackPanel Margin="10" VerticalAlignment="Top" HorizontalAlignment="Stretch">
+                <Button x:Name="BtnStart" Content="啟動" Margin="0,6,0,6" Padding="12" Height="72" HorizontalAlignment="Stretch" FontSize="16" FontWeight="Bold" />
+                <Button x:Name="BtnStop" Content="停止" Margin="0,6,0,6" Padding="12" Height="72" HorizontalAlignment="Stretch" FontSize="16" FontWeight="Bold" />
+                <Button x:Name="BtnPause" Content="暫停" Margin="0,6,0,6" Padding="12" Height="72" HorizontalAlignment="Stretch" FontSize="16" FontWeight="Bold" />
+                <Button x:Name="BtnInit" Margin="0,6,0,6" Padding="0" Height="72" HorizontalAlignment="Stretch" FontSize="16" FontWeight="Bold"
  PreviewMouseLeftButtonDown="BtnInit_PreviewMouseLeftButtonDown"
  PreviewMouseLeftButtonUp="BtnInit_PreviewMouseLeftButtonUp"
  LostMouseCapture="BtnInit_LostMouseCapture">
- <Grid x:Name="BtnInitGrid" Width="146" Height="72">
- <Rectangle x:Name="InitProgressRect" HorizontalAlignment="Left" Width="0" VerticalAlignment="Stretch" Height="{Binding ActualHeight, RelativeSource={RelativeSource AncestorType=Button}}" IsHitTestVisible="False" Panel.ZIndex="0">
- <Rectangle.Fill>
- <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
- <GradientStop Color="#FF1E90FF" Offset="0.0" />
- <GradientStop Color="#FF66B2FF" Offset="0.6" />
- <GradientStop Color="#FFBFE9FF" Offset="1.0" />
- </LinearGradientBrush>
- </Rectangle.Fill>
- </Rectangle>
- <TextBlock Text="初始化" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black" FontWeight="Bold" Panel.ZIndex="1" Margin="12,0" />
- </Grid>
- </Button>
- <Button x:Name="BtnResetError" Style="{StaticResource ResetButtonDefaultStyle}" Margin="0,6,0,6" Padding="0" Height="72" HorizontalAlignment="Stretch" FontSize="16" FontWeight="Bold"
+                    <Grid x:Name="BtnInitGrid" Width="146" Height="72">
+                        <Rectangle x:Name="InitProgressRect" HorizontalAlignment="Left" Width="0" VerticalAlignment="Stretch" Height="{Binding ActualHeight, RelativeSource={RelativeSource AncestorType=Button}}" IsHitTestVisible="False" Panel.ZIndex="0">
+                            <Rectangle.Fill>
+                                <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                    <GradientStop Color="#FF1E90FF" Offset="0.0" />
+                                    <GradientStop Color="#FF66B2FF" Offset="0.6" />
+                                    <GradientStop Color="#FFBFE9FF" Offset="1.0" />
+                                </LinearGradientBrush>
+                            </Rectangle.Fill>
+                        </Rectangle>
+                        <TextBlock Text="初始化" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black" FontWeight="Bold" Panel.ZIndex="1" Margin="12,0" />
+                    </Grid>
+                </Button>
+                <Button x:Name="BtnResetError" Style="{StaticResource ResetButtonDefaultStyle}" Margin="0,6,0,6" Padding="0" Height="72" HorizontalAlignment="Stretch" FontSize="16" FontWeight="Bold"
  PreviewMouseLeftButtonDown="BtnResetError_PreviewMouseLeftButtonDown"
  PreviewMouseLeftButtonUp="BtnResetError_PreviewMouseLeftButtonUp"
  LostMouseCapture="BtnResetError_LostMouseCapture">
- <Grid x:Name="BtnResetGrid" Width="146">
- <Rectangle x:Name="ResetProgressRect" HorizontalAlignment="Left" Width="0" VerticalAlignment="Stretch" Height="{Binding ActualHeight, RelativeSource={RelativeSource AncestorType=Button}}" IsHitTestVisible="False" Panel.ZIndex="0">
- <Rectangle.Fill>
- <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
- <GradientStop Color="#FF1E90FF" Offset="0.0" />
- <GradientStop Color="#FF66B2FF" Offset="0.6" />
- <GradientStop Color="#FFBFE9FF" Offset="1.0" />
- </LinearGradientBrush>
- </Rectangle.Fill>
- </Rectangle>
- <TextBlock Text="錯誤重置" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black" FontWeight="Bold" Panel.ZIndex="1" Margin="12,0" />
- </Grid>
- </Button>
- <!-- Progress ring removed; progress will be indicated by button background gradient -->
- <Button x:Name="BtnStopBuzzer" Content="蜂鳴器停止" Margin="0,6,0,6" Padding="12" Height="72" HorizontalAlignment="Stretch" FontSize="16" FontWeight="Bold" />
- </StackPanel>
- </Border>
+                    <Grid x:Name="BtnResetGrid" Width="146">
+                        <Rectangle x:Name="ResetProgressRect" HorizontalAlignment="Left" Width="0" VerticalAlignment="Stretch" Height="{Binding ActualHeight, RelativeSource={RelativeSource AncestorType=Button}}" IsHitTestVisible="False" Panel.ZIndex="0">
+                            <Rectangle.Fill>
+                                <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                    <GradientStop Color="#FF1E90FF" Offset="0.0" />
+                                    <GradientStop Color="#FF66B2FF" Offset="0.6" />
+                                    <GradientStop Color="#FFBFE9FF" Offset="1.0" />
+                                </LinearGradientBrush>
+                            </Rectangle.Fill>
+                        </Rectangle>
+                        <TextBlock Text="錯誤重置" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black" FontWeight="Bold" Panel.ZIndex="1" Margin="12,0" />
+                    </Grid>
+                </Button>
+                <!-- Progress ring removed; progress will be indicated by button background gradient -->
+                <Button x:Name="BtnStopBuzzer" Content="蜂鳴器停止" Margin="0,6,0,6" Padding="12" Height="72" HorizontalAlignment="Stretch" FontSize="16" FontWeight="Bold" />
+            </StackPanel>
+        </Border>
 
- <!-- Right: two stacked boxes -->
- <Grid Grid.Column="1" Margin="16">
- <Grid.RowDefinitions>
- <RowDefinition Height="*" />
- <RowDefinition Height="200" />
- </Grid.RowDefinitions>
+        <!-- Right: two stacked boxes -->
+        <Grid Grid.Column="1" Margin="16">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="200" />
+            </Grid.RowDefinitions>
 
- <Border Grid.Row="0" Margin="0,0,0,8" Background="#FFFFFFFF" BorderBrush="#FFBDBDBD" BorderThickness="1" CornerRadius="6">
- <Grid>
- <TextBlock Text="右上方框" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="16" />
- </Grid>
- </Border>
+            <Border Grid.Row="0" Margin="0,0,0,8" Background="#FFFFFFFF" BorderBrush="#FFBDBDBD" BorderThickness="1" CornerRadius="6">
+                <Canvas x:Name="Home_TopRight_Canvas" Background="Transparent"
+ HorizontalAlignment="Left" VerticalAlignment="Stretch"
+ Width="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=Border}}"
+ Height="{Binding ActualHeight, RelativeSource={RelativeSource AncestorType=Border}}">
+                    <template:Template_System x:Name="EmbeddedTemplateSystem" Canvas.Left="0" Canvas.Top="0"
+ Width="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=Canvas}}"
+ Height="{Binding ActualHeight, RelativeSource={RelativeSource AncestorType=Canvas}}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                </Canvas>
+            </Border>
 
- <!-- Right-Bottom: split into left/right areas -->
- <Border Grid.Row="1" Margin="0,8,0,0" Background="#FFFFFFFF" BorderBrush="#FFBDBDBD" BorderThickness="1" CornerRadius="6" Padding="8">
- <Grid>
- <Grid.ColumnDefinitions>
- <ColumnDefinition Width="2*" />
- <ColumnDefinition Width="3*" />
- </Grid.ColumnDefinitions>
+            <!-- Right-Bottom: split into left/right areas -->
+            <Border Grid.Row="1" Margin="0,8,0,0" Background="#FFFFFFFF" BorderBrush="#FFBDBDBD" BorderThickness="1" CornerRadius="6" Padding="8">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="2*" />
+                        <ColumnDefinition Width="3*" />
+                    </Grid.ColumnDefinitions>
 
- <!-- Left: OperateLog last entry -->
- <StackPanel Grid.Column="0" Margin="4">
- <TextBlock Text="Operate Log (Last)" FontWeight="Bold" Margin="0,0,0,6" />
- <Border Background="#FFF" BorderBrush="#FFE0E0E0" BorderThickness="1" Padding="6" CornerRadius="4">
- <ScrollViewer VerticalScrollBarVisibility="Auto" Height="140">
- <TextBlock x:Name="tbOperateLogLast" Text="尚無資料" TextWrapping="Wrap" Height="140" />
- </ScrollViewer>
- </Border>
- </StackPanel>
+                    <!-- Left: OperateLog last entry -->
+                    <StackPanel Grid.Column="0" Margin="4">
+                        <TextBlock Text="Operate Log (Last)" FontWeight="Bold" Margin="0,0,0,6" />
+                        <Border Background="#FFF" BorderBrush="#FFE0E0E0" BorderThickness="1" Padding="6" CornerRadius="4">
+                            <ScrollViewer VerticalScrollBarVisibility="Auto" Height="140">
+                                <TextBlock x:Name="tbOperateLogLast" Text="尚無資料" TextWrapping="Wrap" Height="140" />
+                            </ScrollViewer>
+                        </Border>
+                    </StackPanel>
 
- <!-- Right: current Alarms and Warnings -->
- <StackPanel Grid.Column="1" Margin="4">
- <TextBlock Text="Alarms &amp; Warnings" FontWeight="Bold" Margin="0,0,0,6" />
- <Border Background="#FFF" BorderBrush="#FFE0E0E0" BorderThickness="1" Padding="4" CornerRadius="4">
- <ListBox x:Name="lbCurrentAlarms" Height="140">
- <ListBox.ItemTemplate>
- <DataTemplate DataType="{x:Type alarm:AlarmEntry}">
- <!-- Single-line layout: Code | Description (trimmed) | Time -->
- <Grid Margin="0">
- <Grid.ColumnDefinitions>
- <ColumnDefinition Width="Auto" />
- <ColumnDefinition Width="*" />
- <ColumnDefinition Width="Auto" />
- </Grid.ColumnDefinitions>
- <TextBlock Grid.Column="0" Text="{Binding Code}" FontWeight="Bold" Margin="2,0,8,0" VerticalAlignment="Center" />
- <TextBlock Grid.Column="1" Text="{Binding Description}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" Foreground="Black" />
- <TextBlock Grid.Column="2" Text="{Binding HappenTime, StringFormat='{}{0:yyyy-MM-dd HH:mm:ss}'}" FontStyle="Italic" FontSize="11" Foreground="Gray" Margin="8,0,2,0" VerticalAlignment="Center" />
- </Grid>
- </DataTemplate>
- </ListBox.ItemTemplate>
- <ListBox.ItemContainerStyle>
- <Style TargetType="ListBoxItem">
- <Setter Property="Padding" Value="4" />
- <Setter Property="HorizontalContentAlignment" Value="Stretch" />
- <Setter Property="Template">
- <Setter.Value>
- <ControlTemplate TargetType="ListBoxItem">
- <Border x:Name="Bd" BorderBrush="#FFE0E0E0" BorderThickness="0,0,0,1" Background="{TemplateBinding Background}" Padding="4">
- <ContentPresenter />
- </Border>
- </ControlTemplate>
- </Setter.Value>
- </Setter>
- <Style.Triggers>
- <DataTrigger Binding="{Binding Type}" Value="Alarm">
- <Setter Property="Background" Value="#FFF08080" />
- </DataTrigger>
- <DataTrigger Binding="{Binding Type}" Value="Warning">
- <Setter Property="Background" Value="#FFFFFF99" />
- </DataTrigger>
- </Style.Triggers>
- </Style>
- </ListBox.ItemContainerStyle>
- </ListBox>
- </Border>
- </StackPanel>
- </Grid>
- </Border>
- </Grid>
- </Grid>
+                    <!-- Right: current Alarms and Warnings -->
+                    <StackPanel Grid.Column="1" Margin="4">
+                        <TextBlock Text="Alarms &amp; Warnings" FontWeight="Bold" Margin="0,0,0,6" />
+                        <Border Background="#FFF" BorderBrush="#FFE0E0E0" BorderThickness="1" Padding="4" CornerRadius="4">
+                            <ListBox x:Name="lbCurrentAlarms" Height="140">
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate DataType="{x:Type alarm:AlarmEntry}">
+                                        <!-- Single-line layout: Code | Description (trimmed) | Time -->
+                                        <Grid Margin="0">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Grid.Column="0" Text="{Binding Code}" FontWeight="Bold" Margin="2,0,8,0" VerticalAlignment="Center" />
+                                            <TextBlock Grid.Column="1" Text="{Binding Description}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" Foreground="Black" />
+                                            <TextBlock Grid.Column="2" Text="{Binding HappenTime, StringFormat='{}{0:yyyy-MM-dd HH:mm:ss}'}" FontStyle="Italic" FontSize="11" Foreground="Gray" Margin="8,0,2,0" VerticalAlignment="Center" />
+                                        </Grid>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                                <ListBox.ItemContainerStyle>
+                                    <Style TargetType="ListBoxItem">
+                                        <Setter Property="Padding" Value="4" />
+                                        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                                        <Setter Property="Template">
+                                            <Setter.Value>
+                                                <ControlTemplate TargetType="ListBoxItem">
+                                                    <Border x:Name="Bd" BorderBrush="#FFE0E0E0" BorderThickness="0,0,0,1" Background="{TemplateBinding Background}" Padding="4">
+                                                        <ContentPresenter />
+                                                    </Border>
+                                                </ControlTemplate>
+                                            </Setter.Value>
+                                        </Setter>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding Type}" Value="Alarm">
+                                                <Setter Property="Background" Value="#FFF08080" />
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding Type}" Value="Warning">
+                                                <Setter Property="Background" Value="#FFFFFF99" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </ListBox.ItemContainerStyle>
+                            </ListBox>
+                        </Border>
+                    </StackPanel>
+                </Grid>
+            </Border>
+        </Grid>
+    </Grid>
 </UserControl>

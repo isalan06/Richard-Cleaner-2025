@@ -9,7 +9,10 @@
  d:DesignHeight="450" d:DesignWidth="800">
  <Grid>
  <!-- Container canvas that hosts the system line control -->
- <Canvas x:Name="LineHostCanvas" Background="Transparent" Width="800" Height="450">
+ <Canvas x:Name="LineHostCanvas" Background="Transparent"
+ Width="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=UserControl}}"
+ Height="{Binding ActualHeight, RelativeSource={RelativeSource AncestorType=UserControl}}"
+ HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
  <sys:Template_System_Line x:Name="SystemLineControl" Canvas.Left="0" Canvas.Top="0" />
  </Canvas>
  </Grid>
