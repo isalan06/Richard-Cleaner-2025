@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:CleanerControlApp.Vision.SystemTemplate"
              mc:Ignorable="d"
-             d:DesignHeight="220" d:DesignWidth="150">
+             d:DesignHeight="220" d:DesignWidth="150" x:Name="RootControl">
   <Grid>
     <Canvas x:Name="ComponentCanvas" Background="Transparent" Canvas.Left="0" Canvas.Top="0" Width="150" Height="220">
       <Canvas x:Name="TankCanvas" Background="Transparent" Canvas.Left="0" Canvas.Top="0" Width="150" Height="220" >

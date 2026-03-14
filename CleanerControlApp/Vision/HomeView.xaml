@@ -93,7 +93,7 @@
  HorizontalAlignment="Left" VerticalAlignment="Stretch"
  Width="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=Border}}"
  Height="{Binding ActualHeight, RelativeSource={RelativeSource AncestorType=Border}}">
-                    <template:Template_System x:Name="EmbeddedTemplateSystem" Canvas.Left="0" Canvas.Top="0"
+                    <template:Template_Home x:Name="EmbeddedTemplateSystem" Canvas.Left="0" Canvas.Top="0"
  Width="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=Canvas}}"
  Height="{Binding ActualHeight, RelativeSource={RelativeSource AncestorType=Canvas}}" HorizontalAlignment="Center" VerticalAlignment="Center" />
                 </Canvas>

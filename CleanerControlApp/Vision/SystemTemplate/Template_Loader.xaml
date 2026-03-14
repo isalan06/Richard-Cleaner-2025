@@ -7,7 +7,7 @@
  mc:Ignorable="d" 
  x:Name="RootControl"
  d:DesignHeight="220" d:DesignWidth="150">
- <Grid>
+    <Grid>
         <Canvas x:Name="LoaderCanvas" Background="Transparent" Canvas.Left="0" Canvas.Top="0" Width="150" Height="220" >
             <Canvas x:Name="TankCanvas" Background="Transparent" Canvas.Left="0" Canvas.Top="0" Width="150" Height="220">
  <Rectangle Canvas.Left="0" Canvas.Top="0" Width="150" Height="220" Stroke="#2B72C2" StrokeThickness="2" Fill="White" HorizontalAlignment="Left" VerticalAlignment="Top"/>
