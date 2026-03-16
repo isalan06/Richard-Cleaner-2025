@@ -374,6 +374,16 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
 
             return result;
         }
+        public bool BackToOriginalPosition()
+        {
+            bool result = false;
+            if (!Moving && !MotorMoving && IsNormalStatus && MotorHome && _motorXAxis != null)
+            {
+                _motorXAxis.MoveToPosition(0, 1);
+                result = true;
+            }
+            return result;
+        }
 
 
         public bool CheckTankCassetteExist()

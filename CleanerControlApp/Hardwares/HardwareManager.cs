@@ -427,6 +427,8 @@ namespace CleanerControlApp.Hardwares
 
             InitializedProcedure();
 
+            AutoProcedure();
+
             await Task.Yield();
         }
 
@@ -511,6 +513,7 @@ namespace CleanerControlApp.Hardwares
         {
             if (!_firstAlarm && HasSystemAlarm)
             {
+                _auto_procedure_trigger = false;
                 _initializing = false;
                 _firstAlarm = true;
                 if (_shuttle != null) _shuttle.AlarmStop();
@@ -568,6 +571,20 @@ namespace CleanerControlApp.Hardwares
             }
         }
 
+        public bool LoaderCanPick => LoaderCassetteCount > 0;
+        public int LoaderFirstCassettePosition
+        {
+            get
+            {
+                if (LoaderCassetteInPosition5) return 5;
+                if (LoaderCassetteInPosition4) return 4;
+                if (LoaderCassetteInPosition3) return 3;
+                if (LoaderCassetteInPosition2) return 2;
+                if (LoaderCassetteInPosition1) return 1;
+                return 0; // no cassette
+            }
+        }
+
         public int UnloaderCassetteCount
         {
             get
@@ -581,6 +598,19 @@ namespace CleanerControlApp.Hardwares
                 if (UnloadCassetteInPosition5) result++;
 
                 return result;
+            }
+        }
+        public bool UnloaderCanPlace => UnloaderCassetteCount < 5;
+        public int UnloaderFirstEmptyPosition
+        {
+            get
+            {
+                if (!UnloadCassetteInPosition1) return 14;
+                if (!UnloadCassetteInPosition2) return 13;
+                if (!UnloadCassetteInPosition3) return 12;
+                if (!UnloadCassetteInPosition4) return 11;
+                if (!UnloadCassetteInPosition5) return 10;
+                return 0; // no empty position
             }
         }
 
@@ -608,7 +638,6 @@ namespace CleanerControlApp.Hardwares
         public bool HeatingTankAuto => _heatingTank != null && _heatingTank.Auto;
 
         public bool SystemAuto => ShuttleAuto && SinkAuto && SoakingTankAuto && DryingTank1Auto && DryingTank2Auto && HeatingTankAuto;
-
         public bool HasAutoStatus => ShuttleAuto || SinkAuto || SoakingTankAuto || DryingTank1Auto || DryingTank2Auto || HeatingTankAuto;
 
         #endregion
@@ -778,7 +807,170 @@ namespace CleanerControlApp.Hardwares
 
         #endregion
 
-        #region Auto & Stop & Pause
+        #region Auto Procedure
+
+        private bool _auto_procedure_trigger = false;
+        private bool _auto_procedure_executing = false;
+        private bool _auto_procedure_pick_executing = false;
+        private bool _auto_procedure_place_executing = false;
+        private bool _auto_procedure_backtoP0_executing= false;
+        private int _auto_procedure_current_pick_position = -1;
+        private int _auto_procedure_current_place_position = -1;
+        
+        private bool CheckPickAndPlacePosition(out int pickPosition, out int placePosition)
+        {
+            pickPosition = -1; 
+            placePosition = -1;
+
+
+            if (!_auto_procedure_trigger && HasAutoStatus && _sink != null && _soakingTank != null && _dryingTanks != null && _dryingTanks.Length > 1)
+            {
+                if (UnloaderCanPlace)
+                {
+                    if (!_dryingTanks[1].ModulePass && _dryingTanks[1].HS_ActFinished) { pickPosition = 9; placePosition = UnloaderFirstEmptyPosition; return true; }
+                    if (!_dryingTanks[0].ModulePass && _dryingTanks[0].HS_ActFinished) { pickPosition = 8; placePosition = UnloaderFirstEmptyPosition; return true; }
+                    if (!_soakingTank.ModulePass && _dryingTanks[0].ModulePass && _dryingTanks[1].ModulePass && _soakingTank.HS_ActFinished) { pickPosition = 7; placePosition = UnloaderFirstEmptyPosition; return true; }
+                    if (!_sink.ModulePass && _soakingTank.ModulePass && _dryingTanks[0].ModulePass && _dryingTanks[1].ModulePass && _sink.HS_ActFinished) { pickPosition = 6; placePosition = UnloaderFirstEmptyPosition; return true; }
+                    if (_sink.ModulePass && _soakingTank.ModulePass && _dryingTanks[0].ModulePass && _dryingTanks[1].ModulePass && LoaderCanPick) { pickPosition = LoaderFirstCassettePosition; placePosition = UnloaderFirstEmptyPosition; return true; }
+                }
+                if (_dryingTanks[1].HS_InputPermit && !_dryingTanks[1].ModulePass)
+                {
+                    if (!_soakingTank.ModulePass && _soakingTank.HS_ActFinished) { pickPosition = 7; placePosition = 9;  return true; }
+                    if(!_sink.ModulePass && _soakingTank.ModulePass && _sink.HS_ActFinished) { pickPosition = 6; placePosition = 9; return true; }
+                    if(_sink.ModulePass && _soakingTank.ModulePass && LoaderCanPick) { pickPosition = LoaderFirstCassettePosition; placePosition = 9; return true; }
+                }
+                if (_dryingTanks[0].HS_InputPermit && !_dryingTanks[0].ModulePass)
+                {
+                    if (!_soakingTank.ModulePass && _soakingTank.HS_ActFinished) { pickPosition = 7; placePosition = 8; return true; }
+                    if (!_sink.ModulePass && _soakingTank.ModulePass && _sink.HS_ActFinished) { pickPosition = 6; placePosition = 8; return true; }
+                    if (_sink.ModulePass && _soakingTank.ModulePass && LoaderCanPick) { pickPosition = LoaderFirstCassettePosition; placePosition = 8; return true; }
+                }
+                if (_soakingTank.HS_InputPermit && !_soakingTank.ModulePass)
+                { 
+                    if(!_sink.ModulePass && _sink.HS_ActFinished) { pickPosition = 6; placePosition = 7; return true; }
+                    if(_sink.ModulePass && LoaderCanPick) { pickPosition = LoaderFirstCassettePosition; placePosition = 7; return true; }
+                }
+                if(_sink.HS_InputPermit && !_sink.ModulePass)
+                {
+                    if (LoaderCanPick) { pickPosition = LoaderFirstCassettePosition; placePosition = 6; return true; }
+                }
+
+            }
+
+            return false;
+        }
+
+        private void SetMoving(int position, bool moving)
+        {
+            if (_sink != null && _soakingTank != null && _dryingTanks != null && _dryingTanks.Length > 1)
+            {
+                if (position == 6) _sink.HS_ClamperMoving = moving;
+                if (position == 7) _soakingTank.HS_ClamperMoving = moving;
+                if (position == 8) _dryingTanks[0].HS_ClamperMoving = moving;
+                if (position == 9) _dryingTanks[1].HS_ClamperMoving = moving;
+            }
+        }
+        private void SetPickFinished(int position, bool pickFinished)
+        {
+            if (_sink != null && _soakingTank != null && _dryingTanks != null && _dryingTanks.Length > 1)
+            {
+                if (position == 6) _sink.HS_ClamperPickFinished = pickFinished;
+                if (position == 7) _soakingTank.HS_ClamperPickFinished = pickFinished;
+                if (position == 8) _dryingTanks[0].HS_ClamperPickFinished = pickFinished;
+                if (position == 9) _dryingTanks[1].HS_ClamperPickFinished = pickFinished;
+            }
+        }
+        private void SetPlaceFinished(int position, bool placeFinished)
+        {
+            if (_sink != null && _soakingTank != null && _dryingTanks != null && _dryingTanks.Length > 1)
+            {
+                if (position == 6) _sink.HS_ClamperPlaceFinished = placeFinished;
+                if (position == 7) _soakingTank.HS_ClamperPlaceFinished = placeFinished;
+                if (position == 8) _dryingTanks[0].HS_ClamperPlaceFinished = placeFinished;
+                if (position == 9) _dryingTanks[1].HS_ClamperPlaceFinished = placeFinished;
+            }
+        }
+
+        private string GetPositionName(int position)
+        {
+            if (position == 6) return "沖水槽";
+            if (position == 7) return "浸泡槽";
+            if (position == 8) return "烘乾槽#1";
+            if (position == 9) return "烘乾槽#2";
+            if (position >= 10 && position <= 14) return $"Unloader# {15 - position}";
+            if (position >= 1 && position <= 5) return $"Loader# {position}";
+            return $"Unknown Position {position}";
+        }
+
+        private void AutoProcedure()
+        {
+            if (_auto_procedure_trigger)
+            {
+                if (!ShuttleAuto)
+                {
+                    _auto_procedure_trigger = false;
+                    OperateLog.Log("自動狀態異常", "系統處於自動狀態，但模組不在自動模式，已停止自動流程，請檢查模組狀態。");
+                }
+                else
+                {
+                    if (CheckPickAndPlacePosition(out int pickPosition, out int placePosition) && !_auto_procedure_executing)
+                    {
+                        _auto_procedure_executing = true;
+                        _auto_procedure_current_pick_position = pickPosition;
+                        _auto_procedure_current_place_position = placePosition;
+                        _auto_procedure_pick_executing = false;
+                        _auto_procedure_place_executing = false;
+                        _auto_procedure_backtoP0_executing = false;
+                        OperateLog.Log("自動流程啟動", $"系統自動流程啟動，Shuttle 將 卡匣 從 {GetPositionName(pickPosition)} 移動到 {GetPositionName(placePosition)}。");
+                    }
+
+                    if (_auto_procedure_executing && _shuttle != null)
+                    {
+                        if (!_auto_procedure_pick_executing)
+                        {
+                            _auto_procedure_pick_executing = _shuttle.PickCassette(_auto_procedure_current_pick_position);
+                            SetMoving(_auto_procedure_current_pick_position, true);
+                        }
+
+                        if (_auto_procedure_pick_executing && !_auto_procedure_place_executing && !_shuttle.Moving && _shuttle.Cassette)
+                        { 
+                            SetMoving(_auto_procedure_current_pick_position, false);
+                            SetPickFinished(_auto_procedure_current_pick_position, true);
+                            _auto_procedure_place_executing = _shuttle.PlaceCassette(_auto_procedure_current_place_position);
+                            SetMoving(_auto_procedure_current_place_position, true);
+                        }
+
+                        if (_auto_procedure_pick_executing && _auto_procedure_place_executing && !_auto_procedure_backtoP0_executing && !_shuttle.Moving && !_shuttle.Cassette)
+                        { 
+                            SetMoving(_auto_procedure_current_place_position, false);
+                            SetPlaceFinished(_auto_procedure_current_place_position, true);
+                            _auto_procedure_backtoP0_executing = _shuttle.BackToOriginalPosition();
+                        }
+
+                        if (_auto_procedure_backtoP0_executing && _shuttle.ShuttleXMotor != null && _shuttle.ShuttleXMotor.GetInPos(0))
+                        {
+                            _auto_procedure_executing = false;
+                            _auto_procedure_pick_executing = false;
+                            _auto_procedure_place_executing = false;
+                            _auto_procedure_backtoP0_executing = false;
+                        }
+                    }
+
+
+                }
+            }
+            else
+            {
+                _auto_procedure_executing = false;
+                _auto_procedure_pick_executing = false;
+                _auto_procedure_place_executing = false;
+                _auto_procedure_backtoP0_executing = false;
+            }
+        }
+
+        #endregion
+
+       #region Auto & Stop & Pause Trigger
 
         public bool AutoStart()
         {

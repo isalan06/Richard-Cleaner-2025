@@ -9,6 +9,7 @@
     <Version>1.0.0</Version>
     <!-- Prevent SDK from auto-generating assembly attributes (avoids duplicate attributes) -->
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <ApplicationIcon>water-splash_38741.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
@@ -44,6 +45,9 @@
   <!-- Include all files under Pictures as Resource so XAML pack URIs can load them -->
   <ItemGroup>
     <Resource Include="Pictures\**\*.*" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="water-splash_38741.ico" />
   </ItemGroup>
 
 </Project>
