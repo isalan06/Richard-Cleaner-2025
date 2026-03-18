@@ -222,7 +222,7 @@ namespace CleanerControlApp.Hardwares.SoakingTank.Services
 
         public bool Auto => _auto;
         public bool Pausing => _pausing;
-        public bool Ultrasonic => _ultrasonic;
+        public bool Ultrasonic => _ultrasonic && _ultrasonicDevice != null && (_ultrasonicDevice.UltrasonicEnabled || _sim_pass_motor);
         public bool Cassette => _cassette;
         public bool Initialized => _initialized && (_sim_pass_motor || MotorHome);
         public bool Idle => Sensor_CoverOpen && !_ultrasonic && !_cassette && _initialized && IsNormalStatus && (_sim_pass_motor || (MotorServoOn && MotorIdle && MotorHome));
@@ -310,6 +310,7 @@ namespace CleanerControlApp.Hardwares.SoakingTank.Services
             {
                 if(ultrasonic) SetCurrent(_moduleSettings.SoakingTank != null ? _moduleSettings.SoakingTank.UltrasonicSetCurrent : 1f);
                 Command_CleanerUltrasonicOpen = ultrasonic;
+                _ultrasonic = ultrasonic;
                 result = true;
             }
 
@@ -729,6 +730,9 @@ namespace CleanerControlApp.Hardwares.SoakingTank.Services
                 // 未烘乾完成前程序
                 if (!_actFinished)
                 {
+                    if (_motor_air_retry_count != 0) _motor_air_retry_count = 0;
+                    if(_motor_air_up_flag) _motor_air_up_flag = false;
+
                     // 蓋子打開等待卡匣放入
                     if (!_cassette && Command_CleanerCoverClose)
                     {
@@ -844,13 +848,13 @@ namespace CleanerControlApp.Hardwares.SoakingTank.Services
                     }
 
                     // 卡匣取出前確認蓋子打開且馬達在上方位置，若不在原點位置則移動到上方位置
-                    if (_cassette && Sensor_CoverOpen && !InPos1 && !_motor_commanding && MotorIdle)
+                    if (_cassette && Sensor_CoverOpen && !InPos1 && !_motor_commanding && MotorIdle && !Sensor_Liquid_L)
                     {
                         MoveToPosition(0, 0);
                     }
 
                     // 風刀反覆吹氣流程
-                    if (_cassette && InPos1 && MotorIdle && !_motor_commanding)
+                    if (_cassette && InPos1 && MotorIdle && !_motor_commanding && !Sensor_Liquid_L)
                     {
                         if (!RetryAirFinished)
                         {

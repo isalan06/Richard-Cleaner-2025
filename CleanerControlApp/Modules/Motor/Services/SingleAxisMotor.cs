@@ -90,6 +90,10 @@ namespace CleanerControlApp.Modules.Motor.Services
         {
             _sim_pass_motor = !_sim_pass_motor;
         }
+        public void SimMotorPass(bool pass)
+        {
+            _sim_pass_motor = pass;
+        }
 
         public bool MotorServoOn => _plcService != null && (_moduleIndex == 1 ? _plcService.ShuttleZServoServoOn : _plcService.ShuttleXServoServoOn);
         public bool MotorNLimit => _plcService != null && (_moduleIndex == 1 ? _plcService.ShuttleZLimitN : _plcService.ShuttleXLimitN);

@@ -1,4 +1,4 @@
-<UserControl x:Class="CleanerControlApp.Vision.Developer.Module.DevModuleShuttleView"
+﻿<UserControl x:Class="CleanerControlApp.Vision.Developer.Module.DevModuleShuttleView"
  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -27,8 +27,9 @@
  <Button x:Name="Btn_Pause" Content="&#x66AB;&#x505C;" Width="60" Height="26" Margin="6,0,0,0" Click="Btn_Pause_Click" />
  <Button x:Name="Btn_AlarmStop" Content="&#x932F;&#x8AA4;&#x505C;&#x6B62;" Width="80" Height="26" Margin="6,0,0,0" Click="Btn_AlarmStop_Click" />
  <!-- developer buttons -->
- <Button x:Name="Btn_MotorPass" Content="&#x99AC;&#x9054;Pass" Width="90" Height="26" Margin="6,0,0,0" Click="Btn_MotorPass_Click" />
- <!-- removed OpenClamper/CloseClamper/Pick/Place/Move buttons -->
+ <Button x:Name="Btn_MotorPass" Content="&#x99AC;&#x9054; Pass" Width="90" Height="26" Margin="6,0,0,0" Click="Btn_MotorPass_Click" />
+ <Button x:Name="Btn_ClamperPass" Content="夾爪 Pass" Width="90" Height="26" Margin="6,0,0,0" Click="Btn_ClamerPass_Click" />
+                    <!-- removed OpenClamper/CloseClamper/Pick/Place/Move buttons -->
  </StackPanel>
  </StackPanel>
  </Grid>

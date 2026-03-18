@@ -823,20 +823,20 @@ namespace CleanerControlApp.Hardwares
             placePosition = -1;
 
 
-            if (!_auto_procedure_trigger && HasAutoStatus && _sink != null && _soakingTank != null && _dryingTanks != null && _dryingTanks.Length > 1)
+            if (_sink != null && _soakingTank != null && _dryingTanks != null && _dryingTanks.Length > 1)
             {
                 if (UnloaderCanPlace)
                 {
-                    if (!_dryingTanks[1].ModulePass && _dryingTanks[1].HS_ActFinished) { pickPosition = 9; placePosition = UnloaderFirstEmptyPosition; return true; }
-                    if (!_dryingTanks[0].ModulePass && _dryingTanks[0].HS_ActFinished) { pickPosition = 8; placePosition = UnloaderFirstEmptyPosition; return true; }
-                    if (!_soakingTank.ModulePass && _dryingTanks[0].ModulePass && _dryingTanks[1].ModulePass && _soakingTank.HS_ActFinished) { pickPosition = 7; placePosition = UnloaderFirstEmptyPosition; return true; }
-                    if (!_sink.ModulePass && _soakingTank.ModulePass && _dryingTanks[0].ModulePass && _dryingTanks[1].ModulePass && _sink.HS_ActFinished) { pickPosition = 6; placePosition = UnloaderFirstEmptyPosition; return true; }
+                    if (!_dryingTanks[1].ModulePass && _dryingTanks[1].HS_ActFinished) { pickPosition = 9; placePosition = UnloaderFirstEmptyPosition;  return true; }
+                    if (!_dryingTanks[0].ModulePass && _dryingTanks[0].HS_ActFinished) { pickPosition = 8; placePosition = UnloaderFirstEmptyPosition;  return true; }
+                    if (!_soakingTank.ModulePass && _dryingTanks[0].ModulePass && _dryingTanks[1].ModulePass && _soakingTank.HS_ActFinished) { pickPosition = 7; placePosition = UnloaderFirstEmptyPosition;  return true; }
+                    if (!_sink.ModulePass && _soakingTank.ModulePass && _dryingTanks[0].ModulePass && _dryingTanks[1].ModulePass && _sink.HS_ActFinished) { pickPosition = 6; placePosition = UnloaderFirstEmptyPosition;  return true; }
                     if (_sink.ModulePass && _soakingTank.ModulePass && _dryingTanks[0].ModulePass && _dryingTanks[1].ModulePass && LoaderCanPick) { pickPosition = LoaderFirstCassettePosition; placePosition = UnloaderFirstEmptyPosition; return true; }
                 }
                 if (_dryingTanks[1].HS_InputPermit && !_dryingTanks[1].ModulePass)
                 {
                     if (!_soakingTank.ModulePass && _soakingTank.HS_ActFinished) { pickPosition = 7; placePosition = 9;  return true; }
-                    if(!_sink.ModulePass && _soakingTank.ModulePass && _sink.HS_ActFinished) { pickPosition = 6; placePosition = 9; return true; }
+                    if(!_sink.ModulePass && _soakingTank.ModulePass && _sink.HS_ActFinished) { pickPosition = 6; placePosition = 9;  return true; }
                     if(_sink.ModulePass && _soakingTank.ModulePass && LoaderCanPick) { pickPosition = LoaderFirstCassettePosition; placePosition = 9; return true; }
                 }
                 if (_dryingTanks[0].HS_InputPermit && !_dryingTanks[0].ModulePass)
@@ -915,36 +915,48 @@ namespace CleanerControlApp.Hardwares
                 {
                     if (CheckPickAndPlacePosition(out int pickPosition, out int placePosition) && !_auto_procedure_executing)
                     {
+                        
                         _auto_procedure_executing = true;
                         _auto_procedure_current_pick_position = pickPosition;
                         _auto_procedure_current_place_position = placePosition;
                         _auto_procedure_pick_executing = false;
                         _auto_procedure_place_executing = false;
                         _auto_procedure_backtoP0_executing = false;
-                        OperateLog.Log("自動流程啟動", $"系統自動流程啟動，Shuttle 將 卡匣 從 {GetPositionName(pickPosition)} 移動到 {GetPositionName(placePosition)}。");
+                        OperateLog.Log("自動流程啟動", $"系統自動流程啟動，移載組 將 卡匣 從 {GetPositionName(pickPosition)} 移動到 {GetPositionName(placePosition)}。");
                     }
 
                     if (_auto_procedure_executing && _shuttle != null)
                     {
                         if (!_auto_procedure_pick_executing)
                         {
-                            _auto_procedure_pick_executing = _shuttle.PickCassette(_auto_procedure_current_pick_position);
-                            SetMoving(_auto_procedure_current_pick_position, true);
+                            if (_auto_procedure_pick_executing = _shuttle.PickCassette(_auto_procedure_current_pick_position))
+                            {
+                                SetMoving(_auto_procedure_current_pick_position, true);
+                                OperateLog.Log("自動流程取卡啟動", $"移載組 開始從 {GetPositionName(_auto_procedure_current_pick_position)} 取卡匣。");
+                            }
                         }
 
                         if (_auto_procedure_pick_executing && !_auto_procedure_place_executing && !_shuttle.Moving && _shuttle.Cassette)
-                        { 
-                            SetMoving(_auto_procedure_current_pick_position, false);
-                            SetPickFinished(_auto_procedure_current_pick_position, true);
-                            _auto_procedure_place_executing = _shuttle.PlaceCassette(_auto_procedure_current_place_position);
-                            SetMoving(_auto_procedure_current_place_position, true);
+                        {
+                            if (_auto_procedure_place_executing = _shuttle.PlaceCassette(_auto_procedure_current_place_position))
+                            {
+                                SetMoving(_auto_procedure_current_pick_position, false);
+                                SetPickFinished(_auto_procedure_current_pick_position, true);
+
+                                SetMoving(_auto_procedure_current_place_position, true);
+                                OperateLog.Log("自動流程放卡啟動", $"移載組 開始將卡匣放到 {GetPositionName(_auto_procedure_current_place_position)}。");
+                            }
                         }
 
                         if (_auto_procedure_pick_executing && _auto_procedure_place_executing && !_auto_procedure_backtoP0_executing && !_shuttle.Moving && !_shuttle.Cassette)
-                        { 
-                            SetMoving(_auto_procedure_current_place_position, false);
-                            SetPlaceFinished(_auto_procedure_current_place_position, true);
-                            _auto_procedure_backtoP0_executing = _shuttle.BackToOriginalPosition();
+                        {
+                            if (_auto_procedure_backtoP0_executing = _shuttle.BackToOriginalPosition())
+                            {
+                                SetMoving(_auto_procedure_current_place_position, false);
+                                SetPlaceFinished(_auto_procedure_current_place_position, true);
+
+                                OperateLog.Log("自動流程回原點啟動", $"移載組 開始回到原點。");
+                            }
                         }
 
                         if (_auto_procedure_backtoP0_executing && _shuttle.ShuttleXMotor != null && _shuttle.ShuttleXMotor.GetInPos(0))
@@ -953,6 +965,7 @@ namespace CleanerControlApp.Hardwares
                             _auto_procedure_pick_executing = false;
                             _auto_procedure_place_executing = false;
                             _auto_procedure_backtoP0_executing = false;
+                            OperateLog.Log("自動流程完成", $"移載組 已完成從 {GetPositionName(_auto_procedure_current_pick_position)} 移動到 {GetPositionName(_auto_procedure_current_place_position)} 的流程，並回到原點。");
                         }
                     }
 
@@ -980,6 +993,7 @@ namespace CleanerControlApp.Hardwares
             {
                 if (_shuttle != null && _sink != null && _soakingTank != null && _dryingTanks != null && _dryingTanks.Length > 1 && _heatingTank != null)
                 {
+                    _auto_procedure_trigger = true;
                     _shuttle.AutoStart();
                     _sink.AutoStart();
                     _soakingTank.AutoStart();

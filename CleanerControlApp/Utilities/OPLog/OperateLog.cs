@@ -65,8 +65,8 @@ namespace CleanerControlApp.Utilities.Log
                 
             try
             {
+                // 不再根據 Developer 權限寫入 TestLog，所有使用者統一寫入 OperateLog
                 string dir = GetLogDirectory();
-                if (UserManager.CurrentUserRole == Modules.UserManagement.Models.UserRole.Developer) dir = GetLogDirectory_Test();
                 Directory.CreateDirectory(dir);
 
                 string filePath = Path.Combine(dir, $"OperateLog-{DateTime.Now:yyyyMMdd}.csv");
@@ -106,14 +106,6 @@ namespace CleanerControlApp.Utilities.Log
             return Path.Combine(baseDir, "OperateLog", monthFolder);
         }
 
-        private static string GetLogDirectory_Test()
-        {
-            // 使用應用程式的執行目錄下的 OperateLog/yyyyMM 資料夾
-            string baseDir = AppDomain.CurrentDomain.BaseDirectory ?? Directory.GetCurrentDirectory();
-            string monthFolder = DateTime.Now.ToString("yyyyMM");
-            return Path.Combine(baseDir, "TestLog", monthFolder);
-        }
-
         private static string EscapeCsvField(string input)
         {
             if (string.IsNullOrEmpty(input))
@@ -130,22 +122,11 @@ namespace CleanerControlApp.Utilities.Log
         {
             try
             {
-                // Try normal OperateLog folder first
                 string dir = GetLogDirectoryForDate(date);
                 string filePath = Path.Combine(dir, $"OperateLog-{date:yyyyMMdd}.csv");
                 if (!File.Exists(filePath))
                 {
-                    // try test log location
-                    string testDir = GetLogDirectoryForDate_Test(date);
-                    string testFile = Path.Combine(testDir, $"OperateLog-{date:yyyyMMdd}.csv");
-                    if (File.Exists(testFile))
-                    {
-                        filePath = testFile;
-                    }
-                    else
-                    {
-                        return new List<OperateLogEntry>();
-                    }
+                    return new List<OperateLogEntry>();
                 }
 
                 var lines = File.ReadAllLines(filePath, Encoding.UTF8);
@@ -187,13 +168,6 @@ namespace CleanerControlApp.Utilities.Log
             string baseDir = AppDomain.CurrentDomain.BaseDirectory ?? Directory.GetCurrentDirectory();
             string monthFolder = date.ToString("yyyyMM");
             return Path.Combine(baseDir, "OperateLog", monthFolder);
-        }
-
-        private static string GetLogDirectoryForDate_Test(DateTime date)
-        {
-            string baseDir = AppDomain.CurrentDomain.BaseDirectory ?? Directory.GetCurrentDirectory();
-            string monthFolder = date.ToString("yyyyMM");
-            return Path.Combine(baseDir, "TestLog", monthFolder);
         }
 
         // Simple CSV parser that respects quoted fields and escaped quotes

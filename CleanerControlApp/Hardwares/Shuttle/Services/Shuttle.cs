@@ -51,6 +51,7 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
         private bool _autoStopFlag = false;
 
         private bool _sim_pass_motor = false;
+        private bool _sim_pass_clamper = false;
 
         private static int _clamperTimeoutThreshold_Value = 30;
 
@@ -192,8 +193,8 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
         public bool Sensor_ClamperFrontClose => _plcService != null && _plcService.ShuttleZFClamperClose;
         public bool Sensor_ClamperBackOpen => _plcService != null && _plcService.ShuttleZBClamperOpen;
         public bool Sensor_ClamperBackClose => _plcService != null && _plcService.ShuttleZBClamperClose;
-        public bool Sensor_ClamperOpen => _plcService != null && _plcService.ShuttleZClampOpen;
-        public bool Sensor_ClamperClose => _plcService != null && _plcService.ShuttleZClampClose;
+        public bool Sensor_ClamperOpen => _plcService != null && _plcService.ShuttleZClamperOpenSign;
+        public bool Sensor_ClamperClose => _plcService != null && _plcService.ShuttleZClamperCloseSign;
 
         public bool Check_ClamperOpen => Sensor_ClamperFrontOpen && Sensor_ClamperBackOpen && Sensor_ClamperOpen;
         public bool Check_ClamperClose => Sensor_ClamperFrontClose && Sensor_ClamperBackClose && Sensor_ClamperClose;
@@ -319,6 +320,13 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
         public void SimMotorPass()
         {
             _sim_pass_motor = !_sim_pass_motor;
+            _motorXAxis?.SimMotorPass(_sim_pass_motor);
+            _motorZAxis?.SimMotorPass(_sim_pass_motor);
+
+        }
+        public void SimClamperPass()
+        { 
+            _sim_pass_clamper = !_sim_pass_clamper;
         }
 
         public void AllMotorStop()
@@ -345,7 +353,7 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
         {
             bool result = false;
 
-            if (IsEmpty && !Moving && !MotorMoving && IsNormalStatus && MotorHome && ZInIdlePosition)
+            if ((IsEmpty || _sim_pass_clamper) && !Moving && !MotorMoving && IsNormalStatus && MotorHome && ZInIdlePosition)
             {
                 if (position > 0 && position < 15)
                 {
@@ -361,7 +369,7 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
         {
             bool result = false;
 
-            if (HasCassette && !Moving && !MotorMoving && IsNormalStatus && MotorHome && ZInIdlePosition)
+            if ((HasCassette || _sim_pass_clamper) && !Moving && !MotorMoving && IsNormalStatus && MotorHome && ZInIdlePosition)
             {
                 if(position > 0 && position < 15)
                 {
@@ -601,7 +609,7 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
                             break;
 
                         case 20: // Clamper Close to Pick Cassette
-                            if (Check_ClamperClose)
+                            if (Check_ClamperClose || _sim_pass_clamper)
                             {
                                 _pickCase = 30;
                             }
@@ -621,7 +629,7 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
                             break;
 
                         case 40: // Check Cassette Exist
-                            if (HasCassette)
+                            if (HasCassette || _sim_pass_clamper)
                             {
                                 _cassette = true;
                                 _pickTrigger = false;
@@ -667,7 +675,7 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
                             break;
 
                         case 20: // Clamper Open to Place Cassette
-                            if (Check_ClamperOpen)
+                            if (Check_ClamperOpen || _sim_pass_clamper)
                             {
                                 _placeCase = 30;
                             }
@@ -687,7 +695,7 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
                             break;
 
                         case 40: // Check Cassette Exist
-                            if (IsEmpty)
+                            if (IsEmpty || _sim_pass_clamper)
                             {
                                 _cassette = false;
                                 _placeTrigger = false;

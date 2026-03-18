@@ -9,6 +9,7 @@ namespace CleanerControlApp.Modules.Motor.Interfaces
     public interface ISingleAxisMotor
     {
         void SimMotorPass();
+        void SimMotorPass(bool pass);
 
         bool MotorServoOn { get; }
         bool MotorNLimit { get; }

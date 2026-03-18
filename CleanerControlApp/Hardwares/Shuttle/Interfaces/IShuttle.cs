@@ -58,6 +58,7 @@ namespace CleanerControlApp.Hardwares.Shuttle.Interfaces
         void ModuleReset();
 
         void SimMotorPass();
+        void SimClamperPass();
         void AllMotorStop();
 
 
