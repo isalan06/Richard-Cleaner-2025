@@ -139,6 +139,8 @@ namespace CleanerControlApp.Utilities
         public int SoakingTankModulePass { get; set; }
         public int DryingTank1ModulePass { get; set; }
         public int DryingTank2ModulePass { get; set; }
+
+        public int WriteMotionParameterAfterInitialization { get; set; }
     }
 
 }

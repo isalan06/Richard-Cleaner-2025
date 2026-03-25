@@ -72,6 +72,8 @@ namespace CleanerControlApp.Modules.MitsubishiPLC.Services
 
         private int _routeIndex = 0;
 
+        private bool _writeplcparameter_done = false;
+
         #endregion
 
         #region constructor
@@ -239,7 +241,16 @@ namespace CleanerControlApp.Modules.MitsubishiPLC.Services
                     }
 
                     if (++_routeIndex >= _routeProcess.Length)
+                    {
                         _routeIndex = 0;
+
+                        // write plc parameter for first time
+                        if(!_writeplcparameter_done)
+                        {
+                            _writeplcparameter_done = true;
+                            await writeParameter();
+                        }
+                    }
                 }
 
 

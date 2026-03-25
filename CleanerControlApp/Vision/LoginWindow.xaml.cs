@@ -16,6 +16,7 @@ using CleanerControlApp.Modules.UserManagement.Services;
 using CleanerControlApp.Utilities.Log;
 using Microsoft.Extensions.Logging;
 using CleanerControlApp.Hardwares;
+using CleanerControlApp.Utilities;
 
 
 namespace CleanerControlApp.Vision
@@ -28,17 +29,22 @@ namespace CleanerControlApp.Vision
         private readonly UserManager _userManager;
         private readonly ILogger<LoginWindow> _logger;
         private readonly HardwareManager _hardwareManager;
-        public LoginWindow(UserManager userManager, ILogger<LoginWindow> logger, HardwareManager hardwareManager)
+        private readonly UnitSettings _unitSettings;
+        public LoginWindow(UserManager userManager, ILogger<LoginWindow> logger, HardwareManager hardwareManager, UnitSettings unitSettings)
         {
             InitializeComponent();
             _userManager = userManager;
             _logger = logger;
             _hardwareManager = hardwareManager;
+            _unitSettings = unitSettings;
 
             // Pre-fill credentials for testing to avoid repeatedly typing them.
             // TODO: Remove these defaults before production.
-            UsernameTextBox.Text = "supervisor";
-            PasswordBox.Password = "9527";
+            if (_unitSettings.System != null && _unitSettings.System.LoginUseDefaultDeveloper != 0)
+            {
+                UsernameTextBox.Text = "supervisor";
+                PasswordBox.Password = "9527";
+            }
         }
 
 

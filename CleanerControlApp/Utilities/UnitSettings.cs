@@ -139,5 +139,6 @@ namespace CleanerControlApp.Utilities
     public class US_System
     { 
         public int Initialization_Timeout_Second { get; set; }
+        public int LoginUseDefaultDeveloper { get; set; }
     }
 }
