@@ -104,15 +104,30 @@
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="2*" />
-                        <ColumnDefinition Width="3*" />
+                        <ColumnDefinition Width="2*" />
                     </Grid.ColumnDefinitions>
 
                     <!-- Left: OperateLog last entry -->
                     <StackPanel Grid.Column="0" Margin="4">
-                        <TextBlock Text="Operate Log (Last)" FontWeight="Bold" Margin="0,0,0,6" />
+                        <Grid Margin="0,0,0,6">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="Operate Log (Last)" FontWeight="Bold" VerticalAlignment="Center" />
+                            <Button x:Name="BtnHint" Grid.Column="1" Content="Hint" Margin="8,0,0,0" Padding="6,2" VerticalAlignment="Center" />
+                        </Grid>
                         <Border Background="#FFF" BorderBrush="#FFE0E0E0" BorderThickness="1" Padding="6" CornerRadius="4">
-                            <ScrollViewer VerticalScrollBarVisibility="Auto" Height="140">
+                            <ScrollViewer VerticalScrollBarVisibility="Auto" Height="40">
                                 <TextBlock x:Name="tbOperateLogLast" Text="尚無資料" TextWrapping="Wrap" Height="140" />
+                            </ScrollViewer>
+                        </Border>
+
+                        <!-- New: current hint label and display -->
+                        <TextBlock Text="現狀及下一步建議" FontWeight="Bold" Margin="0,8,0,4" />
+                        <Border Background="#FFF" BorderBrush="#FFE0E0E0" BorderThickness="1" Padding="6" CornerRadius="4">
+                            <ScrollViewer VerticalScrollBarVisibility="Auto" Height="40">
+                                <TextBlock x:Name="tbSystemHint" Text="尚無資料" TextWrapping="Wrap" FontFamily="Consolas" />
                             </ScrollViewer>
                         </Border>
                     </StackPanel>
@@ -121,7 +136,7 @@
                     <StackPanel Grid.Column="1" Margin="4">
                         <TextBlock Text="Alarms &amp; Warnings" FontWeight="Bold" Margin="0,0,0,6" />
                         <Border Background="#FFF" BorderBrush="#FFE0E0E0" BorderThickness="1" Padding="4" CornerRadius="4">
-                            <ListBox x:Name="lbCurrentAlarms" Height="140">
+                            <ListBox x:Name="lbCurrentAlarms" Height="130">
                                 <ListBox.ItemTemplate>
                                     <DataTemplate DataType="{x:Type alarm:AlarmEntry}">
                                         <!-- Single-line layout: Code | Description (trimmed) | Time -->

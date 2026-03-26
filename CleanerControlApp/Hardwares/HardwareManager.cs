@@ -983,7 +983,7 @@ namespace CleanerControlApp.Hardwares
 
         #endregion
 
-       #region Auto & Stop & Pause Trigger
+        #region Auto & Stop & Pause Trigger
 
         public bool AutoStart()
         {
@@ -1085,6 +1085,135 @@ namespace CleanerControlApp.Hardwares
             if (!_buzzer_stop) OperateLog.Log("停止蜂鳴器", "按下 [停止蜂鳴器] 後停止蜂鳴等待，按下 [錯誤重置] 可以解除該狀態。");
             _buzzer_stop = true;
 
+        }
+
+        #endregion
+
+        #region Hint
+
+        public string Hint()
+        { 
+            var sb = new StringBuilder();
+
+            // Overall system status
+            sb.AppendLine($"整體系統狀態:");
+            sb.AppendLine($" - 背景循環運行: {_running}");
+            sb.AppendLine($" - 系統初始化中: {_initializing}");
+            if (_initializing && _initializingStartTime.HasValue)
+            {
+                var elapsed = DateTime.UtcNow - _initializingStartTime.Value;
+                sb.AppendLine($" - 初始化已進行: {elapsed.TotalSeconds:F0} 秒");
+            }
+            sb.AppendLine($" - 系統已初始化: {SystemInitialized}");
+            sb.AppendLine($" - 系統自動模式: {SystemAuto}");
+            sb.AppendLine($" - 系統有錯誤(Alarm): {HasSystemAlarm}");
+            sb.AppendLine($" - 系統有警告(Warning): {HasSystemWarning}");
+
+            // Communication
+            sb.AppendLine("通訊狀態:");
+            sb.AppendLine($" - Modbus TCP:  {ModbusTCPConnected}");
+            sb.AppendLine($" - Modbus RTU1: {ModbusRTU1Connected}");
+            sb.AppendLine($" - Modbus RTU2: {ModbusRTU2Connected}");
+            sb.AppendLine($" - Modbus RTU3: {ModbusRTU3Connected}");
+            sb.AppendLine($" - Modbus RTU4: {ModbusRTU4Connected}");
+            sb.AppendLine($" - 所有 Modbus連線 (或已繞過檢查): {Check_All_Modbus_Connected}");
+
+            // Module summary
+            sb.AppendLine("模組狀態:");
+            if (_shuttle != null)
+                sb.AppendLine($" - 移載組: \t已初始化={ShuttleInitialized}, \t空閒={ShuttleIdle}, \t自動={ShuttleAuto}, \t錯誤={HasShuttleAlarm}, \t警告={HasShuttleWarning}");
+            if (_sink != null)
+                sb.AppendLine($" - 沖水槽: \t已初始化={SinkInitialized}, \t空閒={SinkIdle}, \t自動={SinkAuto}, \t錯誤={HasSinkAlarm}, \t警告={HasSinkWarning}");
+            if (_soakingTank != null)
+                sb.AppendLine($" - 浸泡槽: \t已初始化={SoakingTankInitialized}, \t空閒={SoakingTankIdle}, \t自動={SoakingTankAuto}, \t錯誤={HasSoakingTankAlarm}, \t警告={HasSoakingTankWarning}");
+            if (_dryingTanks != null && _dryingTanks.Length >0)
+                sb.AppendLine($" - 烘乾槽#1: \t已初始化={DryingTank1Initialized}, \t空閒={DryingTank1Idle}, \t自動={DryingTank1Auto}, \t錯誤={HasDryingTank1Alarm}, \t警告={HasDryingTank1Warning}");
+            if (_dryingTanks != null && _dryingTanks.Length >1)
+                sb.AppendLine($" - 烘乾槽#2: \t已初始化={DryingTank2Initialized}, \t空閒={DryingTank2Idle}, \t自動={DryingTank2Auto}, \t錯誤={HasDryingTank2Alarm}, \t警告={HasDryingTank2Warning}");
+            if (_heatingTank != null)
+                sb.AppendLine($" - 加熱槽: \t已初始化={HeatingTankInitialized}, \t空閒={HeatingTankIdle}, \t自動={HeatingTankAuto}, \t錯誤={HasHeatingTankAlarm}, \t警告={HasHeatingTankWarning}");
+
+            // Alarms / Warnings details
+            sb.AppendLine("錯誤/警告 明細:");
+            sb.AppendLine($" - 通訊錯誤: {!Check_All_Modbus_Connected}");
+            sb.AppendLine($" - EMO(急停) 錯誤: {!EMOSign}");
+            sb.AppendLine($" - 主氣壓 錯誤: {!MainAirSign}");
+            sb.AppendLine($" - 門開關 錯誤: {FrontDoor1Sign || FrontDoor2Sign || FrontDoor3Sign || FrontDoor4Sign || SideDoor1Sign || SideDoor2Sign}");
+            sb.AppendLine($" - 漏水 錯誤: {Leakage1Sign || Leakage2Sign}");
+            sb.AppendLine($" - 廢水槽高位: {WasteTankH}");
+            sb.AppendLine($" - 初始化逾時警告: {_initializingTimeout_alarm}");
+            sb.AppendLine($" - 卡匣檢查警告: {_checkCassette_alarm}");
+
+            // Next possible actions / suggestions
+            sb.AppendLine("建議下一步:");
+
+            _Next(ref sb);
+
+            // Small operational hints
+            sb.AppendLine("操作提示:");
+            sb.AppendLine(" - 自動流程會等待移載組的 Moving/Cassette 狀態，以及各模組的 HS_ActFinished/HS_InputPermit 訊號。");
+            sb.AppendLine(" - 初始化會對每個模組呼叫 ModuleReset()，之後由移載組執行卡匣檢查；初始化時間會依設定逾時。");
+
+            return sb.ToString();
+        }
+
+        private void _Next(ref StringBuilder sb)
+        {
+            if (sb != null)
+            {
+
+                if (HasSystemAlarm)
+                {
+                    sb.AppendLine(" - 系統目前有錯誤。請先排除硬體問題，之後可呼叫 AlarmResetAsync()以清除錯誤狀態。");
+                    sb.AppendLine(" - 也可暫時停止蜂鳴器：呼叫 Buzzer_Stop()。");
+                }
+
+                if (!_initializing && !HasSystemAlarm && !HasAutoStatus)
+                {
+                    sb.AppendLine(" - 系統可進行初始化：呼叫 Initialize() 。");
+                }
+                else if (HasAutoStatus)
+                {
+                    sb.AppendLine(" - 目前有模組處於自動模式。若要重新初始化，請先停止自動 (AutoStop()) 。");
+                }
+
+                if (SystemInitialized && !SystemAuto && !HasSystemAlarm)
+                {
+                    sb.AppendLine(" - 系統已初始化並可開始自動：呼叫 AutoStart() 開始自動運作。");
+                }
+                if (SystemAuto)
+                {
+                    sb.AppendLine(" - 系統目前處於自動模式：可呼叫 AutoPause() 暫停或 AutoStop(force=true) 強制停止。");
+                }
+
+                if (!Check_All_Modbus_Connected)
+                {
+                    sb.AppendLine(" - 通訊尚未完全連線。請呼叫 CommunicationConnect(true) 或檢查網路/序列埠連線。");
+                }
+
+                // If initialization was attempted but rejected, include reason
+                var canInitCode = CheckCanInitialize(out string initStatus);
+                if (canInitCode != 0)
+                {
+                    sb.AppendLine($" - 初始化被阻止：{initStatus}");
+                    if (canInitCode == 1)
+                        sb.AppendLine(" (請停止模組自動模式以允許初始化。)");
+                    if (canInitCode == 2)
+                        sb.AppendLine(" (請先解除錯誤後再初始化。)");
+                    if (canInitCode == 3)
+                        sb.AppendLine(" (系統正在初始化中。)");
+                    if (canInitCode == 4)
+                        sb.AppendLine(" (請先移除夾爪上的卡匣。)");
+                }
+            }
+        }
+        public string Next()
+        {
+            var sb = new StringBuilder();
+
+            _Next(ref sb);
+
+            return sb.ToString();
         }
 
         #endregion

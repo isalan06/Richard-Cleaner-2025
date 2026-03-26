@@ -160,6 +160,16 @@ namespace CleanerControlApp.Vision
             {
                 PopulateCurrentAlarms();
                 LoadLatestOperateLog();
+                // populate initial system hint if hardware available
+                try
+                {
+                    var hwInit = App.AppHost?.Services?.GetService<HardwareManager>();
+                    if (hwInit != null && tbSystemHint != null)
+                    {
+                        tbSystemHint.Text = hwInit.Next();
+                    }
+                }
+                catch { }
             }
             catch { }
 
@@ -175,6 +185,9 @@ namespace CleanerControlApp.Vision
 
             // Ensure cleanup on unload
             this.Unloaded += HomeView_Unloaded;
+
+            // Wire hint button
+            BtnHint.Click += BtnHint_Click;
         }
 
         private void StartOperateLogTimer()
@@ -241,6 +254,15 @@ namespace CleanerControlApp.Vision
                 _lastInitializingState = initializing;
                 _lastSystemInitializedState = systemInit;
                 UpdateInitButtonVisual(initializing, systemInit);
+                // update system hint display
+                try
+                {
+                    if (tbSystemHint != null)
+                    {
+                        tbSystemHint.Text = hw.Next();
+                    }
+                }
+                catch { }
             }
             catch { }
         }
@@ -901,6 +923,74 @@ namespace CleanerControlApp.Vision
                 this.Unloaded -= HomeView_Unloaded;
             }
             catch { }
+        }
+
+        private void BtnHint_Click(object? sender, RoutedEventArgs e)
+        {
+            try
+            {
+                var hw = App.AppHost?.Services?.GetService<HardwareManager>();
+                if (hw == null)
+                {
+                    MessageBox.Show("HardwareManager not available.", "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+
+                string hint = hw.Hint();
+
+                // Determine owner window (to center the popup)
+                var owner = Window.GetWindow(this);
+
+                // Create content
+                var textBlock = new TextBlock
+                {
+                    Text = hint,
+                    TextWrapping = TextWrapping.Wrap,
+                    FontFamily = new System.Windows.Media.FontFamily("Consolas"),
+                    Margin = new Thickness(8)
+                };
+
+                var scroll = new ScrollViewer
+                {
+                    Content = textBlock
+                };
+
+                var win = new Window()
+                {
+                    Title = "系統提示",
+                    Content = scroll,
+                    SizeToContent = SizeToContent.Manual,
+                    WindowStartupLocation = owner != null ? WindowStartupLocation.CenterOwner : WindowStartupLocation.CenterScreen
+                };
+
+                if (owner != null)
+                {
+                    // set owner and size relative to owner (1.5x)
+                    win.Owner = owner;
+
+                    double w = owner.ActualWidth >0 ? owner.ActualWidth *1.5 :600 *1.5;
+                    double h = owner.ActualHeight >0 ? owner.ActualHeight *1.5 :420 *1.5;
+
+                    // ensure it does not exceed available work area
+                    w = Math.Min(w, SystemParameters.WorkArea.Width);
+                    h = Math.Min(h, SystemParameters.WorkArea.Height);
+
+                    win.Width = w;
+                    win.Height = h;
+                }
+                else
+                {
+                    // fallback: scale default size
+                    win.Width = 600 * 1.5;
+                    win.Height = 420 * 1.5;
+                }
+
+                win.ShowDialog();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"顯示Hint失敗:\n{ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
     }
 }
