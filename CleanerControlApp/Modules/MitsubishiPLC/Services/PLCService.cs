@@ -30,7 +30,7 @@ namespace CleanerControlApp.Modules.MitsubishiPLC.Services
         private PLC_Bit_Union[] _statusIO = Array.Empty<PLC_Bit_Union>();
 
         // 預設 Motion Position (DWord) 數量
-        private const int DefaultMotionPosCount = 4;
+        private const int DefaultMotionPosCount = 8;
         private PLC_DWord_Union[] _motionPos = Array.Empty<PLC_DWord_Union>();
 
         // 預設 Command 數量
@@ -699,6 +699,11 @@ namespace CleanerControlApp.Modules.MitsubishiPLC.Services
         public int Axis3Pos => _motionPos[2].IntValue;
         public int Axis4Pos => _motionPos[3].IntValue;
 
+        public int Axis1EncoderPos => _motionPos[4].IntValue;
+        public int Axis2EncoderPos => _motionPos[5].IntValue;
+        public int Axis3EncoderPos => _motionPos[6].IntValue;
+        public int Axis4EncoderPos => _motionPos[7].IntValue;
+
         #endregion
 
         #region Command
@@ -718,6 +723,11 @@ namespace CleanerControlApp.Modules.MitsubishiPLC.Services
         {
             get { return _command[0].Bit2; }
             set { _command[0].Bit2 = value; }
+        }
+        public bool Command_ResetEncoder
+        { 
+            get => _command[0].Bit3;
+            set => _command[0].Bit3 = value;
         }
 
         public bool Command_Axis1JogP
@@ -1399,7 +1409,7 @@ namespace CleanerControlApp.Modules.MitsubishiPLC.Services
                     {
                         FunctionCode = 0x03,
                         StartAddress = 500,
-                        DataNumber = 26
+                        DataNumber = 34
                     }
                 },
                 new PLCFrame()

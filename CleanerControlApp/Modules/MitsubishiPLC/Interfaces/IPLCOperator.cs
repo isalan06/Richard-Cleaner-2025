@@ -208,6 +208,11 @@ namespace CleanerControlApp.Modules.MitsubishiPLC.Interfaces
         public int Axis3Pos { get; }
         public int Axis4Pos { get; }
 
+        public int Axis1EncoderPos { get; }
+        public int Axis2EncoderPos { get; }
+        public int Axis3EncoderPos { get; }
+        public int Axis4EncoderPos { get; }
+
         #endregion
 
         #region Command
@@ -215,6 +220,7 @@ namespace CleanerControlApp.Modules.MitsubishiPLC.Interfaces
         public bool Command_AutoStart { get; set; }
         public bool Command_AlarmReset { get; set; }
         public bool Command_WriteParameter { get; set; }
+        public bool Command_ResetEncoder { get; set; }
 
         public bool Command_Axis1JogP { get; set; }
         public bool Command_Axis1JogN { get; set; }

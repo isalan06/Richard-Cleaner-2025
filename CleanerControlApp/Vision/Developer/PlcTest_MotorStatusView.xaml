@@ -3,188 +3,192 @@
  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
- mc:Ignorable="d">
- <Grid Background="White">
- <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
- <ItemsControl ItemsSource="{Binding Axes}">
- <ItemsControl.ItemsPanel>
- <ItemsPanelTemplate>
- <UniformGrid Columns="4" />
- </ItemsPanelTemplate>
- </ItemsControl.ItemsPanel>
- <ItemsControl.ItemTemplate>
- <DataTemplate>
- <Border BorderBrush="#FFB0B0B0" BorderThickness="1" Margin="6" Padding="8" CornerRadius="6" Background="WhiteSmoke" Width="280">
- <StackPanel>
- <TextBlock Text="{Binding Header}" FontWeight="Bold" Margin="4" HorizontalAlignment="Center" />
- <Separator Margin="2" />
- <!-- Alarm Section -->
- <TextBlock Text="警報" FontWeight="SemiBold" Margin="4,8,4,2" />
- <ItemsControl ItemsSource="{Binding AlarmItems}">
- <ItemsControl.ItemsPanel>
- <ItemsPanelTemplate>
- <StackPanel />
- </ItemsPanelTemplate>
- </ItemsControl.ItemsPanel>
- <ItemsControl.ItemTemplate>
- <DataTemplate>
- <Grid Margin="4">
- <Grid.ColumnDefinitions>
- <ColumnDefinition Width="Auto" />
- <ColumnDefinition Width="*" />
- </Grid.ColumnDefinitions>
- <Ellipse Width="16" Height="16" Stroke="Gray" StrokeThickness="1" VerticalAlignment="Center">
- <Ellipse.Style>
- <Style TargetType="Ellipse">
- <Setter Property="Fill" Value="Gray" />
- <Style.Triggers>
- <DataTrigger Binding="{Binding IsOn}" Value="True">
- <Setter Property="Fill" Value="Red" />
- </DataTrigger>
- </Style.Triggers>
- </Style>
- </Ellipse.Style>
- </Ellipse>
- <TextBlock Grid.Column="1" Text="{Binding Description}" Margin="8,0,0,0" VerticalAlignment="Center" />
- </Grid>
- </DataTemplate>
- </ItemsControl.ItemTemplate>
- </ItemsControl>
- 
- <Separator Margin="6" />
- <!-- Status Section -->
- <TextBlock Text="狀態" FontWeight="SemiBold" Margin="4,8,4,2" />
- <ItemsControl ItemsSource="{Binding StatusItems}">
- <ItemsControl.ItemsPanel>
- <ItemsPanelTemplate>
- <StackPanel />
- </ItemsPanelTemplate>
- </ItemsControl.ItemsPanel>
- <ItemsControl.ItemTemplate>
- <DataTemplate>
- <Grid Margin="4">
- <Grid.ColumnDefinitions>
- <ColumnDefinition Width="Auto" />
- <ColumnDefinition Width="*" />
- </Grid.ColumnDefinitions>
- <Ellipse Width="16" Height="16" Stroke="Gray" StrokeThickness="1" VerticalAlignment="Center">
- <Ellipse.Style>
- <Style TargetType="Ellipse">
- <Setter Property="Fill" Value="Gray" />
- <Style.Triggers>
- <DataTrigger Binding="{Binding IsOn}" Value="True">
- <Setter Property="Fill" Value="Green" />
- </DataTrigger>
- </Style.Triggers>
- </Style>
- </Ellipse.Style>
- </Ellipse>
- <TextBlock Grid.Column="1" Text="{Binding Description}" Margin="8,0,0,0" VerticalAlignment="Center" />
- </Grid>
- </DataTemplate>
- </ItemsControl.ItemTemplate>
- </ItemsControl>
- 
- <Separator Margin="6" />
- <!-- Current Position -->
- <TextBlock Margin="4,4,4,0">
- <Run Text="當前位置: " />
- <Run Text="{Binding CurrentPosition}" />
- </TextBlock>
- 
- <!-- Control Buttons: switch from WrapPanel to two-column UniformGrid -->
- <UniformGrid Columns="2" Margin="4,8,4,0" HorizontalAlignment="Stretch">
- <Button Margin="4" PreviewMouseLeftButtonDown="OnActionButtonDown" PreviewMouseLeftButtonUp="OnActionButtonUp" Tag="JogP" HorizontalAlignment="Stretch" Height="40">
- <Button.Style>
- <Style TargetType="Button">
- <Setter Property="Background" Value="Teal"/>
- <Setter Property="Foreground" Value="Black" />
- <Style.Triggers>
- <Trigger Property="IsPressed" Value="True">
- <Setter Property="Background" Value="DarkBlue" />
- <Setter Property="Foreground" Value="Red" />
- </Trigger>
- </Style.Triggers>
- </Style>
- </Button.Style>
- Jog+
- </Button>
- <Button Margin="4" PreviewMouseLeftButtonDown="OnActionButtonDown" PreviewMouseLeftButtonUp="OnActionButtonUp" Tag="JogN" HorizontalAlignment="Stretch" Height="40">
- <Button.Style>
- <Style TargetType="Button">
- <Setter Property="Background" Value="Teal"/>
- <Setter Property="Foreground" Value="Black" />
- <Style.Triggers>
- <Trigger Property="IsPressed" Value="True">
- <Setter Property="Background" Value="DarkBlue" />
- <Setter Property="Foreground" Value="Red" />
- </Trigger>
- </Style.Triggers>
- </Style>
- </Button.Style>
- Jog-
- </Button>
- <Button Margin="4" PreviewMouseLeftButtonDown="OnCommandButtonDown" PreviewMouseLeftButtonUp="OnCommandButtonUp" Tag="JSpeedH" HorizontalAlignment="Stretch" Height="40">JSpeedH
- <Button.Style>
- <Style TargetType="Button">
- <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.ControlBrushKey}}"/>
- <Style.Triggers>
- <DataTrigger Binding="{Binding JSpeedH_On}" Value="True">
- <Setter Property="Background" Value="LightGreen" />
- </DataTrigger>
- </Style.Triggers>
- </Style>
- </Button.Style>
- </Button>
- <Button Margin="4" PreviewMouseLeftButtonDown="OnCommandButtonDown" PreviewMouseLeftButtonUp="OnCommandButtonUp" Tag="JSpeedM" HorizontalAlignment="Stretch" Height="40">JSpeedM
- <Button.Style>
- <Style TargetType="Button">
- <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.ControlBrushKey}}"/>
- <Style.Triggers>
- <DataTrigger Binding="{Binding JSpeedM_On}" Value="True">
- <Setter Property="Background" Value="LightGreen" />
- </DataTrigger>
- </Style.Triggers>
- </Style>
- </Button.Style>
- </Button>
- <Button Margin="4" PreviewMouseLeftButtonDown="OnActionButtonDown" PreviewMouseLeftButtonUp="OnActionButtonUp" Tag="Home" HorizontalAlignment="Stretch" Height="40">Home</Button>
- <Button Margin="4" PreviewMouseLeftButtonDown="OnActionButtonDown" PreviewMouseLeftButtonUp="OnActionButtonUp" Tag="Stop" HorizontalAlignment="Stretch" Height="40">Stop</Button>
- <Button Margin="4" PreviewMouseLeftButtonDown="OnActionButtonDown" PreviewMouseLeftButtonUp="OnActionButtonUp" Tag="Command" HorizontalAlignment="Stretch" Height="40">Command</Button>
- <Button Margin="4" PreviewMouseLeftButtonDown="OnCommandButtonDown" PreviewMouseLeftButtonUp="OnCommandButtonUp" Tag="ServoOn" HorizontalAlignment="Stretch" Height="40">Servo On
- <Button.Style>
- <Style TargetType="Button">
- <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.ControlBrushKey}}"/>
- <Style.Triggers>
- <DataTrigger Binding="{Binding ServoOn_On}" Value="True">
- <Setter Property="Background" Value="LightGreen" />
- </DataTrigger>
- </Style.Triggers>
- </Style>
- </Button.Style>
- </Button>
- <Button Margin="4" PreviewMouseLeftButtonDown="OnActionButtonDown" PreviewMouseLeftButtonUp="OnActionButtonUp" Tag="AlarmReset" HorizontalAlignment="Stretch" Height="40">Alarm Reset</Button>
- </UniformGrid>
- 
- <!-- Target position and Speed input lines -->
- <StackPanel Margin="4,8,4,0">
- <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,2,0,2">
- <TextBlock Text="定位位址:" VerticalAlignment="Center" Width="80" />
- <!-- allow signed number for target position -->
- <TextBox Width="120" Text="{Binding TargetPositionText, UpdateSourceTrigger=PropertyChanged}" PreviewTextInput="SignedNumber_PreviewTextInput" DataObject.Pasting="SignedNumber_Pasting" />
- </StackPanel>
- <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,2,0,2">
- <TextBlock Text="運轉速度:" VerticalAlignment="Center" Width="80" />
- <!-- speed remains numeric only -->
- <TextBox Width="120" Text="{Binding SpeedText, UpdateSourceTrigger=PropertyChanged}" PreviewTextInput="NumberOnly_PreviewTextInput" DataObject.Pasting="NumberOnly_Pasting" />
- </StackPanel>
- </StackPanel>
- 
- </StackPanel>
- </Border>
- </DataTemplate>
- </ItemsControl.ItemTemplate>
- </ItemsControl>
- </ScrollViewer>
- </Grid>
+ mc:Ignorable="d" d:DesignHeight="1000" d:DesignWidth="800">
+    <Grid Background="White">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="1*"/>
+            <ColumnDefinition Width="1*"/>
+        </Grid.ColumnDefinitions>
+        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" Grid.ColumnSpan="2">
+            <ItemsControl ItemsSource="{Binding Axes}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <UniformGrid Columns="4" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border BorderBrush="#FFB0B0B0" BorderThickness="1" Margin="6" Padding="8" CornerRadius="6" Background="WhiteSmoke" Width="280">
+                            <StackPanel>
+                                <TextBlock Text="{Binding Header}" FontWeight="Bold" Margin="4" HorizontalAlignment="Center" />
+                                <Separator Margin="2" />
+                                <!-- Alarm Section -->
+                                <TextBlock Text="警報" FontWeight="SemiBold" Margin="4,8,4,2" />
+                                <ItemsControl ItemsSource="{Binding AlarmItems}">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <StackPanel />
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Grid Margin="4">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto" />
+                                                    <ColumnDefinition Width="*" />
+                                                </Grid.ColumnDefinitions>
+                                                <Ellipse Width="16" Height="16" Stroke="Gray" StrokeThickness="1" VerticalAlignment="Center">
+                                                    <Ellipse.Style>
+                                                        <Style TargetType="Ellipse">
+                                                            <Setter Property="Fill" Value="Gray" />
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding IsOn}" Value="True">
+                                                                    <Setter Property="Fill" Value="Red" />
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </Ellipse.Style>
+                                                </Ellipse>
+                                                <TextBlock Grid.Column="1" Text="{Binding Description}" Margin="8,0,0,0" VerticalAlignment="Center" />
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+
+                                <Separator Margin="6" />
+                                <!-- Status Section -->
+                                <TextBlock Text="狀態" FontWeight="SemiBold" Margin="4,8,4,2" />
+                                <ItemsControl ItemsSource="{Binding StatusItems}">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <StackPanel />
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Grid Margin="4">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto" />
+                                                    <ColumnDefinition Width="*" />
+                                                </Grid.ColumnDefinitions>
+                                                <Ellipse Width="16" Height="16" Stroke="Gray" StrokeThickness="1" VerticalAlignment="Center">
+                                                    <Ellipse.Style>
+                                                        <Style TargetType="Ellipse">
+                                                            <Setter Property="Fill" Value="Gray" />
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding IsOn}" Value="True">
+                                                                    <Setter Property="Fill" Value="Green" />
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </Ellipse.Style>
+                                                </Ellipse>
+                                                <TextBlock Grid.Column="1" Text="{Binding Description}" Margin="8,0,0,0" VerticalAlignment="Center" />
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+
+                                <Separator Margin="6" />
+                                <!-- Current Position -->
+                                <TextBlock Margin="4,4,4,0">
+                                     <Run Text="當前位置: " />
+                                     <Run Text="{Binding CurrentPosition}" />
+                                </TextBlock>
+
+                                <!-- Control Buttons: switch from WrapPanel to two-column UniformGrid -->
+                                <UniformGrid Columns="2" Margin="4,8,4,0" HorizontalAlignment="Stretch">
+                                    <Button Margin="4" PreviewMouseLeftButtonDown="OnActionButtonDown" PreviewMouseLeftButtonUp="OnActionButtonUp" Tag="JogP" HorizontalAlignment="Stretch" Height="40">
+                                        <Button.Style>
+                                            <Style TargetType="Button">
+                                                <Setter Property="Background" Value="Teal"/>
+                                                <Setter Property="Foreground" Value="Black" />
+                                                <Style.Triggers>
+                                                    <Trigger Property="IsPressed" Value="True">
+                                                        <Setter Property="Background" Value="DarkBlue" />
+                                                        <Setter Property="Foreground" Value="Red" />
+                                                    </Trigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Button.Style>
+                                        Jog+
+                                    </Button>
+                                    <Button Margin="4" PreviewMouseLeftButtonDown="OnActionButtonDown" PreviewMouseLeftButtonUp="OnActionButtonUp" Tag="JogN" HorizontalAlignment="Stretch" Height="40">
+                                        <Button.Style>
+                                            <Style TargetType="Button">
+                                                <Setter Property="Background" Value="Teal"/>
+                                                <Setter Property="Foreground" Value="Black" />
+                                                <Style.Triggers>
+                                                    <Trigger Property="IsPressed" Value="True">
+                                                        <Setter Property="Background" Value="DarkBlue" />
+                                                        <Setter Property="Foreground" Value="Red" />
+                                                    </Trigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Button.Style>
+                                        Jog-
+                                    </Button>
+                                    <Button Margin="4" PreviewMouseLeftButtonDown="OnCommandButtonDown" PreviewMouseLeftButtonUp="OnCommandButtonUp" Tag="JSpeedH" HorizontalAlignment="Stretch" Height="40">JSpeedH
+                                        <Button.Style>
+                                            <Style TargetType="Button">
+                                                <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.ControlBrushKey}}"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding JSpeedH_On}" Value="True">
+                                                        <Setter Property="Background" Value="LightGreen" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Button.Style>
+                                    </Button>
+                                    <Button Margin="4" PreviewMouseLeftButtonDown="OnCommandButtonDown" PreviewMouseLeftButtonUp="OnCommandButtonUp" Tag="JSpeedM" HorizontalAlignment="Stretch" Height="40">JSpeedM
+                                        <Button.Style>
+                                            <Style TargetType="Button">
+                                                <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.ControlBrushKey}}"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding JSpeedM_On}" Value="True">
+                                                        <Setter Property="Background" Value="LightGreen" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Button.Style>
+                                    </Button>
+                                    <Button Margin="4" PreviewMouseLeftButtonDown="OnActionButtonDown" PreviewMouseLeftButtonUp="OnActionButtonUp" Tag="Home" HorizontalAlignment="Stretch" Height="40">Home</Button>
+                                    <Button Margin="4" PreviewMouseLeftButtonDown="OnActionButtonDown" PreviewMouseLeftButtonUp="OnActionButtonUp" Tag="Stop" HorizontalAlignment="Stretch" Height="40">Stop</Button>
+                                    <Button Margin="4" PreviewMouseLeftButtonDown="OnActionButtonDown" PreviewMouseLeftButtonUp="OnActionButtonUp" Tag="Command" HorizontalAlignment="Stretch" Height="40">Command</Button>
+                                    <Button Margin="4" PreviewMouseLeftButtonDown="OnCommandButtonDown" PreviewMouseLeftButtonUp="OnCommandButtonUp" Tag="ServoOn" HorizontalAlignment="Stretch" Height="40">Servo On
+                                        <Button.Style>
+                                            <Style TargetType="Button">
+                                                <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.ControlBrushKey}}"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding ServoOn_On}" Value="True">
+                                                        <Setter Property="Background" Value="LightGreen" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Button.Style>
+                                    </Button>
+                                    <Button Margin="4" PreviewMouseLeftButtonDown="OnActionButtonDown" PreviewMouseLeftButtonUp="OnActionButtonUp" Tag="AlarmReset" HorizontalAlignment="Stretch" Height="40">Alarm Reset</Button>
+                                </UniformGrid>
+
+                                <!-- Target position and Speed input lines -->
+                                <StackPanel Margin="4,8,4,0">
+                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,2,0,2">
+                                        <TextBlock Text="定位位址:" VerticalAlignment="Center" Width="80" />
+                                        <!-- allow signed number for target position -->
+                                        <TextBox Width="120" Text="{Binding TargetPositionText, UpdateSourceTrigger=PropertyChanged}" PreviewTextInput="SignedNumber_PreviewTextInput" DataObject.Pasting="SignedNumber_Pasting" />
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,2,0,2">
+                                        <TextBlock Text="運轉速度:" VerticalAlignment="Center" Width="80" />
+                                        <!-- speed remains numeric only -->
+                                        <TextBox Width="120" Text="{Binding SpeedText, UpdateSourceTrigger=PropertyChanged}" PreviewTextInput="NumberOnly_PreviewTextInput" DataObject.Pasting="NumberOnly_Pasting" />
+                                    </StackPanel>
+                                </StackPanel>
+
+                            </StackPanel>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+    </Grid>
 </UserControl>
