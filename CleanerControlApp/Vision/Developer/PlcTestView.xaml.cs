@@ -265,6 +265,55 @@ namespace CleanerControlApp.Vision.Developer
             }
         }
 
+        // 編碼器重置 (Mouse)
+        private void BtnResetEncoder_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            var op = this.DataContext as IPLCOperator ?? App.AppHost?.Services.GetService(typeof(IPLCOperator)) as IPLCOperator;
+            if (op != null)
+            {
+                op.Command_ResetEncoder = true;
+            }
+        }
+
+        // 編碼器重置 放開 (Mouse)
+        private void BtnResetEncoder_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            var op = this.DataContext as IPLCOperator ?? App.AppHost?.Services.GetService(typeof(IPLCOperator)) as IPLCOperator;
+            if (op != null)
+            {
+                op.Command_ResetEncoder = false;
+            }
+        }
+
+        // 編碼器重置 游標移出時也確保關閉
+        private void BtnResetEncoder_MouseLeave(object sender, System.Windows.Input.MouseEventArgs e)
+        {
+            var op = this.DataContext as IPLCOperator ?? App.AppHost?.Services.GetService(typeof(IPLCOperator)) as IPLCOperator;
+            if (op != null)
+            {
+                op.Command_ResetEncoder = false;
+            }
+        }
+
+        // 編碼器重置 Touch support
+        private void BtnResetEncoder_TouchDown(object sender, TouchEventArgs e)
+        {
+            var op = this.DataContext as IPLCOperator ?? App.AppHost?.Services.GetService(typeof(IPLCOperator)) as IPLCOperator;
+            if (op != null)
+            {
+                op.Command_ResetEncoder = true;
+            }
+        }
+
+        private void BtnResetEncoder_TouchUp(object sender, TouchEventArgs e)
+        {
+            var op = this.DataContext as IPLCOperator ?? App.AppHost?.Services.GetService(typeof(IPLCOperator)) as IPLCOperator;
+            if (op != null)
+            {
+                op.Command_ResetEncoder = false;
+            }
+        }
+
         // Simple design-time implementation of IPLCService to allow XAML designer to show values
         private class DesignTimePlcViewModel : IPLCService
         {
@@ -298,6 +347,24 @@ namespace CleanerControlApp.Vision.Developer
 
             // 實作 IPLCService 介面的 ParametersWriteCompleted 事件
             public event EventHandler? ParametersWriteCompleted;
+        }
+
+        private void BtnAlarmReset_Click(object sender, System.Windows.RoutedEventArgs e)
+        {
+
+        }
+
+        private void BtnResetEncoder_Click(object sender, System.Windows.RoutedEventArgs e)
+        {
+            // optional: single click behavior - toggle pulse quickly
+            var op = this.DataContext as IPLCOperator ?? App.AppHost?.Services.GetService(typeof(IPLCOperator)) as IPLCOperator;
+            if (op != null)
+            {
+                // set true then false quickly
+                op.Command_ResetEncoder = true;
+                // schedule a reset to false on UI thread shortly after
+                Dispatcher.BeginInvoke(new Action(() => { op.Command_ResetEncoder = false; }), System.Windows.Threading.DispatcherPriority.Background);
+            }
         }
     }
 }

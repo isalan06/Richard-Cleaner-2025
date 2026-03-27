@@ -64,7 +64,15 @@
                             PreviewMouseLeftButtonUp="BtnAlarmReset_PreviewMouseLeftButtonUp"
                             MouseLeave="BtnAlarmReset_MouseLeave"
                             TouchDown="BtnAlarmReset_TouchDown"
-                            TouchUp="BtnAlarmReset_TouchUp" />
+                            TouchUp="BtnAlarmReset_TouchUp" Click="BtnAlarmReset_Click" />
+
+                    <!-- 新增：編碼器重置按鈕 -->
+                    <Button x:Name="BtnResetEncoder" Content="編碼器重置" Width="140" Height="40" Margin="0,8,0,0"
+                            PreviewMouseLeftButtonDown="BtnResetEncoder_PreviewMouseLeftButtonDown"
+                            PreviewMouseLeftButtonUp="BtnResetEncoder_PreviewMouseLeftButtonUp"
+                            MouseLeave="BtnResetEncoder_MouseLeave"
+                            TouchDown="BtnResetEncoder_TouchDown"
+                            TouchUp="BtnResetEncoder_TouchUp" Click="BtnResetEncoder_Click" />
 
                 </StackPanel>
             </Grid>
