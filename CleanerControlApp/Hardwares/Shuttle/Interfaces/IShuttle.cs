@@ -85,5 +85,7 @@ namespace CleanerControlApp.Hardwares.Shuttle.Interfaces
 
         bool HS_Check_Cassette_Finished { get; set; }
 
+        string Hint();
+
     }
 }

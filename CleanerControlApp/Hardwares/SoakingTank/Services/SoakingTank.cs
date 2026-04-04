@@ -583,6 +583,126 @@ namespace CleanerControlApp.Hardwares.SoakingTank.Services
             }
         }
 
+        public string Hint()
+        {
+            var sb = new StringBuilder();
+
+            // Basic status
+            sb.AppendLine(" - 浸泡槽狀態概覽:");
+            sb.AppendLine($"   已初始化: {_initialized}");
+            sb.AppendLine($"   自動模式: {_auto}");
+            sb.AppendLine($"   暫停中: {_pausing}");
+            sb.AppendLine($"   正在超音波: {_ultrasonic}");
+            sb.AppendLine($"   是否有卡匣: {_cassette}");
+            sb.AppendLine($"   蓋子開啟感測: {Sensor_CoverOpen}");
+            sb.AppendLine($"   蓋子關閉感測: {Sensor_CoverClose}");
+            sb.AppendLine($"   水位 高: {Sensor_Liquid_H},低: {Sensor_Liquid_L}");
+            sb.AppendLine($"   馬達狀態: ServoOn={MotorServoOn}, Home={MotorHome}, Idle={MotorIdle}, Alarm={MotorAlarm}");
+
+            // Alarms / warnings
+            if (HasAlarm)
+            {
+                sb.AppendLine(" - 模組發生錯誤(Alarm)。請先排除錯誤。可呼叫 AlarmReset()以嘗試重置馬達警報或針對硬體排查問題。");
+            }
+            if (HasWarning)
+            {
+                sb.AppendLine(" - 模組發生警告(Warning)。請檢查蓋子/水位/馬達狀態，必要時呼叫 WarningStop() 暫停自動。");
+            }
+
+            // Initialization guidance
+            if (!_initialized)
+            {
+                sb.AppendLine(" - 尚未初始化：請呼叫 ModuleReset() 或 Initialize() 啟動模組初始化（會開啟伺服並回原點）。");
+                return sb.ToString();
+            }
+
+            // Auto vs Manual
+            if (!_auto)
+            {
+                if (IsNormalStatus)
+                    sb.AppendLine(" - 模組已初始化且狀態正常：可呼叫 AutoStart() 開始自動流程。");
+                else
+                    sb.AppendLine(" - 模組狀態不完全正常，請先解除警告/錯誤後再啟動自動。");
+
+                sb.AppendLine(" - 手動操作建議:");
+                if (!MotorServoOn)
+                    sb.AppendLine(" * 呼叫 ServoOn(true) 開啟馬達伺服。");
+                if (!MotorHome && MotorServoOn && MotorIdle)
+                    sb.AppendLine(" * 呼叫 Home()進行回原點。");
+                if (MotorServoOn && MotorIdle)
+                    sb.AppendLine(" * 可用 MoveToPosition(position, speed) 或 Jog(...)進行手動定位/換位。");
+
+                if (!_cassette && Sensor_CoverOpen)
+                    sb.AppendLine(" * 蓋子已開，放入卡匣後由夾爪完成放置，或手動將馬達移至上方位置以協助放置。");
+                if (_cassette && !Sensor_CoverClose)
+                    sb.AppendLine(" * 偵測到卡匣但蓋子尚未關閉：可呼叫 CoverClose(true) 關蓋。");
+
+                sb.AppendLine(" - 手動超音波/注水/排水控制：");
+                sb.AppendLine(" * 呼叫 ManualUltrasonicOP(true/false) 控制超音波。 ");
+                sb.AppendLine(" * 呼叫 ManualWaterInOP(true/false) 控制注水（與加熱槽互動）。");
+                sb.AppendLine(" * 呼叫 ManualWaterOutputOP(true/false) 控制排水。 ");
+
+                return sb.ToString();
+            }
+            else // auto mode
+            {
+                sb.AppendLine(" - 模組處於自動模式：");
+
+                if (_autoStopFlag)
+                    sb.AppendLine(" * 自動流程已被要求停止，系統會在空閒時停止。觀察 Idle 狀態以確認是否已停止。 ");
+                if (_pausing)
+                    sb.AppendLine(" * 自動流程暫停中：呼叫 AutoStart() 可恢復，或 AutoStop(force=true) 強制停止。 ");
+
+                // 未完成處理階段
+                if (!_actFinished)
+                {
+                    sb.AppendLine(" * 未完成沖泡階段（尚在注水/超音波流程）：");
+
+                    if (!_cassette)
+                    {
+                        if (Command_CleanerCoverClose)
+                            sb.AppendLine(" - 蓋子目前要求關閉：若需放入卡匣可呼叫 CoverClose(false) 打開蓋子。");
+                        if (Sensor_CoverOpen && MotorIdle && !InPos1)
+                            sb.AppendLine(" - 蓋子開啟且馬達空閒但不在上方：呼叫 MoveToPosition(0,0) 將馬達移至上方以便放入卡匣。");
+                    }
+                    else // 有卡匣
+                    {
+                        if (!Command_CleanerCoverClose)
+                            sb.AppendLine(" - 已放入卡匣且需關蓋：系統會嘗試移動馬達到放置位置並關蓋，若延遲請檢查馬達狀態。");
+
+                        if (Sensor_CoverClose && !Ultrasonic && !_pausing && Sensor_Liquid_H)
+                            sb.AppendLine(" - 卡匣已關蓋且水位達標：系統會啟動超音波進行處理。");
+
+                        if (Ultrasonic)
+                            sb.AppendLine(" - 正在超音波中：等待計時完成或系統暫停/停止。");
+
+                        if (_motor_commanding)
+                            sb.AppendLine(" - 馬達命令進行中，請等待命令完成。 ");
+                    }
+                }
+                else // act finished
+                {
+                    sb.AppendLine(" * 已完成處理階段（超音波/注水完成）：");
+
+                    if (_cassette && Command_CleanerCoverClose && !Ultrasonic && !Sensor_Liquid_L)
+                        sb.AppendLine(" - 系統會打開蓋子以便取出卡匣，並啟動氣刀吹乾。若需立即取卡可暫停自動或關閉氣刀。 ");
+
+                    if (_cassette && Sensor_CoverOpen && !InPos1 && !_motor_commanding && MotorIdle && !Sensor_Liquid_L)
+                        sb.AppendLine(" - 蓋子開啟且馬達不在上方：系統會嘗試將馬達移至上方(位置1)。");
+
+                    if (_cassette && InPos1 && MotorIdle && !_motor_commanding && !RetryAirFinished)
+                        sb.AppendLine(" - 系統正在進行風刀反覆吹氣，直到 RetryAirFinished 條件滿足。");
+
+                    if (!RetryAirFinished)
+                        sb.AppendLine(" - 若想手動結束吹氣可呼叫 AirOP(false) 或 ManualAirOP(false)。");
+                }
+
+                sb.AppendLine(" - 自動模式下若發生 Alarm/Warning，系統會暫停/停止。請先處理警報再繼續。 ");
+
+                return sb.ToString();
+            }
+        }
+
         #endregion
 
         #region Function

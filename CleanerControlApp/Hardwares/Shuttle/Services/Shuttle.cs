@@ -415,6 +415,93 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
         public bool HS_Check_DryingTank2CassetteExist { get; set; }
         public bool HS_Check_Cassette_Finished { get; set; }
 
+        public string Hint()
+        {
+            var sb = new StringBuilder();
+
+            // Basic status
+            sb.AppendLine(" - 移載組狀態概覽:");
+            sb.AppendLine($" 已初始化: {_initialized}");
+            sb.AppendLine($" 自動模式: {_auto}");
+            sb.AppendLine($" 暫停中: {_pausing}");
+            sb.AppendLine($" 正在執行動作(Moving): {_moving || _pickTrigger || _placeTrigger || _checkCassetteTrigger}");
+            sb.AppendLine($" 是否有卡匣: {_cassette}");
+            sb.AppendLine($" 馬達狀態: ServoOn={MotorServoOn}, Home={MotorHome}, Idle={MotorIdle}, Busy={MotorBusy}, Alarm={MotorAlarm}");
+            sb.AppendLine($"夾爪感測: FrontOpen={Sensor_ClamperFrontOpen}, FrontClose={Sensor_ClamperFrontClose}, BackOpen={Sensor_ClamperBackOpen}, BackClose={Sensor_ClamperBackClose}");
+
+            // Alarms / warnings
+            if (HasAlarm)
+            {
+                sb.AppendLine(" - 模組發生錯誤(Alarm)。請先排除硬體或馬達問題，必要時呼叫 AlarmReset() 清除並重置。");
+            }
+            if (HasWarning)
+            {
+                sb.AppendLine(" - 模組發生警告(Warning)。請檢查夾爪/馬達狀態或回原點後再繼續。可呼叫 WarningStop() 暫停。 ");
+            }
+
+            // Initialization guidance
+            if (!_initialized)
+            {
+                sb.AppendLine(" - 尚未初始化：請呼叫 ModuleReset() 或 Initialize()進行初始化（會啟動伺服並回原點）。");
+                return sb.ToString();
+            }
+
+            // When not in auto
+            if (!_auto)
+            {
+                if (IsNormalStatus)
+                    sb.AppendLine(" - 模組已初始化且狀態正常：可呼叫 AutoStart() 開始自動流程。");
+                else
+                    sb.AppendLine(" - 模組狀態不完全正常，請先解除警告/錯誤後再啟動自動。");
+
+                sb.AppendLine(" - 手動操作建議：");
+                if (!MotorServoOn) sb.AppendLine(" * 呼叫 ShuttleXMotor.ServoOn(true) / ShuttleZMotor.ServoOn(true) 開啟馬達伺服 (或使用 SimMotorPass 測試)。");
+                if (!MotorHome && MotorServoOn && MotorIdle) sb.AppendLine(" * 呼叫 Home()讓馬達回原點。 ");
+                if (MotorServoOn && MotorIdle) sb.AppendLine(" * 可呼叫 ShuttleXMotor.MoveToPosition(...) 或 ShuttleZMotor.MoveToPosition(...)進行手動定位。 ");
+                sb.AppendLine(" * 呼叫 ClamperCloseOP(true/false) 或 ClamperOpenOP(true/false) 控制夾爪開關。");
+                sb.AppendLine(" * 呼叫 PickCassette(position) / PlaceCassette(position)來測試取放序列 (位置編號1~14)。");
+                sb.AppendLine(" * 呼叫 CheckTankCassetteExist()以檢查各槽的卡匣存在狀態。");
+
+                return sb.ToString();
+            }
+
+            // Auto mode guidance
+            sb.AppendLine(" - 模組處於自動模式：");
+            if (_autoStopFlag) sb.AppendLine(" * 自動流程已被要求停止，系統會在空閒時停止，請觀察 Idle 狀態確認是否已停止。 ");
+            if (_pausing) sb.AppendLine(" * 自動流程暫停中：呼叫 AutoStart() 可恢復，或 AutoStop() 強制停止。 ");
+
+            // Pick/place in-progress guidance
+            if (_pickTrigger)
+            {
+                sb.AppendLine(" * 正在執行取卡流程：");
+                sb.AppendLine($" -目前 pickCase: {_pickCase}");
+                sb.AppendLine(" - 若流程停滯請檢查馬達是否 Busy/Alarm，或是否有夾爪動作失敗。 ");
+            }
+            if (_placeTrigger)
+            {
+                sb.AppendLine(" * 正在執行放卡流程：");
+                sb.AppendLine($" -目前 placeCase: {_placeCase}");
+                sb.AppendLine(" - 若流程停滯請檢查馬達/夾爪狀態或重置 Alarm。 ");
+            }
+            if (_checkCassetteTrigger)
+            {
+                sb.AppendLine(" * 正在執行檢查卡匣流程：");
+                sb.AppendLine($" -目前 checkCase: {_checkCassetteCase}");
+            }
+
+            // Post-action hints
+            if (!_moving && !_pickTrigger && !_placeTrigger && !_checkCassetteTrigger)
+            {
+                if (!_cassette)
+                    sb.AppendLine(" - 機台空閒且無卡匣：若要放入卡匣請開啟蓋子/將卡匣放到 Loader/Unloader 或使用 PickCassette(...)進行取卡。");
+                else
+                    sb.AppendLine(" - 機台空閒且有卡匣：可呼叫 PlaceCassette(position) 將卡匣放至目標位置，或讓自動流程繼續。 ");
+            }
+
+            sb.AppendLine(" - 若出現警告/錯誤，請先處理後再繼續自動流程。 ");
+
+            return sb.ToString();
+        }
         #endregion
 
         #region Function

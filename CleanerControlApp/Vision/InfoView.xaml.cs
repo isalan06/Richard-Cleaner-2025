@@ -14,6 +14,13 @@ using Microsoft.Win32;
 using System.ComponentModel;
 using System.Windows.Threading;
 using CleanerControlApp.Hardwares;
+using System.Windows.Documents;
+using CleanerControlApp.Hardwares.Shuttle.Interfaces;
+using CleanerControlApp.Hardwares.Sink.Interfaces;
+using CleanerControlApp.Hardwares.SoakingTank.Interfaces;
+using CleanerControlApp.Hardwares.DryingTank.Interfaces;
+using CleanerControlApp.Hardwares.HeatingTank.Interfaces;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace CleanerControlApp.Vision
 {
@@ -53,6 +60,14 @@ namespace CleanerControlApp.Vision
 
             // resolve HardwareManager from DI host if available
             _hardwareManager = App.AppHost?.Services.GetService(typeof(HardwareManager)) as HardwareManager;
+
+            // wire up module info selection change and initialize display
+            try
+            {
+                ModuleInfoComboBox.SelectionChanged += ModuleInfoComboBox_SelectionChanged;
+                UpdateModuleInfoDisplay();
+            }
+            catch { }
 
             // timer to update comm status
             _statusTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
@@ -374,5 +389,77 @@ namespace CleanerControlApp.Vision
             }
             return null;
         }
+
+        // Module info handling
+        private void ModuleInfoComboBox_SelectionChanged(object? sender, SelectionChangedEventArgs e)
+        {
+            UpdateModuleInfoDisplay();
+        }
+
+        private void UpdateModuleInfoDisplay()
+        {
+            try
+            {
+                string selected = (ModuleInfoComboBox.SelectedItem as ComboBoxItem)?.Content?.ToString() ?? string.Empty;
+
+                string hintText = "請選擇模組以顯示資訊...";
+
+                var services = App.AppHost?.Services;
+                if (services == null)
+                {
+                    hintText = "服務容器未初始化。";
+                }
+                else
+                {
+                    switch (selected)
+                    {
+                        case "系統":
+                            var hm = services.GetService<HardwareManager>();
+                            hintText = hm?.Hint() ?? "HardwareManager 未注入";
+                            break;
+                        case "移載組":
+                            var shuttle = services.GetService<IShuttle>();
+                            hintText = shuttle?.Hint() ?? "移載組 未注入";
+                            break;
+                        case "沖水槽":
+                            var sink = services.GetService<ISink>();
+                            hintText = sink?.Hint() ?? "沖水槽 未注入";
+                            break;
+                        case "浸泡槽":
+                            var soaking = services.GetService<ISoakingTank>();
+                            hintText = soaking?.Hint() ?? "浸泡槽 未注入";
+                            break;
+                        case "烘乾槽#1":
+                            var dryingArr1 = services.GetService<IDryingTank[]>();
+                            hintText = (dryingArr1 != null && dryingArr1.Length >0) ? dryingArr1[0].Hint() : "烘乾槽#1 未注入";
+                            break;
+                        case "烘乾槽#2":
+                            var dryingArr2 = services.GetService<IDryingTank[]>();
+                            hintText = (dryingArr2 != null && dryingArr2.Length >1) ? dryingArr2[1].Hint() : "烘乾槽#2 未注入";
+                            break;
+                        case "加熱槽":
+                            var heating = services.GetService<IHeatingTank>();
+                            hintText = heating?.Hint() ?? "加熱槽 未注入";
+                            break;
+                        default:
+                            hintText = "未知的模組選擇。";
+                            break;
+                    }
+                }
+
+                ModuleInfoRichText.Document.Blocks.Clear();
+                ModuleInfoRichText.Document.Blocks.Add(new Paragraph(new Run(hintText)));
+            }
+            catch (Exception ex)
+            {
+                try
+                {
+                    ModuleInfoRichText.Document.Blocks.Clear();
+                    ModuleInfoRichText.Document.Blocks.Add(new Paragraph(new Run("更新模組資訊失敗: " + ex.Message)));
+                }
+                catch { }
+            }
+        }
+
     }
 }

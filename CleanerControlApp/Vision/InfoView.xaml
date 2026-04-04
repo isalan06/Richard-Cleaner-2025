@@ -30,6 +30,7 @@
 
  <Border Grid.Row="1" Grid.Column="0" Margin="8" BorderBrush="#FFCCCCCC" BorderThickness="1" CornerRadius="4" Background="White">
  <ScrollViewer Margin="8" VerticalScrollBarVisibility="Auto">
+ <StackPanel>
  <StackPanel x:Name="SystemInfoPanel">
  <TextBlock x:Name="SoftwareVersionText" Text="" TextWrapping="Wrap" FontWeight="SemiBold" />
  <TextBlock x:Name="OSVersionText" Text="" TextWrapping="Wrap" Margin="0,4,0,0" />
@@ -46,12 +47,12 @@
 
  <StackPanel Orientation="Horizontal" Margin="0,2,0,2" VerticalAlignment="Center">
  <Ellipse Width="12" Height="12" Margin="0,0,8,0" Stroke="Black" StrokeThickness="0.5" Fill="{Binding ModbusRtu1Brush}" />
- <TextBlock Text="Modbus RTU #1 - 變頻器#1" VerticalAlignment="Center" />
+ <TextBlock Text="Modbus RTU #1 -變頻器#1" VerticalAlignment="Center" />
  </StackPanel>
 
  <StackPanel Orientation="Horizontal" Margin="0,2,0,2" VerticalAlignment="Center">
  <Ellipse Width="12" Height="12" Margin="0,0,8,0" Stroke="Black" StrokeThickness="0.5" Fill="{Binding ModbusRtu2Brush}" />
- <TextBlock Text="Modbus RTU #2 - 變頻器#2" VerticalAlignment="Center" />
+ <TextBlock Text="Modbus RTU #2 -變頻器#2" VerticalAlignment="Center" />
  </StackPanel>
 
  <StackPanel Orientation="Horizontal" Margin="0,2,0,2" VerticalAlignment="Center">
@@ -64,7 +65,34 @@
  <TextBlock Text="Modbus RTU #4 - 超音波" VerticalAlignment="Center" />
  </StackPanel>
  </StackPanel>
+ </StackPanel>
 
+ <StackPanel Margin="8">
+ <Grid>
+ <Grid.ColumnDefinitions>
+ <ColumnDefinition Width="Auto" />
+ <ColumnDefinition Width="*" />
+ </Grid.ColumnDefinitions>
+ <TextBlock Text="各模組資訊" FontWeight="Bold" Margin="0,8,8,4" VerticalAlignment="Center" Grid.Column="0" />
+ <ComboBox x:Name="ModuleInfoComboBox" Width="220" Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center">
+ <ComboBoxItem Content="系統" IsSelected="True" />
+ <ComboBoxItem Content="移載組" />
+ <ComboBoxItem Content="沖水槽" />
+ <ComboBoxItem Content="浸泡槽" />
+ <ComboBoxItem Content="烘乾槽#1" />
+ <ComboBoxItem Content="烘乾槽#2" />
+ <ComboBoxItem Content="加熱槽" />
+ </ComboBox>
+ </Grid>
+
+ <RichTextBox x:Name="ModuleInfoRichText" Margin="0,8,0,0" Height="420" IsReadOnly="True">
+ <FlowDocument>
+ <Paragraph>
+ <Run Text="請選擇模組以顯示資訊..." />
+ </Paragraph>
+ </FlowDocument>
+ </RichTextBox>
+ </StackPanel>
  </StackPanel>
  </ScrollViewer>
  </Border>

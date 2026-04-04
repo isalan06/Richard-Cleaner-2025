@@ -98,5 +98,8 @@ namespace CleanerControlApp.Hardwares.Sink.Interfaces
         int InvWarningCode { get; }
         float InvCommandFrequency { get; }
         float InvActualFrequency { get; }
+
+        string Hint();
+
     }
 }

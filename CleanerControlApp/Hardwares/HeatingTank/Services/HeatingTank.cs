@@ -461,6 +461,104 @@ namespace CleanerControlApp.Hardwares.HeatingTank.Services
             return result;
         }
 
+        public string Hint()
+        {
+            var sb = new StringBuilder();
+
+            // Basic status
+            sb.AppendLine(" - 加熱槽狀態概覽:");
+            sb.AppendLine($" 已初始化: {_initialized}");
+            sb.AppendLine($" 自動模式: {_auto}");
+            sb.AppendLine($" 暫停中: {_pausing}");
+            sb.AppendLine($" 加熱中: {_heating}");
+            sb.AppendLine($" 水位: HH={Sensor_Liquid_HH}, H={Sensor_Liquid_H}, L={Sensor_Liquid_L}, LL={Sensor_Liquid_LL}");
+            sb.AppendLine($" PV: {PV} SV: {SV} (PV_Value={PV_Value:F1}, SV_Value={SV_Value:F1})");
+            sb.AppendLine($" INV 頻率: Command={InvCommandFrequency:F1}Hz, Actual={InvActualFrequency:F1}Hz, 狀態 High={IsHighFrequency}, Low={IsLowFrequency}, Zero={IsZeroFrequency}");
+
+            // Alarms / warnings
+            if (HasAlarm)
+            {
+                sb.AppendLine(" - 模組發生嚴重錯誤(Alarm)。請先排除水位或其他硬體錯誤，必要時停止自動與手動處理。可呼叫 AlarmReset() 嘗試清除逾時旗標。");
+            }
+            if (HasWarning)
+            {
+                sb.AppendLine(" - 模組發生警告(Warning)。請檢查 PV/SV 與變頻器狀態，或檢視 INV 錯誤代碼並處理。必要時呼叫 WarningStop() 暫停自動。");
+                sb.AppendLine($" INV 錯誤碼: {InvErrorCode}, 警告碼: {InvWarningCode}");
+            }
+
+            // Initialization guidance
+            if (!_initialized)
+            {
+                sb.AppendLine(" - 尚未初始化：請呼叫 ModuleReset() 或 Initialize()以初始化模組（會設定頻率、設定水系統初始狀態等）。");
+                return sb.ToString();
+            }
+
+            // Manual guidance when not in auto
+            if (!_auto)
+            {
+                if (IsNormalStatus)
+                    sb.AppendLine(" - 模組已初始化且狀態正常：可呼叫 AutoStart() 開始自動流程。");
+                else
+                    sb.AppendLine(" - 模組狀態不完全正常，請先解除警告/錯誤後再啟動自動。");
+
+                sb.AppendLine(" - 手動操作建議:");
+                sb.AppendLine(" * 呼叫 HeatingOP(true/false) 手動開關加熱。 ");
+                sb.AppendLine(" * 呼叫 ManualWaterInOP(true/false) 或 ManualWaterOutOP(true/false) 控制進/出水。 ");
+                sb.AppendLine(" * 呼叫 ManualFrequencyOP(1/2/other) 設定變頻器頻率 (1=低,2=高,其他=關/0頻率)。 ");
+                sb.AppendLine(" * 可呼叫 SetSV(value) 調整目標溫度。 ");
+
+                return sb.ToString();
+            }
+
+            // Auto mode guidance
+            sb.AppendLine(" - 模組處於自動模式：");
+            if (_autoStopFlag)
+                sb.AppendLine(" * 自動流程已被要求停止，系統會在空閒時停止，請觀察 Idle 狀態確認是否已停止。 ");
+            if (_pausing)
+                sb.AppendLine(" * 自動流程暫停中：呼叫 AutoStart() 恢復，或 AutoStop(force=true) 強制停止。 ");
+
+            // Water system and INV guidance derived from AutoProcedure
+            if (_private_waste_HAlarm || _tankHHAlarm || _tankLLAlarm)
+            {
+                sb.AppendLine(" * 偵測到水系統或廢水高位錯誤：系統已停止或會嘗試停止加熱與變頻器輸出。請排除水位或廢水高位問題後再繼續。 ");
+            }
+
+            // Water controls
+            if (!Command_WaterIn && !Sensor_Liquid_L && !_private_waste_HAlarm)
+                sb.AppendLine(" * 水位過低 (L=false)：系統會啟動注水 (WaterInOP)。如需手動操作請呼叫 ManualWaterInOP(true)。");
+            if (Command_WaterIn && Sensor_Liquid_H)
+                sb.AppendLine(" * 水位已達 H：系統會停止注水 (WaterInOP=false)。");
+
+            if (Command_WaterOut && !IsHighFrequency)
+                sb.AppendLine(" * 若開啟出水且變頻器未切到高頻，系統會設定為高頻 (HighFrequencyOP)。");
+            if (!Command_WaterOut && IsHighFrequency)
+                sb.AppendLine(" * 未要求出水但變頻器處於高頻：系統會嘗試切回低頻 (LowFrequencyOP)。");
+
+            // Heating guidance
+            if (!_heating && Sensor_Liquid_L)
+                sb.AppendLine(" * 水位充足且未加熱：系統會啟動加熱 (HeatingOP(true))。如需手動操作可呼叫 ManualHeatingOP(true)。");
+            if (Heating)
+            {
+                sb.AppendLine(" * 正在加熱中，若出現 PV 高/低逾時或異常，系統會自動關閉加熱。請檢查 PV/SV 與溫度控制器。 ");
+                if (LowTemperature)
+                    sb.AppendLine(" - 檢測到溫度偏低，系統會維持或啟動加熱以追趕目標。若長時間偏低請檢查加熱元件或 SV 值。");
+                if (HighTemperature)
+                    sb.AppendLine(" - 檢測到溫度偏高，系統可能會暫停加熱以回復安全狀態。請檢查溫度與設定值。 ");
+            }
+
+            // INV guidance
+            if (DoHighFrequency && !IsHighFrequency)
+                sb.AppendLine(" * 系統設定為 High 頻率但實際尚未到達：請檢查變頻器通訊或狀態 (InvError/Warning)。");
+            if (DoLowFrequency && !IsLowFrequency)
+                sb.AppendLine(" * 系統設定為 Low 頻率但實際尚未到達：請檢查變頻器通訊或狀態。 ");
+            if (DoZeroFrequency && !IsZeroFrequency)
+                sb.AppendLine(" * 系統設定為 Zero 頻率但實際頻率不為零：請檢查變頻器輸出或通訊。 ");
+
+            sb.AppendLine(" - 自動模式下若發生警告/錯誤，系統會暫停/停止相應動作。請先處理警報再繼續自動流程。 ");
+
+            return sb.ToString();
+        }
+
         #endregion
 
         #region Function

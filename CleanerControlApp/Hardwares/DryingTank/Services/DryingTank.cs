@@ -490,6 +490,107 @@ namespace CleanerControlApp.Hardwares.DryingTank.Services
             _sim_pv = pv;
         }
 
+        public string Hint()
+        {
+            var sb = new StringBuilder();
+
+            // Basic status
+            sb.AppendLine($" - 烘乾槽#{ModuleIndex -1} 狀態概覽:");
+            sb.AppendLine($" 已初始化: {_initialized}");
+            sb.AppendLine($" 自動模式: {_auto}");
+            sb.AppendLine($" 暫停中: {_pausing}");
+            sb.AppendLine($" 加熱中: {_heating}");
+            sb.AppendLine($" 是否有卡匣: {_cassette}");
+            sb.AppendLine($" 蓋子開啟感測: {Sensor_CoverOpen}");
+            sb.AppendLine($" 蓋子關閉感測: {Sensor_CoverClose}");
+            sb.AppendLine($" PV: {PV} SV: {SV} (PV_Value={PV_Value:F1}, SV_Value={SV_Value:F1})");
+            sb.AppendLine($" 馬達/其他狀態: Idle={Idle}, IsNormalStatus={IsNormalStatus}");
+
+            // Alarms / warnings
+            if (HasAlarm)
+            {
+                sb.AppendLine(" - 模組發生錯誤(Alarm)。請先排除錯誤後再繼續操作。可呼叫 AlarmReset() 嘗試清除逾時或馬達錯誤（視實作而定）。");
+            }
+            if (HasWarning)
+            {
+                sb.AppendLine(" - 模組發生警告(Warning)。請檢查溫度/蓋子感測或其他警告來源，必要時呼叫 WarningStop() 暫停自動。");
+            }
+
+            // Initialization guidance
+            if (!_initialized)
+            {
+                sb.AppendLine(" - 尚未初始化：請呼叫 ModuleReset() 或 Initialize() 啟動模組初始化流程。初始化會重設狀態並準備開始自動運作。");
+                return sb.ToString();
+            }
+
+            // Manual guidance when not in auto
+            if (!_auto)
+            {
+                if (IsNormalStatus)
+                    sb.AppendLine(" - 模組已初始化且狀態正常：可呼叫 AutoStart() 開始自動流程。");
+                else
+                    sb.AppendLine(" - 模組狀態不完全正常，請先解除警告/錯誤後再啟動自動。");
+
+                sb.AppendLine(" - 手動操作建議：");
+                sb.AppendLine(" * 可呼叫 HeatingOP(true/false)進行手動加熱開/關。");
+                sb.AppendLine(" * 可呼叫 ManualBlowerOP(true/false) 控制風扇；ManualAirOP(true/false) 控制氣閥。 ");
+                sb.AppendLine(" * 可呼叫 CoverClose(true/false) 控制蓋子。 ");
+                sb.AppendLine(" * 可呼叫 SetSV(value) 設定目標溫度(SV)。");
+
+                return sb.ToString();
+            }
+
+            // Auto mode guidance
+            sb.AppendLine(" - 模組處於自動模式：");
+            if (_autoStopFlag)
+                sb.AppendLine(" * 自動流程已被要求停止，系統會在空閒時停止，請觀察 Idle 狀態。");
+            if (_pausing)
+                sb.AppendLine(" * 自動流程暫停中：呼叫 AutoStart() 可恢復，或 AutoStop(force=true) 強制停止以結束自動。");
+
+            if (!_actFinished)
+            {
+                sb.AppendLine(" * 未完成烘乾階段（正在等待放置/加熱）：");
+
+                if (!_cassette)
+                {
+                    if (Command_HeaterCoverClose)
+                        sb.AppendLine(" - 蓋子目前要求關閉：若需放入卡匣可呼叫 CoverClose(false) 打開蓋子並放入卡匣。 ");
+                    if (Sensor_CoverOpen && !Idle)
+                        sb.AppendLine(" - 蓋子已開但模組不在完全空閒狀態，確認馬達/機構狀態後再放入卡匣。 ");
+                }
+                else // 已有卡匣
+                {
+                    if (!Command_HeaterCoverClose)
+                        sb.AppendLine(" - 已放入卡匣且需要關蓋：系統會嘗試關蓋並啟動加熱。若長時間未關蓋請檢查蓋子感測或機構。 ");
+
+                    if (Sensor_CoverClose && !_heating && !_pausing)
+                        sb.AppendLine(" - 卡匣蓋關閉且狀態允許：系統將啟動加熱與風扇。 ");
+
+                    if (_heating)
+                    {
+                        sb.AppendLine($" - 正在加熱中，已加熱時間: {ElpasedHeatingTime_Seconds} 秒，剩餘約: {RemainingHeatingTime_Seconds} 秒。 ");
+                        if (LowTemperature)
+                            sb.AppendLine(" - 檢測到溫度偏低，系統會嘗試加熱至設定值。若持續偏低請檢查加熱元件或設定值(SV)。");
+                        if (HighTemperature)
+                            sb.AppendLine(" - 檢測到溫度偏高，系統可能關閉加熱以回復安全狀態。請檢查 PV/SV 與相關逾時警告。 ");
+                    }
+                }
+            }
+            else // act finished
+            {
+                sb.AppendLine(" * 已完成烘乾階段：");
+                if (_cassette && Command_HeaterCoverClose && !_heating)
+                    sb.AppendLine(" - 系統會打開蓋子以便取出卡匣；若需立即取卡可暫停自動或呼叫 AutoStop()。 ");
+
+                if (HS_ClamperPickFinished)
+                    sb.AppendLine(" -夾爪已取卡完成，系統會重置狀態準備下一循環。 ");
+            }
+
+            sb.AppendLine(" - 若發生警告/錯誤，請先處理後再繼續自動流程。 ");
+
+            return sb.ToString();
+        }
+
         #endregion
 
         #region Function
