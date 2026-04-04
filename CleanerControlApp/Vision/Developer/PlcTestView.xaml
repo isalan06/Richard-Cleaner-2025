@@ -58,21 +58,46 @@
                         <TextBlock x:Name="SystemErrorText" Grid.Column="1" Text="系統異常" Margin="8,0,0,0" VerticalAlignment="Center" FontWeight="SemiBold" />
                     </Grid>
 
-                    <!-- 異常復歸按鈕 -->
-                    <Button x:Name="BtnAlarmReset" Content="異常復歸" Width="140" Height="40" Margin="0,8,0,0"
-                            PreviewMouseLeftButtonDown="BtnAlarmReset_PreviewMouseLeftButtonDown"
-                            PreviewMouseLeftButtonUp="BtnAlarmReset_PreviewMouseLeftButtonUp"
-                            MouseLeave="BtnAlarmReset_MouseLeave"
-                            TouchDown="BtnAlarmReset_TouchDown"
-                            TouchUp="BtnAlarmReset_TouchUp" Click="BtnAlarmReset_Click" />
+                    <!-- Buttons arranged in2x3 grid, reduced size; vertical gap =2px achieved by top/bottom margins of1 -->
+                    <UniformGrid Columns="2" Rows="3" Margin="0,8,0,0" HorizontalAlignment="Left" VerticalAlignment="Top">
+                        <Button x:Name="BtnAlarmReset" Content="異常復歸" Width="120" Height="36" Margin="6,1,6,1"
+                                PreviewMouseLeftButtonDown="BtnAlarmReset_PreviewMouseLeftButtonDown"
+                                PreviewMouseLeftButtonUp="BtnAlarmReset_PreviewMouseLeftButtonUp"
+                                MouseLeave="BtnAlarmReset_MouseLeave"
+                                TouchDown="BtnAlarmReset_TouchDown"
+                                TouchUp="BtnAlarmReset_TouchUp" Click="BtnAlarmReset_Click" />
 
-                    <!-- 新增：編碼器重置按鈕 -->
-                    <Button x:Name="BtnResetEncoder" Content="編碼器重置" Width="140" Height="40" Margin="0,8,0,0"
-                            PreviewMouseLeftButtonDown="BtnResetEncoder_PreviewMouseLeftButtonDown"
-                            PreviewMouseLeftButtonUp="BtnResetEncoder_PreviewMouseLeftButtonUp"
-                            MouseLeave="BtnResetEncoder_MouseLeave"
-                            TouchDown="BtnResetEncoder_TouchDown"
-                            TouchUp="BtnResetEncoder_TouchUp" Click="BtnResetEncoder_Click" />
+                        <Button x:Name="BtnResetEncoder1" Content="軸1編碼器重置" Width="120" Height="36" Margin="6,1,6,1"
+                                PreviewMouseLeftButtonDown="BtnResetEncoder1_PreviewMouseLeftButtonDown"
+                                PreviewMouseLeftButtonUp="BtnResetEncoder1_PreviewMouseLeftButtonUp"
+                                MouseLeave="BtnResetEncoder1_MouseLeave"
+                                TouchDown="BtnResetEncoder1_TouchDown"
+                                TouchUp="BtnResetEncoder1_TouchUp" Click="BtnResetEncoder1_Click" />
+
+                        <Button x:Name="BtnResetEncoder2" Content="軸2編碼器重置" Width="120" Height="36" Margin="6,1,6,1"
+                                PreviewMouseLeftButtonDown="BtnResetEncoder2_PreviewMouseLeftButtonDown"
+                                PreviewMouseLeftButtonUp="BtnResetEncoder2_PreviewMouseLeftButtonUp"
+                                MouseLeave="BtnResetEncoder2_MouseLeave"
+                                TouchDown="BtnResetEncoder2_TouchDown"
+                                TouchUp="BtnResetEncoder2_TouchUp" Click="BtnResetEncoder2_Click" />
+
+                        <Button x:Name="BtnResetEncoder3" Content="軸3編碼器重置" Width="120" Height="36" Margin="6,1,6,1"
+                                PreviewMouseLeftButtonDown="BtnResetEncoder3_PreviewMouseLeftButtonDown"
+                                PreviewMouseLeftButtonUp="BtnResetEncoder3_PreviewMouseLeftButtonUp"
+                                MouseLeave="BtnResetEncoder3_MouseLeave"
+                                TouchDown="BtnResetEncoder3_TouchDown"
+                                TouchUp="BtnResetEncoder3_TouchUp" Click="BtnResetEncoder3_Click" />
+
+                        <Button x:Name="BtnResetEncoder4" Content="軸4編碼器重置" Width="120" Height="36" Margin="6,1,6,1"
+                                PreviewMouseLeftButtonDown="BtnResetEncoder4_PreviewMouseLeftButtonDown"
+                                PreviewMouseLeftButtonUp="BtnResetEncoder4_PreviewMouseLeftButtonUp"
+                                MouseLeave="BtnResetEncoder4_MouseLeave"
+                                TouchDown="BtnResetEncoder4_TouchDown"
+                                TouchUp="BtnResetEncoder4_TouchUp" Click="BtnResetEncoder4_Click" />
+
+                        <!-- empty slot to make2x3 layout symmetrical -->
+                        <Border Background="Transparent" Margin="6,1,6,1" />
+                    </UniformGrid>
 
                 </StackPanel>
             </Grid>

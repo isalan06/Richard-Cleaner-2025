@@ -679,7 +679,7 @@ namespace CleanerControlApp.Hardwares
             if (_shuttle != null) _shuttle.AllMotorStop();
         }
 
-        public int CheckCanInitialize(out string status)
+        public int CheckCanInitialize(out string status, bool logRecord = true)
         {
             int result = 0; // Can Initialize
             status = "可以初始化";
@@ -688,25 +688,25 @@ namespace CleanerControlApp.Hardwares
             {
                 status = "設備中還有模組正處理自動狀態，因此無法初始化";
                 result = 1; // one or more module has auto status
-                OperateLog.Log("自動狀態下無法初始化", status);
+                if(logRecord) OperateLog.Log("自動狀態下無法初始化", status);
             }
             if (HasSystemAlarm)
             {
                 status = "設備中還有錯誤狀態發生，因此無法初始化，請先將錯誤狀態解除";
                 result = 2; // there are alarms in the system
-                OperateLog.Log("錯誤狀態下無法初始化", status);
+                if (logRecord) OperateLog.Log("錯誤狀態下無法初始化", status);
             }
             if (_initializing)
             {
                 status = "設備正在初始化，請勿重複進行初始化";
                 result = 3; // the system is running initializing
-                OperateLog.Log("初始化狀態下無法初始化", status);
+                if (logRecord) OperateLog.Log("初始化狀態下無法初始化", status);
             }
             if (_clamperCloseExist)
             {
                 status = "設備夾爪上有卡匣存在，請先將卡匣取出";
                 result = 4; // the clamper close and cassette exist
-                OperateLog.Log("夾爪有卡匣狀態下無法初始化", status);
+                if (logRecord) OperateLog.Log("夾爪有卡匣狀態下無法初始化", status);
             }
 
 
@@ -1192,7 +1192,7 @@ namespace CleanerControlApp.Hardwares
                 }
 
                 // If initialization was attempted but rejected, include reason
-                var canInitCode = CheckCanInitialize(out string initStatus);
+                var canInitCode = CheckCanInitialize(out string initStatus, false);
                 if (canInitCode != 0)
                 {
                     sb.AppendLine($" - 初始化被阻止：{initStatus}");

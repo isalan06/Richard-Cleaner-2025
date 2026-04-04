@@ -724,10 +724,25 @@ namespace CleanerControlApp.Modules.MitsubishiPLC.Services
             get { return _command[0].Bit2; }
             set { _command[0].Bit2 = value; }
         }
-        public bool Command_ResetEncoder
+        public bool Command_ResetEncoder1
         { 
             get => _command[0].Bit3;
             set => _command[0].Bit3 = value;
+        }
+        public bool Command_ResetEncoder2
+        {
+            get => _command[0].Bit4;
+            set => _command[0].Bit4 = value;
+        }
+        public bool Command_ResetEncoder3
+        {
+            get => _command[0].Bit5;
+            set => _command[0].Bit5 = value;
+        }
+        public bool Command_ResetEncoder4
+        {
+            get => _command[0].Bit6;
+            set => _command[0].Bit6 = value;
         }
 
         public bool Command_Axis1JogP

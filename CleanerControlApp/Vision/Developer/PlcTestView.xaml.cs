@@ -265,53 +265,67 @@ namespace CleanerControlApp.Vision.Developer
             }
         }
 
-        // 編碼器重置 (Mouse)
-        private void BtnResetEncoder_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        // Helper to set axis-specific reset encoder command
+        private void SetResetEncoderCommand(int axis, bool value)
         {
             var op = this.DataContext as IPLCOperator ?? App.AppHost?.Services.GetService(typeof(IPLCOperator)) as IPLCOperator;
-            if (op != null)
+            if (op == null) return;
+            switch (axis)
             {
-                op.Command_ResetEncoder = true;
+                case 1: op.Command_ResetEncoder1 = value; break;
+                case 2: op.Command_ResetEncoder2 = value; break;
+                case 3: op.Command_ResetEncoder3 = value; break;
+                case 4: op.Command_ResetEncoder4 = value; break;
             }
         }
 
-        // 編碼器重置 放開 (Mouse)
-        private void BtnResetEncoder_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        // 軸1 編碼器重置 handlers
+        private void BtnResetEncoder1_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e) => SetResetEncoderCommand(1, true);
+        private void BtnResetEncoder1_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e) => SetResetEncoderCommand(1, false);
+        private void BtnResetEncoder1_MouseLeave(object sender, System.Windows.Input.MouseEventArgs e) => SetResetEncoderCommand(1, false);
+        private void BtnResetEncoder1_TouchDown(object sender, TouchEventArgs e) => SetResetEncoderCommand(1, true);
+        private void BtnResetEncoder1_TouchUp(object sender, TouchEventArgs e) => SetResetEncoderCommand(1, false);
+        private void BtnResetEncoder1_Click(object sender, System.Windows.RoutedEventArgs e)
         {
-            var op = this.DataContext as IPLCOperator ?? App.AppHost?.Services.GetService(typeof(IPLCOperator)) as IPLCOperator;
-            if (op != null)
-            {
-                op.Command_ResetEncoder = false;
-            }
+            // quick pulse on click
+            SetResetEncoderCommand(1, true);
+            Dispatcher.BeginInvoke(new Action(() => SetResetEncoderCommand(1, false)), DispatcherPriority.Background);
         }
 
-        // 編碼器重置 游標移出時也確保關閉
-        private void BtnResetEncoder_MouseLeave(object sender, System.Windows.Input.MouseEventArgs e)
+        // 軸2 編碼器重置 handlers
+        private void BtnResetEncoder2_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e) => SetResetEncoderCommand(2, true);
+        private void BtnResetEncoder2_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e) => SetResetEncoderCommand(2, false);
+        private void BtnResetEncoder2_MouseLeave(object sender, System.Windows.Input.MouseEventArgs e) => SetResetEncoderCommand(2, false);
+        private void BtnResetEncoder2_TouchDown(object sender, TouchEventArgs e) => SetResetEncoderCommand(2, true);
+        private void BtnResetEncoder2_TouchUp(object sender, TouchEventArgs e) => SetResetEncoderCommand(2, false);
+        private void BtnResetEncoder2_Click(object sender, System.Windows.RoutedEventArgs e)
         {
-            var op = this.DataContext as IPLCOperator ?? App.AppHost?.Services.GetService(typeof(IPLCOperator)) as IPLCOperator;
-            if (op != null)
-            {
-                op.Command_ResetEncoder = false;
-            }
+            SetResetEncoderCommand(2, true);
+            Dispatcher.BeginInvoke(new Action(() => SetResetEncoderCommand(2, false)), DispatcherPriority.Background);
         }
 
-        // 編碼器重置 Touch support
-        private void BtnResetEncoder_TouchDown(object sender, TouchEventArgs e)
+        // 軸3 編碼器重置 handlers
+        private void BtnResetEncoder3_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e) => SetResetEncoderCommand(3, true);
+        private void BtnResetEncoder3_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e) => SetResetEncoderCommand(3, false);
+        private void BtnResetEncoder3_MouseLeave(object sender, System.Windows.Input.MouseEventArgs e) => SetResetEncoderCommand(3, false);
+        private void BtnResetEncoder3_TouchDown(object sender, TouchEventArgs e) => SetResetEncoderCommand(3, true);
+        private void BtnResetEncoder3_TouchUp(object sender, TouchEventArgs e) => SetResetEncoderCommand(3, false);
+        private void BtnResetEncoder3_Click(object sender, System.Windows.RoutedEventArgs e)
         {
-            var op = this.DataContext as IPLCOperator ?? App.AppHost?.Services.GetService(typeof(IPLCOperator)) as IPLCOperator;
-            if (op != null)
-            {
-                op.Command_ResetEncoder = true;
-            }
+            SetResetEncoderCommand(3, true);
+            Dispatcher.BeginInvoke(new Action(() => SetResetEncoderCommand(3, false)), DispatcherPriority.Background);
         }
 
-        private void BtnResetEncoder_TouchUp(object sender, TouchEventArgs e)
+        // 軸4 編碼器重置 handlers
+        private void BtnResetEncoder4_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e) => SetResetEncoderCommand(4, true);
+        private void BtnResetEncoder4_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e) => SetResetEncoderCommand(4, false);
+        private void BtnResetEncoder4_MouseLeave(object sender, System.Windows.Input.MouseEventArgs e) => SetResetEncoderCommand(4, false);
+        private void BtnResetEncoder4_TouchDown(object sender, TouchEventArgs e) => SetResetEncoderCommand(4, true);
+        private void BtnResetEncoder4_TouchUp(object sender, TouchEventArgs e) => SetResetEncoderCommand(4, false);
+        private void BtnResetEncoder4_Click(object sender, System.Windows.RoutedEventArgs e)
         {
-            var op = this.DataContext as IPLCOperator ?? App.AppHost?.Services.GetService(typeof(IPLCOperator)) as IPLCOperator;
-            if (op != null)
-            {
-                op.Command_ResetEncoder = false;
-            }
+            SetResetEncoderCommand(4, true);
+            Dispatcher.BeginInvoke(new Action(() => SetResetEncoderCommand(4, false)), DispatcherPriority.Background);
         }
 
         // Simple design-time implementation of IPLCService to allow XAML designer to show values
@@ -352,19 +366,6 @@ namespace CleanerControlApp.Vision.Developer
         private void BtnAlarmReset_Click(object sender, System.Windows.RoutedEventArgs e)
         {
 
-        }
-
-        private void BtnResetEncoder_Click(object sender, System.Windows.RoutedEventArgs e)
-        {
-            // optional: single click behavior - toggle pulse quickly
-            var op = this.DataContext as IPLCOperator ?? App.AppHost?.Services.GetService(typeof(IPLCOperator)) as IPLCOperator;
-            if (op != null)
-            {
-                // set true then false quickly
-                op.Command_ResetEncoder = true;
-                // schedule a reset to false on UI thread shortly after
-                Dispatcher.BeginInvoke(new Action(() => { op.Command_ResetEncoder = false; }), System.Windows.Threading.DispatcherPriority.Background);
-            }
         }
     }
 }

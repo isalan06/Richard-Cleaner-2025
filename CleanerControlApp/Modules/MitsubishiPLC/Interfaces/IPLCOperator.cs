@@ -220,7 +220,10 @@ namespace CleanerControlApp.Modules.MitsubishiPLC.Interfaces
         public bool Command_AutoStart { get; set; }
         public bool Command_AlarmReset { get; set; }
         public bool Command_WriteParameter { get; set; }
-        public bool Command_ResetEncoder { get; set; }
+        public bool Command_ResetEncoder1 { get; set; }
+        public bool Command_ResetEncoder2 { get; set; }
+        public bool Command_ResetEncoder3 { get; set; }
+        public bool Command_ResetEncoder4 { get; set; }
 
         public bool Command_Axis1JogP { get; set; }
         public bool Command_Axis1JogN { get; set; }
