@@ -1,3 +1,4 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
 <UserControl x:Class="CleanerControlApp.Vision.SettingViews.SetSystemView"
  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -5,7 +6,66 @@
  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
  mc:Ignorable="d"
  d:DesignHeight="400" d:DesignWidth="600">
- <Grid Background="White">
- <TextBlock Text="System Settings" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="24" />
+ <Grid Background="White" Margin="8">
+ <Grid.RowDefinitions>
+ <RowDefinition Height="Auto" />
+ <RowDefinition Height="*" />
+ </Grid.RowDefinitions>
+
+ <Grid Grid.Row="0" Margin="0,0,0,8">
+ <Grid.ColumnDefinitions>
+ <ColumnDefinition Width="Auto" />
+ <ColumnDefinition Width="Auto" />
+ <ColumnDefinition Width="*" />
+ </Grid.ColumnDefinitions>
+
+ <TextBlock x:Name="LblTitle" VerticalAlignment="Center" FontSize="18" FontWeight="Bold" Grid.Column="0" Text="&#x7CFB;&#x7D71;&#x53C3;&#x6578;" />
+
+ <StackPanel Orientation="Horizontal" Grid.Column="1" HorizontalAlignment="Left" Margin="8,0,0,0">
+ <Button x:Name="BtnRead" Content="&#x8B80;&#x53D6;" Width="80" Height="28" Margin="0,0,8,0" Click="BtnRead_Click" />
+ <Button x:Name="BtnWrite" Content="&#x5BEB;&#x5165;" Width="80" Height="28" Click="BtnWrite_Click" />
+ </StackPanel>
+ </Grid>
+
+ <Grid Grid.Row="1">
+ <Grid.ColumnDefinitions>
+ <ColumnDefinition Width="480" />
+ </Grid.ColumnDefinitions>
+
+ <Border Grid.Column="0" Padding="12" BorderBrush="LightGray" BorderThickness="1" CornerRadius="4" Background="White" Height="360" VerticalAlignment="Top" Margin="0,0,-2,0">
+ <StackPanel>
+ <TextBlock x:Name="HdrSystem" Text="&#x7CFB;&#x7D71;" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,8" />
+ <Grid>
+ <Grid.RowDefinitions>
+ <RowDefinition Height="Auto" />
+ <RowDefinition Height="Auto" />
+ <RowDefinition Height="Auto" />
+ <RowDefinition Height="Auto" />
+ <RowDefinition Height="Auto" />
+ </Grid.RowDefinitions>
+ <Grid.ColumnDefinitions>
+ <ColumnDefinition Width="240" />
+ <ColumnDefinition Width="180" />
+ </Grid.ColumnDefinitions>
+
+ <TextBlock x:Name="TB_SinkModulePass_Label" Text="沖水槽模組跳過設定:" Grid.Column="0" VerticalAlignment="Center" Height="20" />
+ <TextBox x:Name="Txt_SinkModulePass" Grid.Row="0" Grid.Column="1" Margin="4,4,0,4" />
+
+ <TextBlock x:Name="TB_SoakingModulePass_Label" Text="浸泡槽模組跳過設定:" Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" Height="20" />
+ <TextBox x:Name="Txt_SoakingTankModulePass" Grid.Row="1" Grid.Column="1" Margin="4,4,0,4" />
+
+ <TextBlock x:Name="TB_Drying1ModulePass_Label" Text="烘乾槽#1模組跳過設定:" Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" Height="20" />
+ <TextBox x:Name="Txt_DryingTank1ModulePass" Grid.Row="2" Grid.Column="1" Margin="4,4,0,4" />
+
+ <TextBlock x:Name="TB_Drying2ModulePass_Label" Text="烘乾槽#2模組跳過設定:" Grid.Row="3" Grid.Column="0" VerticalAlignment="Center" Height="20" />
+ <TextBox x:Name="Txt_DryingTank2ModulePass" Grid.Row="3" Grid.Column="1" Margin="4,4,0,4" />
+
+ <TextBlock x:Name="TB_WriteMotionParam_Label" Text="初始寫入馬達參數到PLC:" Grid.Row="4" Grid.Column="0" VerticalAlignment="Center" Height="20" />
+ <TextBox x:Name="Txt_WriteMotionParameterAfterInitialization" Grid.Row="4" Grid.Column="1" Margin="4,4,0,4" />
+
+ </Grid>
+ </StackPanel>
+ </Border>
+ </Grid>
  </Grid>
 </UserControl>

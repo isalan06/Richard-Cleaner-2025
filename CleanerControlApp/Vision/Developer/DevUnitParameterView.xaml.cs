@@ -75,6 +75,8 @@ namespace CleanerControlApp.Vision.Developer
  LoadShuttleToUi();
  // Populate motor UI (X=motors[0], Z=motors[1])
  LoadMotorsToUi();
+ // Populate system UI
+ LoadSystemToUi();
  }
  catch
  {
@@ -134,6 +136,8 @@ namespace CleanerControlApp.Vision.Developer
  // Save shuttle and motors into memory
  SaveShuttleUi();
  SaveMotorsUi();
+ // Save system UI into memory
+ SaveSystemUi();
 
  // Also update DI singleton (if available) so runtime consumers see changes immediately
  try
@@ -151,6 +155,7 @@ namespace CleanerControlApp.Vision.Developer
  diUnit.SoakingTank = _unitSettings.SoakingTank;
  diUnit.Shuttle = _unitSettings.Shuttle;
  diUnit.Motors = _unitSettings.Motors;
+ diUnit.System = _unitSettings.System;
  }
  }
  }
@@ -180,6 +185,8 @@ namespace CleanerControlApp.Vision.Developer
  SaveHeatingUi();
  // Also save soaking fields
  SaveSoakingUi();
+ // Also save system fields
+ SaveSystemUi();
  // Also save shuttle and motor fields
  SaveShuttleUi();
  SaveMotorsUi();
@@ -201,6 +208,7 @@ namespace CleanerControlApp.Vision.Developer
  diUnit.SoakingTank = _unitSettings.SoakingTank;
  diUnit.Shuttle = _unitSettings.Shuttle;
  diUnit.Motors = _unitSettings.Motors;
+ diUnit.System = _unitSettings.System;
  }
  }
  }
@@ -488,6 +496,53 @@ namespace CleanerControlApp.Vision.Developer
  TxtSoakCoverCloseTimeout.Text = string.Empty;
  TxtSoakActTimeLimit.Text = string.Empty;
  TxtSoakUltrasonicCurrentMaxLimit.Text = string.Empty;
+ }
+ }
+ catch
+ {
+ // ignore
+ }
+ }
+
+ // Helper: save system UI controls into _unitSettings.System
+ private void SaveSystemUi()
+ {
+ try
+ {
+ if (_unitSettings == null) _unitSettings = new UnitSettings();
+ if (_unitSettings.System == null) _unitSettings.System = new US_System();
+ var sys = _unitSettings.System;
+
+ if (int.TryParse(TxtSystemInitializationTimeout.Text, out var init)) sys.Initialization_Timeout_Second = init;
+ if (int.TryParse(TxtSystemLoginUseDefaultDeveloper.Text, out var login)) sys.LoginUseDefaultDeveloper = login;
+ if (int.TryParse(TxtSystemUseMotionAssistant.Text, out var motion)) sys.UseMotionAssistant = motion;
+
+ _unitSettings.System = sys;
+ _isDirty = true;
+ }
+ catch
+ {
+ // ignore
+ }
+ }
+
+ // Helper: load system values into UI
+ private void LoadSystemToUi()
+ {
+ try
+ {
+ if (_unitSettings?.System != null)
+ {
+ var sys = _unitSettings.System;
+ TxtSystemInitializationTimeout.Text = sys.Initialization_Timeout_Second.ToString();
+ TxtSystemLoginUseDefaultDeveloper.Text = sys.LoginUseDefaultDeveloper.ToString();
+ TxtSystemUseMotionAssistant.Text = sys.UseMotionAssistant.ToString();
+ }
+ else
+ {
+ TxtSystemInitializationTimeout.Text = string.Empty;
+ TxtSystemLoginUseDefaultDeveloper.Text = string.Empty;
+ TxtSystemUseMotionAssistant.Text = string.Empty;
  }
  }
  catch
