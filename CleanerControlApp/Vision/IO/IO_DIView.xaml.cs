@@ -198,6 +198,8 @@ namespace CleanerControlApp.Vision.IO
  if (_wordIndex <0 || _wordIndex >= arr.Length) return false;
  // ensure bit index in0..15
  if (_bitIndex <0 || _bitIndex >15) return false;
+                if (_wordIndex == 4)
+                { /* Debug - 不會進入 */ }
  return arr[_wordIndex].GetBit(_bitIndex);
  }
  }
