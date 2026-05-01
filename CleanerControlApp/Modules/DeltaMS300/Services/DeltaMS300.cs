@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace CleanerControlApp.Modules.DeltaMS300.Services
@@ -56,8 +57,8 @@ namespace CleanerControlApp.Modules.DeltaMS300.Services
         // per-device timeout timers: when a device times out, start a timer to clear timeout after a delay
         private Timer? _timeoutTimers = null;
 
-        // timeout duration for retry
-        private static readonly TimeSpan DeviceTimeoutClearDelay = TimeSpan.FromMinutes(10);
+        // timeout duration for retry (changed to 5 seconds)
+        private static readonly TimeSpan DeviceTimeoutClearDelay = TimeSpan.FromSeconds(10);
 
         #endregion
 
@@ -364,7 +365,7 @@ namespace CleanerControlApp.Modules.DeltaMS300.Services
 
                                     // capture local idx for callback
 
-                                    if (_timeoutTimers != null)
+                                    if (_timeoutTimers == null)
                                     {
                                         _timeoutTimers = new Timer(state =>
                                         {
@@ -390,26 +391,7 @@ namespace CleanerControlApp.Modules.DeltaMS300.Services
                     }
                     else
                     {
-                        if (_timeoutTimers != null)
-                        {
-                            _timeoutTimers = new Timer(state =>
-                            {
-                                try
-                                {
-                                    _deviceTimeout = false;
-                                }
-                                catch { }
-                                try
-                                {
-                                    if (_timeoutTimers != null)
-                                    {
-                                        try { _timeoutTimers?.Dispose(); } catch { }
-                                        _timeoutTimers = null;
-                                    }
-                                }
-                                catch { }
-                            }, null, DeviceTimeoutClearDelay, Timeout.InfiniteTimeSpan);
-                        }
+                       
                     }
 
                     if (++_routeIndex >= _routeProcess.Length)

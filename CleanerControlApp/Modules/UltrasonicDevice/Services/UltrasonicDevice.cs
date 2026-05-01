@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace CleanerControlApp.Modules.UltrasonicDevice.Services
@@ -58,7 +59,7 @@ namespace CleanerControlApp.Modules.UltrasonicDevice.Services
         private Timer? _timeoutTimers = null;
 
         // timeout duration for retry
-        private static readonly TimeSpan DeviceTimeoutClearDelay = TimeSpan.FromMinutes(10);
+        private static readonly TimeSpan DeviceTimeoutClearDelay = TimeSpan.FromSeconds(10);
 
         #endregion
 
@@ -352,7 +353,7 @@ namespace CleanerControlApp.Modules.UltrasonicDevice.Services
 
                                     // capture local idx for callback
 
-                                    if (_timeoutTimers != null)
+                                    if (_timeoutTimers == null)
                                     {
                                         _timeoutTimers = new Timer(state =>
                                         {

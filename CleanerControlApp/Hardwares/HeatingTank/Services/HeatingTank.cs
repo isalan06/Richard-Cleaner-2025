@@ -80,11 +80,14 @@ namespace CleanerControlApp.Hardwares.HeatingTank.Services
         private bool _sim_inv_high = false;
         private bool _sim_inv_low = false;
 
-        private int _inv_op_index = 0; // 0: Zero; 1: Low; 2: High
+        private int _inv_op_index =0; //0: Zero;1: Low;2: High
+ // prevent spamming SetFrequency: shared cooldown for delta frequency commands
+ private DateTime _lastDeltaFrequencyCommand = DateTime.MinValue;
+ private static readonly TimeSpan DeltaFrequencyCommandCooldown = TimeSpan.FromSeconds(3);
 
-        #endregion
+ #endregion
 
-        #region constructor
+ #region constructor
 
         public HeatingTank(ILogger<HeatingTank>? logger, IPLCOperator? plcService, ITemperatureControllers? temperatureControllers, UnitSettings unitSettings, ModuleSettings moduleSettings, IDeltaMS300 deltaMS300)
         {
@@ -409,8 +412,13 @@ namespace CleanerControlApp.Hardwares.HeatingTank.Services
             bool result = false;
             if (_deltaMS300 != null && !_tankLLAlarm && !_tankLLAlarm && !_private_waste_HAlarm)
             {
-                _deltaMS300.SetFrequency(_moduleSettings.HeatingTank != null ? _moduleSettings.HeatingTank.INV_High : 0f);
-                _inv_op_index = 2;
+                // enforce shared cooldown so device has time to react
+                if (DateTime.UtcNow - _lastDeltaFrequencyCommand < DeltaFrequencyCommandCooldown)
+                    return false;
+
+                _deltaMS300.SetFrequency(_moduleSettings.HeatingTank != null ? _moduleSettings.HeatingTank.INV_High :0f);
+                _inv_op_index =2;
+                _lastDeltaFrequencyCommand = DateTime.UtcNow;
                 result = true;
             }
             return result;
@@ -420,8 +428,12 @@ namespace CleanerControlApp.Hardwares.HeatingTank.Services
             bool result = false;
             if (_deltaMS300 != null && !_tankLLAlarm && !_tankLLAlarm && !_private_waste_HAlarm)
             {
-                _deltaMS300.SetFrequency(_moduleSettings.HeatingTank != null ? _moduleSettings.HeatingTank.INV_Low : 0f);
-                _inv_op_index = 1;
+                if (DateTime.UtcNow - _lastDeltaFrequencyCommand < DeltaFrequencyCommandCooldown)
+                    return false;
+
+                _deltaMS300.SetFrequency(_moduleSettings.HeatingTank != null ? _moduleSettings.HeatingTank.INV_Low :0f);
+                _inv_op_index =1;
+                _lastDeltaFrequencyCommand = DateTime.UtcNow;
                 result = true;
             }
             return result;
@@ -431,8 +443,12 @@ namespace CleanerControlApp.Hardwares.HeatingTank.Services
             bool result = false;
             if (_deltaMS300 != null)
             {
-                _deltaMS300.SetFrequency(_moduleSettings.HeatingTank != null ? _moduleSettings.HeatingTank.INV_Zero : 0f);
-                _inv_op_index = 0;
+                if (DateTime.UtcNow - _lastDeltaFrequencyCommand < DeltaFrequencyCommandCooldown)
+                    return false;
+
+                _deltaMS300.SetFrequency(_moduleSettings.HeatingTank != null ? _moduleSettings.HeatingTank.INV_Zero :0f);
+                _inv_op_index =0;
+                _lastDeltaFrequencyCommand = DateTime.UtcNow;
                 result = true;
             }
             return result;
