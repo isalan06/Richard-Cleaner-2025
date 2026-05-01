@@ -348,7 +348,7 @@ namespace CleanerControlApp.Hardwares
         public bool Leakage1Sign => _plcOperator != null && _plcOperator.Leakage1;
         public bool Leakage2Sign => _plcOperator != null && _plcOperator.Leakage2;
 
-        public bool WasteTankH => _plcOperator != null && _plcOperator.WasteWaterPosH;
+        public bool WasteTankH => _plcOperator != null && !_plcOperator.WasteWaterPosH;
 
         public bool Tower_Red
         {
@@ -437,10 +437,10 @@ namespace CleanerControlApp.Hardwares
         #region Alarm
 
         private bool _communication_alarm => !Check_All_Modbus_Connected;
-        private bool _emo_alarm => !EMOSign;
+        private bool _emo_alarm => EMOSign;
         private bool _main_air_alarm => !MainAirSign;
-        private bool _door_alarm => FrontDoor1Sign || FrontDoor2Sign || FrontDoor3Sign || FrontDoor4Sign || SideDoor1Sign || SideDoor2Sign;
-        private bool _leakage_alarm => Leakage1Sign || Leakage2Sign;
+        private bool _door_alarm => !FrontDoor1Sign || !FrontDoor2Sign || !FrontDoor3Sign || !FrontDoor4Sign || !SideDoor1Sign || !SideDoor2Sign;
+        private bool _leakage_alarm => !Leakage1Sign || !Leakage2Sign;
         private bool _wasteTankH_alarm => WasteTankH;
         private bool _checkCassette_alarm { get; set; }
 

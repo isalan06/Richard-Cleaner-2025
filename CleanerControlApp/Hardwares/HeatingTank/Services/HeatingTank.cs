@@ -181,10 +181,10 @@ namespace CleanerControlApp.Hardwares.HeatingTank.Services
         public void Start() { _running = true; }
         public void Stop() { _running = false; }
 
-        public bool Sensor_Liquid_HH => _plcService != null && _plcService.HotWaterPosHH;
-        public bool Sensor_Liquid_H => _plcService != null && _plcService.HotWaterPosH;
-        public bool Sensor_Liquid_L => _plcService != null && _plcService.HotWaterPosL;
-        public bool Sensor_Liquid_LL => _plcService != null && _plcService.HotWaterPosLL;
+        public bool Sensor_Liquid_HH => _plcService != null && !_plcService.HotWaterPosHH;
+        public bool Sensor_Liquid_H => _plcService != null && !_plcService.HotWaterPosH;
+        public bool Sensor_Liquid_L => _plcService != null && !_plcService.HotWaterPosL;
+        public bool Sensor_Liquid_LL => _plcService != null && !_plcService.HotWaterPosLL;
 
         public bool Command_WaterIn
         {
@@ -852,7 +852,7 @@ namespace CleanerControlApp.Hardwares.HeatingTank.Services
         private bool _tankLLAlarm => !Sensor_Liquid_LL;
         private bool _tankHHAlarm => Sensor_Liquid_HH;
 
-        private bool _private_waste_HAlarm => (_plcService != null) && _plcService.WasteWaterPosH;
+        private bool _private_waste_HAlarm => (_plcService != null) && !_plcService.WasteWaterPosH;
 
         #endregion
     }

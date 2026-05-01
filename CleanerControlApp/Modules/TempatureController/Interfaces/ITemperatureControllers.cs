@@ -32,5 +32,10 @@ namespace CleanerControlApp.Modules.TempatureController.Interfaces
         double LastLoopDurationMilliseconds { get; }
         double AverageLoopDurationMilliseconds { get; }
         long CommandQueueExecutedCount { get; }
+
+        string PortName { get; }
+
+        int WriteCount { get; }
+        int ReadCount { get; }
     }
 }

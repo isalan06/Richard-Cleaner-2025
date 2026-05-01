@@ -40,5 +40,9 @@ namespace CleanerControlApp.Modules.DeltaMS300.Interfaces
         long CommandQueueExecutedCount { get; }
 
         void SetFrequency(float value);
+
+        string PortName { get; }
+        int WriteCount { get; }
+        int ReadCount { get; }
     }
 }

@@ -103,6 +103,9 @@ namespace CleanerControlApp.Modules.Modbus.Services
 
         private readonly object _sync = new object();
 
+        private int _writeCount = 0;
+        private int _readCount = 0;
+
         #endregion
 
         #region Constructor
@@ -335,6 +338,9 @@ namespace CleanerControlApp.Modules.Modbus.Services
             }
         }
 
+        public int WriteCount => _writeCount;
+        public int ReadCount => _readCount;
+
         #endregion
 
         public async Task<ModbusRTUFrame?> Act(ModbusRTUFrame? command)
@@ -365,10 +371,14 @@ namespace CleanerControlApp.Modules.Modbus.Services
 
                 DateTime dt = DateTime.Now;
 
+                
+
                 if (_master != null)
                 {
                     try
                     {
+                        _writeCount++;
+
                         switch (_frame.FunctionCode)
                         {
                             case 0x1:
@@ -411,6 +421,8 @@ namespace CleanerControlApp.Modules.Modbus.Services
                                     await _master.WriteMultipleRegistersAsync(_frame.SlaveAddress, _frame.StartAddress, _frame.Data);
                                 break;
                         }
+
+                        _readCount++;
                     }
                     catch (TimeoutException)
                     { 
@@ -431,7 +443,7 @@ namespace CleanerControlApp.Modules.Modbus.Services
                 FrameReadMilliseconds = DateTime.Now.Subtract(dt).TotalMilliseconds; // 記錄讀取時間
                 InterFrameActMilliseconds = DateTime.Now.Subtract(dt_next).TotalMilliseconds; // 記錄與上次Act的間隔時間
                 dt_next = DateTime.Now; // 更新下一次的時間點
-
+                
             }
 
             return _frame;

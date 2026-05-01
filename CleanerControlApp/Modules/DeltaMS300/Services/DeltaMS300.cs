@@ -216,6 +216,9 @@ namespace CleanerControlApp.Modules.DeltaMS300.Services
             _commandQueue.Enqueue(cmd);
         }
 
+        public string PortName => _modbusService != null ? _modbusService.PortName : "";
+        public int WriteCount => _modbusService != null ? _modbusService.WriteCount : 0;  
+        public int ReadCount => _modbusService != null ? _modbusService.ReadCount : 0;
 
         #endregion
 
@@ -311,7 +314,7 @@ namespace CleanerControlApp.Modules.DeltaMS300.Services
                                 {
                                     if (_routeProcess[_routeIndex].Id == 1)
                                     {
-                                        if(data.Data != null && data.Data.Length >= 2)
+                                        if (data.Data != null && data.Data.Length >= 2)
                                             this.SetRead2102H2103H(data.Data[0], data.Data[1]);
                                     }
                                     else if (_routeProcess[_routeIndex].Id == 2)
@@ -319,7 +322,7 @@ namespace CleanerControlApp.Modules.DeltaMS300.Services
                                         if (data.Data != null && data.Data.Length >= 1)
                                             this.SetRead2001H(data.Data[0]);
                                     }
-                                    else if(_routeProcess[_routeIndex].Id == 3)
+                                    else if (_routeProcess[_routeIndex].Id == 3)
                                     {
                                         if (data.Data != null && data.Data.Length >= 1)
                                             this.SetRead2100H(data.Data[0]);
@@ -383,6 +386,29 @@ namespace CleanerControlApp.Modules.DeltaMS300.Services
                                     }
                                 }
                             }
+                        }
+                    }
+                    else
+                    {
+                        if (_timeoutTimers != null)
+                        {
+                            _timeoutTimers = new Timer(state =>
+                            {
+                                try
+                                {
+                                    _deviceTimeout = false;
+                                }
+                                catch { }
+                                try
+                                {
+                                    if (_timeoutTimers != null)
+                                    {
+                                        try { _timeoutTimers?.Dispose(); } catch { }
+                                        _timeoutTimers = null;
+                                    }
+                                }
+                                catch { }
+                            }, null, DeviceTimeoutClearDelay, Timeout.InfiniteTimeSpan);
                         }
                     }
 

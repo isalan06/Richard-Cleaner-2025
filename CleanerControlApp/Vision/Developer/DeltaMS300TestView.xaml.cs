@@ -190,10 +190,27 @@ namespace CleanerControlApp.Vision.Developer
             txtSystem.Text = isRunning ? "°õ¦æ¤¤" : "°±¤î";
             systemEllipse.Fill = isRunning ? Brushes.Green : Brushes.Red;
 
+            // set tooltip on the comm status title to show port name
+            try
+            {
+                var title = idx ==0 ? txtMS0CommStatusTitle : txtMS1CommStatusTitle;
+                var port = module.PortName ?? string.Empty;
+                title.ToolTip = string.IsNullOrEmpty(port) ? null : port;
+            }
+            catch { }
+
             // Diagnostics
-            txtLoopCount.Text = module.LoopIterationCount.ToString();
-            txtLastMs.Text = module.LastLoopDurationMilliseconds.ToString("F1");
-            txtAvgMs.Text = module.AverageLoopDurationMilliseconds.ToString("F1");
+            try
+            {
+                txtLoopCount.Text = $"({module.LoopIterationCount}/{module.LastLoopDurationMilliseconds:F2}/{module.AverageLoopDurationMilliseconds:F2})";
+            }
+            catch
+            {
+                txtLoopCount.Text = module.LoopIterationCount.ToString();
+            }
+            // show write/read counts per request
+            try { txtLastMs.Text = module.WriteCount.ToString(); } catch { txtLastMs.Text = "-"; }
+            try { txtAvgMs.Text = module.ReadCount.ToString(); } catch { txtAvgMs.Text = "-"; }
             txtCmdCount.Text = module.CommandQueueExecutedCount.ToString();
 
             txtErr.Text = module.DeviceError ? "True" : "-";

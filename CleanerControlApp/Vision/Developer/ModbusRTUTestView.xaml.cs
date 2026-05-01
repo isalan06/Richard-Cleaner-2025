@@ -529,6 +529,9 @@ namespace CleanerControlApp.Vision.Developer
             {
                 Close();
             }
+
+            public int ReadCount => 0;
+            public int WriteCount => 0;
         }
         #endregion
     }

@@ -59,7 +59,7 @@ namespace CleanerControlApp.Services
             try
             {
                 // Fire-and-forget: kick off connect but do not await here so startup proceeds immediately.
-                Task.Run(async () =>
+                _ = Task.Run(async () =>
                 {
                     try
                     {

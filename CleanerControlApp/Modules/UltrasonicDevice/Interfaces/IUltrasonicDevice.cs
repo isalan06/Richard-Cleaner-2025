@@ -37,5 +37,9 @@ namespace CleanerControlApp.Modules.UltrasonicDevice.Interfaces
         void UltrasonicOperate(bool enable);
 
         void SetUltrasonicCurrent(float current);
+
+        string PortName { get; }
+        int WriteCount { get; }
+        int ReadCount { get; }
     }
 }

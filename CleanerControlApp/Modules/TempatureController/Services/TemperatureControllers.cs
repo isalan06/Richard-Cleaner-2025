@@ -205,6 +205,11 @@ namespace CleanerControlApp.Modules.TempatureController.Services
 
         public IModbusRTUService? ModbusRTUService => _modbusService;
 
+        public string PortName => _modbusService != null ? _modbusService.PortName : "";
+
+        public int WriteCount => _modbusService != null ? _modbusService.WriteCount : 0;
+        public int ReadCount => _modbusService != null ? _modbusService.ReadCount : 0;
+
         #endregion
 
 

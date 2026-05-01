@@ -6,7 +6,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              mc:Ignorable="d"
              d:DesignHeight="300" d:DesignWidth="600">
-    <Grid Background="White">
+    <Grid Background="White" Margin="0,0,0,-257">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="215" />
             <ColumnDefinition Width="*" />
@@ -46,22 +46,22 @@
                 </StackPanel>
 
                 <Separator Margin="0,10,0,8" />
-                <TextBlock Text="通訊運行狀況" FontWeight="Bold" FontSize="13" Margin="0,0,0,6" />
+                <TextBlock Text="通訊運行狀況" FontWeight="Bold" FontSize="13" Margin="0,0,0,6" x:Name="txtUDCommStatusTitle"/>
 
                 <!-- Diagnostics: loop times and command counts (spacing reduced to2) -->
                 <StackPanel Margin="0,2,0,0">
                     <StackPanel Margin="2">
-                        <TextBlock Text="迴圈次數" FontSize="12" />
+                        <TextBlock Text="迴圈次數/耗時/平均耗時" FontSize="12" />
                         <TextBlock x:Name="txtUDLoopIterationCount" Text="-" FontWeight="Bold" Margin="0,1,0,2" />
                     </StackPanel>
 
                     <StackPanel Margin="2">
-                        <TextBlock Text="上次迴圈耗時 (ms)" FontSize="12" />
+                        <TextBlock Text="命令次數" FontSize="12" />
                         <TextBlock x:Name="txtUDLastLoopMs" Text="-" FontWeight="Bold" Margin="0,1,0,2" />
                     </StackPanel>
 
                     <StackPanel Margin="2">
-                        <TextBlock Text="平均迴圈耗時 (ms)" FontSize="12" />
+                        <TextBlock Text="回應次數" FontSize="12" />
                         <TextBlock x:Name="txtUDAvgLoopMs" Text="-" FontWeight="Bold" Margin="0,1,0,2" />
                     </StackPanel>
 

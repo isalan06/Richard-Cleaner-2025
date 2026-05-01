@@ -46,22 +46,22 @@
                 </StackPanel>
 
                 <Separator Margin="0,10,0,8" />
-                <TextBlock Text="通訊運行狀況" FontWeight="Bold" FontSize="13" Margin="0,0,0,6" />
+                <TextBlock x:Name="txtMS0CommStatusTitle" Text="通訊運行狀況" FontWeight="Bold" FontSize="13" Margin="0,0,0,6" />
 
                 <!-- Diagnostics -->
                 <StackPanel Margin="0,2,0,0">
                     <StackPanel Margin="2">
-                        <TextBlock Text="迴圈次數" FontSize="12" />
+                        <TextBlock Text="迴圈次數/耗時/平均耗時" FontSize="12" />
                         <TextBlock x:Name="txtMS0LoopIterationCount" Text="-" FontWeight="Bold" Margin="0,1,0,2" />
                     </StackPanel>
 
                     <StackPanel Margin="2">
-                        <TextBlock Text="上次迴圈耗時 (ms)" FontSize="12" />
+                        <TextBlock Text="命令次數" FontSize="12" />
                         <TextBlock x:Name="txtMS0LastLoopMs" Text="-" FontWeight="Bold" Margin="0,1,0,2" />
                     </StackPanel>
 
                     <StackPanel Margin="2">
-                        <TextBlock Text="平均迴圈耗時 (ms)" FontSize="12" />
+                        <TextBlock Text="回應次數" FontSize="12" />
                         <TextBlock x:Name="txtMS0AvgLoopMs" Text="-" FontWeight="Bold" Margin="0,1,0,2" />
                     </StackPanel>
 
@@ -164,22 +164,22 @@
                 </StackPanel>
 
                 <Separator Margin="0,10,0,8" />
-                <TextBlock Text="通訊運行狀況" FontWeight="Bold" FontSize="13" Margin="0,0,0,6" />
+                <TextBlock x:Name="txtMS1CommStatusTitle" Text="通訊運行狀況" FontWeight="Bold" FontSize="13" Margin="0,0,0,6" />
 
                 <!-- Diagnostics -->
                 <StackPanel Margin="0,2,0,0">
                     <StackPanel Margin="2">
-                        <TextBlock Text="迴圈次數" FontSize="12" />
+                        <TextBlock Text="迴圈次數/耗時/平均耗時" FontSize="12" />
                         <TextBlock x:Name="txtMS1LoopIterationCount" Text="-" FontWeight="Bold" Margin="0,1,0,2" />
                     </StackPanel>
 
                     <StackPanel Margin="2">
-                        <TextBlock Text="上次迴圈耗時 (ms)" FontSize="12" />
+                        <TextBlock Text="命令次數" FontSize="12" />
                         <TextBlock x:Name="txtMS1LastLoopMs" Text="-" FontWeight="Bold" Margin="0,1,0,2" />
                     </StackPanel>
 
                     <StackPanel Margin="2">
-                        <TextBlock Text="平均迴圈耗時 (ms)" FontSize="12" />
+                        <TextBlock Text="回應次數" FontSize="12" />
                         <TextBlock x:Name="txtMS1AvgLoopMs" Text="-" FontWeight="Bold" Margin="0,1,0,2" />
                     </StackPanel>
 

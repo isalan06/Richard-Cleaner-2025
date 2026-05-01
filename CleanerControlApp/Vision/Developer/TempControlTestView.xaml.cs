@@ -49,6 +49,21 @@ namespace CleanerControlApp.Vision.Developer
  ellipseRtuStatus.Fill = rtuRunning ? Brushes.Green : Brushes.Red;
  txtRtuStatus.Text = rtuRunning ? "連線中" : "離線";
 
+ // update tooltip to show port name
+ try
+ {
+ var port = _temperatureControllers?.PortName ?? string.Empty;
+ if (!string.IsNullOrEmpty(port))
+ {
+ txtCommStatusTitle.ToolTip = port;
+ }
+ else
+ {
+ txtCommStatusTitle.ToolTip = null;
+ }
+ }
+ catch { }
+
  bool sysRunning = false;
  try { sysRunning = _temperatureControllers?.IsRunning ?? false; } catch { }
  ellipseSystemStatus.Fill = sysRunning ? Brushes.Green : Brushes.Red;
@@ -107,14 +122,22 @@ namespace CleanerControlApp.Vision.Developer
  {
  if (_temperatureControllers != null)
  {
- txtLoopIterationCount.Text = _temperatureControllers.LoopIterationCount.ToString();
- txtLastLoopMs.Text = _temperatureControllers.LastLoopDurationMilliseconds.ToString("F2");
- txtAvgLoopMs.Text = _temperatureControllers.AverageLoopDurationMilliseconds.ToString("F2");
+ // keep individual fields updated
+ // show write/read counters in these fields per UI request
+ txtLastLoopMs.Text = _temperatureControllers.WriteCount.ToString();
+ txtAvgLoopMs.Text = _temperatureControllers.ReadCount.ToString();
  txtCmdExecCount.Text = _temperatureControllers.CommandQueueExecutedCount.ToString();
+
+ // show combined diagnostics in txtLoopIterationCount as requested
+ try
+ {
+ txtLoopIterationCount.Text = $"({_temperatureControllers.LoopIterationCount}/{_temperatureControllers.LastLoopDurationMilliseconds:F2}/{_temperatureControllers.AverageLoopDurationMilliseconds:F2})";
+ }
+ catch { txtLoopIterationCount.Text = "(-/-/-)"; }
  }
  else
  {
- txtLoopIterationCount.Text = "-";
+ txtLoopIterationCount.Text = "(-/-/-)";
  txtLastLoopMs.Text = "-";
  txtAvgLoopMs.Text = "-";
  txtCmdExecCount.Text = "-";
@@ -251,6 +274,14 @@ namespace CleanerControlApp.Vision.Developer
  bool running = svc.IsRunning;
  ellipseRtuStatus.Fill = running ? Brushes.Green : Brushes.Red;
  txtRtuStatus.Text = running ? "連線中" : "離線";
+
+ // set tooltip to port name if available
+ try
+ {
+ var port = _temperatureControllers?.PortName ?? string.Empty;
+ if (!string.IsNullOrEmpty(port)) txtCommStatusTitle.ToolTip = port;
+ }
+ catch { }
  }
  }
  catch { }
@@ -268,6 +299,10 @@ namespace CleanerControlApp.Vision.Developer
  try { running = svc.IsRunning; } catch { }
  ellipseRtuStatus.Fill = running ? Brushes.Green : Brushes.Red;
  txtRtuStatus.Text = running ? "連線中" : "離線";
+
+ // update tooltip
+ try { var port = _temperatureControllers?.PortName ?? string.Empty; if (!string.IsNullOrEmpty(port)) txtCommStatusTitle.ToolTip = port; }
+ catch { }
  }
  }
  catch { }
@@ -384,6 +419,10 @@ namespace CleanerControlApp.Vision.Developer
  public double LastLoopDurationMilliseconds =>0.0;
  public double AverageLoopDurationMilliseconds =>0.0;
  public long CommandQueueExecutedCount =>0;
- }
+
+ public string PortName => "COMX";
+            public int WriteCount =>0;
+            public int ReadCount =>0;
+        }
  }
 }

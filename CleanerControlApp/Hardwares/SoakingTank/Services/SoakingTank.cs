@@ -163,8 +163,8 @@ namespace CleanerControlApp.Hardwares.SoakingTank.Services
 
         }
 
-        public bool Sensor_Liquid_H => _plcService != null && _plcService.TankWaterPosH;
-        public bool Sensor_Liquid_L => _plcService != null && _plcService.TankWaterPosL;
+        public bool Sensor_Liquid_H => _plcService != null && !_plcService.TankWaterPosH;
+        public bool Sensor_Liquid_L => _plcService != null && !_plcService.TankWaterPosL;
 
         public bool Command_CleanerCoverClose
         {
@@ -1110,7 +1110,7 @@ namespace CleanerControlApp.Hardwares.SoakingTank.Services
         private bool _motorAlarmHomeTimeout => (_plcService != null) && _plcService.Axis4ErrorHomeTimeout;
         private bool _motorAlarmMoveTimeout => (_plcService != null) && _plcService.Axis4ErrorCommandTimeout;
 
-        private bool _private_waste_HAlarm => (_plcService != null) && _plcService.WasteWaterPosH;
+        private bool _private_waste_HAlarm => (_plcService != null) && !_plcService.WasteWaterPosH;
 
         #endregion
     }

@@ -59,6 +59,21 @@ namespace CleanerControlApp.Vision.Developer
                 ellipseUDDeviceStatus.Fill = rtuRunning ? Brushes.Green : Brushes.Red;
                 txtUDDeviceStatus.Text = rtuRunning ? "連線" : "離線";
 
+                // update tooltip to show port name
+                try
+                {
+                    var port = _ultrasonicDevice?.PortName ?? string.Empty;
+                    if (!string.IsNullOrEmpty(port))
+                    {
+                        txtUDCommStatusTitle.ToolTip = port;
+                    }
+                    else
+                    {
+                        txtUDCommStatusTitle.ToolTip = null;
+                    }
+                }
+                catch { }
+
                 bool sysRunning = false;
                 try { sysRunning = _ultrasonicDevice?.IsRunning ?? false; } catch { }
                 ellipseUDSystemStatus.Fill = sysRunning ? Brushes.Green : Brushes.Red;
@@ -83,14 +98,21 @@ namespace CleanerControlApp.Vision.Developer
                 {
                     if (_ultrasonicDevice != null)
                     {
-                        txtUDLoopIterationCount.Text = _ultrasonicDevice.LoopIterationCount.ToString();
-                        txtUDLastLoopMs.Text = _ultrasonicDevice.LastLoopDurationMilliseconds.ToString("F2");
-                        txtUDAvgLoopMs.Text = _ultrasonicDevice.AverageLoopDurationMilliseconds.ToString("F2");
+                        // Show combined string in txtUDLoopIterationCount as requested
+                        try
+                        {
+                            txtUDLoopIterationCount.Text = $"({_ultrasonicDevice.LoopIterationCount}/{_ultrasonicDevice.LastLoopDurationMilliseconds:F2}/{_ultrasonicDevice.AverageLoopDurationMilliseconds:F2})";
+                        }
+                        catch { txtUDLoopIterationCount.Text = "(-/-/-)"; }
+
+                        // show WriteCount / ReadCount per request
+                        txtUDLastLoopMs.Text = _ultrasonicDevice.WriteCount.ToString();
+                        txtUDAvgLoopMs.Text = _ultrasonicDevice.ReadCount.ToString();
                         txtUDCmdExecCount.Text = _ultrasonicDevice.CommandQueueExecutedCount.ToString();
                     }
                     else
                     {
-                        txtUDLoopIterationCount.Text = "-";
+                        txtUDLoopIterationCount.Text = "(-/-/-)";
                         txtUDLastLoopMs.Text = "-";
                         txtUDAvgLoopMs.Text = "-";
                         txtUDCmdExecCount.Text = "-";
@@ -113,6 +135,14 @@ namespace CleanerControlApp.Vision.Developer
                     bool running = svc.IsRunning;
                     ellipseUDDeviceStatus.Fill = running ? Brushes.Green : Brushes.Red;
                     txtUDDeviceStatus.Text = running ? "連線" : "離線";
+
+                    // set tooltip to port name if available
+                    try
+                    {
+                        var port = _ultrasonicDevice?.PortName ?? string.Empty;
+                        if (!string.IsNullOrEmpty(port)) txtUDCommStatusTitle.ToolTip = port;
+                    }
+                    catch { }
                 }
             }
             catch { }
@@ -130,6 +160,10 @@ namespace CleanerControlApp.Vision.Developer
                     try { running = svc.IsRunning; } catch { }
                     ellipseUDDeviceStatus.Fill = running ? Brushes.Green : Brushes.Red;
                     txtUDDeviceStatus.Text = running ? "連線" : "離線";
+
+                    // update tooltip
+                    try { var port = _ultrasonicDevice?.PortName ?? string.Empty; if (!string.IsNullOrEmpty(port)) txtUDCommStatusTitle.ToolTip = port; }
+                    catch { }
                 }
             }
             catch { }
@@ -263,6 +297,10 @@ namespace CleanerControlApp.Vision.Developer
 
             public void UltrasonicOperate(bool enable) { }
             public void SetUltrasonicCurrent(float current) { }
+
+            public string PortName => "COMX";
+            public int WriteCount => 0;
+            public int ReadCount => 0;
         }
     }
 }

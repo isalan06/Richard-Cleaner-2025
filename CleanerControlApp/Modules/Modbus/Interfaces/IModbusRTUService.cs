@@ -31,5 +31,8 @@ namespace CleanerControlApp.Modules.Modbus.Interfaces
         // Added for compatibility with callers that expect Start/Stop
         void Start();
         void Stop();
+
+        int ReadCount { get; }
+        int WriteCount { get; }
     }
 }

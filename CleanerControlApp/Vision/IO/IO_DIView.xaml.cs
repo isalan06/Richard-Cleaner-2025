@@ -9,20 +9,20 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace CleanerControlApp.Vision.IO
 {
- public partial class IO_DIView : UserControl
- {
- public ObservableCollection<DIGroup> Groups { get; } = new ObservableCollection<DIGroup>();
+    public partial class IO_DIView : UserControl
+    {
+        public ObservableCollection<DIGroup> Groups { get; } = new ObservableCollection<DIGroup>();
 
- private readonly IPLCService? _plcService;
- private readonly DispatcherTimer _refreshTimer;
+        private readonly IPLCService? _plcService;
+        private readonly DispatcherTimer _refreshTimer;
 
- public IO_DIView()
- {
- InitializeComponent();
- DataContext = this;
+        public IO_DIView()
+        {
+            InitializeComponent();
+            DataContext = this;
 
- // resolve plc service from host if available
- _plcService = App.AppHost?.Services.GetService<IPLCService>();
+            // resolve plc service from host if available
+            _plcService = App.AppHost?.Services.GetService<IPLCService>();
 
             // Populate groups according to provided table (updated descriptions)
             AddGroup("X0~X7", new[] {
@@ -85,8 +85,8 @@ namespace CleanerControlApp.Vision.IO
  ("X51","沖水槽開蓋氣缸後到位磁簧"),
  ("X52","浸泡槽開蓋氣缸前到位磁簧"),
  ("X53","浸泡槽開蓋氣缸後到位磁簧"),
- ("X54","浸泡槽低水位浮球開關"),
- ("X55","浸泡槽高水位浮球開關"),
+ ("X54","浸泡槽低水位浮球開關(ON: 無; OFF: 有)"),
+ ("X55","浸泡槽高水位浮球開關(ON: 無; OFF: 有)"),
  ("X56","烘乾槽1開蓋氣缸前到位磁簧"),
  ("X57","烘乾槽1開蓋氣缸後到位磁簧")
  });
@@ -94,31 +94,31 @@ namespace CleanerControlApp.Vision.IO
             AddGroup("X60~X67", new[] {
  ("X60","烘乾槽2開蓋氣缸前到位磁簧"),
  ("X61","烘乾槽2開蓋氣缸後到位磁簧"),
- ("X62","熱水槽水位浮球開關LL"),
- ("X63","熱水槽水位浮球開關L"),
- ("X64","熱水槽水位浮球開關H"),
- ("X65","熱水槽水位浮球開關HH"),
- ("X66","廢水槽水位浮球開關H"),
+ ("X62","熱水槽水位浮球開關LL(ON: 無; OFF: 有)"),
+ ("X63","熱水槽水位浮球開關L(ON: 無; OFF: 有)"),
+ ("X64","熱水槽水位浮球開關H(ON: 無; OFF: 有)"),
+ ("X65","熱水槽水位浮球開關HH(ON: 無; OFF: 有)"),
+ ("X66","廢水槽水位浮球開關H(ON: 無; OFF: 有)"),
  ("X67","Reserved")
  });
 
             AddGroup("X70~X77", new[] {
- ("X70","緊急停止開關訊號"),
+ ("X70","緊急停止開關訊號(ON:觸發; OFF:正常)"),
  ("X71","維修訊號"),
  ("X72","移載組Z軸夾爪開"),
  ("X73","移載組Z軸夾爪關"),
- ("X74","主氣源訊號"),
- ("X75","前門檢感應器1"),
- ("X76","前門檢感應器2"),
- ("X77","前門檢感應器3")
+ ("X74","主氣源訊號(ON:正常; OFF:異常)"),
+ ("X75","前門檢感應器1(ON:關; OFF:開)"),
+ ("X76","前門檢感應器2(ON:關; OFF:開)"),
+ ("X77","前門檢感應器3(ON:關; OFF:開)")
  });
 
             AddGroup("X100~X107", new[] {
- ("X100","前門檢感應器4"),
- ("X101","側門檢感應器1"),
- ("X102","側門檢感應器2"),
- ("X103","漏液感應器1"),
- ("X104","漏液感應器2"),
+ ("X100","前門檢感應器4(ON:關; OFF:開)"),
+ ("X101","側門檢感應器1(ON:關; OFF:開)"),
+ ("X102","側門檢感應器2(ON:關; OFF:開)"),
+ ("X103","漏液感應器1(ON:正常; OFF:異常)"),
+ ("X104","漏液感應器2(ON:正常; OFF:異常)"),
  ("X105","Reserved"),
  ("X106","Reserved"),
  ("X107","Reserved")
@@ -126,90 +126,100 @@ namespace CleanerControlApp.Vision.IO
 
             // Refresh timer to update lamp display from PLC
             _refreshTimer = new DispatcherTimer(DispatcherPriority.Normal)
- {
- Interval = System.TimeSpan.FromMilliseconds(200)
- };
- _refreshTimer.Tick += (s, e) =>
- {
- foreach (var g in Groups)
- {
- foreach (var it in g.Items)
- it.Refresh();
- }
- };
- _refreshTimer.Start();
- }
+            {
+                Interval = System.TimeSpan.FromMilliseconds(200)
+            };
+            _refreshTimer.Tick += (s, e) =>
+            {
+                foreach (var g in Groups)
+                {
+                    foreach (var it in g.Items)
+                        it.Refresh();
+                }
+            };
+            _refreshTimer.Start();
+        }
 
- private void AddGroup(string header, (string addr, string desc)[] entries)
- {
- var g = new DIGroup { Header = header };
- foreach (var e in entries)
- {
- g.Items.Add(new DIItem(e.addr, e.desc, _plcService));
- }
- Groups.Add(g);
- }
- }
+        private void AddGroup(string header, (string addr, string desc)[] entries)
+        {
+            var g = new DIGroup { Header = header };
+            foreach (var e in entries)
+            {
+                g.Items.Add(new DIItem(e.addr, e.desc, _plcService));
+            }
+            Groups.Add(g);
+        }
+    }
 
- public class DIGroup
- {
- public string? Header { get; set; }
- public ObservableCollection<DIItem> Items { get; } = new ObservableCollection<DIItem>();
- }
+    public class DIGroup
+    {
+        public string? Header { get; set; }
+        public ObservableCollection<DIItem> Items { get; } = new ObservableCollection<DIItem>();
+    }
 
- public class DIItem : INotifyPropertyChanged
- {
- private readonly IPLCService? _plc;
- private readonly int _wordIndex;
- private readonly int _bitIndex;
+    public class DIItem : INotifyPropertyChanged
+    {
+        private readonly IPLCService? _plc;
+        private readonly int _wordIndex;
+        private readonly int _bitIndex;
 
- public string Address { get; }
- public string Description { get; }
+        public string Address { get; }
+        public string Description { get; }
 
- public DIItem(string address, string description, IPLCService? plc)
- {
- Address = address;
- Description = description;
- _plc = plc;
+        public DIItem(string address, string description, IPLCService? plc)
+        {
+            Address = address;
+            Description = description;
+            _plc = plc;
 
- // compute mapping from address to DIO_X[word].Bit
- // address format: Xnn (e.g., X0, X10, X20, X100)
- if (int.TryParse(address.TrimStart('X', 'x'), out int num))
- {
- int tens = num /10;
- int units = num %10;
- _wordIndex = tens /2; // every two 'tens' groups map to next word
- _bitIndex = units + (tens %2) *8; // tens odd -> high byte (bits8..15)
- }
- else
- {
- _wordIndex =0;
- _bitIndex =0;
- }
- }
+            // compute mapping from address to DIO_X[word].Bit
+            // address format: Xnn (e.g., X0, X10, X20, X100)
+            if (int.TryParse(address.TrimStart('X', 'x'), out int num))
+            {
+                int tens = num / 10;
+                int units = num % 10;
 
- public bool IsOn
- {
- get
- {
- if (_plc == null) return false;
- var arr = _plc.DIO_X;
- if (arr == null) return false;
- if (_wordIndex <0 || _wordIndex >= arr.Length) return false;
- // ensure bit index in0..15
- if (_bitIndex <0 || _bitIndex >15) return false;
-                if (_wordIndex == 4)
-                { /* Debug - 不會進入 */ }
- return arr[_wordIndex].GetBit(_bitIndex);
- }
- }
+                // Special-case addresses in the100s (X100..X107) which map to the last DIO_X word (index4)
+                // For X100..X107 we map to word index4 and bits0..7
+                if (num >= 100)
+                {
+                    _wordIndex = 4;
+                    _bitIndex = units; // units should be0..7 for defined addresses
+                }
+                else
+                {
+                    // general mapping: every two 'tens' groups map to a word; odd tens map to high byte (bits8..15)
+                    _wordIndex = tens / 2; // every two 'tens' groups map to next word
+                    _bitIndex = units + (tens % 2) * 8; // tens odd -> high byte (bits8..15)
+                }
+            }
+            else
+            {
+                _wordIndex = 0;
+                _bitIndex = 0;
+            }
+        }
 
- public void Refresh() => OnPropertyChanged(nameof(IsOn));
+        public bool IsOn
+        {
+            get
+            {
+                if (_plc == null) return false;
+                var arr = _plc.DIO_X;
+                if (arr == null) return false;
+                if (_wordIndex < 0 || _wordIndex >= arr.Length) return false;
+                // ensure bit index in0..15
+                if (_bitIndex < 0 || _bitIndex > 15) return false;
+                return arr[_wordIndex].GetBit(_bitIndex);
+            }
+        }
 
- public event PropertyChangedEventHandler? PropertyChanged;
- protected void OnPropertyChanged([CallerMemberName] string? propName = null)
- {
- PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propName));
- }
- }
+        public void Refresh() => OnPropertyChanged(nameof(IsOn));
+
+        public event PropertyChangedEventHandler? PropertyChanged;
+        protected void OnPropertyChanged([CallerMemberName] string? propName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propName));
+        }
+    }
 }
