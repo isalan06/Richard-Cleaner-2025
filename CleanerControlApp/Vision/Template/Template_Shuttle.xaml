@@ -10,9 +10,9 @@
             <local:Template_Clamper x:Name="Clamper" Canvas.Left="326" Canvas.Top="49" Height="311" Width="333" />
             <local:Template_Motor_1 x:Name="Motor1" Canvas.Left="766" Canvas.Top="49" HorizontalAlignment="Left" VerticalAlignment="Center" />
             <local:Template_Motor_2 x:Name="Motor2" Canvas.Top="49" HorizontalAlignment="Left" VerticalAlignment="Top" />
-            <Button FontSize="18" Content="錯誤重置" Click="ResetAlarm_Click" Background="#ADD8E6" Height="75" Canvas.Left="505" Canvas.Top="385" Width="121" HorizontalAlignment="Center" VerticalAlignment="Top"/>
-            <Button FontSize="18" Content="開啟夾爪" Click="OpenClamper_Click" Background="#ADD8E6" Height="74" Canvas.Left="641" Canvas.Top="86" Width="120" HorizontalAlignment="Center" VerticalAlignment="Top"/>
-            <Button FontSize="18" Content="關閉夾爪" Click="CloseClamper_Click" Background="#ADD8E6" Height="75" Canvas.Left="641" Canvas.Top="167" Width="120" HorizontalAlignment="Center" VerticalAlignment="Top"/>
+            <Button FontSize="20" Content="錯誤重置" Click="ResetAlarm_Click" Background="#ADD8E6" Height="75" Canvas.Left="505" Canvas.Top="385" Width="121" HorizontalAlignment="Center" VerticalAlignment="Top"/>
+            <Button FontSize="20" Content="開啟夾爪" Click="OpenClamper_Click" Background="#ADD8E6" Height="74" Canvas.Left="641" Canvas.Top="86" Width="120" HorizontalAlignment="Center" VerticalAlignment="Top"/>
+            <Button FontSize="20" Content="關閉夾爪" Click="CloseClamper_Click" Background="#ADD8E6" Height="75" Canvas.Left="641" Canvas.Top="167" Width="120" HorizontalAlignment="Center" VerticalAlignment="Top"/>
 
             <!-- X axis controls -->
             <ComboBox x:Name="cmbXSpeedMode" FontSize="18" Canvas.Left="906" Canvas.Top="371" Width="146" Height="30" SelectedIndex="0" SelectedValuePath="Tag" HorizontalAlignment="Left" VerticalAlignment="Center">
@@ -22,7 +22,7 @@
             <TextBlock Text="速度選擇" FontSize="20" Foreground="#333333" TextAlignment="Center" Width="89" Height="25" Canvas.Left="793" Canvas.Top="373" HorizontalAlignment="Left" VerticalAlignment="Top"/>
             <TextBlock Text="位置選擇" FontSize="20" Foreground="#333333" TextAlignment="Center" Height="25" Canvas.Left="793" Canvas.Top="341" Width="89"/>
             <ComboBox x:Name="cmbXPositionSelect" FontSize="18" Canvas.Left="906" Canvas.Top="336" Width="291" Height="30" SelectedIndex="0" SelectedValuePath="Tag" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-            <Button x:Name="btnMoveX" Canvas.Left="937" Canvas.Top="419" Width="113" Height="48" Content="Move" Click="btnMoveToP1_Click" Background="LightSeaGreen" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+            <Button x:Name="btnMoveX" FontSize="20" Canvas.Left="937" Canvas.Top="419" Width="113" Height="48" Content="Move" Click="btnMoveToP1_Click" Background="LightSeaGreen" HorizontalAlignment="Left" VerticalAlignment="Top"/>
             <Border Canvas.Left="809" Canvas.Top="421" Width="120" Height="40" BorderBrush="#2E993E" BorderThickness="1" CornerRadius="4" Padding="4" ToolTip="P1 - 上位" HorizontalAlignment="Left" VerticalAlignment="Top">
                 <Border.Style>
                     <Style TargetType="{x:Type Border}">
@@ -34,9 +34,9 @@
                         </Style.Triggers>
                     </Style>
                 </Border.Style>
-                <TextBlock Text="定位" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="14" Foreground="Black" />
+                <TextBlock Text="定位" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="20" Foreground="Black" />
             </Border>
-            <Button x:Name="btnTeachX" Content="Teach" Background="LightSeaGreen" Height="48" Canvas.Left="1071" Canvas.Top="419" Width="113" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+            <Button x:Name="btnTeachX" FontSize="20" Content="Teach" Background="LightSeaGreen" Height="48" Canvas.Left="1071" Canvas.Top="419" Width="113" HorizontalAlignment="Left" VerticalAlignment="Top"/>
 
             <!-- Z axis controls -->
             <ComboBox x:Name="cmbZSpeedMode" FontSize="18" Canvas.Left="135" Canvas.Top="373" Width="146" Height="30" SelectedIndex="0" SelectedValuePath="Tag" HorizontalAlignment="Left" VerticalAlignment="Top">
@@ -46,7 +46,7 @@
             <TextBlock Text="速度選擇" FontSize="20" Foreground="#333333" TextAlignment="Center" Width="89" Height="25" Canvas.Left="22" Canvas.Top="375" HorizontalAlignment="Left" VerticalAlignment="Top"/>
             <TextBlock Text="位置選擇" FontSize="20" Foreground="#333333" TextAlignment="Center" Height="25" Canvas.Left="22" Canvas.Top="343" Width="89"/>
             <ComboBox x:Name="cmbZPositionSelect" FontSize="18" Canvas.Left="135" Canvas.Top="338" Width="291" Height="30" SelectedIndex="0" SelectedValuePath="Tag" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-            <Button x:Name="btnMoveZ" Canvas.Left="166" Canvas.Top="421" Width="113" Height="48" Content="Move" Click="btnMoveToPZ_Click" Background="LightSeaGreen" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+            <Button x:Name="btnMoveZ" FontSize="20" Canvas.Left="166" Canvas.Top="421" Width="113" Height="48" Content="Move" Click="btnMoveToPZ_Click" Background="LightSeaGreen" HorizontalAlignment="Left" VerticalAlignment="Top"/>
             <Border Canvas.Left="38" Canvas.Top="423" Width="120" Height="40" BorderBrush="#2E993E" BorderThickness="1" CornerRadius="4" Padding="4" ToolTip="Z 定位" HorizontalAlignment="Left" VerticalAlignment="Top">
                 <Border.Style>
                     <Style TargetType="{x:Type Border}">
@@ -58,9 +58,9 @@
                         </Style.Triggers>
                     </Style>
                 </Border.Style>
-                <TextBlock Text="定位" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="14" Foreground="Black" />
+                <TextBlock Text="定位" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="20" Foreground="Black" />
             </Border>
-            <Button x:Name="btnTeachZ" Content="Teach" Background="LightSeaGreen" Height="48" Canvas.Left="300" Canvas.Top="421" Width="113" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+            <Button x:Name="btnTeachZ" FontSize="20" Content="Teach" Background="LightSeaGreen" Height="48" Canvas.Left="300" Canvas.Top="421" Width="113" HorizontalAlignment="Left" VerticalAlignment="Top"/>
             <Border Canvas.Left="516" Canvas.Top="467" BorderBrush="Black" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding AutoStatus, ElementName=RootControl}" Height="20" HorizontalAlignment="Left" VerticalAlignment="Top">
                 <Border.Style>
                     <Style TargetType="{x:Type Border}">

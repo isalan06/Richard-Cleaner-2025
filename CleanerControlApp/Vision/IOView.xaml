@@ -14,8 +14,8 @@
  <!-- 左側方框：放置按鈕 -->
  <Border Grid.Column="0" Margin="8" Padding="8" BorderBrush="Gray" BorderThickness="1" CornerRadius="4" Background="#FFF">
  <StackPanel VerticalAlignment="Top" Margin="0,0,0,8">
- <Button x:Name="BtnTabDI" Content="DI" Height="72" HorizontalAlignment="Stretch" Margin="0,0,0,6" Click="BtnTabDI_Click" />
- <Button x:Name="BtnTabDO" Content="DO" Height="72" HorizontalAlignment="Stretch" Margin="0,0,0,6" Click="BtnTabDO_Click" />
+                <Button x:Name="BtnTabDI" FontSize="20" Content="DI" Height="72" HorizontalAlignment="Stretch" Margin="0,0,0,6" Click="BtnTabDI_Click" />
+                <Button x:Name="BtnTabDO" FontSize="20" Content="DO" Height="72" HorizontalAlignment="Stretch" Margin="0,0,0,6" Click="BtnTabDO_Click" />
  </StackPanel>
  </Border>
 

@@ -78,9 +78,9 @@
                 <ComboBoxItem Tag="1">搖擺速度</ComboBoxItem>
             </ComboBox>
             <TextBlock Text="速度選擇" FontSize="20" Foreground="#333333" TextAlignment="Center" Width="89" Height="25" Canvas.Left="119" Canvas.Top="332" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-            <Button x:Name="btnMoveToP1" Canvas.Left="216" Canvas.Top="381" Width="113" Height="48" Content="Move" Click="btnMoveToP1_Click" Background="LightSeaGreen" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-            <Button x:Name="btnMoveToP2" Content="Move" Click="btnMoveToP2_Click" Background="LightSeaGreen" Height="48" Canvas.Left="216" Canvas.Top="440" Width="113" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-            <Button x:Name="btnMoveToP3" Content="Move" Click="btnMoveToP3_Click" Background="LightSeaGreen" Height="48" Canvas.Left="216" Canvas.Top="501" Width="113" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+            <Button x:Name="btnMoveToP1" FontSize="20" Canvas.Left="216" Canvas.Top="381" Width="113" Height="48" Content="Move" Click="btnMoveToP1_Click" Background="LightSeaGreen" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+            <Button x:Name="btnMoveToP2" FontSize="20" Content="Move" Click="btnMoveToP2_Click" Background="LightSeaGreen" Height="48" Canvas.Left="216" Canvas.Top="440" Width="113" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+            <Button x:Name="btnMoveToP3" FontSize="20" Content="Move" Click="btnMoveToP3_Click" Background="LightSeaGreen" Height="48" Canvas.Left="216" Canvas.Top="501" Width="113" HorizontalAlignment="Left" VerticalAlignment="Center"/>
 
             <!-- P1 - 上位 indicator with border and background binding to InPos1 -->
             <Border Canvas.Left="88" Canvas.Top="383" Width="120" Height="40" BorderBrush="#2E993E" BorderThickness="1" CornerRadius="4" Padding="4" HorizontalAlignment="Left" VerticalAlignment="Center" ToolTip="P1 - 上位">
@@ -94,7 +94,7 @@
                         </Style.Triggers>
                     </Style>
                 </Border.Style>
-                <TextBlock Text="P1 - 上位" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="14" Foreground="Black" />
+                <TextBlock Text="P1 - 上位" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="20" Foreground="Black" />
             </Border>
             <Border Canvas.Left="88" Canvas.Top="444" Width="120" Height="40" BorderBrush="#2E993E" BorderThickness="1" CornerRadius="4" Padding="4" ToolTip="P1 - 上位" HorizontalAlignment="Left" VerticalAlignment="Center">
                 <Border.Style>
@@ -107,7 +107,7 @@
                         </Style.Triggers>
                     </Style>
                 </Border.Style>
-                <TextBlock Text="P2 - 中位" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="14" Foreground="Black" />
+                <TextBlock Text="P2 - 中位" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="20" Foreground="Black" />
             </Border>
             <Border Canvas.Left="88" Canvas.Top="505" Width="120" Height="40" BorderBrush="#2E993E" BorderThickness="1" CornerRadius="4" Padding="4" ToolTip="P1 - 上位" HorizontalAlignment="Left" VerticalAlignment="Center">
                 <Border.Style>
@@ -120,11 +120,11 @@
                         </Style.Triggers>
                     </Style>
                 </Border.Style>
-                <TextBlock Text="P3 - 下位" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="14" Foreground="Black" />
+                <TextBlock Text="P3 - 下位" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="20" Foreground="Black" />
             </Border>
-            <Button x:Name="btnTeachP1" Content="Teach" Click="btnTeachP1_Click" Background="LightSeaGreen" Height="48" Canvas.Left="350" Canvas.Top="381" Width="113" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-            <Button x:Name="btnTeachP2" Content="Teach" Click="btnTeachP2_Click" Background="LightSeaGreen" Height="48" Canvas.Left="350" Canvas.Top="440" Width="113" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-            <Button x:Name="btnTeachP3" Content="Teach" Click="btnTeachP3_Click" Background="LightSeaGreen" Height="48" Canvas.Left="350" Canvas.Top="501" Width="113" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+            <Button x:Name="btnTeachP1" FontSize="20" Content="Teach" Click="btnTeachP1_Click" Background="LightSeaGreen" Height="48" Canvas.Left="350" Canvas.Top="381" Width="113" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+            <Button x:Name="btnTeachP2" FontSize="20" Content="Teach" Click="btnTeachP2_Click" Background="LightSeaGreen" Height="48" Canvas.Left="350" Canvas.Top="440" Width="113" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+            <Button x:Name="btnTeachP3" FontSize="20" Content="Teach" Click="btnTeachP3_Click" Background="LightSeaGreen" Height="48" Canvas.Left="350" Canvas.Top="501" Width="113" HorizontalAlignment="Left" VerticalAlignment="Center"/>
 
         </Canvas>
     </Grid>

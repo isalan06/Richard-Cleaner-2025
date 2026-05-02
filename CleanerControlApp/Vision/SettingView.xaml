@@ -14,12 +14,12 @@
  <!-- Left panel: place buttons here (styling aligned with IOView) -->
  <Border Grid.Column="0" Margin="8" Padding="8" BorderBrush="Gray" BorderThickness="1" CornerRadius="4" Background="#FFF">
  <StackPanel VerticalAlignment="Top" Margin="0,0,0,8">
- <Button x:Name="BtnSystem" Content="系統" Height="72" HorizontalAlignment="Stretch" Margin="0,0,0,6" Click="BtnSystem_Click" />
- <Button x:Name="BtnShuttle" Content="移載組" Height="72" HorizontalAlignment="Stretch" Margin="0,0,0,6" Click="BtnShuttle_Click" />
- <Button x:Name="BtnSink" Content="沖水槽" Height="72" HorizontalAlignment="Stretch" Margin="0,0,0,6" Click="BtnSink_Click" />
- <Button x:Name="BtnSoakingTank" Content="浸泡槽" Height="72" HorizontalAlignment="Stretch" Margin="0,0,0,6" Click="BtnSoakingTank_Click" />
- <Button x:Name="BtnDryingTank" Content="烘乾槽" Height="72" HorizontalAlignment="Stretch" Margin="0,0,0,6" Click="BtnDryingTank_Click" />
- <Button x:Name="BtnHeatingTank" Content="加熱槽" Height="72" HorizontalAlignment="Stretch" Margin="0,0,0,6" Click="BtnHeatingTank_Click" />
+                <Button x:Name="BtnSystem" FontSize="20" Content="系統" Height="72" HorizontalAlignment="Stretch" Margin="0,0,0,6" Click="BtnSystem_Click" />
+                <Button x:Name="BtnShuttle" FontSize="20" Content="移載組" Height="72" HorizontalAlignment="Stretch" Margin="0,0,0,6" Click="BtnShuttle_Click" />
+                <Button x:Name="BtnSink" FontSize="20" Content="沖水槽" Height="72" HorizontalAlignment="Stretch" Margin="0,0,0,6" Click="BtnSink_Click" />
+                <Button x:Name="BtnSoakingTank" FontSize="20" Content="浸泡槽" Height="72" HorizontalAlignment="Stretch" Margin="0,0,0,6" Click="BtnSoakingTank_Click" />
+                <Button x:Name="BtnDryingTank" FontSize="20" Content="烘乾槽" Height="72" HorizontalAlignment="Stretch" Margin="0,0,0,6" Click="BtnDryingTank_Click" />
+                <Button x:Name="BtnHeatingTank" FontSize="20" Content="加熱槽" Height="72" HorizontalAlignment="Stretch" Margin="0,0,0,6" Click="BtnHeatingTank_Click" />
  </StackPanel>
  </Border>
 

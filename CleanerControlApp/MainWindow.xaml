@@ -29,7 +29,7 @@
                             <TextBlock x:Name="CurrentUserNameText" Text="帳號: -" Foreground="White" FontWeight="Bold"/>
                             <TextBlock x:Name="CurrentUserRoleText" Text="權限: -" Foreground="White" FontSize="12"/>
                         </StackPanel>
-                        <Button x:Name="LogoutButton" Content="登出" Margin="6,0,0,0" Padding="10,8" Height="80" Click="LogoutButton_Click"/>
+                        <Button x:Name="LogoutButton" FontSize="20" Content="登出" Margin="6,0,0,0" Padding="10,8" Height="80" Click="LogoutButton_Click"/>
                     </StackPanel>
                 </Border>
 
@@ -39,28 +39,28 @@
                     <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center">
                         <!-- Auto indicator -->
                         <Border x:Name="AutoIndicator" Width="120" Height="28" Background="#FFB0B0B0" CornerRadius="4" Margin="0,4">
-                            <TextBlock Text="自動" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black" FontWeight="Bold"/>
+                            <TextBlock Text="自動" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black" FontWeight="Bold"/>
                         </Border>
                         <!-- Warning indicator -->
                         <Border x:Name="WarningIndicator" Width="120" Height="28" Background="#FFB0B0B0" CornerRadius="4" Margin="0,4">
-                            <TextBlock Text="警告" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black" FontWeight="Bold"/>
+                            <TextBlock Text="警告" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black" FontWeight="Bold"/>
                         </Border>
                         <!-- Alarm indicator -->
                         <Border x:Name="AlarmIndicator" Width="120" Height="28" Background="#FFB0B0B0" CornerRadius="4" Margin="0,4">
-                            <TextBlock Text="錯誤" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black" FontWeight="Bold"/>
+                            <TextBlock Text="錯誤" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black" FontWeight="Bold"/>
                         </Border>
                     </StackPanel>
                 </Border>
 
-                <UniformGrid Columns="8" Height="116" Width="1019">
-                    <Button x:Name="BtnHome" Content="主畫面" Margin="0,10,0,10" Padding="12,10" Click="BtnHome_Click" Width="103" />
-                    <Button x:Name="BtnManual" Content="手動操作" Margin="0,10,0,10" Padding="12,10" Click="BtnManual_Click" Width="105" />
-                    <Button x:Name="BtnIO" Content="IO" Margin="0,10,0,10" Padding="12,10" Click="BtnIO_Click" Width="107" />
-                    <Button x:Name="BtnAlarm" Content="Alarm" Margin="0,10,0,10" Padding="12,10" Click="BtnAlarm_Click" Width="107" />
-                    <Button x:Name="BtnInfo" Content="資訊" Margin="0,10,0,10" Padding="12,10" Click="BtnInfo_Click" Width="109" />
-                    <Button x:Name="BtnSetting" Content="設定" Margin="0,10,0,10" Padding="12,10" Click="BtnSetting_Click" Width="111" />
-                    <Button x:Name="BtnUser" Content="使用者管理" Margin="0,10,0,10" Padding="12,10" Click="BtnUser_Click" Width="113" />
-                    <Button x:Name="BtnDeveloper" Content="開發畫面" Margin="0,10,0,10" Padding="12,10" Click="BtnDeveloper_Click" Width="113" />
+                <UniformGrid Columns="8" Height="116" Width="1024">
+                    <Button x:Name="BtnHome" FontSize="20" Content="主畫面" Margin="0,10,0,10" Padding="12,10" Click="BtnHome_Click" Width="103" />
+                    <Button x:Name="BtnManual" FontSize="20" Content="手動操作" Margin="0,10,0,10" Padding="12,10" Click="BtnManual_Click" Width="105" />
+                    <Button x:Name="BtnIO" FontSize="20" Content="IO" Margin="0,10,0,10" Padding="12,10" Click="BtnIO_Click" Width="107" />
+                    <Button x:Name="BtnAlarm" FontSize="20" Content="Alarm" Margin="0,10,0,10" Padding="12,10" Click="BtnAlarm_Click" Width="107" />
+                    <Button x:Name="BtnInfo" FontSize="20" Content="資訊" Margin="0,10,0,10" Padding="12,10" Click="BtnInfo_Click" Width="109" />
+                    <Button x:Name="BtnSetting" FontSize="20" Content="設定" Margin="0,10,0,10" Padding="12,10" Click="BtnSetting_Click" Width="111" />
+                    <Button x:Name="BtnUser" FontSize="20" Content="使用者管理" Margin="0,10,0,10" Padding="12,10" Click="BtnUser_Click" Width="130" />
+                    <Button x:Name="BtnDeveloper" FontSize="20" Content="開發畫面" Margin="0,10,0,10" Padding="12,10" Click="BtnDeveloper_Click" Width="113" />
                 </UniformGrid>
 
             </DockPanel>
