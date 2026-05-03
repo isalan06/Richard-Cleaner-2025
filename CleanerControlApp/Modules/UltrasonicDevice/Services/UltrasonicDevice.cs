@@ -59,7 +59,7 @@ namespace CleanerControlApp.Modules.UltrasonicDevice.Services
         private Timer? _timeoutTimers = null;
 
         // timeout duration for retry
-        private static readonly TimeSpan DeviceTimeoutClearDelay = TimeSpan.FromSeconds(10);
+        private static readonly TimeSpan DeviceTimeoutClearDelay = TimeSpan.FromSeconds(2);
 
         #endregion
 
