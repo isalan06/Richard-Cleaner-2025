@@ -54,11 +54,25 @@ namespace CleanerControlApp.Vision.SettingViews
 
         private void BuildMotorXPosControls(float unitTransfer)
         {
-            Sp_MotorX_PosList.Children.Clear();
-            for (int i = 0; i < ShuttleXMotorName.Name.Length; i++)
+            // Unregister any previously registered dynamic TextBox names for X positions
+            try
             {
-                var panel = new StackPanel { Orientation = Orientation.Horizontal, Margin = new Thickness(0, 2, 0, 2) };
-                var lbl = new TextBlock { Text = ShuttleXMotorName.Name[i], Width = 140, VerticalAlignment = VerticalAlignment.Center };
+                for (int i =0; i < ShuttleXMotorName.Name.Length; i++)
+                {
+                    var existing = this.FindName($"Tb_MotorX_Pos_{i}");
+                    if (existing != null)
+                    {
+                        try { this.UnregisterName($"Tb_MotorX_Pos_{i}"); } catch { }
+                    }
+                }
+            }
+            catch { }
+
+            Sp_MotorX_PosList.Children.Clear();
+            for (int i =0; i < ShuttleXMotorName.Name.Length; i++)
+            {
+                var panel = new StackPanel { Orientation = Orientation.Horizontal, Margin = new Thickness(0,2,0,2) };
+                var lbl = new TextBlock { Text = ShuttleXMotorName.Name[i], Width =140, VerticalAlignment = VerticalAlignment.Center };
                 var tb = new TextBox { Width =120, Name = $"Tb_MotorX_Pos_{i}", Margin = new Thickness(8,0,0,0) };
                 panel.Children.Add(lbl);
                 panel.Children.Add(tb);
@@ -70,8 +84,22 @@ namespace CleanerControlApp.Vision.SettingViews
 
         private void BuildMotorZPosControls(float unitTransfer)
         {
+            // Unregister any previously registered dynamic TextBox names for Z positions
+            try
+            {
+                for (int i =0; i < ShuttleZMotorName.Name.Length; i++)
+                {
+                    var existing = this.FindName($"Tb_MotorZ_Pos_{i}");
+                    if (existing != null)
+                    {
+                        try { this.UnregisterName($"Tb_MotorZ_Pos_{i}"); } catch { }
+                    }
+                }
+            }
+            catch { }
+
             Sp_MotorZ_PosList.Children.Clear();
-            for (int i = 0; i < ShuttleZMotorName.Name.Length; i++)
+            for (int i =0; i < ShuttleZMotorName.Name.Length; i++)
             {
                 var panel = new StackPanel { Orientation = Orientation.Horizontal, Margin = new Thickness(0, 2, 0, 2) };
                 var lbl = new TextBlock { Text = ShuttleZMotorName.Name[i], Width = 140, VerticalAlignment = VerticalAlignment.Center };

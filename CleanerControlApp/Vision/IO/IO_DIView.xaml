@@ -3,7 +3,13 @@
  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
- mc:Ignorable="d">
+ mc:Ignorable="d" FontSize="16">
+ <UserControl.Resources>
+ <!-- Implicit TextBlock style: ensure default font size is16 now. Explicit FontSize values keep precedence. -->
+ <Style TargetType="TextBlock">
+ <Setter Property="FontSize" Value="16" />
+ </Style>
+ </UserControl.Resources>
  <Grid Background="White">
  <DockPanel Margin="8">
  <TextBlock Text="DI Status" DockPanel.Dock="Top" FontSize="18" FontWeight="SemiBold" Margin="4" />

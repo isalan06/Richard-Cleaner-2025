@@ -11,8 +11,8 @@
         <Canvas x:Name="LoaderCanvas" Background="Transparent" Canvas.Left="0" Canvas.Top="0" Width="150" Height="220">
             <Canvas x:Name="TankCanvas" Background="Transparent" Canvas.Left="0" Canvas.Top="0" Width="150" Height="220">
                 <Rectangle Canvas.Left="0" Canvas.Top="0" Width="150" Height="220" Stroke="#2B72C2" StrokeThickness="2" Fill="White" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-                <TextBlock Text="Unloader" FontSize="20" Canvas.Left="31" Canvas.Top="48" Foreground="#333333" TextAlignment="Center" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-                <Border Canvas.Left="103" Canvas.Top="171" BorderBrush="#2E993E" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding UnloaderCassetteInPosition1}" Width="58" RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Left" VerticalAlignment="Top">
+                <TextBlock Text="Unloader" FontSize="26" Canvas.Left="21" Canvas.Top="20" Foreground="#333333" TextAlignment="Center" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                <Border Canvas.Left="97" Canvas.Top="161" BorderBrush="#2E993E" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding UnloaderCassetteInPosition1}" Width="68" RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Left" VerticalAlignment="Top">
                     <Border.RenderTransform>
                         <TransformGroup>
                             <ScaleTransform/>
@@ -31,9 +31,9 @@
                             </Style.Triggers>
                         </Style>
                     </Border.Style>
-                    <TextBlock Text="X36 - #1" FontSize="12" Foreground="Black"/>
+                    <TextBlock Text="X36 - #1" FontSize="14" Foreground="Black"/>
                 </Border>
-                <Border Canvas.Left="75" Canvas.Top="171" BorderBrush="#2E993E" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding UnloaderCassetteInPosition2}" Width="58" RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Left" VerticalAlignment="Top">
+                <Border Canvas.Left="69" Canvas.Top="161" BorderBrush="#2E993E" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding UnloaderCassetteInPosition2}" Width="68" RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Left" VerticalAlignment="Top">
                     <Border.RenderTransform>
                         <TransformGroup>
                             <ScaleTransform/>
@@ -52,9 +52,9 @@
                             </Style.Triggers>
                         </Style>
                     </Border.Style>
-                    <TextBlock Text="X37 - #2" FontSize="12" Foreground="Black"/>
+                    <TextBlock Text="X37 - #2" FontSize="14" Foreground="Black"/>
                 </Border>
-                <Border Canvas.Left="47" Canvas.Top="171" BorderBrush="#2E993E" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding UnloaderCassetteInPosition3}" Width="58" RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Left" VerticalAlignment="Top">
+                <Border Canvas.Left="41" Canvas.Top="161" BorderBrush="#2E993E" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding UnloaderCassetteInPosition3}" Width="68" RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Left" VerticalAlignment="Top">
                     <Border.RenderTransform>
                         <TransformGroup>
                             <ScaleTransform/>
@@ -73,9 +73,9 @@
                             </Style.Triggers>
                         </Style>
                     </Border.Style>
-                    <TextBlock Text="X40 - #3" FontSize="12" Foreground="Black"/>
+                    <TextBlock Text="X40 - #3" FontSize="14" Foreground="Black"/>
                 </Border>
-                <Border Canvas.Left="19" Canvas.Top="171" BorderBrush="#2E993E" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding UnloaderCassetteInPosition4}" Width="58" RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Left" VerticalAlignment="Top">
+                <Border Canvas.Left="13" Canvas.Top="161" BorderBrush="#2E993E" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding UnloaderCassetteInPosition4}" Width="68" RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Left" VerticalAlignment="Top">
                     <Border.RenderTransform>
                         <TransformGroup>
                             <ScaleTransform/>
@@ -94,9 +94,9 @@
                             </Style.Triggers>
                         </Style>
                     </Border.Style>
-                    <TextBlock Text="X41 - #4" FontSize="12" Foreground="Black"/>
+                    <TextBlock Text="X41 - #4" FontSize="14" Foreground="Black"/>
                 </Border>
-                <Border Canvas.Left="-9" Canvas.Top="171" BorderBrush="#2E993E" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding UnloaderCassetteInPosition5}" Width="58" RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Left" VerticalAlignment="Top">
+                <Border Canvas.Left="-15" Canvas.Top="161" BorderBrush="#2E993E" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding UnloaderCassetteInPosition5}" Width="68" RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Left" VerticalAlignment="Top">
                     <Border.RenderTransform>
                         <TransformGroup>
                             <ScaleTransform/>
@@ -115,7 +115,7 @@
                             </Style.Triggers>
                         </Style>
                     </Border.Style>
-                    <TextBlock Text="X42 - #5" FontSize="12" Foreground="Black"/>
+                    <TextBlock Text="X42 - #5" FontSize="14" Foreground="Black"/>
                 </Border>
                 <TextBlock Text="{Binding UnloaderCassetteCount, StringFormat=\{0:N0\}}" FontSize="20" Foreground="#333333" TextAlignment="Center" Width="47" Height="25" HorizontalAlignment="Left" Canvas.Left="76" Canvas.Top="88" VerticalAlignment="Top"/>
                 <TextBlock Text="數量:" FontSize="20" Foreground="#333333" TextAlignment="Center" Height="25" Width="46" HorizontalAlignment="Left" Canvas.Left="28" Canvas.Top="88" VerticalAlignment="Top"/>

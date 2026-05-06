@@ -21,7 +21,7 @@
       <Grid x:Name="InnerGrid" Canvas.Left="0" Canvas.Top="0"
  Width="994"
  Height="524">
-        <template:Template_DryingTank HorizontalAlignment="Right" VerticalAlignment="Top" Loaded="Template_DryingTank_Loaded" Margin="0,104,-24,0" />
+        <template:Template_DryingTank HorizontalAlignment="Right" VerticalAlignment="Top" Loaded="Template_DryingTank_Loaded" Margin="0,104,-60,0" />
       </Grid>
     </Canvas>
   </Grid>

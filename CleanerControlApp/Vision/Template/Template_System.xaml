@@ -10,17 +10,15 @@
     <Grid>
         <!-- Container canvas that hosts the system line control -->
         <Canvas x:Name="LineHostCanvas" Background="Transparent"
- Width="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=UserControl}}"
- Height="{Binding ActualHeight, RelativeSource={RelativeSource AncestorType=UserControl}}"
- HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-            <sys:Template_System_Line x:Name="SystemLineControl" Canvas.Left="0" Canvas.Top="0" />
+ Height="{Binding ActualHeight, RelativeSource={RelativeSource AncestorType=UserControl}}" Margin="0,0,-529,0">
+            <sys:Template_System_Line x:Name="SystemLineControl" Canvas.Left="0" Canvas.Top="118" Width="1201" VerticalAlignment="Center" HorizontalAlignment="Left" />
 
             <!-- Pass buttons for modules -->
             <StackPanel Orientation="Vertical" Canvas.Right="10" Canvas.Top="10" HorizontalAlignment="Right"/>
-            <Button x:Name="Btn_Sink_Pass" Content="Pass" Width="80" Height="28" Click="Btn_Sink_Pass_Click" HorizontalAlignment="Left" Canvas.Left="805" Canvas.Top="73" VerticalAlignment="Top" />
-            <Button x:Name="Btn_Dry2_Pass" Content="Pass" Width="80" Height="28" Click="Btn_Dry2_Pass_Click" HorizontalAlignment="Left" Canvas.Left="270" Canvas.Top="73" VerticalAlignment="Top" />
-            <Button x:Name="Btn_Dry1_Pass" Content="Pass" Width="80" Height="28" Click="Btn_Dry1_Pass_Click" HorizontalAlignment="Left" Canvas.Left="456" Canvas.Top="73" VerticalAlignment="Top" />
-            <Button x:Name="Btn_Soaking_Pass" Content="Pass" Width="80" Height="28" Click="Btn_Soaking_Pass_Click" HorizontalAlignment="Left" Canvas.Left="630" Canvas.Top="73" VerticalAlignment="Top" />
+            <Button x:Name="Btn_Sink_Pass" FontSize="20" Content="Pass" Width="80" Height="28" Click="Btn_Sink_Pass_Click" HorizontalAlignment="Left" Canvas.Left="855" Canvas.Top="73" VerticalAlignment="Center" />
+            <Button x:Name="Btn_Dry2_Pass" FontSize="20" Content="Pass" Width="80" Height="28" Click="Btn_Dry2_Pass_Click" HorizontalAlignment="Left" Canvas.Left="269" Canvas.Top="73" VerticalAlignment="Center" />
+            <Button x:Name="Btn_Dry1_Pass" FontSize="20" Content="Pass" Width="80" Height="28" Click="Btn_Dry1_Pass_Click" HorizontalAlignment="Left" Canvas.Left="459" Canvas.Top="73" VerticalAlignment="Center" />
+            <Button x:Name="Btn_Soaking_Pass" FontSize="20" Content="Pass" Width="80" Height="28" Click="Btn_Soaking_Pass_Click" HorizontalAlignment="Left" Canvas.Left="664" Canvas.Top="73" VerticalAlignment="Top" />
 
         </Canvas>
     </Grid>

@@ -16,6 +16,6 @@
  <TextBlock Text="浸泡槽 手動操作" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,10,0,10" />
 
  <!-- Placeholder for Template_SoakingTank; created in code-behind -->
- <ContentControl x:Name="TemplateHost" Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
+ <ContentControl x:Name="TemplateHost" Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Center" />
  </Grid>
 </UserControl>
