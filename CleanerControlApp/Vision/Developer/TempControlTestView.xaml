@@ -10,7 +10,15 @@
             <ColumnDefinition Width="215" />
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
-        <TextBlock Text="Temperature Control Test" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,12,0,0" FontSize="16" FontWeight="Bold" Grid.ColumnSpan="2" />
+        <TextBlock Text="溫控器測試" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,12,0,0" FontSize="16" FontWeight="Bold" Grid.ColumnSpan="2" />
+
+        <!-- Pass buttons placed on the right side of the top area -->
+        <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,12,12,0">
+            <Button x:Name="btnTC1Pass" Content="TC-1 Pass" Width="90" Height="26" Margin="4,0" Click="BtnTC1Pass_Click" />
+            <Button x:Name="btnTC2Pass" Content="TC-2 Pass" Width="90" Height="26" Margin="4,0" Click="BtnTC2Pass_Click" />
+            <Button x:Name="btnTC3Pass" Content="TC-3 Pass" Width="90" Height="26" Margin="4,0" Click="BtnTC3Pass_Click" />
+            <Button x:Name="btnTC4Pass" Content="TC-4 Pass" Width="90" Height="26" Margin="4,0" Click="BtnTC4Pass_Click" />
+        </StackPanel>
 
         <Border Grid.Column="0" Margin="12,44,6,12" Background="#FFF8F8F8" BorderBrush="#FFCCCCCC" BorderThickness="1" CornerRadius="4" Padding="8">
             <StackPanel>

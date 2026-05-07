@@ -44,7 +44,7 @@ namespace CleanerControlApp.Hardwares.DryingTank.Services
 
         private int _moduleIndex = 0;
 
-        private int ModuleIndex => (_moduleIndex == 0) ? 2 : 3;
+        private int ModuleIndex => (_moduleIndex == 0) ? 1 : 2;
 
         private readonly UnitSettings _unitSettings;
         private readonly ModuleSettings _moduleSettings;

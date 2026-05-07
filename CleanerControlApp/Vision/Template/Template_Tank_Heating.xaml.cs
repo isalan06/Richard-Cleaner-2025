@@ -59,6 +59,9 @@ namespace CleanerControlApp.Vision.Template
             Loaded += (s, e) => _timer.Start();
             Unloaded += (s, e) => _timer.Stop();
 
+            // Ensure bindings like {Binding PV} resolve to this control's properties
+            DataContext = this;
+
             UpdateFromHeatingTank();
         }
 

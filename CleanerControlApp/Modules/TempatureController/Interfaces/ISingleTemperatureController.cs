@@ -18,5 +18,7 @@ namespace CleanerControlApp.Modules.TempatureController.Interfaces
         public float HB { get; }
 
         public void SetData(ushort[]? data);
+
+        public int Index { get; }
     }
 }

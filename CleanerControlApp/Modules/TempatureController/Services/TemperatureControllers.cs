@@ -57,6 +57,8 @@ namespace CleanerControlApp.Modules.TempatureController.Services
         // timeout duration for retry
         private static readonly TimeSpan DeviceTimeoutClearDelay = TimeSpan.FromSeconds(10);
 
+        private bool[]? _modulePass = null;
+
         #endregion
 
         #region constructor
@@ -70,13 +72,15 @@ namespace CleanerControlApp.Modules.TempatureController.Services
             _deviceTimeout = new bool[ModuleCount];
             _deviceError = new bool[ModuleCount];
 
+            _modulePass = new bool[ModuleCount];
+
             // initialize timeout timers array
             _timeoutTimers = new Timer[ModuleCount];
 
             _controllers = new ISingleTemperatureController[ModuleCount];
             for (int i =0; i < ModuleCount; i++)
             {
-                _controllers[i] = new SingleTemperatureController();
+                _controllers[i] = new SingleTemperatureController(i);
             }
 
             _modbusService = modbusPool != null && modbusPool.Count > RTUAssemblyIndex ? modbusPool[RTUAssemblyIndex] : null;
@@ -210,6 +214,18 @@ namespace CleanerControlApp.Modules.TempatureController.Services
         public int WriteCount => _modbusService != null ? _modbusService.WriteCount : 0;
         public int ReadCount => _modbusService != null ? _modbusService.ReadCount : 0;
 
+        public bool[]? ModulePass
+        {
+            get => _modulePass;
+            set
+            {
+                if (value != null && value.Length == ModuleCount)
+                {
+                    _modulePass = value;
+                }
+            }
+        }
+
         #endregion
 
 
@@ -297,77 +313,80 @@ namespace CleanerControlApp.Modules.TempatureController.Services
                 {
                     if (_deviceTimeout != null && !_deviceTimeout[_routeProcess[_routeIndex].ModuleIndex])
                     {
-                        var data = await _modbusService.Act(_routeProcess[_routeIndex].CommandFrame);
-
-                        if (data != null)
+                        if (_modulePass != null && _modulePass.Length > _routeIndex && !_modulePass[_routeIndex])
                         {
-                            if (_controllers != null && data is ModbusRTUFrame)
+                            var data = await _modbusService.Act(_routeProcess[_routeIndex].CommandFrame);
+
+                            if (data != null)
                             {
-                                if (!data.HasTimeout)
+                                if (_controllers != null && data is ModbusRTUFrame)
                                 {
-                                    _controllers[_routeProcess[_routeIndex].ModuleIndex].SetData(data.Data);
-                                    if (_deviceConnected != null)
-                                        _deviceConnected[_routeProcess[_routeIndex].ModuleIndex] = true;
-                                    if (_deviceTimeout != null)
+                                    if (!data.HasTimeout)
                                     {
-                                        // clear timeout flag and cancel any pending timer
-                                        _deviceTimeout[_routeProcess[_routeIndex].ModuleIndex] = false;
-                                        try
+                                        _controllers[_routeProcess[_routeIndex].ModuleIndex].SetData(data.Data);
+                                        if (_deviceConnected != null)
+                                            _deviceConnected[_routeProcess[_routeIndex].ModuleIndex] = true;
+                                        if (_deviceTimeout != null)
                                         {
+                                            // clear timeout flag and cancel any pending timer
+                                            _deviceTimeout[_routeProcess[_routeIndex].ModuleIndex] = false;
+                                            try
+                                            {
+                                                if (_timeoutTimers != null)
+                                                {
+                                                    var tIndex = _routeProcess[_routeIndex].ModuleIndex;
+                                                    try { _timeoutTimers[tIndex]?.Dispose(); } catch { }
+                                                    _timeoutTimers[tIndex] = null;
+                                                }
+                                            }
+                                            catch { }
+                                        }
+
+                                    }
+                                    else
+                                    {
+                                        if (_deviceConnected != null)
+                                            _deviceConnected[_routeProcess[_routeIndex].ModuleIndex] = false;
+                                        if (_deviceTimeout != null)
+                                        {
+                                            // set timeout flag and start a timer to clear it after delay
+                                            int idx = _routeProcess[_routeIndex].ModuleIndex;
+                                            _deviceTimeout[idx] = true;
+
+                                            // dispose existing timer if any
+                                            try
+                                            {
+                                                if (_timeoutTimers != null && _timeoutTimers[idx] != null)
+                                                {
+                                                    try { _timeoutTimers[idx]?.Dispose(); } catch { }
+                                                    _timeoutTimers[idx] = null;
+                                                }
+                                            }
+                                            catch { }
+
+                                            // capture local idx for callback
+                                            int captured = idx;
+
                                             if (_timeoutTimers != null)
                                             {
-                                                var tIndex = _routeProcess[_routeIndex].ModuleIndex;
-                                                try { _timeoutTimers[tIndex]?.Dispose(); } catch { }
-                                                _timeoutTimers[tIndex] = null;
-                                            }
-                                        }
-                                        catch { }
-                                    }
-
-                                }
-                                else
-                                {
-                                    if (_deviceConnected != null)
-                                        _deviceConnected[_routeProcess[_routeIndex].ModuleIndex] = false;
-                                    if (_deviceTimeout != null)
-                                    {
-                                        // set timeout flag and start a timer to clear it after delay
-                                        int idx = _routeProcess[_routeIndex].ModuleIndex;
-                                        _deviceTimeout[idx] = true;
-
-                                        // dispose existing timer if any
-                                        try
-                                        {
-                                            if (_timeoutTimers != null && _timeoutTimers[idx] != null)
-                                            {
-                                                try { _timeoutTimers[idx]?.Dispose(); } catch { }
-                                                _timeoutTimers[idx] = null;
-                                            }
-                                        }
-                                        catch { }
-
-                                        // capture local idx for callback
-                                        int captured = idx;
-
-                                        if (_timeoutTimers != null)
-                                        {
-                                            _timeoutTimers[captured] = new Timer(state =>
-                                            {
-                                                try
+                                                _timeoutTimers[captured] = new Timer(state =>
                                                 {
-                                                    if (_deviceTimeout != null) _deviceTimeout[captured] = false;
-                                                }
-                                                catch { }
-                                                try
-                                                {
-                                                    if (_timeoutTimers != null)
+                                                    try
                                                     {
-                                                        try { _timeoutTimers[captured]?.Dispose(); } catch { }
-                                                        _timeoutTimers[captured] = null;
+                                                        if (_deviceTimeout != null) _deviceTimeout[captured] = false;
                                                     }
-                                                }
-                                                catch { }
-                                            }, null, DeviceTimeoutClearDelay, Timeout.InfiniteTimeSpan);
+                                                    catch { }
+                                                    try
+                                                    {
+                                                        if (_timeoutTimers != null)
+                                                        {
+                                                            try { _timeoutTimers[captured]?.Dispose(); } catch { }
+                                                            _timeoutTimers[captured] = null;
+                                                        }
+                                                    }
+                                                    catch { }
+                                                }, null, DeviceTimeoutClearDelay, Timeout.InfiniteTimeSpan);
+                                            }
                                         }
                                     }
                                 }

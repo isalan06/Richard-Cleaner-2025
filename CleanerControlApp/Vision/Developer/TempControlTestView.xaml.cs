@@ -134,6 +134,9 @@ namespace CleanerControlApp.Vision.Developer
  txtLoopIterationCount.Text = $"({_temperatureControllers.LoopIterationCount}/{_temperatureControllers.LastLoopDurationMilliseconds:F2}/{_temperatureControllers.AverageLoopDurationMilliseconds:F2})";
  }
  catch { txtLoopIterationCount.Text = "(-/-/-)"; }
+
+ // Update ModulePass button backgrounds
+ UpdateModulePassButtons();
  }
  else
  {
@@ -392,6 +395,59 @@ namespace CleanerControlApp.Vision.Developer
  private void BtnSetSV2_Click(object sender, RoutedEventArgs e) => HandleSetSV(GetSetSVText(2),2);
  private void BtnSetSV3_Click(object sender, RoutedEventArgs e) => HandleSetSV(GetSetSVText(3),3);
 
+ // Pass button handlers
+ private void BtnTC1Pass_Click(object sender, RoutedEventArgs e) => ToggleModulePass(0);
+ private void BtnTC2Pass_Click(object sender, RoutedEventArgs e) => ToggleModulePass(1);
+ private void BtnTC3Pass_Click(object sender, RoutedEventArgs e) => ToggleModulePass(2);
+ private void BtnTC4Pass_Click(object sender, RoutedEventArgs e) => ToggleModulePass(3);
+
+ private void ToggleModulePass(int index)
+ {
+ try
+ {
+ if (_temperatureControllers == null) return;
+ var arr = _temperatureControllers.ModulePass;
+ if (arr == null || arr.Length <= index)
+ {
+ // create small array if possible
+ var newArr = new bool[Math.Max(4, (index +1))];
+ if (arr != null)
+ {
+ for (int i =0; i < arr.Length && i < newArr.Length; i++) newArr[i] = arr[i];
+ }
+ newArr[index] = !newArr[index];
+ _temperatureControllers.ModulePass = newArr;
+ }
+ else
+ {
+ arr[index] = !arr[index];
+ _temperatureControllers.ModulePass = arr;
+ }
+
+ UpdateModulePassButtons();
+ }
+ catch { }
+ }
+
+ private void UpdateModulePassButtons()
+ {
+ try
+ {
+ var arr = _temperatureControllers?.ModulePass;
+ SetButtonBackground(btnTC1Pass, arr != null && arr.Length >0 && arr[0]);
+ SetButtonBackground(btnTC2Pass, arr != null && arr.Length >1 && arr[1]);
+ SetButtonBackground(btnTC3Pass, arr != null && arr.Length >2 && arr[2]);
+ SetButtonBackground(btnTC4Pass, arr != null && arr.Length >3 && arr[3]);
+ }
+ catch { }
+ }
+
+ private void SetButtonBackground(Button btn, bool pass)
+ {
+ if (btn == null) return;
+ btn.Background = pass ? Brushes.LightGreen : Brushes.LightGray;
+ }
+
  // Simple dummy implementation to avoid null checks when DI not configured
  private class DummyTemperatureControllers : ITemperatureControllers
  {
@@ -421,8 +477,11 @@ namespace CleanerControlApp.Vision.Developer
  public long CommandQueueExecutedCount =>0;
 
  public string PortName => "COMX";
-            public int WriteCount =>0;
-            public int ReadCount =>0;
-        }
+ public int WriteCount =>0;
+ public int ReadCount =>0;
+
+ private bool[] _modulePass = new bool[4];
+ public bool[]? ModulePass { get => _modulePass; set { if (value != null) _modulePass = value; } }
+ }
  }
 }

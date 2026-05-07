@@ -18,15 +18,17 @@ namespace CleanerControlApp.Modules.TempatureController.Services
         #region attribute
 
         private ushort[]? _buffers = null;
+        private int _index = 0;
 
         #endregion
 
         #region constructor
 
         // Removed IServiceProvider parameter - no service-locator usage
-        public SingleTemperatureController()
+        public SingleTemperatureController(int index)
         {
             _buffers = new ushort[BUFFER_SIZE];
+            _index = index;
         }
 
         #endregion
@@ -100,6 +102,8 @@ namespace CleanerControlApp.Modules.TempatureController.Services
             }
             Array.Copy(data, _buffers, BUFFER_SIZE);
         }
+
+        public int Index => _index;
 
         #endregion
     }

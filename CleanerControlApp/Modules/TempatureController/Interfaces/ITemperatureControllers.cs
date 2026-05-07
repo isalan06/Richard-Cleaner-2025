@@ -37,5 +37,7 @@ namespace CleanerControlApp.Modules.TempatureController.Interfaces
 
         int WriteCount { get; }
         int ReadCount { get; }
+
+        bool[]? ModulePass { get; set; }
     }
 }
