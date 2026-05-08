@@ -41,20 +41,20 @@
             <!-- Info rows under INV-1 -->
             <StackPanel Canvas.Left="131" Canvas.Top="71" Orientation="Vertical" Width="180" Background="Transparent">
                 <StackPanel Orientation="Horizontal" Margin="0,2,0,2">
-                    <TextBlock Text="命令頻率(Hz): " FontSize="12" Foreground="Black" Width="90" />
-                    <TextBlock x:Name="txtCmdFreq" Text="0.00" FontSize="12" Foreground="Black" />
+                    <TextBlock Text="命令頻率(Hz): " FontSize="16" Foreground="Black" Width="100" />
+                    <TextBlock x:Name="txtCmdFreq" Text="0.00" FontSize="16" Foreground="Black" />
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" Margin="0,2,0,2">
-                    <TextBlock Text="輸出頻率(Hz): " FontSize="12" Foreground="Black" Width="90" />
-                    <TextBlock x:Name="txtActFreq" Text="0.00" FontSize="12" Foreground="Black" />
+                    <TextBlock Text="輸出頻率(Hz): " FontSize="16" Foreground="Black" Width="100" />
+                    <TextBlock x:Name="txtActFreq" Text="0.00" FontSize="16" Foreground="Black" />
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" Margin="0,2,0,2">
-                    <TextBlock Text="錯誤碼: " FontSize="12" Foreground="Black" Width="90" />
-                    <TextBlock x:Name="txtErrCode" Text="0" FontSize="12" Foreground="Black" />
+                    <TextBlock Text="錯誤碼: " FontSize="16" Foreground="Black" Width="55" />
+                    <TextBlock x:Name="txtErrCode" Text="0" FontSize="16" Foreground="Black" />
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" Margin="0,2,0,2">
-                    <TextBlock Text="警告碼: " FontSize="12" Foreground="Black" Width="90" />
-                    <TextBlock x:Name="txtWarnCode" Text="0" FontSize="12" Foreground="Black" />
+                    <TextBlock Text="警告碼: " FontSize="16" Foreground="Black" Width="55" />
+                    <TextBlock x:Name="txtWarnCode" Text="0" FontSize="16" Foreground="Black" />
                 </StackPanel>
             </StackPanel>
 

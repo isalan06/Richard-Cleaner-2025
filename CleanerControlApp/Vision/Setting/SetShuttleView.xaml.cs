@@ -72,7 +72,7 @@ namespace CleanerControlApp.Vision.SettingViews
             for (int i =0; i < ShuttleXMotorName.Name.Length; i++)
             {
                 var panel = new StackPanel { Orientation = Orientation.Horizontal, Margin = new Thickness(0,2,0,2) };
-                var lbl = new TextBlock { Text = ShuttleXMotorName.Name[i], Width =140, VerticalAlignment = VerticalAlignment.Center };
+                var lbl = new TextBlock { Text = ShuttleXMotorName.Name[i], Width =150, VerticalAlignment = VerticalAlignment.Center };
                 var tb = new TextBox { Width =120, Name = $"Tb_MotorX_Pos_{i}", Margin = new Thickness(8,0,0,0) };
                 panel.Children.Add(lbl);
                 panel.Children.Add(tb);
@@ -102,7 +102,7 @@ namespace CleanerControlApp.Vision.SettingViews
             for (int i =0; i < ShuttleZMotorName.Name.Length; i++)
             {
                 var panel = new StackPanel { Orientation = Orientation.Horizontal, Margin = new Thickness(0, 2, 0, 2) };
-                var lbl = new TextBlock { Text = ShuttleZMotorName.Name[i], Width = 140, VerticalAlignment = VerticalAlignment.Center };
+                var lbl = new TextBlock { Text = ShuttleZMotorName.Name[i], Width = 150, VerticalAlignment = VerticalAlignment.Center };
                 var tb = new TextBox { Width =120, Name = $"Tb_MotorZ_Pos_{i}", Margin = new Thickness(8,0,0,0) };
                 panel.Children.Add(lbl);
                 panel.Children.Add(tb);

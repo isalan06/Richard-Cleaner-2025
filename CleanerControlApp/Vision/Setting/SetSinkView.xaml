@@ -4,7 +4,7 @@
  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
  mc:Ignorable="d"
- d:DesignHeight="400" d:DesignWidth="600">
+ d:DesignHeight="400" d:DesignWidth="600" FontSize="14">
  <Grid Background="White" Margin="8">
  <Grid.RowDefinitions>
  <RowDefinition Height="Auto" />
@@ -31,7 +31,7 @@
  <ColumnDefinition Width="480" />
  </Grid.ColumnDefinitions>
 
- <Border Grid.Column="0" Padding="12" BorderBrush="LightGray" BorderThickness="1" CornerRadius="4" Background="White" Height="288" VerticalAlignment="Top" Margin="0,0,-2,0">
+ <Border Grid.Column="0" Padding="12" BorderBrush="LightGray" BorderThickness="1" CornerRadius="4" Background="White" VerticalAlignment="Top" Margin="0,0,-2,0">
  <StackPanel>
  <TextBlock Text="沖水槽" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,8" />
  <Grid>
@@ -47,36 +47,36 @@
  <RowDefinition Height="Auto" />
  </Grid.RowDefinitions>
  <Grid.ColumnDefinitions>
- <ColumnDefinition Width="158" />
+ <ColumnDefinition Width="165" />
  <ColumnDefinition Width="202" />
  </Grid.ColumnDefinitions>
 
- <TextBlock Text="低壓設定值 (kg/cm2):" Grid.Column="0" VerticalAlignment="Center" Height="15" />
+ <TextBlock Text="低壓設定值 (kg/cm2):" Grid.Column="0" VerticalAlignment="Center" />
  <TextBox x:Name="Txt_SV_Low" Grid.Row="0" Grid.Column="1" Margin="4,4,0,4" />
 
- <TextBlock Text="高壓設定值 (kg/cm2):" Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" Height="15" />
+ <TextBlock Text="高壓設定值 (kg/cm2):" Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" />
  <TextBox x:Name="Txt_SV_High" Grid.Row="1" Grid.Column="1" Margin="4,4,0,4" />
 
- <TextBlock Text="清洗動作時間(秒):" Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" Height="16" />
+ <TextBlock Text="清洗動作時間(秒):" Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" />
  <TextBox x:Name="Txt_ActTime" Grid.Row="2" Grid.Column="1" Margin="4,4,0,4" />
 
- <TextBlock Text="馬達位置 #1-承接位(mm):" Grid.Row="3" Grid.Column="0" VerticalAlignment="Center" Height="15" />
+ <TextBlock Text="馬達位置 #1-承接位(mm):" Grid.Row="3" Grid.Column="0" VerticalAlignment="Center" />
  <TextBox x:Name="Txt_MotorPos1" Grid.Row="3" Grid.Column="1" Margin="4,4,0,4" />
 
- <TextBlock Text="馬達位置 #2-槽內位(mm):" Grid.Row="4" Grid.Column="0" VerticalAlignment="Center" Height="15" />
+ <TextBlock Text="馬達位置 #2-槽內位(mm):" Grid.Row="4" Grid.Column="0" VerticalAlignment="Center" />
  <TextBox x:Name="Txt_MotorPos2" Grid.Row="4" Grid.Column="1" Margin="4,4,0,4" />
 
- <TextBlock Text="馬達位置 #3-搖擺位(mm):" Grid.Row="5" Grid.Column="0" VerticalAlignment="Center" Height="15" />
+ <TextBlock Text="馬達位置 #3-搖擺位(mm):" Grid.Row="5" Grid.Column="0" VerticalAlignment="Center" />
  <TextBox x:Name="Txt_MotorPos3" Grid.Row="5" Grid.Column="1" Margin="4,4,0,4" />
 
- <TextBlock Text="馬達速度 #1-升降(mm/s):" Grid.Row="6" Grid.Column="0" VerticalAlignment="Center" Height="16" />
+ <TextBlock Text="馬達速度 #1-升降(mm/s):" Grid.Row="6" Grid.Column="0" VerticalAlignment="Center" />
  <TextBox x:Name="Txt_MotorVel1" Grid.Row="6" Grid.Column="1" Margin="4,4,0,4" />
 
- <TextBlock Text="馬達速度 #2-搖擺(mm/s):" Grid.Row="7" Grid.Column="0" VerticalAlignment="Center" Height="15" />
+ <TextBlock Text="馬達速度 #2-搖擺(mm/s):" Grid.Row="7" Grid.Column="0" VerticalAlignment="Center" />
  <TextBox x:Name="Txt_MotorVel2" Grid.Row="7" Grid.Column="1" Margin="4,4,0,4" />
 
  <!-- NumericUpDown-like control for AirKnifeRetryCount -->
- <TextBlock Text="風刀往復次數:" Grid.Row="8" Grid.Column="0" VerticalAlignment="Center" Height="15" />
+ <TextBlock Text="風刀往復次數:" Grid.Row="8" Grid.Column="0" VerticalAlignment="Center" />
  <Grid Grid.Row="8" Grid.Column="1" Margin="4,4,0,4">
  <Grid.ColumnDefinitions>
  <ColumnDefinition Width="Auto" />

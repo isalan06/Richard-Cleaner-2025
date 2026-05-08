@@ -4,7 +4,7 @@
  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
  mc:Ignorable="d"
- d:DesignHeight="400" d:DesignWidth="900">
+ d:DesignHeight="400" d:DesignWidth="900" FontSize="14">
  <Grid Background="White" Margin="8">
  <Grid.RowDefinitions>
  <RowDefinition Height="Auto" />
@@ -48,7 +48,7 @@
  <RowDefinition Height="Auto" />
  </Grid.RowDefinitions>
  <Grid.ColumnDefinitions>
- <ColumnDefinition Width="120" />
+ <ColumnDefinition Width="130" />
  <ColumnDefinition Width="120" />
  </Grid.ColumnDefinitions>
 
@@ -83,7 +83,7 @@
  </Border>
 
  <!-- Right box: Motor Z Positions -->
- <Border Grid.Column="4" Padding="12" BorderBrush="LightGray" BorderThickness="1" CornerRadius="4" Background="White" Height="324" VerticalAlignment="Top">
+ <Border Grid.Column="4" Padding="12" BorderBrush="LightGray" BorderThickness="1" CornerRadius="4" Background="White" VerticalAlignment="Top">
  <StackPanel>
  <TextBlock Text="Z軸位置 (Positions)" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,8" />
  <TextBlock Text="單位: mm" FontSize="12" Foreground="Gray" Margin="0,0,0,6" />

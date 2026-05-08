@@ -5,7 +5,7 @@
  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
  mc:Ignorable="d"
- d:DesignHeight="400" d:DesignWidth="600">
+ d:DesignHeight="400" d:DesignWidth="600" FontSize="14">
  <Grid Background="White" Margin="8">
  <Grid.RowDefinitions>
  <RowDefinition Height="Auto" />
@@ -32,7 +32,7 @@
  <ColumnDefinition Width="480" />
  </Grid.ColumnDefinitions>
 
- <Border Grid.Column="0" Padding="12" BorderBrush="LightGray" BorderThickness="1" CornerRadius="4" Background="White" Height="360" VerticalAlignment="Top" Margin="0,0,-2,0">
+ <Border Grid.Column="0" Padding="12" BorderBrush="LightGray" BorderThickness="1" CornerRadius="4" Background="White"  VerticalAlignment="Top" Margin="0,0,-2,0">
  <StackPanel>
  <TextBlock x:Name="HdrSystem" Text="&#x7CFB;&#x7D71;" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,8" />
  <Grid>

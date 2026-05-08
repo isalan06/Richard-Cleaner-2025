@@ -17,7 +17,7 @@
  MouseMove="Group_MouseMove"
  MouseLeftButtonUp="Group_MouseLeftButtonUp" HorizontalAlignment="Left" VerticalAlignment="Top">
                 <Rectangle Canvas.Left="0" Canvas.Top="0" Width="150" Height="220" Stroke="#2B72C2" StrokeThickness="2" Fill="White" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                <TextBlock Text="浸泡槽" FontSize="20" Canvas.Left="45" Canvas.Top="50" Foreground="#333333" TextAlignment="Center" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                <TextBlock Text="浸泡槽" FontSize="26" Canvas.Left="31" Canvas.Top="50" Foreground="#333333" TextAlignment="Center" HorizontalAlignment="Left" VerticalAlignment="Center"/>
                 <!-- Use pack URIs for images so they resolve as resources -->
                 <Image Source="/CleanerControlApp;component/Pictures/Cover.png" Canvas.Left="20" Canvas.Top="-40" Width="110" Height="40" RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Left" VerticalAlignment="Top">
                     <Image.RenderTransform>
@@ -28,26 +28,13 @@
                 <!-- <Image Source="/CleanerControlApp;component/Pictures/Ultrasonic.png" Canvas.Left="100" Canvas.Top="172" Width="40" Height="40" HorizontalAlignment="Left" VerticalAlignment="Top" ToolTip="Ultrasonic" /> -->
 
                 <!-- Replace plain image with bordered image that changes background when ultrasonic command is on -->
-                <Border Canvas.Left="86" Canvas.Top="154" Width="56" Height="56" CornerRadius="4" BorderBrush="#2B72C2" BorderThickness="1" HorizontalAlignment="Left" VerticalAlignment="Top">
-                    <Border.Style>
-                        <Style TargetType="{x:Type Border}">
-                            <Setter Property="Background" Value="White"/>
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding CommandUltrasonicOpen, ElementName=RootControl}" Value="True">
-                                    <Setter Property="Background" Value="#CCFFCC"/>
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </Border.Style>
-                    <Image Source="/CleanerControlApp;component/Pictures/Ultrasonic.png" Width="40" Height="40" HorizontalAlignment="Center" VerticalAlignment="Center" ToolTip="Ultrasonic"/>
-                </Border>
 
                 <!-- Elapsed and Remaining heating time for Drying Tank #2 (bound to ElapsedHeatingRight / RemainingHeatingRight) -->
-                <TextBlock Text="浸泡時間:" FontSize="12" Canvas.Left="11" Canvas.Top="80" Foreground="#333333" TextAlignment="Center" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-                <TextBlock Text="剩餘時間:" FontSize="12" Canvas.Left="10" Canvas.Top="102" Foreground="#333333" TextAlignment="Center" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-                <TextBlock Text="{Binding ElapsedAct, ElementName=RootControl}" FontSize="12" Canvas.Left="75" Canvas.Top="80" Foreground="#333333" />
-                <TextBlock Text="{Binding RemainingAct, ElementName=RootControl}" FontSize="12" Canvas.Left="75" Canvas.Top="102" Foreground="#333333" />
-                <Border Canvas.Left="11" Canvas.Top="122" BorderBrush="Black" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding AutoStatus, ElementName=RootControl}" Height="20" HorizontalAlignment="Left" VerticalAlignment="Top">
+                <TextBlock Text="浸泡時間:" FontSize="16" Canvas.Left="11" Canvas.Top="85" Foreground="#333333" TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Top"/>
+                <TextBlock Text="剩餘時間:" FontSize="16" Canvas.Left="10" Canvas.Top="107" Foreground="#333333" TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Top"/>
+                <TextBlock Text="{Binding ElapsedAct, ElementName=RootControl}" FontSize="16" Canvas.Left="82" Canvas.Top="85" Foreground="#333333" />
+                <TextBlock Text="{Binding RemainingAct, ElementName=RootControl}" FontSize="16" Canvas.Left="82" Canvas.Top="107" Foreground="#333333" />
+                <Border Canvas.Left="11" Canvas.Top="139" BorderBrush="Black" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding AutoStatus, ElementName=RootControl}" Height="24" HorizontalAlignment="Center" VerticalAlignment="Top">
                     <Border.Style>
                         <Style TargetType="{x:Type Border}">
                             <Setter Property="Background" Value="#FFFFFF"/>
@@ -58,9 +45,9 @@
                             </Style.Triggers>
                         </Style>
                     </Border.Style>
-                    <TextBlock Text="自動" FontSize="10" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black"/>
+                    <TextBlock Text="自動" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black"/>
                 </Border>
-                <Border Canvas.Left="46" Canvas.Top="122" BorderBrush="Black" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding PauseStatus, ElementName=RootControl}" Height="20" HorizontalAlignment="Left" VerticalAlignment="Top">
+                <Border Canvas.Left="52" Canvas.Top="139" BorderBrush="Black" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding PauseStatus, ElementName=RootControl}" Height="24" HorizontalAlignment="Left" VerticalAlignment="Top">
                     <Border.Style>
                         <Style TargetType="{x:Type Border}">
                             <Setter Property="Background" Value="#FFFFFF"/>
@@ -71,9 +58,9 @@
                             </Style.Triggers>
                         </Style>
                     </Border.Style>
-                    <TextBlock Text="暫停" FontSize="10" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black"/>
+                    <TextBlock Text="暫停" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black"/>
                 </Border>
-                <Border Canvas.Left="81" Canvas.Top="122" BorderBrush="Black" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding CassetteStatus, ElementName=RootControl}" Height="20" HorizontalAlignment="Left" VerticalAlignment="Top">
+                <Border Canvas.Left="93" Canvas.Top="139" BorderBrush="Black" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding CassetteStatus, ElementName=RootControl}" Height="24" HorizontalAlignment="Left" VerticalAlignment="Center">
                     <Border.Style>
                         <Style TargetType="{x:Type Border}">
                             <Setter Property="Background" Value="#FFFFFF"/>
@@ -84,9 +71,9 @@
                             </Style.Triggers>
                         </Style>
                     </Border.Style>
-                    <TextBlock Text="卡匣" FontSize="10" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black"/>
+                    <TextBlock Text="卡匣" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black"/>
                 </Border>
-                <Border Canvas.Left="11" Canvas.Top="147" BorderBrush="Black" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding IdleStatus, ElementName=RootControl}" Height="20" HorizontalAlignment="Left" VerticalAlignment="Top">
+                <Border Canvas.Left="11" Canvas.Top="165" BorderBrush="Black" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding IdleStatus, ElementName=RootControl}" Height="24" HorizontalAlignment="Center" VerticalAlignment="Top">
                     <Border.Style>
                         <Style TargetType="{x:Type Border}">
                             <Setter Property="Background" Value="#FFFFFF"/>
@@ -97,9 +84,9 @@
                             </Style.Triggers>
                         </Style>
                     </Border.Style>
-                    <TextBlock Text="閒置" FontSize="10" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black"/>
+                    <TextBlock Text="閒置" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black"/>
                 </Border>
-                <Border Canvas.Left="46" Canvas.Top="147" BorderBrush="Black" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding InitializedStatus, ElementName=RootControl}" Height="20" HorizontalAlignment="Left" VerticalAlignment="Top">
+                <Border Canvas.Left="52" Canvas.Top="165" BorderBrush="Black" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding InitializedStatus, ElementName=RootControl}" Height="24" HorizontalAlignment="Left" VerticalAlignment="Top">
                     <Border.Style>
                         <Style TargetType="{x:Type Border}">
                             <Setter Property="Background" Value="#FFFFFF"/>
@@ -110,9 +97,9 @@
                             </Style.Triggers>
                         </Style>
                     </Border.Style>
-                    <TextBlock Text="初始" FontSize="10" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black"/>
+                    <TextBlock Text="初始" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black"/>
                 </Border>
-                <Border Canvas.Left="11" Canvas.Top="172" BorderBrush="Black" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding WarningStatus, ElementName=RootControl}" Height="20" HorizontalAlignment="Left" VerticalAlignment="Top">
+                <Border Canvas.Left="11" Canvas.Top="191" BorderBrush="Black" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding WarningStatus, ElementName=RootControl}" Height="24" HorizontalAlignment="Center" VerticalAlignment="Top">
                     <Border.Style>
                         <Style TargetType="{x:Type Border}">
                             <Setter Property="Background" Value="#FFFFFF"/>
@@ -123,9 +110,9 @@
                             </Style.Triggers>
                         </Style>
                     </Border.Style>
-                    <TextBlock Text="警告" FontSize="10" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black"/>
+                    <TextBlock Text="警告" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black"/>
                 </Border>
-                <Border Canvas.Left="46" Canvas.Top="172" BorderBrush="Black" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding AlarmStatus, ElementName=RootControl}" Height="20" HorizontalAlignment="Left" VerticalAlignment="Top">
+                <Border Canvas.Left="52" Canvas.Top="191" BorderBrush="Black" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding AlarmStatus, ElementName=RootControl}" Height="24" HorizontalAlignment="Center" VerticalAlignment="Top">
                     <Border.Style>
                         <Style TargetType="{x:Type Border}">
                             <Setter Property="Background" Value="#FFFFFF"/>
@@ -136,9 +123,9 @@
                             </Style.Triggers>
                         </Style>
                     </Border.Style>
-                    <TextBlock Text="錯誤" FontSize="10" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black"/>
+                    <TextBlock Text="錯誤" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black"/>
                 </Border>
-                <Border BorderBrush="#2E993E" BorderThickness="1" CornerRadius="3" Padding="4" Canvas.Left="-11" Canvas.Top="-40" HorizontalAlignment="Left" VerticalAlignment="Top">
+                <Border BorderBrush="#2E993E" BorderThickness="1" CornerRadius="3" Padding="4" Canvas.Left="-36" Canvas.Top="-40" HorizontalAlignment="Left" VerticalAlignment="Center">
                     <Border.Style>
                         <Style TargetType="{x:Type Border}">
                             <Setter Property="Background" Value="#FFFFFF"/>
@@ -149,9 +136,9 @@
                             </Style.Triggers>
                         </Style>
                     </Border.Style>
-                    <TextBlock Text="Y51 - 關" FontSize="10" Foreground="Black" />
+                    <TextBlock Text="Y51 - 關" FontSize="14" Foreground="Black" />
                 </Border>
-                <Border BorderBrush="#2E993E" BorderThickness="1" CornerRadius="3" Padding="4" Width="51" Height="22" Canvas.Left="130" Canvas.Top="-42" HorizontalAlignment="Center" VerticalAlignment="Top">
+                <Border BorderBrush="#2E993E" BorderThickness="1" CornerRadius="3" Padding="4" Width="62" Height="26" Canvas.Left="130" Canvas.Top="-45" HorizontalAlignment="Left" VerticalAlignment="Top">
                     <Border.Style>
                         <Style TargetType="{x:Type Border}">
                             <Setter Property="Background" Value="#FFFFFF"/>
@@ -162,10 +149,10 @@
                             </Style.Triggers>
                         </Style>
                     </Border.Style>
-                    <TextBlock Text="X52 - 開" FontSize="10" Foreground="Black" />
+                    <TextBlock Text="X52 - 開" FontSize="14" Foreground="Black" />
 
                 </Border>
-                <Border Canvas.Left="130" Canvas.Top="-20" Width="50" Height="22" BorderBrush="#2E993E" BorderThickness="1" CornerRadius="3" Padding="4" HorizontalAlignment="Left" VerticalAlignment="Top">
+                <Border Canvas.Left="130" Canvas.Top="-20" Width="62" Height="25" BorderBrush="#2E993E" BorderThickness="1" CornerRadius="3" Padding="4" HorizontalAlignment="Left" VerticalAlignment="Top">
                     <Border.Style>
                         <Style TargetType="{x:Type Border}">
                             <Setter Property="Background" Value="#FFFFFF"/>
@@ -176,7 +163,7 @@
                             </Style.Triggers>
                         </Style>
                     </Border.Style>
-                    <TextBlock Text="X53 - 關" FontSize="10" Foreground="Black" />
+                    <TextBlock Text="X53 - 關" FontSize="14" Foreground="Black" />
 
                 </Border>
                 <Border BorderBrush="#2E993E" BorderThickness="1" CornerRadius="3" Padding="4" Canvas.Left="86" Canvas.Top="10" HorizontalAlignment="Left" VerticalAlignment="Top">
@@ -190,9 +177,9 @@
                             </Style.Triggers>
                         </Style>
                     </Border.Style>
-                    <TextBlock Text="Y55 - 開" FontSize="10" Foreground="Black" />
+                    <TextBlock Text="Y55 - 開" FontSize="14" Foreground="Black" />
                 </Border>
-                <Border BorderBrush="Black" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding PickFinished, ElementName=RootControl}" Width="82" Height="22" Canvas.Left="86" Canvas.Top="-122" HorizontalAlignment="Left" VerticalAlignment="Top">
+                <Border BorderBrush="Black" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding PickFinished, ElementName=RootControl}" Width="110" Height="22" Canvas.Left="86" Canvas.Top="-122" HorizontalAlignment="Left" VerticalAlignment="Top">
                     <Border.Style>
                         <Style TargetType="{x:Type Border}">
                             <Setter Property="Background" Value="White"/>
@@ -203,9 +190,9 @@
                             </Style.Triggers>
                         </Style>
                     </Border.Style>
-                    <TextBlock Text="Pick Finished" FontSize="10" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black"/>
+                    <TextBlock Text="Pick Finished" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black"/>
                 </Border>
-                <Border BorderBrush="Black" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding PlaceFinished, ElementName=RootControl}" Width="82" Height="22" HorizontalAlignment="Center" Canvas.Left="86" Canvas.Top="-96" VerticalAlignment="Top">
+                <Border BorderBrush="Black" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding PlaceFinished, ElementName=RootControl}" Width="110" Height="22" HorizontalAlignment="Center" Canvas.Left="86" Canvas.Top="-96" VerticalAlignment="Top">
                     <Border.Style>
                         <Style TargetType="{x:Type Border}">
                             <Setter Property="Background" Value="White"/>
@@ -216,9 +203,9 @@
                             </Style.Triggers>
                         </Style>
                     </Border.Style>
-                    <TextBlock Text="Place Finished" FontSize="10" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black"/>
+                    <TextBlock Text="Place Finished" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black"/>
                 </Border>
-                <Border BorderBrush="Black" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding Moving, ElementName=RootControl}" Width="82" Height="22" HorizontalAlignment="Left" Canvas.Left="86" Canvas.Top="-69" VerticalAlignment="Top">
+                <Border BorderBrush="Black" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding Moving, ElementName=RootControl}" Width="110" Height="22" HorizontalAlignment="Left" Canvas.Left="86" Canvas.Top="-69" VerticalAlignment="Top">
                     <Border.Style>
                         <Style TargetType="{x:Type Border}">
                             <Setter Property="Background" Value="White"/>
@@ -229,9 +216,9 @@
                             </Style.Triggers>
                         </Style>
                     </Border.Style>
-                    <TextBlock Text="Moving" FontSize="10" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black"/>
+                    <TextBlock Text="Moving" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black"/>
                 </Border>
-                <Border BorderBrush="Black" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding InputPermit, ElementName=RootControl}" Width="82" Height="22" HorizontalAlignment="Left" Canvas.Left="-7" Canvas.Top="-96" VerticalAlignment="Top">
+                <Border BorderBrush="Black" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding InputPermit, ElementName=RootControl}" Width="110" Height="22" HorizontalAlignment="Left" Canvas.Left="-28" Canvas.Top="-96" VerticalAlignment="Center">
                     <Border.Style>
                         <Style TargetType="{x:Type Border}">
                             <Setter Property="Background" Value="White"/>
@@ -242,9 +229,9 @@
                             </Style.Triggers>
                         </Style>
                     </Border.Style>
-                    <TextBlock Text="Input Permit" FontSize="10" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black"/>
+                    <TextBlock Text="Input Permit" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black"/>
                 </Border>
-                <Border BorderBrush="Black" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding ActFinished, ElementName=RootControl}" Width="82" Height="22" HorizontalAlignment="Left" Canvas.Left="-7" Canvas.Top="-69" VerticalAlignment="Top">
+                <Border BorderBrush="Black" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding ActFinished, ElementName=RootControl}" Width="110" Height="22" HorizontalAlignment="Left" Canvas.Left="-28" Canvas.Top="-69" VerticalAlignment="Center">
                     <Border.Style>
                         <Style TargetType="{x:Type Border}">
                             <Setter Property="Background" Value="White"/>
@@ -255,9 +242,9 @@
                             </Style.Triggers>
                         </Style>
                     </Border.Style>
-                    <TextBlock Text="Act Finished" FontSize="10" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black"/>
+                    <TextBlock Text="Act Finished" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black"/>
                 </Border>
-                <Border BorderBrush="#2E993E" BorderThickness="1" CornerRadius="3" Padding="4" Width="60" Height="22" Canvas.Left="-65" Canvas.Top="35" HorizontalAlignment="Center" VerticalAlignment="Top">
+                <Border BorderBrush="#2E993E" BorderThickness="1" CornerRadius="3" Padding="4" Width="60" Height="28" Canvas.Left="-65" Canvas.Top="35" HorizontalAlignment="Center" VerticalAlignment="Top">
                     <Border.Style>
                         <Style TargetType="{x:Type Border}">
                             <Setter Property="Background" Value="#FFFFFF"/>
@@ -268,10 +255,10 @@
                             </Style.Triggers>
                         </Style>
                     </Border.Style>
-                    <TextBlock Text="X55 - H" FontSize="10" Foreground="Black" />
+                    <TextBlock Text="X55 - H" FontSize="14" Foreground="Black" />
 
                 </Border>
-                <Border BorderBrush="#2E993E" BorderThickness="1" CornerRadius="3" Padding="4" Width="60" Height="22" Canvas.Left="-65" Canvas.Top="171" HorizontalAlignment="Left" VerticalAlignment="Top">
+                <Border BorderBrush="#2E993E" BorderThickness="1" CornerRadius="3" Padding="4" Width="60" Height="26" Canvas.Left="-65" Canvas.Top="171" HorizontalAlignment="Center" VerticalAlignment="Top">
                     <Border.Style>
                         <Style TargetType="{x:Type Border}">
                             <Setter Property="Background" Value="#FFFFFF"/>
@@ -282,7 +269,7 @@
                             </Style.Triggers>
                         </Style>
                     </Border.Style>
-                    <TextBlock Text="X54 - L" FontSize="10" Foreground="Black" />
+                    <TextBlock Text="X54 - L" FontSize="14" Foreground="Black" />
 
                 </Border>
                 <Border Canvas.Left="156" Canvas.Top="113" Background="White" BorderBrush="Black" BorderThickness="1" CornerRadius="3" Padding="4" Height="25" Width="84" HorizontalAlignment="Left" VerticalAlignment="Top">
@@ -290,7 +277,7 @@
                     <TextBlock Text="超音波" FontSize="18" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black"/>
                 </Border>
             </Canvas>
-            <Border BorderBrush="Black" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding RequestWater, ElementName=RootControl}" Width="82" Height="22" Canvas.Left="132" Canvas.Top="45" HorizontalAlignment="Left" VerticalAlignment="Top">
+            <Border BorderBrush="Black" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding RequestWater, ElementName=RootControl}" Width="110" Height="22" Canvas.Left="111" Canvas.Top="45" HorizontalAlignment="Left" VerticalAlignment="Center">
                 <Border.Style>
                     <Style TargetType="{x:Type Border}">
                         <Setter Property="Background" Value="White"/>
@@ -301,32 +288,45 @@
                         </Style.Triggers>
                     </Style>
                 </Border.Style>
-                <TextBlock Text="注水" FontSize="10" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black"/>
+                <TextBlock Text="注水" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black"/>
             </Border>
-            <StackPanel Canvas.Left="294" Canvas.Top="311" Orientation="Vertical" Width="180" Background="Transparent" HorizontalAlignment="Left" VerticalAlignment="Top">
+            <StackPanel Canvas.Left="372" Canvas.Top="311" Orientation="Vertical" Width="180" Background="Transparent" HorizontalAlignment="Left" VerticalAlignment="Center">
                 <StackPanel Orientation="Horizontal" Margin="0,2,0,2">
-                    <TextBlock Text="設置電流(A): " FontSize="12" Foreground="Black" Width="90" />
-                    <TextBlock x:Name="txtSetCurrent" Text="0.00" FontSize="12" Foreground="Black" />
+                    <TextBlock Text="設置電流(A): " FontSize="16" Foreground="Black" Width="110" />
+                    <TextBlock x:Name="txtSetCurrent" Text="0.00" FontSize="16" Foreground="Black" />
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" Margin="0,2,0,2">
-                    <TextBlock Text="輸出頻率(kHz): " FontSize="12" Foreground="Black" Width="90" />
-                    <TextBlock x:Name="txtActFreq" Text="0.0" FontSize="12" Foreground="Black" />
+                    <TextBlock Text="輸出頻率(kHz): " FontSize="16" Foreground="Black" Width="110" />
+                    <TextBlock x:Name="txtActFreq" Text="0.0" FontSize="16" Foreground="Black" />
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" Margin="0,2,0,2">
-                    <TextBlock Text="時間(秒): " FontSize="12" Foreground="Black" Width="90" />
-                    <TextBlock x:Name="txtTime" Text="0" FontSize="12" Foreground="Black" />
+                    <TextBlock Text="時間(秒): " FontSize="16" Foreground="Black" Width="70" />
+                    <TextBlock x:Name="txtTime" Text="0" FontSize="16" Foreground="Black" />
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" Margin="0,2,0,2">
-                    <TextBlock Text="功率(%): " FontSize="12" Foreground="Black" Width="90" />
-                    <TextBlock x:Name="txtPower" Text="0" FontSize="12" Foreground="Black" />
+                    <TextBlock Text="功率(%): " FontSize="16" Foreground="Black" Width="70" />
+                    <TextBlock x:Name="txtPower" Text="0" FontSize="16" Foreground="Black" />
                 </StackPanel>
             </StackPanel>
 
             <!-- Inserted WaterOutToWaste image -->
             <Image Source="/CleanerControlApp;component/Pictures/WaterOutToWaste.png" Canvas.Left="249" Canvas.Top="405" Width="80" Height="40" ToolTip="Water Out To Waste" HorizontalAlignment="Left" VerticalAlignment="Top" />
+            <Border Canvas.Left="301" Canvas.Top="322" Width="56" Height="56" CornerRadius="4" BorderBrush="#2B72C2" BorderThickness="1" HorizontalAlignment="Left" VerticalAlignment="Top">
+                <Border.Style>
+                    <Style TargetType="{x:Type Border}">
+                        <Setter Property="Background" Value="White"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding CommandUltrasonicOpen, ElementName=RootControl}" Value="True">
+                                <Setter Property="Background" Value="#CCFFCC"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Border.Style>
+                <Image Source="/CleanerControlApp;component/Pictures/Ultrasonic.png" Width="40" Height="40" HorizontalAlignment="Center" VerticalAlignment="Center" ToolTip="Ultrasonic"/>
+            </Border>
 
         </Canvas>
-        <Border BorderBrush="#2E993E" BorderThickness="1" CornerRadius="3" Padding="4" Margin="302,414,318,161">
+        <Border BorderBrush="#2E993E" BorderThickness="1" CornerRadius="3" Padding="4" Margin="302,414,300,158">
             <Border.Style>
                 <Style TargetType="{x:Type Border}">
                     <Setter Property="Background" Value="#FFFFFF"/>
@@ -337,7 +337,7 @@
                     </Style.Triggers>
                 </Style>
             </Border.Style>
-            <TextBlock Text="Y43 - 排水" FontSize="10" Foreground="Black" Height="13" VerticalAlignment="Top" />
+            <TextBlock Text="Y43 - 排水" FontSize="14" Foreground="Black" Height="16" VerticalAlignment="Center" />
         </Border>
         <!--其他控制項在這裡 -->
     </Grid>

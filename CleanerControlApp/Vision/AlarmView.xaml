@@ -5,7 +5,7 @@
  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
  xmlns:alarm="clr-namespace:CleanerControlApp.Utilities.Alarm"
  mc:Ignorable="d"
- d:DesignHeight="600" d:DesignWidth="800">
+ d:DesignHeight="600" d:DesignWidth="800" FontSize="14">
  <UserControl.Resources>
  <!-- Call static method GetAllEntries on AlarmManager to obtain the current snapshot -->
  <ObjectDataProvider x:Key="AllAlarms" ObjectType="{x:Type alarm:AlarmManager}" MethodName="GetAllEntries" />
@@ -26,7 +26,7 @@
  </Grid.RowDefinitions>
 
  <DockPanel Grid.Row="0">
- <TextBlock Text="即時警報" FontSize="16" FontWeight="Bold" Margin="8" DockPanel.Dock="Top" />
+ <TextBlock Text="即時警報" FontSize="18" FontWeight="Bold" Margin="8" DockPanel.Dock="Top" />
  <!-- DataGrid bound to AlarmManager.GetAllEntries(), rows hidden when IsAlarm is false -->
  <DataGrid x:Name="realTimeGrid" ItemsSource="{Binding Source={StaticResource AllAlarms}}"
  Margin="8"
@@ -68,7 +68,7 @@
  <TextBox x:Name="txtCodeQuery" Width="120" VerticalAlignment="Center" />
  <Button x:Name="btnQuery" Content="查詢" Margin="8,0,0,0" Padding="8,4" Click="BtnQuery_Click" />
  </StackPanel>
- <TextBlock Text="錯誤說明" FontSize="14" FontWeight="Bold" Margin="0,0,0,4" />
+ <TextBlock Text="錯誤說明" FontSize="16" FontWeight="Bold" Margin="0,0,0,4" />
  <TextBox x:Name="txtSolution" IsReadOnly="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" Background="White" Height="125" HorizontalAlignment="Stretch" />
  </StackPanel>
  <!-- Right: kept empty or reserved for future controls -->
@@ -88,7 +88,7 @@
  <RowDefinition Height="*" />
  </Grid.RowDefinitions>
 
- <TextBlock Text="歷史警報" FontSize="16" FontWeight="Bold" Margin="8" Grid.Row="0" />
+ <TextBlock Text="歷史警報" FontSize="18" FontWeight="Bold" Margin="8" Grid.Row="0" />
  <!-- Date selection label and DatePicker with Load button -->
  <StackPanel Orientation="Horizontal" Margin="8" VerticalAlignment="Top" Grid.Row="1">
  <TextBlock Text="日期選擇" VerticalAlignment="Center" Margin="0,4,8,0" />

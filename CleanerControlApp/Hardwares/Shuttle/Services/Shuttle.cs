@@ -104,11 +104,11 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
                 AlarmManager.AttachFlagGetter("ALM107", () => _motorXAlarmLimitP);
                 AlarmManager.AttachFlagGetter("ALM108", () => _motorXAlarmHomeTimeout);
                 AlarmManager.AttachFlagGetter("ALM109", () => _motorXAlarmMoveTimeout);
-                AlarmManager.AttachFlagGetter("ALM110", () => _motorXAlarm);
-                AlarmManager.AttachFlagGetter("ALM111", () => _motorXAlarmLimitN);
-                AlarmManager.AttachFlagGetter("ALM112", () => _motorXAlarmLimitP);
-                AlarmManager.AttachFlagGetter("ALM113", () => _motorXAlarmHomeTimeout);
-                AlarmManager.AttachFlagGetter("ALM114", () => _motorXAlarmMoveTimeout);
+                AlarmManager.AttachFlagGetter("ALM110", () => _motorZAlarm);
+                AlarmManager.AttachFlagGetter("ALM111", () => _motorZAlarmLimitN);
+                AlarmManager.AttachFlagGetter("ALM112", () => _motorZAlarmLimitP);
+                AlarmManager.AttachFlagGetter("ALM113", () => _motorZAlarmHomeTimeout);
+                AlarmManager.AttachFlagGetter("ALM114", () => _motorZAlarmMoveTimeout);
                 AlarmManager.AttachFlagGetter("ALM115", () => _pickProcedureError);
                 AlarmManager.AttachFlagGetter("ALM116", () => _placeProcedureError);
                 AlarmManager.AttachFlagGetter("ALM117", () => _checkCassetteProcedureError);

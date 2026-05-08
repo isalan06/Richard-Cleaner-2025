@@ -4,11 +4,11 @@
  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
  mc:Ignorable="d"
- d:DesignHeight="400" d:DesignWidth="600">
+ d:DesignHeight="400" d:DesignWidth="600" FontSize="14">
  <Grid Background="White" Margin="8">
  <Grid.RowDefinitions>
  <RowDefinition Height="Auto" />
- <RowDefinition Height="*" />
+ <RowDefinition Height="Auto" />
  </Grid.RowDefinitions>
 
  <Grid Grid.Row="0" Margin="0,0,0,8">
@@ -49,25 +49,25 @@
  <ColumnDefinition Width="202" />
  </Grid.ColumnDefinitions>
 
-                        <TextBlock Text="低溫設定值 (℃):" Grid.Column="0" VerticalAlignment="Center" Height="15" />
+ <TextBlock Text="低溫設定值 (℃):" Grid.Column="0" VerticalAlignment="Center" />
  <TextBox x:Name="Txt_SV_Low" Grid.Row="0" Grid.Column="1" Margin="4,4,0,4" />
 
-                        <TextBlock Text="高溫設定值 (℃):" Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" Height="15" />
+ <TextBlock Text="高溫設定值 (℃):" Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" />
  <TextBox x:Name="Txt_SV_High" Grid.Row="1" Grid.Column="1" Margin="4,4,0,4" />
 
- <TextBlock Text="INV 高 (Hz):" Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" Height="16" />
+ <TextBlock Text="INV 高 (Hz):" Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" />
  <TextBox x:Name="Txt_INV_High" Grid.Row="2" Grid.Column="1" Margin="4,4,0,4" />
 
- <TextBlock Text="INV低 (Hz):" Grid.Row="3" Grid.Column="0" VerticalAlignment="Center" Height="15" />
+ <TextBlock Text="INV低 (Hz):" Grid.Row="3" Grid.Column="0" VerticalAlignment="Center" />
  <TextBox x:Name="Txt_INV_Low" Grid.Row="3" Grid.Column="1" Margin="4,4,0,4" />
 
- <TextBlock Text="INV 零點 (Hz):" Grid.Row="4" Grid.Column="0" VerticalAlignment="Center" Height="15" />
+ <TextBlock Text="INV 零點 (Hz):" Grid.Row="4" Grid.Column="0" VerticalAlignment="Center" />
  <TextBox x:Name="Txt_INV_Zero" Grid.Row="4" Grid.Column="1" Margin="4,4,0,4" />
 
- <TextBlock Text="高水位檢查延遲 (秒):" Grid.Row="5" Grid.Column="0" VerticalAlignment="Center" Height="15" />
+ <TextBlock Text="高水位檢查延遲 (秒):" Grid.Row="5" Grid.Column="0" VerticalAlignment="Center" />
  <TextBox x:Name="Txt_Water_H_CheckDelay" Grid.Row="5" Grid.Column="1" Margin="4,4,0,4" />
 
- <TextBlock Text="低水位檢查延遲 (秒):" Grid.Row="6" Grid.Column="0" VerticalAlignment="Center" Height="15" />
+ <TextBlock Text="低水位檢查延遲 (秒):" Grid.Row="6" Grid.Column="0" VerticalAlignment="Center" />
  <TextBox x:Name="Txt_Water_L_CheckDelay" Grid.Row="6" Grid.Column="1" Margin="4,4,0,4" />
 
  </Grid>

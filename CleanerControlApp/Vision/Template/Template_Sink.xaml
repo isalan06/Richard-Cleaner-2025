@@ -19,7 +19,7 @@
             <local:Template_Motor_3 Canvas.Left="46" Canvas.Top="26" Width="464" Height="292" Canvas.ZIndex="100" />
 
             <!-- Embed Template Tank Sink as UserControl -->
-            <local:Template_Tank_Sink Canvas.Left="399" Width="150" Height="220" HorizontalAlignment="Left" VerticalAlignment="Center" Canvas.ZIndex="20" />
+            <local:Template_Tank_Sink Canvas.Left="399" Width="150" Height="220" HorizontalAlignment="Left" VerticalAlignment="Center" Canvas.ZIndex="20" IsHitTestVisible="False" />
             <Border Canvas.Left="594" Canvas.Top="438" Width="40" Height="32" BorderBrush="Gray" BorderThickness="1" CornerRadius="3" HorizontalAlignment="Left" VerticalAlignment="Top">
                 <Border.Style>
                     <Style TargetType="{x:Type Border}">

@@ -7,7 +7,7 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800" x:Name="RootControl">
     <Grid>
-        <Canvas>
+        <Canvas Margin="-2,0,2,0">
             <!-- Embed Clamper image from project's Pictures folder. Adjust Canvas.Left/Top/Width/Height as needed -->
             <Image Source="pack://application:,,,/CleanerControlApp;component/Pictures/Clamper.png"
                    Canvas.Left="130" Canvas.Top="87"
@@ -17,7 +17,7 @@
 
                 <TextBlock Text="夾爪" FontSize="18" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black"/>
             </Border>
-            <Border Canvas.Left="240" Canvas.Top="37" BorderBrush="#2E993E" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding Sensor_ClamperFOpen, ElementName=RootControl}" Width="92" HorizontalAlignment="Left" VerticalAlignment="Top" RenderTransformOrigin="0.5,0.5">
+            <Border Canvas.Left="222" Canvas.Top="35" BorderBrush="#2E993E" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding Sensor_ClamperFOpen, ElementName=RootControl}" Width="110" HorizontalAlignment="Left" VerticalAlignment="Center" RenderTransformOrigin="0.5,0.5">
                 <Border.RenderTransform>
                     <TransformGroup>
                         <ScaleTransform/>
@@ -36,9 +36,9 @@
                         </Style.Triggers>
                     </Style>
                 </Border.Style>
-                <TextBlock Text="X32 - 前夾爪開" FontSize="12" Foreground="Black"/>
+                <TextBlock Text="X32 - 前夾爪開" FontSize="14" Foreground="Black"/>
             </Border>
-            <Border Canvas.Left="214" Canvas.Top="37" BorderBrush="#2E993E" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding Sensor_ClamperFClose, ElementName=RootControl}" Width="92" RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Left" VerticalAlignment="Center">
+            <Border Canvas.Left="194" Canvas.Top="35" BorderBrush="#2E993E" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding Sensor_ClamperFClose, ElementName=RootControl}" Width="110" RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Left" VerticalAlignment="Center">
                 <Border.RenderTransform>
                     <TransformGroup>
                         <ScaleTransform/>
@@ -57,9 +57,9 @@
                         </Style.Triggers>
                     </Style>
                 </Border.Style>
-                <TextBlock Text="X33 - 前夾爪關" FontSize="12" Foreground="Black"/>
+                <TextBlock Text="X33 - 前夾爪關" FontSize="14" Foreground="Black"/>
             </Border>
-            <Border Canvas.Left="128" Canvas.Top="37" BorderBrush="#2E993E" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding Sensor_ClamperBOpen, ElementName=RootControl}" Width="92" RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Left" VerticalAlignment="Center">
+            <Border Canvas.Left="128" Canvas.Top="35" BorderBrush="#2E993E" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding Sensor_ClamperBOpen, ElementName=RootControl}" Width="110" RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Center" VerticalAlignment="Top">
                 <Border.RenderTransform>
                     <TransformGroup>
                         <ScaleTransform/>
@@ -78,9 +78,9 @@
                         </Style.Triggers>
                     </Style>
                 </Border.Style>
-                <TextBlock Text="X34 - 後夾爪開" FontSize="12" Foreground="Black"/>
+                <TextBlock Text="X34 - 後夾爪開" FontSize="14" Foreground="Black"/>
             </Border>
-            <Border BorderBrush="#2E993E" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding Sensor_ClamperBClose, ElementName=RootControl}" RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Left" Height="25" Canvas.Left="155" Canvas.Top="37" VerticalAlignment="Center" Width="92">
+            <Border BorderBrush="#2E993E" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding Sensor_ClamperBClose, ElementName=RootControl}" RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Left" Height="25" Canvas.Left="153" Canvas.Top="37" VerticalAlignment="Center" Width="110">
                 <Border.RenderTransform>
                     <TransformGroup>
                         <ScaleTransform/>
@@ -99,9 +99,9 @@
                         </Style.Triggers>
                     </Style>
                 </Border.Style>
-                <TextBlock Text="X35 - 後夾爪關" FontSize="12" Foreground="Black"/>
+                <TextBlock Text="X35 - 後夾爪關" FontSize="14" Foreground="Black"/>
             </Border>
-            <Border BorderBrush="#2E993E" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding Sensor_Exist1, ElementName=RootControl}" RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Left" Height="25" Canvas.Left="247" Canvas.Top="142" VerticalAlignment="Top" Width="72">
+            <Border BorderBrush="#2E993E" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding Sensor_Exist1, ElementName=RootControl}" RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Left" Height="25" Canvas.Left="247" Canvas.Top="142" VerticalAlignment="Top" Width="92">
                 <Border.RenderTransform>
                     <TransformGroup>
                         <ScaleTransform/>
@@ -120,9 +120,9 @@
                         </Style.Triggers>
                     </Style>
                 </Border.Style>
-                <TextBlock Text="X30 - 在席1" FontSize="12" Foreground="Black"/>
+                <TextBlock Text="X30 - 在席1" FontSize="14" Foreground="Black"/>
             </Border>
-            <Border BorderBrush="#2E993E" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding Sensor_Exist2, ElementName=RootControl}" RenderTransformOrigin="0.5,0.5" Height="25" Canvas.Left="137" Canvas.Top="141" Width="72" HorizontalAlignment="Left" VerticalAlignment="Top">
+            <Border BorderBrush="#2E993E" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding Sensor_Exist2, ElementName=RootControl}" RenderTransformOrigin="0.5,0.5" Height="25" Canvas.Left="117" Canvas.Top="141" Width="92" HorizontalAlignment="Left" VerticalAlignment="Center">
                 <Border.RenderTransform>
                     <TransformGroup>
                         <ScaleTransform/>
@@ -141,9 +141,9 @@
                         </Style.Triggers>
                     </Style>
                 </Border.Style>
-                <TextBlock Text="X31 - 在席2" FontSize="12" Foreground="Black"/>
+                <TextBlock Text="X31 - 在席2" FontSize="14" Foreground="Black"/>
             </Border>
-            <Border Canvas.Left="282" Canvas.Top="240" BorderBrush="#2E993E" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding ClamperOpen, ElementName=RootControl}" Width="82" HorizontalAlignment="Left" VerticalAlignment="Center">
+            <Border Canvas.Left="282" Canvas.Top="236" BorderBrush="#2E993E" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding ClamperOpen, ElementName=RootControl}" Width="100" HorizontalAlignment="Center" VerticalAlignment="Top">
                 <Border.Style>
                     <Style TargetType="{x:Type Border}">
                         <Setter Property="Background" Value="#FFFFFF"/>
@@ -154,10 +154,10 @@
                         </Style.Triggers>
                     </Style>
                 </Border.Style>
-                <TextBlock Text="Y40 - 夾爪開" FontSize="12" Foreground="Black" />
+                <TextBlock Text="Y40 - 夾爪開" FontSize="14" Foreground="Black" />
 
             </Border>
-            <Border Canvas.Left="189" Canvas.Top="282" BorderBrush="#2E993E" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding ClamperClose, ElementName=RootControl}" Width="82" HorizontalAlignment="Left" VerticalAlignment="Top">
+            <Border Canvas.Left="177" Canvas.Top="282" BorderBrush="#2E993E" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding ClamperClose, ElementName=RootControl}" Width="100" HorizontalAlignment="Left" VerticalAlignment="Center">
                 <Border.Style>
                     <Style TargetType="{x:Type Border}">
                         <Setter Property="Background" Value="#FFFFFF"/>
@@ -168,10 +168,10 @@
                         </Style.Triggers>
                     </Style>
                 </Border.Style>
-                <TextBlock Text="Y41 - 夾爪關" FontSize="12" Foreground="Black" />
+                <TextBlock Text="Y41 - 夾爪關" FontSize="14" Foreground="Black" />
 
             </Border>
-            <Border Canvas.Left="282" Canvas.Top="265" BorderBrush="#2E993E" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding Sensor_ClamperOpen, ElementName=RootControl}" Width="82" RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Left" VerticalAlignment="Center">
+            <Border Canvas.Left="282" Canvas.Top="265" BorderBrush="#2E993E" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding Sensor_ClamperOpen, ElementName=RootControl}" Width="100" RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Left" VerticalAlignment="Center">
                 <Border.RenderTransform>
                     <TransformGroup>
                         <ScaleTransform/>
@@ -190,9 +190,9 @@
                         </Style.Triggers>
                     </Style>
                 </Border.Style>
-                <TextBlock Text="X72 - 夾爪開" FontSize="12" Foreground="Black"/>
+                <TextBlock Text="X72 - 夾爪開" FontSize="14" Foreground="Black"/>
             </Border>
-            <Border Canvas.Left="189" Canvas.Top="307" BorderBrush="#2E993E" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding Sensor_ClamperClose, ElementName=RootControl}" Width="82" RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Left" VerticalAlignment="Top">
+            <Border Canvas.Left="177" Canvas.Top="311" BorderBrush="#2E993E" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding Sensor_ClamperClose, ElementName=RootControl}" Width="100" RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Left" VerticalAlignment="Center">
                 <Border.RenderTransform>
                     <TransformGroup>
                         <ScaleTransform/>
@@ -211,7 +211,7 @@
                         </Style.Triggers>
                     </Style>
                 </Border.Style>
-                <TextBlock Text="X73 - 夾爪關" FontSize="12" Foreground="Black"/>
+                <TextBlock Text="X73 - 夾爪關" FontSize="14" Foreground="Black"/>
             </Border>
         </Canvas>
     </Grid>

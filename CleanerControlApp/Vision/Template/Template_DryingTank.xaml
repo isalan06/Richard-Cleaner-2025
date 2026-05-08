@@ -62,15 +62,15 @@
             </Image>
 
             <!-- Blowers and valves at bottom right of each tank -->
-            <Image Source="pack://application:,,,/CleanerControlApp;component/Pictures/Blower.png" Canvas.Left="114" Canvas.Top="260" Width="48" Height="48" HorizontalAlignment="Center" VerticalAlignment="Top"/>
-            <Image Source="pack://application:,,,/CleanerControlApp;component/Pictures/Blower.png" Canvas.Left="348" Canvas.Top="255" Width="48" Height="48" HorizontalAlignment="Center" VerticalAlignment="Top"/>
+            <Image Source="pack://application:,,,/CleanerControlApp;component/Pictures/Blower.png" Canvas.Left="137" Canvas.Top="260" Width="48" Height="48" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+            <Image Source="pack://application:,,,/CleanerControlApp;component/Pictures/Blower.png" Canvas.Left="369" Canvas.Top="260" Width="48" Height="48" HorizontalAlignment="Left" VerticalAlignment="Top"/>
 
             <!-- Air valve icons left of each blower -->
-            <Image Source="pack://application:,,,/CleanerControlApp;component/Pictures/AirValve.png" Canvas.Left="22" Canvas.Top="280" Width="36" Height="28" HorizontalAlignment="Center" VerticalAlignment="Top"/>
-            <Image Source="pack://application:,,,/CleanerControlApp;component/Pictures/AirValve.png" Canvas.Left="263" Canvas.Top="277" Width="36" Height="28" HorizontalAlignment="Center" VerticalAlignment="Top"/>
+            <Image Source="pack://application:,,,/CleanerControlApp;component/Pictures/AirValve.png" Canvas.Left="40" Canvas.Top="285" Width="36" Height="28" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+            <Image Source="pack://application:,,,/CleanerControlApp;component/Pictures/AirValve.png" Canvas.Left="274" Canvas.Top="285" Width="36" Height="28" HorizontalAlignment="Left" VerticalAlignment="Top"/>
 
             <!-- Status labels with green boxes (changed to red per request) -->
-            <Border Canvas.Left="203" Canvas.Top="284" BorderBrush="#2E993E" BorderThickness="1" CornerRadius="3" Padding="4" HorizontalAlignment="Center" VerticalAlignment="Top">
+            <Border Canvas.Left="203" Canvas.Top="285" BorderBrush="#2E993E" BorderThickness="1" CornerRadius="3" Padding="4" HorizontalAlignment="Center" VerticalAlignment="Top">
                 <Border.Style>
                     <Style TargetType="Border">
                         <Setter Property="Background" Value="#FFFFFF"/>
@@ -81,7 +81,7 @@
                         </Style.Triggers>
                     </Style>
                 </Border.Style>
-                <TextBlock Text="Y56 - Air" FontSize="10" Foreground="#2E993E">
+                <TextBlock Text="Y56 - Air" FontSize="14" Foreground="#2E993E">
                     <TextBlock.Style>
                         <Style TargetType="TextBlock">
                             <Setter Property="Foreground" Value="#2E993E"/>
@@ -94,7 +94,7 @@
                     </TextBlock.Style>
                 </TextBlock>
             </Border>
-            <Border Canvas.Left="290" Canvas.Top="279" BorderBrush="#2E993E" BorderThickness="1" CornerRadius="3" Padding="4" HorizontalAlignment="Center" VerticalAlignment="Top" Width="56">
+            <Border Canvas.Left="296" Canvas.Top="252" BorderBrush="#2E993E" BorderThickness="1" CornerRadius="3" Padding="4" HorizontalAlignment="Left" VerticalAlignment="Top" Width="70">
                 <Border.Style>
                     <Style TargetType="Border">
                         <Setter Property="Background" Value="#FFFFFF"/>
@@ -105,7 +105,7 @@
                         </Style.Triggers>
                     </Style>
                 </Border.Style>
-                <TextBlock Text="Y34 - On" FontSize="10" Foreground="#2E993E">
+                <TextBlock Text="Y34 - On" FontSize="14" Foreground="#2E993E">
                     <TextBlock.Style>
                         <Style TargetType="TextBlock">
                             <Setter Property="Foreground" Value="#2E993E"/>
@@ -120,7 +120,7 @@
             </Border>
 
             <!-- Top small labels for sensors: RIGHT TANK (TC-3 H/L) bind to High/Low Right -->
-            <Border Canvas.Left="-23" Canvas.Top="33" BorderBrush="#2E993E" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding HighTemperatureRight, ElementName=RootControl}">
+            <Border Canvas.Left="-31" Canvas.Top="36" Width="55" BorderBrush="#2E993E" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding HighTemperatureRight, ElementName=RootControl}" HorizontalAlignment="Center" VerticalAlignment="Top">
                 <Border.Style>
                     <Style TargetType="Border">
                         <Setter Property="Background" Value="#FFFFFF"/>
@@ -131,7 +131,7 @@
                         </Style.Triggers>
                     </Style>
                 </Border.Style>
-                <TextBlock Text="TC-3 H" FontSize="10" Foreground="#2E993E">
+                <TextBlock Text="TC-3 H" FontSize="14" Foreground="#2E993E">
                     <TextBlock.Style>
                         <Style TargetType="TextBlock">
                             <Setter Property="Foreground" Value="#2E993E"/>
@@ -144,7 +144,7 @@
                     </TextBlock.Style>
                 </TextBlock>
             </Border>
-            <Border Canvas.Left="-23" Canvas.Top="61" BorderBrush="#2E993E" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding LowTemperatureRight, ElementName=RootControl}">
+            <Border Canvas.Left="-31" Canvas.Top="64" Width="55" BorderBrush="#2E993E" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding LowTemperatureRight, ElementName=RootControl}" HorizontalAlignment="Center" VerticalAlignment="Top">
                 <Border.Style>
                     <Style TargetType="Border">
                         <Setter Property="Background" Value="#FFFFFF"/>
@@ -155,7 +155,7 @@
                         </Style.Triggers>
                     </Style>
                 </Border.Style>
-                <TextBlock Text="TC-3 L" FontSize="10" Foreground="#2E993E">
+                <TextBlock Text="TC-3 L" FontSize="14" Foreground="#2E993E">
                     <TextBlock.Style>
                         <Style TargetType="TextBlock">
                             <Setter Property="Foreground" Value="#2E993E"/>
@@ -170,7 +170,7 @@
             </Border>
 
             <!-- TC-2 H/L for LEFT TANK (already bound to Left properties) -->
-            <Border Canvas.Left="213" Canvas.Top="33" BorderBrush="#2E993E" BorderThickness="1" CornerRadius="3" Padding="4" HorizontalAlignment="Left" VerticalAlignment="Center" ToolTip="{Binding HighTemperatureLeft, ElementName=RootControl}">
+            <Border Canvas.Left="205" Canvas.Top="36" Width="55" BorderBrush="#2E993E" BorderThickness="1" CornerRadius="3" Padding="4" HorizontalAlignment="Center" VerticalAlignment="Top" ToolTip="{Binding HighTemperatureLeft, ElementName=RootControl}">
                 <Border.Style>
                     <Style TargetType="Border">
                         <Setter Property="Background" Value="#FFFFFF"/>
@@ -181,7 +181,7 @@
                         </Style.Triggers>
                     </Style>
                 </Border.Style>
-                <TextBlock Text="TC-2 H" FontSize="10" HorizontalAlignment="Center" VerticalAlignment="Center">
+                <TextBlock Text="TC-2 H" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center">
                     <TextBlock.Style>
                         <Style TargetType="TextBlock">
                             <Setter Property="Foreground" Value="#2E993E"/>
@@ -195,7 +195,7 @@
                 </TextBlock>
             </Border>
 
-            <Border Canvas.Left="214" Canvas.Top="61" BorderBrush="#2E993E" BorderThickness="1" CornerRadius="3" Padding="4" HorizontalAlignment="Left" VerticalAlignment="Center" ToolTip="{Binding LowTemperatureLeft, ElementName=RootControl}">
+            <Border Canvas.Left="205" Canvas.Top="64" Width="55" BorderBrush="#2E993E" BorderThickness="1" CornerRadius="3" Padding="4" HorizontalAlignment="Center" VerticalAlignment="Top" ToolTip="{Binding LowTemperatureLeft, ElementName=RootControl}">
                 <Border.Style>
                     <Style TargetType="Border">
                         <Setter Property="Background" Value="#FFFFFF"/>
@@ -206,7 +206,7 @@
                         </Style.Triggers>
                     </Style>
                 </Border.Style>
-                <TextBlock Text="TC-2 L" FontSize="10" HorizontalAlignment="Center" VerticalAlignment="Center">
+                <TextBlock Text="TC-2 L" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center">
                     <TextBlock.Style>
                         <Style TargetType="TextBlock">
                             <Setter Property="Foreground" Value="#2E993E"/>
@@ -221,7 +221,7 @@
             </Border>
 
             <!-- Border for Y52 - 閉 (left tank command cover close) -->
-            <Border Grid.Column="2" BorderBrush="#2E993E" BorderThickness="1" CornerRadius="3" Padding="4" Canvas.Left="234" Canvas.Top="-6">
+            <Border Grid.Column="2" BorderBrush="#2E993E" BorderThickness="1" CornerRadius="3" Padding="4" Canvas.Left="221" Canvas.Top="-6" HorizontalAlignment="Left" VerticalAlignment="Center">
                 <Border.Style>
                     <Style TargetType="Border">
                         <Setter Property="Background" Value="#FFFFFF"/>
@@ -232,7 +232,7 @@
                         </Style.Triggers>
                     </Style>
                 </Border.Style>
-                <TextBlock Text="Y52 - 關" FontSize="10" Foreground="#2E993E">
+                <TextBlock Text="Y52 - 關" FontSize="14" Foreground="#2E993E">
                     <TextBlock.Style>
                         <Style TargetType="TextBlock">
                             <Setter Property="Foreground" Value="#2E993E"/>
@@ -247,7 +247,7 @@
             </Border>
 
             <!-- Border for Y53 - 關 (right tank command cover close) -->
-            <Border Grid.Column="2" BorderBrush="#2E993E" BorderThickness="1" CornerRadius="3" Padding="4" Canvas.Left="3" Canvas.Top="-6">
+            <Border Grid.Column="2" BorderBrush="#2E993E" BorderThickness="1" CornerRadius="3" Padding="4" Canvas.Top="-6" HorizontalAlignment="Left" VerticalAlignment="Center" Canvas.Left="-13">
                 <Border.Style>
                     <Style TargetType="Border">
                         <Setter Property="Background" Value="#FFFFFF"/>
@@ -258,7 +258,7 @@
                         </Style.Triggers>
                     </Style>
                 </Border.Style>
-                <TextBlock Text="Y53 - 關" FontSize="10" Foreground="#2E993E">
+                <TextBlock Text="Y53 - 關" FontSize="14" Foreground="#2E993E">
                     <TextBlock.Style>
                         <Style TargetType="TextBlock">
                             <Setter Property="Foreground" Value="#2E993E"/>
@@ -284,7 +284,7 @@
                         </Style.Triggers>
                     </Style>
                 </Border.Style>
-                <TextBlock Text="Y57 - Air" FontSize="10" Foreground="#2E993E">
+                <TextBlock Text="Y57 - Air" FontSize="14" Foreground="#2E993E">
                     <TextBlock.Style>
                         <Style TargetType="TextBlock">
                             <Setter Property="Foreground" Value="#2E993E"/>
@@ -298,7 +298,7 @@
                 </TextBlock>
             </Border>
             <!-- Border for X61 - 關 (right tank cover close) -->
-            <Border Canvas.Left="152" Canvas.Top="10" Width="50" Height="22" BorderBrush="#2E993E" BorderThickness="1" CornerRadius="3" Padding="4">
+            <Border Canvas.Left="147" Canvas.Top="10" Width="62" Height="25" BorderBrush="#2E993E" BorderThickness="1" CornerRadius="3" Padding="4" HorizontalAlignment="Left" VerticalAlignment="Center">
                 <Border.Style>
                     <Style TargetType="Border">
                         <Setter Property="Background" Value="#FFFFFF"/>
@@ -309,7 +309,7 @@
                         </Style.Triggers>
                     </Style>
                 </Border.Style>
-                <TextBlock Text="X61 - 關" FontSize="10" Foreground="#2E993E">
+                <TextBlock Text="X61 - 關" FontSize="14" Foreground="#2E993E">
                     <TextBlock.Style>
                         <Style TargetType="TextBlock">
                             <Setter Property="Foreground" Value="#2E993E"/>
@@ -324,7 +324,7 @@
             </Border>
 
             <!-- Border for X56 - 開 (left tank cover open) -->
-            <Border Canvas.Left="392" Canvas.Top="-10" Width="50" Height="22" BorderBrush="#2E993E" BorderThickness="1" CornerRadius="3" Padding="4">
+            <Border Canvas.Left="384" Canvas.Top="-15" Width="62" Height="25" BorderBrush="#2E993E" BorderThickness="1" CornerRadius="3" Padding="4" HorizontalAlignment="Center" VerticalAlignment="Top">
                 <Border.Style>
                     <Style TargetType="Border">
                         <Setter Property="Background" Value="#FFFFFF"/>
@@ -335,7 +335,7 @@
                         </Style.Triggers>
                     </Style>
                 </Border.Style>
-                <TextBlock Text="X56 - 開" FontSize="10" Foreground="#2E993E">
+                <TextBlock Text="X56 - 開" FontSize="14" Foreground="#2E993E">
                     <TextBlock.Style>
                         <Style TargetType="TextBlock">
                             <Setter Property="Foreground" Value="#2E993E"/>
@@ -350,12 +350,12 @@
             </Border>
 
             <!-- Manual control buttons for left tank cover (to the right of X56) -->
-            <Button Canvas.Left="448" Canvas.Top="-12" Width="120" Height="60" FontSize="18" Content="開啟上蓋" Click="OpenCoverLeft_Click" Background="#ADD8E6"/>
-            <Button Canvas.Left="586" Canvas.Top="-12" Width="120" Height="60" FontSize="18" Content="關閉上蓋" Click="CloseCoverLeft_Click" Background="#ADD8E6" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+            <Button Canvas.Left="448" Canvas.Top="-12" Width="120" Height="60" FontSize="20" Content="開啟上蓋" Click="OpenCoverLeft_Click" Background="#ADD8E6"/>
+            <Button Canvas.Left="586" Canvas.Top="-12" Width="120" Height="60" FontSize="20" Content="關閉上蓋" Click="CloseCoverLeft_Click" Background="#ADD8E6" HorizontalAlignment="Left" VerticalAlignment="Center"/>
 
             <!-- Manual control buttons for right tank cover (to the right of X61) -->
-            <Button Canvas.Left="-292" Canvas.Top="-12" Width="120" Height="60" FontSize="18" Content="開啟上蓋" Click="OpenCoverRight_Click" Background="#ADD8E6" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-            <Button Canvas.Left="-153" Canvas.Top="-12" Width="120" Height="60" FontSize="18" Content="關閉上蓋" Click="CloseCoverRight_Click" Background="#ADD8E6" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            <Button Canvas.Left="-292" Canvas.Top="-12" Width="120" Height="60" FontSize="20" Content="開啟上蓋" Click="OpenCoverRight_Click" Background="#ADD8E6" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+            <Button Canvas.Left="-153" Canvas.Top="-12" Width="120" Height="60" FontSize="20" Content="關閉上蓋" Click="CloseCoverRight_Click" Background="#ADD8E6" HorizontalAlignment="Center" VerticalAlignment="Center"/>
 
             <!-- Elapsed and Remaining heating time for Drying Tank #1 (bound to ElapsedHeatingLeft / RemainingHeatingLeft) -->
             <TextBlock Text="{Binding ElapsedHeatingLeft, ElementName=RootControl}" FontSize="20" Canvas.Left="350" Canvas.Top="107" Foreground="#333333" />
@@ -373,7 +373,7 @@
             <!-- Small arrow accent between tanks -->
 
             <!-- Border for Y35 - On (right tank blower) -->
-            <Border Canvas.Left="54" Canvas.Top="280" BorderBrush="#2E993E" BorderThickness="1" CornerRadius="3" Padding="4" Width="55" HorizontalAlignment="Center" VerticalAlignment="Top">
+            <Border Canvas.Left="62" Canvas.Top="252" BorderBrush="#2E993E" BorderThickness="1" CornerRadius="3" Padding="4" Width="70" HorizontalAlignment="Left" VerticalAlignment="Top">
                 <Border.Style>
                     <Style TargetType="Border">
                         <Setter Property="Background" Value="#FFFFFF"/>
@@ -384,7 +384,7 @@
                         </Style.Triggers>
                     </Style>
                 </Border.Style>
-                <TextBlock Text="Y35 - On" FontSize="10" Foreground="#2E993E">
+                <TextBlock Text="Y35 - On" FontSize="14" Foreground="#2E993E">
                     <TextBlock.Style>
                         <Style TargetType="TextBlock">
                             <Setter Property="Foreground" Value="#2E993E"/>
@@ -582,7 +582,7 @@
                 <TextBlock Text="錯誤" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black"/>
             </Border>
         </Canvas>
-        <Border BorderBrush="#2E993E" BorderThickness="1" CornerRadius="3" Padding="4" Margin="185,-6,0,0" Grid.Column="2" HorizontalAlignment="Left" Width="51" Height="22" VerticalAlignment="Top">
+        <Border BorderBrush="#2E993E" BorderThickness="1" CornerRadius="3" Padding="4" Margin="180,-11,0,0" Grid.Column="2" HorizontalAlignment="Left" Width="62" Height="25" VerticalAlignment="Top">
             <Border.Style>
                 <Style TargetType="Border">
                     <Setter Property="Background" Value="#FFFFFF"/>
@@ -593,7 +593,7 @@
                     </Style.Triggers>
                 </Style>
             </Border.Style>
-            <TextBlock Text="X60 - 開" FontSize="10" Foreground="#2E993E">
+            <TextBlock Text="X60 - 開" FontSize="14" Foreground="#2E993E">
                 <TextBlock.Style>
                     <Style TargetType="TextBlock">
                         <Setter Property="Foreground" Value="#2E993E"/>
@@ -606,7 +606,7 @@
                 </TextBlock.Style>
             </TextBlock>
         </Border>
-        <Border BorderBrush="#2E993E" BorderThickness="1" CornerRadius="3" Padding="4" Margin="425,16,0,0" Grid.Column="2" HorizontalAlignment="Left" Width="50" Height="22" VerticalAlignment="Top">
+        <Border BorderBrush="#2E993E" BorderThickness="1" CornerRadius="3" Padding="4" Margin="417,16,0,0" Grid.Column="2" HorizontalAlignment="Left" Width="62" Height="25" VerticalAlignment="Top">
             <Border.Style>
                 <Style TargetType="Border">
                     <Setter Property="Background" Value="#FFFFFF"/>
@@ -617,7 +617,7 @@
                     </Style.Triggers>
                 </Style>
             </Border.Style>
-            <TextBlock Text="X57 - 關" FontSize="10" Foreground="#2E993E">
+            <TextBlock Text="X57 - 關" FontSize="14" Foreground="#2E993E">
                 <TextBlock.Style>
                     <Style TargetType="TextBlock">
                         <Setter Property="Foreground" Value="#2E993E"/>
@@ -634,21 +634,21 @@
         <TextBlock Text="{Binding PVRight, StringFormat='{}{0:F1}'}" FontSize="20" Foreground="#333333" TextAlignment="Center" Grid.Column="2" Margin="116,47,0,0" HorizontalAlignment="Left" Width="47" Height="25" VerticalAlignment="Top"/>
         <TextBlock Text="°C" FontSize="20" Foreground="#333333" TextAlignment="Center" Grid.Column="2" Margin="0,47,300,0" HorizontalAlignment="Right" Width="30" Height="25" VerticalAlignment="Top"/>
         <TextBlock Text="°C" FontSize="20" Foreground="#333333" TextAlignment="Center" Grid.Column="2" Margin="159,47,0,0" Height="25" VerticalAlignment="Top" HorizontalAlignment="Left" Width="38"/>
-        <Button FontSize="18" Content="開始烘乾" Click="OpenHeaterLeft_Click" Background="#ADD8E6" Grid.Column="2" Margin="480,60,131,0" Height="60" VerticalAlignment="Top"/>
-        <Button FontSize="18" Content="停止烘乾" Click="CloseHeaterLeft_Click" Background="#ADD8E6" Grid.Column="2" Margin="618,60,-7,0" Height="60" VerticalAlignment="Top"/>
-        <Button FontSize="18" Content="開始烘乾" Click="OpenHeaterRight_Click" Background="#ADD8E6" Margin="-138,60,0,0" Height="60" VerticalAlignment="Top" HorizontalAlignment="Left" Width="120"/>
-        <Button FontSize="18" Content="停止烘乾" Click="CloseHeaterRight_Click" Background="#ADD8E6" Grid.Column="1" Margin="0,60,1,0" Height="60" VerticalAlignment="Top"/>
-        <Button FontSize="18" Content="開鼓風機" Click="OpenBlowerLeft_Click" Background="#ADD8E6" Grid.Column="2" Margin="481,126,131,0" Height="60" VerticalAlignment="Top"/>
-        <Button FontSize="18" Content="關鼓風機" Click="CloseBlowerLeft_Click" Background="#ADD8E6" Grid.Column="2" Margin="618,126,-7,0" Height="60" VerticalAlignment="Top"/>
-        <Button FontSize="18" Content="開啟正壓" Click="OpenAirLeft_Click" Background="#ADD8E6" Grid.Column="2" Margin="0,193,131,0" HorizontalAlignment="Right" Width="120" Height="60" VerticalAlignment="Top"/>
-        <Button FontSize="18" Content="關閉正壓" Click="CloseAirLeft_Click" Background="#ADD8E6" Grid.Column="2" Margin="618,193,-7,0" Height="60" VerticalAlignment="Top"/>
-        <Button FontSize="18" Content="開鼓風機" Click="OpenBlowerRight_Click" Background="#ADD8E6" Margin="-137,126,0,0" Height="60" VerticalAlignment="Top" HorizontalAlignment="Left" Width="120"/>
-        <Button FontSize="18" Content="關鼓風機" Click="CloseBlowerRight_Click" Background="#ADD8E6" Margin="0,126,1,0" Grid.ColumnSpan="2" Height="60" VerticalAlignment="Top"/>
-        <Button FontSize="18" Content="開啟正壓" Click="OpenAirRight_Click" Background="#ADD8E6" Margin="-137,193,0,0" Height="60" VerticalAlignment="Top" HorizontalAlignment="Left" Width="120"/>
-        <Button FontSize="18" Content="關閉正壓" Click="CloseAirRight_Click" Background="#ADD8E6" Margin="1,193,0,0" Grid.ColumnSpan="2" Height="60" VerticalAlignment="Top"/>
-        <Button FontSize="18" Content="錯誤重置" Click="ResetAlarmLeft_Click" Background="#ADD8E6" Grid.Column="2" Margin="0,296,0,0" Height="60" VerticalAlignment="Top" HorizontalAlignment="Center" Width="148"/>
-        <Button FontSize="18" Content="錯誤重置" Click="ResetAlarmRight_Click" Background="#ADD8E6" Grid.Column="2" Margin="49,296,0,0" HorizontalAlignment="Left" Width="149" Height="60" VerticalAlignment="Top"/>
-        <Border BorderBrush="Black" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding PickFinishedLeft, ElementName=RootControl}" Grid.Column="2" Margin="376,-100,0,0" HorizontalAlignment="Left" Width="82" Height="22" VerticalAlignment="Top">
+        <Button FontSize="20" Content="開始烘乾" Click="OpenHeaterLeft_Click" Background="#ADD8E6" Grid.Column="2" Margin="480,60,131,0" Height="60" VerticalAlignment="Top"/>
+        <Button FontSize="20" Content="停止烘乾" Click="CloseHeaterLeft_Click" Background="#ADD8E6" Grid.Column="2" Margin="618,60,-7,0" Height="60" VerticalAlignment="Top"/>
+        <Button FontSize="20" Content="開始烘乾" Click="OpenHeaterRight_Click" Background="#ADD8E6" Margin="-138,60,0,0" Height="60" VerticalAlignment="Top" HorizontalAlignment="Left" Width="120"/>
+        <Button FontSize="20" Content="停止烘乾" Click="CloseHeaterRight_Click" Background="#ADD8E6" Grid.Column="1" Margin="0,60,1,0" Height="60" VerticalAlignment="Top"/>
+        <Button FontSize="20" Content="開鼓風機" Click="OpenBlowerLeft_Click" Background="#ADD8E6" Grid.Column="2" Margin="481,126,131,0" Height="60" VerticalAlignment="Top"/>
+        <Button FontSize="20" Content="關鼓風機" Click="CloseBlowerLeft_Click" Background="#ADD8E6" Grid.Column="2" Margin="618,126,-7,0" Height="60" VerticalAlignment="Top"/>
+        <Button FontSize="20" Content="開啟正壓" Click="OpenAirLeft_Click" Background="#ADD8E6" Grid.Column="2" Margin="0,193,131,0" HorizontalAlignment="Right" Width="120" Height="60" VerticalAlignment="Top"/>
+        <Button FontSize="20" Content="關閉正壓" Click="CloseAirLeft_Click" Background="#ADD8E6" Grid.Column="2" Margin="618,193,-7,0" Height="60" VerticalAlignment="Top"/>
+        <Button FontSize="20" Content="開鼓風機" Click="OpenBlowerRight_Click" Background="#ADD8E6" Margin="-137,126,0,0" Height="60" VerticalAlignment="Top" HorizontalAlignment="Left" Width="120"/>
+        <Button FontSize="20" Content="關鼓風機" Click="CloseBlowerRight_Click" Background="#ADD8E6" Margin="0,126,1,0" Grid.ColumnSpan="2" Height="60" VerticalAlignment="Top"/>
+        <Button FontSize="20" Content="開啟正壓" Click="OpenAirRight_Click" Background="#ADD8E6" Margin="-137,193,0,0" Height="60" VerticalAlignment="Top" HorizontalAlignment="Left" Width="120"/>
+        <Button FontSize="20" Content="關閉正壓" Click="CloseAirRight_Click" Background="#ADD8E6" Margin="1,193,0,0" Grid.ColumnSpan="2" Height="60" VerticalAlignment="Top"/>
+        <Button FontSize="20" Content="錯誤重置" Click="ResetAlarmLeft_Click" Background="#ADD8E6" Grid.Column="2" Margin="0,323,0,0" Height="60" VerticalAlignment="Top" HorizontalAlignment="Center" Width="148"/>
+        <Button FontSize="20" Content="錯誤重置" Click="ResetAlarmRight_Click" Background="#ADD8E6" Grid.Column="2" Margin="55,323,0,0" HorizontalAlignment="Left" Width="149" Height="60" VerticalAlignment="Top"/>
+        <Border BorderBrush="Black" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding PickFinishedLeft, ElementName=RootControl}" Grid.Column="2" Margin="376,-100,0,0" HorizontalAlignment="Left" Width="100" Height="22" VerticalAlignment="Top">
             <Border.Style>
                 <Style TargetType="{x:Type Border}">
                     <Setter Property="Background" Value="White"/>
@@ -659,9 +659,9 @@
                     </Style.Triggers>
                 </Style>
             </Border.Style>
-            <TextBlock Text="Pick Finished" FontSize="10" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black"/>
+            <TextBlock Text="Pick Finished" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black"/>
         </Border>
-        <Border BorderBrush="Black" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding PlaceFinishedLeft, ElementName=RootControl}" Grid.Column="2" Margin="376,-73,0,0" HorizontalAlignment="Left" Width="82" Height="22" VerticalAlignment="Top">
+        <Border BorderBrush="Black" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding PlaceFinishedLeft, ElementName=RootControl}" Grid.Column="2" Margin="376,-73,0,0" HorizontalAlignment="Left" Width="100" Height="22" VerticalAlignment="Top">
             <Border.Style>
                 <Style TargetType="{x:Type Border}">
                     <Setter Property="Background" Value="White"/>
@@ -672,9 +672,9 @@
                     </Style.Triggers>
                 </Style>
             </Border.Style>
-            <TextBlock Text="Place Finished" FontSize="10" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black"/>
+            <TextBlock Text="Place Finished" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black"/>
         </Border>
-        <Border BorderBrush="Black" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding ActFinishedLeft, ElementName=RootControl}" Grid.Column="2" Margin="284,-73,0,0" HorizontalAlignment="Left" Width="82" Height="22" VerticalAlignment="Top">
+        <Border BorderBrush="Black" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding ActFinishedLeft, ElementName=RootControl}" Grid.Column="2" Margin="271,-73,0,0" HorizontalAlignment="Left" Width="100" Height="22" VerticalAlignment="Top">
             <Border.Style>
                 <Style TargetType="{x:Type Border}">
                     <Setter Property="Background" Value="White"/>
@@ -685,9 +685,9 @@
                     </Style.Triggers>
                 </Style>
             </Border.Style>
-            <TextBlock Text="Act Finished" FontSize="10" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black"/>
+            <TextBlock Text="Act Finished" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black"/>
         </Border>
-        <Border BorderBrush="Black" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding InputPermitLeft, ElementName=RootControl}" Grid.Column="2" Margin="284,-100,0,0" HorizontalAlignment="Left" Width="82" Height="22" VerticalAlignment="Top">
+        <Border BorderBrush="Black" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding InputPermitLeft, ElementName=RootControl}" Grid.Column="2" Margin="271,-100,0,0" HorizontalAlignment="Left" Width="100" Height="22" VerticalAlignment="Top">
             <Border.Style>
                 <Style TargetType="{x:Type Border}">
                     <Setter Property="Background" Value="White"/>
@@ -698,9 +698,9 @@
                     </Style.Triggers>
                 </Style>
             </Border.Style>
-            <TextBlock Text="Input Permit" FontSize="10" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black"/>
+            <TextBlock Text="Input Permit" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black"/>
         </Border>
-        <Border BorderBrush="Black" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding MovingLeft, ElementName=RootControl}" Grid.Column="2" Margin="376,-46,0,0" HorizontalAlignment="Left" Width="82" Height="22" VerticalAlignment="Top">
+        <Border BorderBrush="Black" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding MovingLeft, ElementName=RootControl}" Grid.Column="2" Margin="376,-46,0,0" HorizontalAlignment="Left" Width="100" Height="22" VerticalAlignment="Top">
             <Border.Style>
                 <Style TargetType="{x:Type Border}">
                     <Setter Property="Background" Value="White"/>
@@ -711,9 +711,9 @@
                     </Style.Triggers>
                 </Style>
             </Border.Style>
-            <TextBlock Text="Moving" FontSize="10" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black"/>
+            <TextBlock Text="Moving" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black"/>
         </Border>
-        <Border BorderBrush="Black" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding PickFinishedRight, ElementName=RootControl}" Grid.Column="2" Margin="128,-100,0,0" HorizontalAlignment="Left" Width="82" Height="22" VerticalAlignment="Top">
+        <Border BorderBrush="Black" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding PickFinishedRight, ElementName=RootControl}" Grid.Column="2" Margin="128,-100,0,0" HorizontalAlignment="Left" Width="100" Height="22" VerticalAlignment="Top">
             <Border.Style>
                 <Style TargetType="{x:Type Border}">
                     <Setter Property="Background" Value="White"/>
@@ -724,9 +724,9 @@
                     </Style.Triggers>
                 </Style>
             </Border.Style>
-            <TextBlock Text="Pick Finished" FontSize="10" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black"/>
+            <TextBlock Text="Pick Finished" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black"/>
         </Border>
-        <Border BorderBrush="Black" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding PlaceFinishedRight, ElementName=RootControl}" Grid.Column="2" Margin="128,-73,0,0" HorizontalAlignment="Left" Width="82" Height="22" VerticalAlignment="Top">
+        <Border BorderBrush="Black" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding PlaceFinishedRight, ElementName=RootControl}" Grid.Column="2" Margin="128,-73,0,0" HorizontalAlignment="Left" Width="100" Height="22" VerticalAlignment="Top">
             <Border.Style>
                 <Style TargetType="{x:Type Border}">
                     <Setter Property="Background" Value="White"/>
@@ -737,9 +737,9 @@
                     </Style.Triggers>
                 </Style>
             </Border.Style>
-            <TextBlock Text="Place Finished" FontSize="10" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black"/>
+            <TextBlock Text="Place Finished" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black"/>
         </Border>
-        <Border BorderBrush="Black" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding MovingRight, ElementName=RootControl}" Grid.Column="2" Margin="128,-46,0,0" HorizontalAlignment="Left" Width="82" Height="22" VerticalAlignment="Top">
+        <Border BorderBrush="Black" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding MovingRight, ElementName=RootControl}" Grid.Column="2" Margin="128,-46,0,0" HorizontalAlignment="Left" Width="100" Height="22" VerticalAlignment="Top">
             <Border.Style>
                 <Style TargetType="{x:Type Border}">
                     <Setter Property="Background" Value="White"/>
@@ -750,9 +750,9 @@
                     </Style.Triggers>
                 </Style>
             </Border.Style>
-            <TextBlock Text="Moving" FontSize="10" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black"/>
+            <TextBlock Text="Moving" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black"/>
         </Border>
-        <Border BorderBrush="Black" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding InputPermitRight, ElementName=RootControl}" Grid.Column="2" Margin="33,-100,0,0" HorizontalAlignment="Left" Width="82" Height="22" VerticalAlignment="Top">
+        <Border BorderBrush="Black" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding InputPermitRight, ElementName=RootControl}" Grid.Column="2" Margin="23,-100,0,0" HorizontalAlignment="Left" Width="100" Height="22" VerticalAlignment="Top">
             <Border.Style>
                 <Style TargetType="{x:Type Border}">
                     <Setter Property="Background" Value="White"/>
@@ -763,9 +763,9 @@
                     </Style.Triggers>
                 </Style>
             </Border.Style>
-            <TextBlock Text="Input Permit" FontSize="10" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black"/>
+            <TextBlock Text="Input Permit" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black"/>
         </Border>
-        <Border BorderBrush="Black" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding ActFinishedRight, ElementName=RootControl}" Grid.Column="2" Margin="33,-73,0,0" HorizontalAlignment="Left" Width="82" Height="22" VerticalAlignment="Top">
+        <Border BorderBrush="Black" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding ActFinishedRight, ElementName=RootControl}" Grid.Column="2" Margin="23,-73,0,0" HorizontalAlignment="Left" Width="100" Height="22" VerticalAlignment="Top">
             <Border.Style>
                 <Style TargetType="{x:Type Border}">
                     <Setter Property="Background" Value="White"/>
@@ -776,7 +776,7 @@
                     </Style.Triggers>
                 </Style>
             </Border.Style>
-            <TextBlock Text="Act Finished" FontSize="10" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black"/>
+            <TextBlock Text="Act Finished" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black"/>
         </Border>
     </Grid>
 </UserControl>
