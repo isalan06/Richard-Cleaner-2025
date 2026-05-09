@@ -32,6 +32,8 @@ namespace CleanerControlApp.Modules.Motor.Services
 
         private bool _motor_commanding = false;
 
+        private string _jog_status = "";
+
         #endregion
 
         #region constructor
@@ -149,7 +151,6 @@ namespace CleanerControlApp.Modules.Motor.Services
                         _plcService.Command_Axis2JogP = false;
                         _plcService.Command_Axis2JogN = false;
                     }
-
                 }
             }
             else
@@ -384,6 +385,24 @@ namespace CleanerControlApp.Modules.Motor.Services
                     });
                 }
                 catch { }
+            }
+        }
+
+        public string JogStatus
+        {
+            get
+            {
+                if (_moduleIndex == 1)
+                {
+
+                    _jog_status = MotorAlarm ? "馬達發生錯誤" : !MotorServoOn ? "馬達未啟動" : (_plcService != null && (_plcService.Axis2CommandProcedure || _plcService.Axis2HomeProcedure)) ? "馬達執行程序中" : "";
+                    return _jog_status;
+                }
+                else
+                {
+                    _jog_status = MotorAlarm ? "馬達發生錯誤" : !MotorServoOn ? "馬達未啟動" : (_plcService != null && (_plcService.Axis1CommandProcedure || _plcService.Axis1HomeProcedure)) ? "馬達執行程序中" : "";
+                    return _jog_status;
+                }
             }
         }
 

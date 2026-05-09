@@ -101,5 +101,7 @@ namespace CleanerControlApp.Hardwares.Sink.Interfaces
 
         string Hint();
 
+        string JogStatus { get; }
+
     }
 }

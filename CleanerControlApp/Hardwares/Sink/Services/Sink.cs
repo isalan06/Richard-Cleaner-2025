@@ -76,6 +76,8 @@ namespace CleanerControlApp.Hardwares.Sink.Services
         private bool _motor_air_up_flag = false;
         private bool RetryAirFinished => _moduleSettings.Sink != null && _moduleSettings.Sink.AirKnifeRetryCount == _motor_air_retry_count;
 
+        private string _jogStatus = "";
+
         #endregion
 
         #region constructor
@@ -411,8 +413,8 @@ namespace CleanerControlApp.Hardwares.Sink.Services
             }
         }
         public void Jog(bool jog, int dir, int speed) // dir: 0: Down(+), 1: Up(-); speed: 0: low, 1: medium, 2:high
-        { 
-            if(_plcService != null && !MotorAlarm && MotorServoOn && !_auto && !_plcService.Axis3CommandProcedure && !_plcService.Axis3HomeProcedure)
+        {
+            if (_plcService != null && !MotorAlarm && MotorServoOn && !_auto && !_plcService.Axis3CommandProcedure && !_plcService.Axis3HomeProcedure)
             {
                 if (speed == 2)
                     _plcService.Command_Axis3JogSpeedH = true;
@@ -422,11 +424,11 @@ namespace CleanerControlApp.Hardwares.Sink.Services
                     _plcService.Command_Axis3JogSpeedM = true;
                 }
                 else
-                { 
+                {
                     _plcService.Command_Axis3JogSpeedH = false;
                     _plcService.Command_Axis3JogSpeedM = false;
                 }
-                
+
                 if (jog)
                 {
                     if (dir == 0)
@@ -686,6 +688,17 @@ namespace CleanerControlApp.Hardwares.Sink.Services
                 return sb.ToString();
             }
         }
+
+        public string JogStatus
+        {
+            get
+            {
+                _jogStatus = MotorAlarm ? "馬達發生錯誤" : !MotorServoOn ? "馬達未啟動" : (_plcService != null && (_plcService.Axis3CommandProcedure || _plcService.Axis3HomeProcedure)) ? "馬達執行程序中" : "";
+                return _jogStatus;
+            }
+        }
+
+
         #endregion
 
         #region Function

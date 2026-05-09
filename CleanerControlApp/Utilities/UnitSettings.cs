@@ -141,5 +141,6 @@ namespace CleanerControlApp.Utilities
         public int Initialization_Timeout_Second { get; set; }
         public int LoginUseDefaultDeveloper { get; set; }
         public int UseMotionAssistant { get; set; }
+        public int ServoOnAfterInitialization { get; set; }
     }
 }

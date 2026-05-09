@@ -40,6 +40,6 @@ namespace CleanerControlApp.Modules.Motor.Interfaces
 
         void Command_AlarmReset();
 
-
+        string JogStatus { get; }
     }
 }

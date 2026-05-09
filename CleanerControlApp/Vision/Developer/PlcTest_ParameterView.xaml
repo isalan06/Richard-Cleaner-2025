@@ -74,7 +74,7 @@
  </Grid>
  </GroupBox>
 
- <GroupBox Header="Timeout(ms)" Margin="0,2,0,0">
+ <GroupBox Header="Timeout(0.1s)" Margin="0,2,0,0">
  <Grid>
  <Grid.ColumnDefinitions>
  <ColumnDefinition Width="100" />
@@ -146,7 +146,7 @@
  </Grid>
  </GroupBox>
 
- <GroupBox Header="Timeout(ms)" Margin="0,2,0,0">
+ <GroupBox Header="Timeout(0.1s)" Margin="0,2,0,0">
  <Grid>
  <Grid.ColumnDefinitions>
  <ColumnDefinition Width="100" />
@@ -219,7 +219,7 @@
  </Grid>
  </GroupBox>
 
- <GroupBox Header="Timeout(ms)" Margin="0,2,0,0">
+ <GroupBox Header="Timeout(0.1s)" Margin="0,2,0,0">
  <Grid>
  <Grid.ColumnDefinitions>
  <ColumnDefinition Width="100" />
@@ -292,7 +292,7 @@
  </Grid>
  </GroupBox>
 
- <GroupBox Header="Timeout(ms)" Margin="0,2,0,0">
+ <GroupBox Header="Timeout(0.1s)" Margin="0,2,0,0">
  <Grid>
  <Grid.ColumnDefinitions>
  <ColumnDefinition Width="100" />

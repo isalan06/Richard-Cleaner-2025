@@ -7,6 +7,7 @@ using CleanerControlApp.Modules.Motor.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using CleanerControlApp.Hardwares.Shuttle.Interfaces;
 
 namespace CleanerControlApp.Vision.Template
 {
@@ -16,6 +17,7 @@ namespace CleanerControlApp.Vision.Template
     public partial class Template_Motor_1 : UserControl, INotifyPropertyChanged
     {
         private ISingleAxisMotor? _motor; // originally direct field
+        private IShuttle? _shuttle;
         private readonly DispatcherTimer _timer;
 
         private bool _limitN;
@@ -44,6 +46,15 @@ namespace CleanerControlApp.Vision.Template
             catch
             {
                 _motor = null;
+            }
+
+            try
+            {
+                _shuttle = App.AppHost?.Services.GetService<IShuttle>();
+            }
+            catch
+            {
+                _shuttle = null;
             }
 
             // set direction tags on buttons
@@ -220,10 +231,138 @@ namespace CleanerControlApp.Vision.Template
             return 0; // default low
         }
 
+        // helper to check ShuttleXMotor.JogStatus; returns true if OK to proceed, false if popup shown
+        private bool CheckShuttleJogStatus(Point clickScreenPosition)
+        {
+            try
+            {
+                if (_shuttle != null && _shuttle.ShuttleXMotor != null)
+                {
+                    var status = _shuttle.ShuttleXMotor.JogStatus;
+                    if (!string.IsNullOrEmpty(status))
+                    {
+                        ShowStatusPopup(status, clickScreenPosition);
+                        return false;
+                    }
+                }
+            }
+            catch
+            {
+                // ignore
+            }
+            return true;
+        }
+
+        private void ShowStatusPopup(string status, Point screenPosition)
+        {
+            try
+            {
+                var owner = Window.GetWindow(this);
+                var w = new Window()
+                {
+                    Title = "無法操作原因",
+                    Owner = owner,
+                    WindowStyle = WindowStyle.None,
+                    AllowsTransparency = true,
+                    Background = System.Windows.Media.Brushes.Transparent,
+                    ShowInTaskbar = false,
+                    SizeToContent = SizeToContent.WidthAndHeight,
+                    ResizeMode = ResizeMode.NoResize,
+                    WindowStartupLocation = WindowStartupLocation.CenterOwner
+                };
+
+                var border = new Border()
+                {
+                    Background = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(0xEE,0xFF,0xCC,0xCC)), // pale red
+                    BorderBrush = System.Windows.Media.Brushes.DarkRed,
+                    BorderThickness = new Thickness(1),
+                    CornerRadius = new CornerRadius(6),
+                    Padding = new Thickness(10)
+                };
+
+                var panel = new StackPanel() { Orientation = Orientation.Vertical };
+                var txt = new TextBlock() { Text = status, FontSize =14, TextWrapping = TextWrapping.Wrap, Foreground = System.Windows.Media.Brushes.Black, MaxWidth =300 };
+                panel.Children.Add(txt);
+
+                // countdown text
+                int autoCloseSeconds =5; // auto close after5 seconds
+                var countdown = new TextBlock() { Text = $"將在 {autoCloseSeconds} 秒後關閉", FontSize =12, Margin = new Thickness(0,8,0,0), Foreground = System.Windows.Media.Brushes.Black, HorizontalAlignment = HorizontalAlignment.Center };
+                panel.Children.Add(countdown);
+
+                // setup auto-close timer (declare before button so handler can stop it)
+                var dt = new DispatcherTimer(DispatcherPriority.Normal) { Interval = TimeSpan.FromSeconds(1) };
+                int remaining = autoCloseSeconds;
+                dt.Tick += (s, e) =>
+                {
+                    try
+                    {
+                        remaining -=1;
+                        if (remaining <=0)
+                        {
+                            dt.Stop();
+                            try { if (w.IsVisible) w.Close(); } catch { }
+                        }
+                        else
+                        {
+                            try { countdown.Text = $"將在 {remaining} 秒後關閉"; } catch { }
+                        }
+                    }
+                    catch { }
+                };
+
+                var btn = new Button() { Content = "關閉", FontSize =18, Padding = new Thickness(8,6,8,6), Margin = new Thickness(0,10,0,0), HorizontalAlignment = HorizontalAlignment.Center };
+                btn.Click += (s, e) =>
+                {
+                    try
+                    {
+                        if (dt.IsEnabled) dt.Stop();
+                        // close immediately on UI thread
+                        try { w.Close(); } catch { }
+                    }
+                    catch { }
+                };
+                panel.Children.Add(btn);
+
+                border.Child = panel;
+                w.Content = border;
+
+                // stop timer if window closed by other means
+                w.Closed += (s, e) => { try { if (dt.IsEnabled) dt.Stop(); } catch { } };
+
+                w.Loaded += (s, e) =>
+                {
+                    try
+                    {
+                        // start countdown after window shown
+                        dt.Start();
+                    }
+                    catch { }
+                };
+
+                // show as modal dialog
+                try { w.ShowDialog(); } catch { }
+            }
+            catch
+            {
+                // ignore
+            }
+        }
+
         private void JogButton_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             try
             {
+                // get mouse position in screen coordinates
+                var pos = e.GetPosition(this);
+                var screen = PointToScreen(pos);
+
+                // check shuttle jog status first
+                if (!CheckShuttleJogStatus(screen))
+                {
+                    e.Handled = true;
+                    return;
+                }
+
                 if (_motor == null) return;
                 if (sender is Button btn)
                 {
@@ -241,6 +380,16 @@ namespace CleanerControlApp.Vision.Template
         {
             try
             {
+                var pos = e.GetPosition(this);
+                var screen = PointToScreen(pos);
+
+                // check shuttle jog status first
+                if (!CheckShuttleJogStatus(screen))
+                {
+                    e.Handled = true;
+                    return;
+                }
+
                 if (_motor == null) return;
                 if (sender is Button btn)
                 {

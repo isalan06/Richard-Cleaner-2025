@@ -60,6 +60,8 @@ namespace CleanerControlApp.Hardwares.SoakingTank.Services
         private bool _motor_air_up_flag = false;
         private bool RetryAirFinished => _moduleSettings.Sink != null && _moduleSettings.Sink.AirKnifeRetryCount == _motor_air_retry_count;
 
+        private string _jogStatus = "";
+
         #endregion
 
         #region constructor
@@ -466,6 +468,7 @@ namespace CleanerControlApp.Hardwares.SoakingTank.Services
                 }
 
             }
+
         }
         public void Home()
         {
@@ -700,6 +703,15 @@ namespace CleanerControlApp.Hardwares.SoakingTank.Services
                 sb.AppendLine(" - 自動模式下若發生 Alarm/Warning，系統會暫停/停止。請先處理警報再繼續。 ");
 
                 return sb.ToString();
+            }
+        }
+
+        public string JogStatus
+        {
+            get
+            {
+                _jogStatus = MotorAlarm ? "馬達發生錯誤" : !MotorServoOn ? "馬達未啟動" : (_plcService != null && (_plcService.Axis4CommandProcedure || _plcService.Axis4HomeProcedure)) ? "馬達執行程序中" : "";
+                return _jogStatus;
             }
         }
 

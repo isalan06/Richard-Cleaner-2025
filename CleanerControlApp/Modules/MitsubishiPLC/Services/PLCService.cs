@@ -2,12 +2,14 @@
 using CleanerControlApp.Modules.MitsubishiPLC.Models;
 using CleanerControlApp.Modules.Modbus.Interfaces;
 using CleanerControlApp.Modules.Modbus.Models;
+using CleanerControlApp.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace CleanerControlApp.Modules.MitsubishiPLC.Services
 {
@@ -172,6 +174,19 @@ namespace CleanerControlApp.Modules.MitsubishiPLC.Services
 
             _cts = new CancellationTokenSource();
             var token = _cts.Token;
+
+            // Try to obtain UnitSettings from the application's DI container (AppHost)
+            // If AppHost or the service is not available, fall back to a new instance
+            UnitSettings settings = global::CleanerControlApp.App.AppHost?.Services.GetService<UnitSettings>() ?? new UnitSettings();
+            if (settings.System != null && settings.System.ServoOnAfterInitialization != 0)
+            { 
+                Command_Axis1ServoOn = true;
+                Command_Axis2ServoOn = true;
+                Command_Axis3ServoOn = true;
+                Command_Axis4ServoOn = true;
+            }
+
+            // start background loop
             _loopTask = Task.Run(() => LoopAsync(token), token);
         }
 

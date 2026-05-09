@@ -104,5 +104,7 @@ namespace CleanerControlApp.Hardwares.SoakingTank.Interfaces
         void Teach(int position);
 
         string Hint();
+
+        string JogStatus { get; }
     }
 }
