@@ -228,6 +228,7 @@ namespace CleanerControlApp.Hardwares.SoakingTank.Services
         public bool Cassette => _cassette;
         public bool Initialized => _initialized && (_sim_pass_motor || MotorHome);
         public bool Idle => Sensor_CoverOpen && !_ultrasonic && !_cassette && _initialized && IsNormalStatus && (_sim_pass_motor || (MotorServoOn && MotorIdle && MotorHome));
+        public bool HomeIdle => Sensor_CoverOpen && !_ultrasonic && !_cassette && IsNormalStatus;
 
         public bool AirOP(bool air)
         {
@@ -472,7 +473,7 @@ namespace CleanerControlApp.Hardwares.SoakingTank.Services
         }
         public void Home()
         {
-            if (_plcService != null && !MotorAlarm && MotorServoOn && Idle)
+            if (_plcService != null && !MotorAlarm && MotorServoOn && HomeIdle)
             {
                 try
                 {
@@ -503,9 +504,52 @@ namespace CleanerControlApp.Hardwares.SoakingTank.Services
                 try
                 {
                     int setPos = _moduleSettings.SoakingTank != null ? _moduleSettings.SoakingTank.MotorPosition_01 : 0; // default to position 1
-                    if (position == 2)
+                    if (position == 1)
                         setPos = _moduleSettings.SoakingTank != null ? _moduleSettings.SoakingTank.MotorPosition_02 : 0;
-                    else if (position == 3)
+                    else if (position == 2)
+                        setPos = _moduleSettings.SoakingTank != null ? _moduleSettings.SoakingTank.MotorPosition_03 : 0;
+
+                    int setVel = _moduleSettings.SoakingTank != null ? _moduleSettings.SoakingTank.MotorVelocity_01 : 0; // default to velocity 1
+                    if (speed == 1)
+                        setVel = _moduleSettings.SoakingTank != null ? _moduleSettings.SoakingTank.MotorVelocity_02 : 0;
+
+                    _plcService.Command_Axis4Pos = setPos;
+                    _plcService.Command_Axis4Speed = setVel;
+                    _plcService.Command_Axis4Command = true;
+                    // fire-and-forget task to reset the command after a delay
+
+                    _motor_commanding = true;
+
+                    _ = Task.Run(async () =>
+                    {
+                        try
+                        {
+                            await Task.Delay(TimeSpan.FromSeconds(3)).ConfigureAwait(false);
+                            if (_plcService != null)
+                                _plcService.Command_Axis4Command = false;
+
+                            _motor_commanding = false;
+                        }
+                        catch
+                        {
+                            // swallow exceptions from the background task
+                        }
+                    });
+                }
+                catch { }
+            }
+        }
+
+        public void Manual_MoveToPosition(int position, int speed)
+        {
+            if (_plcService != null && !MotorAlarm && MotorServoOn && HomeIdle && MotorServoOn && MotorIdle && MotorHome)
+            {
+                try
+                {
+                    int setPos = _moduleSettings.SoakingTank != null ? _moduleSettings.SoakingTank.MotorPosition_01 : 0; // default to position 1
+                    if (position == 1)
+                        setPos = _moduleSettings.SoakingTank != null ? _moduleSettings.SoakingTank.MotorPosition_02 : 0;
+                    else if (position == 2)
                         setPos = _moduleSettings.SoakingTank != null ? _moduleSettings.SoakingTank.MotorPosition_03 : 0;
 
                     int setVel = _moduleSettings.SoakingTank != null ? _moduleSettings.SoakingTank.MotorVelocity_01 : 0; // default to velocity 1

@@ -36,7 +36,8 @@
  </Grid.ColumnDefinitions>
 
  <!-- Left box: Shuttle + Velocities -->
- <Border Grid.Column="0" Padding="12" BorderBrush="LightGray" BorderThickness="1" CornerRadius="4" Background="White" Height="288" VerticalAlignment="Top">
+ <ScrollViewer Grid.Column="0" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+ <Border Padding="12" BorderBrush="LightGray" BorderThickness="1" CornerRadius="4" Background="White">
  <StackPanel>
  <TextBlock Text="移載組 /速度" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,8" />
  <Grid>
@@ -70,28 +71,29 @@
  </Grid>
  </StackPanel>
  </Border>
+ </ScrollViewer>
 
  <!-- Middle box: Motor X Positions -->
- <Border Grid.Column="2" Padding="12" BorderBrush="LightGray" BorderThickness="1" CornerRadius="4" Background="White" VerticalAlignment="Top">
+ <ScrollViewer Grid.Column="2" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+ <Border Padding="12" BorderBrush="LightGray" BorderThickness="1" CornerRadius="4" Background="White">
  <StackPanel>
- <TextBlock Text="X軸位置 (Positions)" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,6" Width="320" TextAlignment="Center"/>
+ <TextBlock Text="X軸位置 (Positions)" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,6" Width="296" TextAlignment="Center"/>
  <TextBlock Text="單位: mm" FontSize="12" Foreground="Gray" Margin="0,0,0,6" />
- <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" MaxHeight="520">
  <StackPanel x:Name="Sp_MotorX_PosList" />
- </ScrollViewer>
  </StackPanel>
  </Border>
+ </ScrollViewer>
 
  <!-- Right box: Motor Z Positions -->
- <Border Grid.Column="4" Padding="12" BorderBrush="LightGray" BorderThickness="1" CornerRadius="4" Background="White" VerticalAlignment="Top">
+ <ScrollViewer Grid.Column="4" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+ <Border Padding="12" BorderBrush="LightGray" BorderThickness="1" CornerRadius="4" Background="White">
  <StackPanel>
  <TextBlock Text="Z軸位置 (Positions)" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,8" />
  <TextBlock Text="單位: mm" FontSize="12" Foreground="Gray" Margin="0,0,0,6" />
- <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" MaxHeight="520">
  <StackPanel x:Name="Sp_MotorZ_PosList" />
- </ScrollViewer>
  </StackPanel>
  </Border>
+ </ScrollViewer>
 
  </Grid>
  </Grid>

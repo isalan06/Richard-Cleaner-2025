@@ -360,7 +360,7 @@ namespace CleanerControlApp.Vision.Template
  try
  {
  int speed = GetSelectedSpeed();
- _soakingTank?.MoveToPosition(0, speed);
+ _soakingTank?.Manual_MoveToPosition(0, speed);
  }
  catch { }
  }
@@ -370,7 +370,7 @@ namespace CleanerControlApp.Vision.Template
  try
  {
  int speed = GetSelectedSpeed();
- _soakingTank?.MoveToPosition(1, speed);
+ _soakingTank?.Manual_MoveToPosition(1, speed);
  }
  catch { }
  }
@@ -380,7 +380,7 @@ namespace CleanerControlApp.Vision.Template
  try
  {
  int speed = GetSelectedSpeed();
- _soakingTank?.MoveToPosition(2, speed);
+ _soakingTank?.Manual_MoveToPosition(2, speed);
  }
  catch { }
  }

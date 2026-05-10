@@ -542,7 +542,7 @@ namespace CleanerControlApp.Vision.Template
             try
             {
                 int speed = GetSelectedSpeed();
-                _sink?.MoveToPosition(0, speed);
+                _sink?.Manual_MoveToPosition(0, speed);
             }
             catch { }
         }
@@ -552,7 +552,7 @@ namespace CleanerControlApp.Vision.Template
             try
             {
                 int speed = GetSelectedSpeed();
-                _sink?.MoveToPosition(1, speed);
+                _sink?.Manual_MoveToPosition(1, speed);
             }
             catch { }
         }
@@ -562,7 +562,7 @@ namespace CleanerControlApp.Vision.Template
             try
             {
                 int speed = GetSelectedSpeed();
-                _sink?.MoveToPosition(2, speed);
+                _sink?.Manual_MoveToPosition(2, speed);
             }
             catch { }
         }
