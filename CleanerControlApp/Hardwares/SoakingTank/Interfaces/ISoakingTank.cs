@@ -37,7 +37,6 @@ namespace CleanerControlApp.Hardwares.SoakingTank.Interfaces
         bool Initialized { get; }
         bool Idle { get; }
 
-        bool HomeIdle { get; }
 
         bool AirOP(bool air);
         bool ManualAirOP(bool air);
@@ -97,7 +96,6 @@ namespace CleanerControlApp.Hardwares.SoakingTank.Interfaces
         void Jog(bool jog, int dir, int speed);
         void Home();
         void MoveToPosition(int position, int speed);
-        void Manual_MoveToPosition(int position, int speed);
         void MotorStop();
 
         bool InPos1 { get; }
@@ -109,5 +107,7 @@ namespace CleanerControlApp.Hardwares.SoakingTank.Interfaces
         string Hint();
 
         string JogStatus { get; }
+        string HomeStatus { get; }
+        string MoveStatus { get; }
     }
 }

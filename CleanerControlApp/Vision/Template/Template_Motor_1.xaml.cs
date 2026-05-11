@@ -61,6 +61,14 @@ namespace CleanerControlApp.Vision.Template
             btnJogPlus.Tag =0; // JOG + -> dir0
             btnJogMinus.Tag =1; // JOG - -> dir1
 
+            // attach lost-capture handlers as insurance to always stop jog
+            try
+            {
+                btnJogPlus.LostMouseCapture += JogButton_LostMouseCapture;
+                btnJogMinus.LostMouseCapture += JogButton_LostMouseCapture;
+            }
+            catch { }
+
             _timer = new DispatcherTimer(DispatcherPriority.Normal)
             {
                 Interval = TimeSpan.FromMilliseconds(200)
@@ -68,7 +76,13 @@ namespace CleanerControlApp.Vision.Template
             _timer.Tick += Timer_Tick;
 
             Loaded += (s, e) => _timer.Start();
-            Unloaded += (s, e) => _timer.Stop();
+            // ensure we stop motor when control unloaded
+            Unloaded += (s, e) =>
+            {
+                try { _timer.Stop(); } catch { }
+                try { StopJogButton(btnJogPlus); } catch { }
+                try { StopJogButton(btnJogMinus); } catch { }
+            };
 
             // initial read
             UpdateFromMotor();
@@ -241,7 +255,7 @@ namespace CleanerControlApp.Vision.Template
                     var status = _shuttle.ShuttleXMotor.JogStatus;
                     if (!string.IsNullOrEmpty(status))
                     {
-                        ShowStatusPopup(status, clickScreenPosition);
+                        ShowStatusPopup(status);
                         return false;
                     }
                 }
@@ -253,7 +267,28 @@ namespace CleanerControlApp.Vision.Template
             return true;
         }
 
-        private void ShowStatusPopup(string status, Point screenPosition)
+        private bool CheckShuttleHomeStatus()
+        {
+            try
+            {
+                if (_shuttle != null && _shuttle.ShuttleXMotor != null)
+                {
+                    var status = _shuttle.ShuttleXMotor.HomeStatus;
+                    if (!string.IsNullOrEmpty(status))
+                    {
+                        ShowStatusPopup(status);
+                        return false;
+                    }
+                }
+            }
+            catch
+            {
+                // ignore
+            }
+            return true;
+        }
+
+        private void ShowStatusPopup(string status)
         {
             try
             {
@@ -369,6 +404,10 @@ namespace CleanerControlApp.Vision.Template
                     int dir =0;
                     if (btn.Tag != null && int.TryParse(btn.Tag.ToString(), out int t)) dir = t;
                     int speed = GetSelectedSpeed();
+
+                    // capture mouse so we can guarantee a LostMouseCapture event if capture lost
+                    try { btn.CaptureMouse(); } catch { }
+
                     // Start jog
                     _motor.Jog(true, dir, speed);
                 }
@@ -383,22 +422,53 @@ namespace CleanerControlApp.Vision.Template
                 var pos = e.GetPosition(this);
                 var screen = PointToScreen(pos);
 
-                // check shuttle jog status first
-                if (!CheckShuttleJogStatus(screen))
+                // Ensure we always send stop to motor first (insurance)
+                if (sender is Button btnStop)
                 {
-                    e.Handled = true;
-                    return;
+                    try { if (btnStop.IsMouseCaptured) btnStop.ReleaseMouseCapture(); } catch { }
+                    StopJogButton(btnStop);
                 }
 
-                if (_motor == null) return;
+                // then check shuttle jog status and show popup if needed (stop already issued)
+                try
+                {
+                    if (!CheckShuttleJogStatus(screen))
+                    {
+                        e.Handled = true;
+                        // do not return before stop - already stopped
+                    }
+                }
+                catch { }
+
+                // nothing more to do here
+            }
+            catch { }
+        }
+
+        // Lost capture: ensure stop called
+        private void JogButton_LostMouseCapture(object? sender, MouseEventArgs e)
+        {
+            try
+            {
                 if (sender is Button btn)
                 {
-                    int dir =0;
-                    if (btn.Tag != null && int.TryParse(btn.Tag.ToString(), out int t)) dir = t;
-                    int speed = GetSelectedSpeed();
-                    // Stop jog
-                    _motor.Jog(false, dir, speed);
+                    StopJogButton(btn);
                 }
+            }
+            catch { }
+        }
+
+        // helper to stop jog for given button safely
+        private void StopJogButton(Button? btn)
+        {
+            try
+            {
+                if (_motor == null || btn == null) return;
+                int dir =0;
+                if (btn.Tag != null && int.TryParse(btn.Tag.ToString(), out int t)) dir = t;
+                int speed = GetSelectedSpeed();
+                // Stop jog - best effort
+                try { _motor.Jog(false, dir, speed); } catch { }
             }
             catch { }
         }
@@ -420,6 +490,14 @@ namespace CleanerControlApp.Vision.Template
             try
             {
                 if (_motor == null) return;
+
+                // check shuttle jog status first
+                if (!CheckShuttleHomeStatus())
+                {
+                    e.Handled = true;
+                    return;
+                }
+
                 _motor.Home();
             }
             catch { }

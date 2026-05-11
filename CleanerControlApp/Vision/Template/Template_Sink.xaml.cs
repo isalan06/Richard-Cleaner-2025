@@ -541,8 +541,14 @@ namespace CleanerControlApp.Vision.Template
         {
             try
             {
+                if (!CheckMoveStatus())
+                {
+                    e.Handled = true;
+                    return;
+                }
+
                 int speed = GetSelectedSpeed();
-                _sink?.Manual_MoveToPosition(0, speed);
+                _sink?.MoveToPosition(0, speed);
             }
             catch { }
         }
@@ -551,8 +557,14 @@ namespace CleanerControlApp.Vision.Template
         {
             try
             {
+                if (!CheckMoveStatus())
+                {
+                    e.Handled = true;
+                    return;
+                }
+
                 int speed = GetSelectedSpeed();
-                _sink?.Manual_MoveToPosition(1, speed);
+                _sink?.MoveToPosition(1, speed);
             }
             catch { }
         }
@@ -561,8 +573,14 @@ namespace CleanerControlApp.Vision.Template
         {
             try
             {
+                if (!CheckMoveStatus())
+                {
+                    e.Handled = true;
+                    return;
+                }
+
                 int speed = GetSelectedSpeed();
-                _sink?.Manual_MoveToPosition(2, speed);
+                _sink?.MoveToPosition(2, speed);
             }
             catch { }
         }
@@ -579,6 +597,122 @@ namespace CleanerControlApp.Vision.Template
         private void btnTeachP3_Click(object sender, RoutedEventArgs e)
         {
             try { MessageBox.Show("請長按3 秒以進行 Teach", "提示", MessageBoxButton.OK, MessageBoxImage.Information); } catch { }
+        }
+
+        private bool CheckMoveStatus()
+        {
+            try
+            {
+                if (_sink != null && _sink != null)
+                {
+                    var status = _sink.MoveStatus;
+                    if (!string.IsNullOrEmpty(status))
+                    {
+                        ShowStatusPopup(status);
+                        return false;
+                    }
+                }
+            }
+            catch
+            {
+                // ignore
+            }
+            return true;
+        }
+
+        private void ShowStatusPopup(string status)
+        {
+            try
+            {
+                var owner = Window.GetWindow(this);
+                var w = new Window()
+                {
+                    Title = "無法操作原因",
+                    Owner = owner,
+                    WindowStyle = WindowStyle.None,
+                    AllowsTransparency = true,
+                    Background = System.Windows.Media.Brushes.Transparent,
+                    ShowInTaskbar = false,
+                    SizeToContent = SizeToContent.WidthAndHeight,
+                    ResizeMode = ResizeMode.NoResize,
+                    WindowStartupLocation = WindowStartupLocation.CenterOwner
+                };
+
+                var border = new Border()
+                {
+                    Background = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(0xEE, 0xFF, 0xCC, 0xCC)), // pale red
+                    BorderBrush = System.Windows.Media.Brushes.DarkRed,
+                    BorderThickness = new Thickness(1),
+                    CornerRadius = new CornerRadius(6),
+                    Padding = new Thickness(10)
+                };
+
+                var panel = new StackPanel() { Orientation = Orientation.Vertical };
+                var txt = new TextBlock() { Text = status, FontSize = 14, TextWrapping = TextWrapping.Wrap, Foreground = System.Windows.Media.Brushes.Black, MaxWidth = 300 };
+                panel.Children.Add(txt);
+
+                // countdown text
+                int autoCloseSeconds = 5; // auto close after5 seconds
+                var countdown = new TextBlock() { Text = $"將在 {autoCloseSeconds} 秒後關閉", FontSize = 12, Margin = new Thickness(0, 8, 0, 0), Foreground = System.Windows.Media.Brushes.Black, HorizontalAlignment = HorizontalAlignment.Center };
+                panel.Children.Add(countdown);
+
+                // setup auto-close timer (declare before button so handler can stop it)
+                var dt = new DispatcherTimer(DispatcherPriority.Normal) { Interval = TimeSpan.FromSeconds(1) };
+                int remaining = autoCloseSeconds;
+                dt.Tick += (s, e) =>
+                {
+                    try
+                    {
+                        remaining -= 1;
+                        if (remaining <= 0)
+                        {
+                            dt.Stop();
+                            try { if (w.IsVisible) w.Close(); } catch { }
+                        }
+                        else
+                        {
+                            try { countdown.Text = $"將在 {remaining} 秒後關閉"; } catch { }
+                        }
+                    }
+                    catch { }
+                };
+
+                var btn = new Button() { Content = "關閉", FontSize = 18, Padding = new Thickness(8, 6, 8, 6), Margin = new Thickness(0, 10, 0, 0), HorizontalAlignment = HorizontalAlignment.Center };
+                btn.Click += (s, e) =>
+                {
+                    try
+                    {
+                        if (dt.IsEnabled) dt.Stop();
+                        // close immediately on UI thread
+                        try { w.Close(); } catch { }
+                    }
+                    catch { }
+                };
+                panel.Children.Add(btn);
+
+                border.Child = panel;
+                w.Content = border;
+
+                // stop timer if window closed by other means
+                w.Closed += (s, e) => { try { if (dt.IsEnabled) dt.Stop(); } catch { } };
+
+                w.Loaded += (s, e) =>
+                {
+                    try
+                    {
+                        // start countdown after window shown
+                        dt.Start();
+                    }
+                    catch { }
+                };
+
+                // show as modal dialog
+                try { w.ShowDialog(); } catch { }
+            }
+            catch
+            {
+                // ignore
+            }
         }
     }
 }

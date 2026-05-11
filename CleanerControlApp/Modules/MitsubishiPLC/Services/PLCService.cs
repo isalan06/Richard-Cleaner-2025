@@ -43,6 +43,9 @@ namespace CleanerControlApp.Modules.MitsubishiPLC.Services
         private const int DefaultMoveInfoCount = 8;
         private PLC_DWord_Union[] _moveInfo = Array.Empty<PLC_DWord_Union>();
 
+        // PLC通信計數器 (DWord)，用於統計或診斷目的
+        private PLC_DWord_Union _communicationCount = new PLC_DWord_Union();
+
         // 預設 ParamMotionInfo (DWord) 數量
         private const int DefaultParamMotionInfoCount = 24;
         private PLC_DWord_Union[] _paramMotionInfo = Array.Empty<PLC_DWord_Union>();
@@ -199,6 +202,9 @@ namespace CleanerControlApp.Modules.MitsubishiPLC.Services
                     // Poll modbus if available
                     if (_modbusService != null)
                     {
+                        // communication
+                        if (Command_ComunicationCount++ > 10000000) Command_ComunicationCount = 0;
+
                         await PollModbusAsync(token).ConfigureAwait(false);
 
                         if (_readparameter)
@@ -318,6 +324,7 @@ namespace CleanerControlApp.Modules.MitsubishiPLC.Services
                     _moveInfo[2].LowWord, _moveInfo[2].HighWord, _moveInfo[3].LowWord, _moveInfo[3].HighWord,
                     _moveInfo[4].LowWord, _moveInfo[4].HighWord, _moveInfo[5].LowWord, _moveInfo[5].HighWord,
                     _moveInfo[6].LowWord, _moveInfo[6].HighWord, _moveInfo[7].LowWord, _moveInfo[7].HighWord,
+                    _communicationCount.LowWord, _communicationCount.HighWord
                 };
             }
         }
@@ -473,6 +480,7 @@ namespace CleanerControlApp.Modules.MitsubishiPLC.Services
             get => _moveInfo;
             set => _moveInfo = value ?? Array.Empty<PLC_DWord_Union>();
         }
+
 
         // ParamMotionInfo (DWord) 陣列
         public PLC_DWord_Union[] ParamMotionInfo
@@ -1217,6 +1225,17 @@ namespace CleanerControlApp.Modules.MitsubishiPLC.Services
 
         #endregion
 
+        #region Communication Info
+
+        public int Command_ComunicationCount
+        {
+            get { return _communicationCount.IntValue; }
+            set { _communicationCount.IntValue = value; }
+        }
+
+        #endregion
+
+
         #region Parameter Read
 
         public int Param_Read_Axis1JogSpeedH => _paramMotionInfo[0].IntValue;
@@ -1450,7 +1469,7 @@ namespace CleanerControlApp.Modules.MitsubishiPLC.Services
                     { 
                         FunctionCode = 0x10,
                         StartAddress = 600,
-                        DataNumber = 26
+                        DataNumber = 28
                     }
                 }
             };

@@ -334,6 +334,12 @@ namespace CleanerControlApp.Modules.MitsubishiPLC.Interfaces
 
         #endregion
 
+        #region Communication Info
+
+        public int Command_ComunicationCount { get; set; }
+
+        #endregion
+
         #region Parameter Read
 
         public int Param_Read_Axis1JogSpeedH { get; }

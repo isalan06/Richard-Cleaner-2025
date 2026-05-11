@@ -10,275 +10,474 @@ using System.Runtime.CompilerServices;
 
 namespace CleanerControlApp.Vision.Template
 {
- /// <summary>
- /// Template_Motor_4.xaml 的互動邏輯
- /// </summary>
- public partial class Template_Motor_4 : UserControl, INotifyPropertyChanged
- {
- private readonly ISoakingTank? _soakingTank;
- private readonly DispatcherTimer _timer;
+    /// <summary>
+    /// Template_Motor_4.xaml 的互動邏輯
+    /// </summary>
+    public partial class Template_Motor_4 : UserControl, INotifyPropertyChanged
+    {
+        private readonly ISoakingTank? _soakingTank;
+        private readonly DispatcherTimer _timer;
 
- private bool _limitN;
- private bool _limitP;
- private bool _servoOn;
- private bool _home;
- private bool _idle;
- private bool _alarm;
- private bool _busy;
+        private bool _limitN;
+        private bool _limitP;
+        private bool _servoOn;
+        private bool _home;
+        private bool _idle;
+        private bool _alarm;
+        private bool _busy;
 
- public event PropertyChangedEventHandler? PropertyChanged;
+        public event PropertyChangedEventHandler? PropertyChanged;
 
- public Template_Motor_4()
- {
- InitializeComponent();
+        public Template_Motor_4()
+        {
+            InitializeComponent();
 
- try
- {
- _soakingTank = App.AppHost?.Services.GetService<ISoakingTank>();
- }
- catch
- {
- _soakingTank = null;
- }
+            try
+            {
+                _soakingTank = App.AppHost?.Services.GetService<ISoakingTank>();
+            }
+            catch
+            {
+                _soakingTank = null;
+            }
 
- // set direction tags on buttons
- btnJogPlus.Tag =0; // JOG + -> dir0
- btnJogMinus.Tag =1; // JOG - -> dir1
+            // set direction tags on buttons
+            btnJogPlus.Tag = 0; // JOG + -> dir0
+            btnJogMinus.Tag = 1; // JOG - -> dir1
 
- _timer = new DispatcherTimer(DispatcherPriority.Normal)
- {
- Interval = TimeSpan.FromMilliseconds(200)
- };
- _timer.Tick += Timer_Tick;
+            // attach lost-capture handlers as insurance to always stop jog
+            try
+            {
+                btnJogPlus.LostMouseCapture += JogButton_LostMouseCapture;
+                btnJogMinus.LostMouseCapture += JogButton_LostMouseCapture;
+            }
+            catch { }
 
- Loaded += (s, e) => _timer.Start();
- Unloaded += (s, e) => _timer.Stop();
+            _timer = new DispatcherTimer(DispatcherPriority.Normal)
+            {
+                Interval = TimeSpan.FromMilliseconds(200)
+            };
+            _timer.Tick += Timer_Tick;
 
- // initial read
- UpdateFromSink();
- }
+            Loaded += (s, e) => _timer.Start();
+            Unloaded += (s, e) =>
+            {
+                try { _timer.Stop(); } catch { }
+                try { StopJogButton(btnJogPlus); } catch { }
+                try { StopJogButton(btnJogMinus); } catch { }
+            };
 
- public bool LimitN
- {
- get => _limitN;
- private set
- {
- if (_limitN != value)
- {
- _limitN = value;
- OnPropertyChanged();
- }
- }
- }
+            // initial read
+            UpdateFromSink();
+        }
 
- public bool LimitP
- {
- get => _limitP;
- private set
- {
- if (_limitP != value)
- {
- _limitP = value;
- OnPropertyChanged();
- }
- }
- }
+        public bool LimitN
+        {
+            get => _limitN;
+            private set
+            {
+                if (_limitN != value)
+                {
+                    _limitN = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
 
- public bool ServoOn
- {
- get => _servoOn;
- private set
- {
- if (_servoOn != value)
- {
- _servoOn = value;
- OnPropertyChanged();
- }
- }
- }
+        public bool LimitP
+        {
+            get => _limitP;
+            private set
+            {
+                if (_limitP != value)
+                {
+                    _limitP = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
 
- public bool Home
- {
- get => _home;
- private set
- {
- if (_home != value)
- {
- _home = value;
- OnPropertyChanged();
- }
- }
- }
+        public bool ServoOn
+        {
+            get => _servoOn;
+            private set
+            {
+                if (_servoOn != value)
+                {
+                    _servoOn = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
 
- public bool Idle
- {
- get => _idle;
- private set
- {
- if (_idle != value)
- {
- _idle = value;
- OnPropertyChanged();
- }
- }
- }
+        public bool Home
+        {
+            get => _home;
+            private set
+            {
+                if (_home != value)
+                {
+                    _home = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
 
- public bool Alarm
- {
- get => _alarm;
- private set
- {
- if (_alarm != value)
- {
- _alarm = value;
- OnPropertyChanged();
- }
- }
- }
+        public bool Idle
+        {
+            get => _idle;
+            private set
+            {
+                if (_idle != value)
+                {
+                    _idle = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
 
- public bool Busy
- {
- get => _busy;
- private set
- {
- if (_busy != value)
- {
- _busy = value;
- OnPropertyChanged();
- }
- }
- }
+        public bool Alarm
+        {
+            get => _alarm;
+            private set
+            {
+                if (_alarm != value)
+                {
+                    _alarm = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
 
- private void OnPropertyChanged([CallerMemberName] string? name = null)
- {
- PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
- }
+        public bool Busy
+        {
+            get => _busy;
+            private set
+            {
+                if (_busy != value)
+                {
+                    _busy = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
 
- private void Timer_Tick(object? sender, EventArgs e)
- {
- UpdateFromSink();
- }
+        private void OnPropertyChanged([CallerMemberName] string? name = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+        }
 
- private void UpdateFromSink()
- {
- try
- {
- if (_soakingTank != null)
- {
- LimitN = _soakingTank.MotorUpLimit;
- LimitP = _soakingTank.MotorDownLimit;
- ServoOn = _soakingTank.MotorServoOn;
- // additional status
- Home = _soakingTank.MotorHome;
- Idle = _soakingTank.MotorIdle;
- Alarm = _soakingTank.MotorAlarm;
- Busy = _soakingTank.MotorBusy;
- // update position display
- try
- {
- txtPositionValue.Text = _soakingTank.Position_Value.ToString("0.00");
- }
- catch
- {
- txtPositionValue.Text = "0.00";
- }
- }
- else
- {
- LimitN = false;
- LimitP = false;
- ServoOn = false;
- Home = false;
- Idle = false;
- Alarm = false;
- Busy = false;
- txtPositionValue.Text = "0.00";
- }
- }
- catch
- {
- // ignore
- }
- }
+        private void Timer_Tick(object? sender, EventArgs e)
+        {
+            UpdateFromSink();
+        }
 
- private int GetSelectedSpeed()
- {
- try
- {
- if (cmbJogSpeed?.SelectedItem is ComboBoxItem cbi && cbi.Tag != null)
- {
- if (int.TryParse(cbi.Tag.ToString(), out int v))
- return v;
- }
- }
- catch { }
- return 0; // default low
- }
+        private void UpdateFromSink()
+        {
+            try
+            {
+                if (_soakingTank != null)
+                {
+                    LimitN = _soakingTank.MotorUpLimit;
+                    LimitP = _soakingTank.MotorDownLimit;
+                    ServoOn = _soakingTank.MotorServoOn;
+                    // additional status
+                    Home = _soakingTank.MotorHome;
+                    Idle = _soakingTank.MotorIdle;
+                    Alarm = _soakingTank.MotorAlarm;
+                    Busy = _soakingTank.MotorBusy;
+                    // update position display
+                    try
+                    {
+                        txtPositionValue.Text = _soakingTank.Position_Value.ToString("0.00");
+                    }
+                    catch
+                    {
+                        txtPositionValue.Text = "0.00";
+                    }
+                }
+                else
+                {
+                    LimitN = false;
+                    LimitP = false;
+                    ServoOn = false;
+                    Home = false;
+                    Idle = false;
+                    Alarm = false;
+                    Busy = false;
+                    txtPositionValue.Text = "0.00";
+                }
+            }
+            catch
+            {
+                // ignore
+            }
+        }
 
- private void JogButton_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
- {
- try
- {
- if (_soakingTank == null) return;
- if (sender is Button btn)
- {
- int dir =0;
- if (btn.Tag != null && int.TryParse(btn.Tag.ToString(), out int t)) dir = t;
- int speed = GetSelectedSpeed();
- // Start jog
- _soakingTank.Jog(true, dir, speed);
- }
- }
- catch { }
- }
+        private int GetSelectedSpeed()
+        {
+            try
+            {
+                if (cmbJogSpeed?.SelectedItem is ComboBoxItem cbi && cbi.Tag != null)
+                {
+                    if (int.TryParse(cbi.Tag.ToString(), out int v))
+                        return v;
+                }
+            }
+            catch { }
+            return 0; // default low
+        }
 
- private void JogButton_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
- {
- try
- {
- if (_soakingTank == null) return;
- if (sender is Button btn)
- {
- int dir =0;
- if (btn.Tag != null && int.TryParse(btn.Tag.ToString(), out int t)) dir = t;
- int speed = GetSelectedSpeed();
- // Stop jog
- _soakingTank.Jog(false, dir, speed);
- }
- }
- catch { }
- }
+        // helper to check ShuttleXMotor.JogStatus; returns true if OK to proceed, false if popup shown
+        private bool CheckShuttleJogStatus(Point clickScreenPosition)
+        {
+            try
+            {
+                if (_soakingTank != null)
+                {
+                    var status = _soakingTank.JogStatus;
+                    if (!string.IsNullOrEmpty(status))
+                    {
+                        ShowStatusPopup(status);
+                        return false;
+                    }
+                }
+            }
+            catch
+            {
+                // ignore
+            }
+            return true;
+        }
 
- private void btnServoOn_Click(object sender, RoutedEventArgs e)
- {
- try
- {
- if (_soakingTank == null) return;
- // toggle servo state
- _soakingTank.ServoOn(!_soakingTank.MotorServoOn);
- UpdateFromSink();
- }
- catch { }
- }
+        private bool CheckShuttleHomeStatus()
+        {
+            try
+            {
+                if (_soakingTank != null)
+                {
+                    var status = _soakingTank.HomeStatus;
+                    if (!string.IsNullOrEmpty(status))
+                    {
+                        ShowStatusPopup(status);
+                        return false;
+                    }
+                }
+            }
+            catch
+            {
+                // ignore
+            }
+            return true;
+        }
 
- private void btnHome_Click(object sender, RoutedEventArgs e)
- {
- try
- {
- if (_soakingTank == null) return;
- _soakingTank.Home();
- }
- catch { }
- }
+        private void ShowStatusPopup(string status)
+        {
+            try
+            {
+                var owner = Window.GetWindow(this);
+                var w = new Window()
+                {
+                    Title = "無法操作原因",
+                    Owner = owner,
+                    WindowStyle = WindowStyle.None,
+                    AllowsTransparency = true,
+                    Background = System.Windows.Media.Brushes.Transparent,
+                    ShowInTaskbar = false,
+                    SizeToContent = SizeToContent.WidthAndHeight,
+                    ResizeMode = ResizeMode.NoResize,
+                    WindowStartupLocation = WindowStartupLocation.CenterOwner
+                };
 
- private void btnStop_Click(object sender, RoutedEventArgs e)
- {
- try
- {
- if (_soakingTank == null) return;
- _soakingTank.MotorStop();
- }
- catch { }
- }
- }
+                var border = new Border()
+                {
+                    Background = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(0xEE, 0xFF, 0xCC, 0xCC)), // pale red
+                    BorderBrush = System.Windows.Media.Brushes.DarkRed,
+                    BorderThickness = new Thickness(1),
+                    CornerRadius = new CornerRadius(6),
+                    Padding = new Thickness(10)
+                };
+
+                var panel = new StackPanel() { Orientation = Orientation.Vertical };
+                var txt = new TextBlock() { Text = status, FontSize = 14, TextWrapping = TextWrapping.Wrap, Foreground = System.Windows.Media.Brushes.Black, MaxWidth = 300 };
+                panel.Children.Add(txt);
+
+                // countdown text
+                int autoCloseSeconds = 5; // auto close after5 seconds
+                var countdown = new TextBlock() { Text = $"將在 {autoCloseSeconds} 秒後關閉", FontSize = 12, Margin = new Thickness(0, 8, 0, 0), Foreground = System.Windows.Media.Brushes.Black, HorizontalAlignment = HorizontalAlignment.Center };
+                panel.Children.Add(countdown);
+
+                // setup auto-close timer (declare before button so handler can stop it)
+                var dt = new DispatcherTimer(DispatcherPriority.Normal) { Interval = TimeSpan.FromSeconds(1) };
+                int remaining = autoCloseSeconds;
+                dt.Tick += (s, e) =>
+                {
+                    try
+                    {
+                        remaining -= 1;
+                        if (remaining <= 0)
+                        {
+                            dt.Stop();
+                            try { if (w.IsVisible) w.Close(); } catch { }
+                        }
+                        else
+                        {
+                            try { countdown.Text = $"將在 {remaining} 秒後關閉"; } catch { }
+                        }
+                    }
+                    catch { }
+                };
+
+                var btn = new Button() { Content = "關閉", FontSize = 18, Padding = new Thickness(8, 6, 8, 6), Margin = new Thickness(0, 10, 0, 0), HorizontalAlignment = HorizontalAlignment.Center };
+                btn.Click += (s, e) =>
+                {
+                    try
+                    {
+                        if (dt.IsEnabled) dt.Stop();
+                        // close immediately on UI thread
+                        try { w.Close(); } catch { }
+                    }
+                    catch { }
+                };
+                panel.Children.Add(btn);
+
+                border.Child = panel;
+                w.Content = border;
+
+                // stop timer if window closed by other means
+                w.Closed += (s, e) => { try { if (dt.IsEnabled) dt.Stop(); } catch { } };
+
+                w.Loaded += (s, e) =>
+                {
+                    try
+                    {
+                        // start countdown after window shown
+                        dt.Start();
+                    }
+                    catch { }
+                };
+
+                // show as modal dialog
+                try { w.ShowDialog(); } catch { }
+            }
+            catch
+            {
+                // ignore
+            }
+        }
+
+        private void JogButton_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            try
+            {
+                // get mouse position in screen coordinates
+                var pos = e.GetPosition(this);
+                var screen = PointToScreen(pos);
+
+                // check shuttle jog status first
+                if (!CheckShuttleJogStatus(screen))
+                {
+                    e.Handled = true;
+                    return;
+                }
+
+                if (_soakingTank == null) return;
+                if (sender is Button btn)
+                {
+                    int dir = 0;
+                    if (btn.Tag != null && int.TryParse(btn.Tag.ToString(), out int t)) dir = t;
+                    int speed = GetSelectedSpeed();
+
+                    // capture mouse so we can get LostMouseCapture if capture lost
+                    try { btn.CaptureMouse(); } catch { }
+
+                    // Start jog
+                    _soakingTank.Jog(true, dir, speed);
+                }
+            }
+            catch { }
+        }
+
+        private void JogButton_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            try
+            {
+                if (_soakingTank == null) return;
+                if (sender is Button btn)
+                {
+                    try { if (btn.IsMouseCaptured) btn.ReleaseMouseCapture(); } catch { }
+                    StopJogButton(btn);
+                }
+            }
+            catch { }
+        }
+
+        // Lost capture: ensure stop called
+        private void JogButton_LostMouseCapture(object? sender, MouseEventArgs e)
+        {
+            try
+            {
+                if (sender is Button btn)
+                {
+                    StopJogButton(btn);
+                }
+            }
+            catch { }
+        }
+
+        // helper to stop jog for given button safely
+        private void StopJogButton(Button? btn)
+        {
+            try
+            {
+                if (_soakingTank == null || btn == null) return;
+                int dir = 0;
+                if (btn.Tag != null && int.TryParse(btn.Tag.ToString(), out int t)) dir = t;
+                int speed = GetSelectedSpeed();
+                // Stop jog - best effort
+                try { _soakingTank.Jog(false, dir, speed); } catch { }
+            }
+            catch { }
+        }
+
+        private void btnServoOn_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (_soakingTank == null) return;
+                // toggle servo state
+                _soakingTank.ServoOn(!_soakingTank.MotorServoOn);
+                UpdateFromSink();
+            }
+            catch { }
+        }
+
+        private void btnHome_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (_soakingTank == null) return;
+
+                // check shuttle jog status first
+                if (!CheckShuttleHomeStatus())
+                {
+                    e.Handled = true;
+                    return;
+                }
+
+                _soakingTank.Home();
+            }
+            catch { }
+        }
+
+        private void btnStop_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (_soakingTank == null) return;
+                _soakingTank.MotorStop();
+            }
+            catch { }
+        }
+    }
 }

@@ -33,6 +33,8 @@ namespace CleanerControlApp.Modules.Motor.Services
         private bool _motor_commanding = false;
 
         private string _jog_status = "";
+        private string _home_status = "";
+        private string _move_status = "";
 
         #endregion
 
@@ -236,7 +238,7 @@ namespace CleanerControlApp.Modules.Motor.Services
         }
         public void MoveToPosition(int position, int speed)
         {
-            if (_plcService != null && !MotorAlarm && MotorServoOn && MotorIdle)
+            if (_plcService != null && !MotorAlarm && MotorServoOn && MotorIdle && MotorHome)
             {
                 try
                 {
@@ -403,6 +405,25 @@ namespace CleanerControlApp.Modules.Motor.Services
                     _jog_status = MotorAlarm ? "馬達發生錯誤" : !MotorServoOn ? "馬達未啟動" : (_plcService != null && (_plcService.Axis1CommandProcedure || _plcService.Axis1HomeProcedure)) ? "馬達執行程序中" : "";
                     return _jog_status;
                 }
+            }
+        }
+
+        public string HomeStatus
+        {
+            get
+            {
+                _home_status = MotorAlarm ? "馬達發生錯誤" : !MotorServoOn ? "馬達未啟動" : !MotorIdle ? "馬達移動中" : "";
+                return _home_status;
+            }
+
+        }
+
+        public string MoveStatus
+        {
+            get
+            {
+                _move_status = MotorAlarm ? "馬達發生錯誤" : !MotorServoOn ? "馬達未啟動" : !MotorIdle ? "馬達移動中" : !MotorHome ? "馬達未復歸" : "";
+                return _move_status;
             }
         }
 

@@ -77,6 +77,8 @@ namespace CleanerControlApp.Hardwares.Sink.Services
         private bool RetryAirFinished => _moduleSettings.Sink != null && _moduleSettings.Sink.AirKnifeRetryCount == _motor_air_retry_count;
 
         private string _jogStatus = "";
+        private string _homeStatus = "";
+        private string _moveStatus = "";
 
         #endregion
 
@@ -448,7 +450,7 @@ namespace CleanerControlApp.Hardwares.Sink.Services
         }
         public void Home()
         {
-            if (_plcService != null && !MotorAlarm && MotorServoOn && HomeIdle)
+            if (_plcService != null && !MotorAlarm && MotorServoOn && MotorIdle)
             {
                 try
                 {
@@ -474,7 +476,7 @@ namespace CleanerControlApp.Hardwares.Sink.Services
         }
         public void MoveToPosition(int position, int speed)
         {
-            if (_plcService != null && !MotorAlarm && MotorServoOn && Idle)
+            if (_plcService != null && !MotorAlarm && MotorServoOn && MotorIdle && MotorHome)
             {
                 try
                 {
@@ -515,48 +517,6 @@ namespace CleanerControlApp.Hardwares.Sink.Services
             }
         }
 
-        public void Manual_MoveToPosition(int position, int speed)
-        {
-            if (_plcService != null && !MotorAlarm && MotorServoOn && HomeIdle && MotorServoOn && MotorIdle && MotorHome)
-            {
-                try
-                {
-                    int setPos = _moduleSettings.Sink != null ? _moduleSettings.Sink.MotorPosition_01 : 0; // default to position 1
-                    if (position == 1)
-                        setPos = _moduleSettings.Sink != null ? _moduleSettings.Sink.MotorPosition_02 : 0;
-                    else if (position == 2)
-                        setPos = _moduleSettings.Sink != null ? _moduleSettings.Sink.MotorPosition_03 : 0;
-
-                    int setVel = _moduleSettings.Sink != null ? _moduleSettings.Sink.MotorVelocity_01 : 0; // default to velocity 1
-                    if (speed == 1)
-                        setVel = _moduleSettings.Sink != null ? _moduleSettings.Sink.MotorVelocity_02 : 0;
-
-                    _plcService.Command_Axis3Pos = setPos;
-                    _plcService.Command_Axis3Speed = setVel;
-                    _plcService.Command_Axis3Command = true;
-                    // fire-and-forget task to reset the command after a delay
-
-                    _motor_commanding = true;
-
-                    _ = Task.Run(async () =>
-                    {
-                        try
-                        {
-                            await Task.Delay(TimeSpan.FromSeconds(3)).ConfigureAwait(false);
-                            if (_plcService != null)
-                                _plcService.Command_Axis3Command = false;
-
-                            _motor_commanding = false;
-                        }
-                        catch
-                        {
-                            // swallow exceptions from the background task
-                        }
-                    });
-                }
-                catch { }
-            }
-        }
         public void MotorStop()
         {
             if (_plcService != null)
@@ -740,6 +700,23 @@ namespace CleanerControlApp.Hardwares.Sink.Services
             {
                 _jogStatus = MotorAlarm ? "馬達發生錯誤" : !MotorServoOn ? "馬達未啟動" : (_plcService != null && (_plcService.Axis3CommandProcedure || _plcService.Axis3HomeProcedure)) ? "馬達執行程序中" : "";
                 return _jogStatus;
+            }
+        }
+
+        public string HomeStatus
+        {
+            get
+            {
+                _homeStatus = MotorAlarm ? "馬達發生錯誤" : !MotorServoOn ? "馬達未啟動" : !MotorIdle ? "馬達動作中" : "";
+                return _homeStatus;
+            }
+        }
+        public string MoveStatus
+        {
+            get
+            {
+                _moveStatus = MotorAlarm ? "馬達發生錯誤" : !MotorServoOn ? "馬達未啟動" : !MotorIdle ? "馬達動作中" : !MotorHome ? "馬達未復歸" : "";
+                return _moveStatus;
             }
         }
 

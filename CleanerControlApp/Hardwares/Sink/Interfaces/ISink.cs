@@ -33,8 +33,6 @@ namespace CleanerControlApp.Hardwares.Sink.Interfaces
         bool Initialized { get; }
         bool Idle { get; }
 
-        bool HomeIdle { get; }
-
         bool HighPressure { get; }
         bool LowPressure { get; }
         bool PressureOP(bool pressure);
@@ -89,7 +87,6 @@ namespace CleanerControlApp.Hardwares.Sink.Interfaces
         void Home();
         void MoveToPosition(int position, int speed);
 
-        void Manual_MoveToPosition(int position, int speed);
         void MotorStop();
 
         bool InPos1 { get; }
@@ -106,6 +103,8 @@ namespace CleanerControlApp.Hardwares.Sink.Interfaces
         string Hint();
 
         string JogStatus { get; }
+        string HomeStatus { get; }
+        string MoveStatus { get; }
 
     }
 }
