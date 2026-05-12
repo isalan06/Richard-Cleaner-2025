@@ -527,6 +527,8 @@ namespace CleanerControlApp.Hardwares
                     }
                 }
                 if (_heatingTank != null) _heatingTank.AlarmStop();
+                _dryrun_procedure_case = 0;
+                _dryrun_procedure_trigger = false;
             }
         }
 
@@ -670,6 +672,9 @@ namespace CleanerControlApp.Hardwares
             _dryingTank2_initialized_trigger = false;
             _heatingTank_initialized_trigger = false;
             _shuttle_check_cassette_trigger = false;
+
+            _dryrun_procedure_trigger = false;
+            _dryrun_procedure_case = 0;
         }
 
         public void AllMotorStop()
@@ -678,7 +683,6 @@ namespace CleanerControlApp.Hardwares
             if (_soakingTank != null) _soakingTank.MotorStop();
             if (_shuttle != null) _shuttle.AllMotorStop();
         }
-
         public int CheckCanInitialize(out string status, bool logRecord = true)
         {
             int result = 0; // Can Initialize
@@ -816,7 +820,10 @@ namespace CleanerControlApp.Hardwares
         private bool _auto_procedure_backtoP0_executing= false;
         private int _auto_procedure_current_pick_position = -1;
         private int _auto_procedure_current_place_position = -1;
-        
+
+        private bool _dryrun_procedure_trigger = false;
+        private int _dryrun_procedure_case = 0;
+
         private bool CheckPickAndPlacePosition(out int pickPosition, out int placePosition)
         {
             pickPosition = -1; 
@@ -979,6 +986,11 @@ namespace CleanerControlApp.Hardwares
                 _auto_procedure_place_executing = false;
                 _auto_procedure_backtoP0_executing = false;
             }
+        }
+
+        private void DryRunProcedure()
+        { 
+        
         }
 
         #endregion

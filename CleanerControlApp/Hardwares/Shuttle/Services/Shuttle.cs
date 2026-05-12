@@ -70,6 +70,8 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
         private bool _checkCassetteProcedureError = false;
         private int _checkCassetteCase = 0;
 
+        private bool _dryRun = false;
+
         #endregion
 
         #region constructor
@@ -293,6 +295,7 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
         {
             _autoStopFlag = false;
             _pausing = false;
+            _dryRun = false;
             if (!_auto && _initialized && IsNormalStatus)
             {
                 _auto = true;
@@ -349,7 +352,7 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
         public bool IsEmpty => !_cassette && Check_ClamperOpen && !Check_ClamperCassetteExist;
 
         // position 1~14 for pick/place position, 0 for original position
-        public bool PickCassette(int position)
+        public bool PickCassette(int position, bool dryRun = false)
         {
             bool result = false;
 
@@ -359,25 +362,27 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
                 {
                     GetActParameters(position, out _actPositionX, out _actVelocityX, out _actPositionZ, out _actVelocityZ);
                     _pickTrigger = true;
+                    _dryRun = dryRun;
                     result = true;
                 }
             }
 
             return result;
         }
-        public bool PlaceCassette(int position)
+        public bool PlaceCassette(int position, bool dryRun = false)
         {
             bool result = false;
 
             if ((HasCassette || _sim_pass_clamper) && !Moving && !MotorMoving && IsNormalStatus && MotorHome && ZInIdlePosition)
             {
-                if(position > 0 && position < 15)
+                if (position > 0 && position < 15)
                 {
                     GetActParameters(position, out _actPositionX, out _actVelocityX, out _actPositionZ, out _actVelocityZ);
                     _placeTrigger = true;
+                    _dryRun = dryRun;
                     result = true;
                 }
-                
+
             }
 
             return result;
@@ -593,6 +598,8 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
             _pickTrigger = false;
             _placeTrigger = false;
 
+            _dryRun = false;
+
             ResetTimeoutFlag();
 
             ClamperOpenOP(true);
@@ -650,6 +657,8 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
             _pickTrigger = false;
             _placeTrigger = false;
 
+            _dryRun = false;
+
         }
 
         private void MotorStop()
@@ -664,7 +673,7 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
             if (!_placeTrigger && _placeCase != 0) _placeCase = 0;
             if (!_checkCassetteTrigger && _checkCassetteCase != 0) _checkCassetteCase = 0;
 
-            if (_auto)
+            if (_auto && !_dryRun)
             {
                 if (Idle && _autoStopFlag && !_pickTrigger && !_placeTrigger && !_moving)
                 {
@@ -804,6 +813,140 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
                 }
 
                 
+            }
+
+            if (!_auto && _dryRun)
+            {
+                // Pick Procedure
+                if (_pickTrigger && !_pausing && _motorXAxis != null && _motorZAxis != null)
+                {
+                    switch (_pickCase)
+                    {
+                        case 0: // X Axis Move To Pick Position
+                            if (_motorXAxis.GetInPos(_actPositionX))
+                            {
+                                _pickCase = 10;
+                            }
+                            else if (!MotorMoving)
+                                _motorXAxis.MoveToPosition(_actPositionX, _actVelocityX);
+                            break;
+
+                        case 10: // Z Axis Move To Pick Position
+                            if (_motorZAxis.GetInPos(_actPositionZ))
+                            {
+                                _pickCase = 20;
+                            }
+                            else if (!MotorMoving)
+                                _motorZAxis.MoveToPosition(_actPositionZ, _actVelocityZ);
+                            break;
+
+                        case 20: // Clamper Close to Pick Cassette
+                            if (Check_ClamperClose || _sim_pass_clamper)
+                            {
+                                _pickCase = 30;
+                            }
+                            else if (!Command_ClamperClose)
+                                ClamperCloseOP(true);
+
+                            break;
+
+                        case 30: // Z Axis Move To Original Position (P1)
+                            if (_motorZAxis.GetInPos(0))
+                            {
+                                _pickCase = 40;
+                            }
+                            else if (!MotorMoving)
+                                _motorZAxis.MoveToPosition(0, _actVelocityZ);
+
+                            break;
+
+                        case 40: // Check Cassette Exist
+                            if (HasCassette || _sim_pass_clamper)
+                            {
+                                _cassette = true;
+                                _pickTrigger = false;
+                                _pickCase = 0;
+                            }
+                            else
+                            {
+                                _cassette = false;
+                                _pickCase = -99;
+                            }
+                            break;
+
+                        default:
+                        case -99:
+                            _pickProcedureError = true;
+                            _pickTrigger = false;
+                            break;
+
+                    }
+                }
+
+                // Place Procedure
+                if (_placeTrigger && !_pausing && _motorXAxis != null && _motorZAxis != null)
+                {
+                    switch (_placeCase)
+                    {
+                        case 0: // X Axis Move To Place Position
+                            if (_motorXAxis.GetInPos(_actPositionX))
+                            {
+                                _placeCase = 10;
+                            }
+                            else if (!MotorMoving)
+                                _motorXAxis.MoveToPosition(_actPositionX, _actVelocityX);
+                            break;
+
+                        case 10: // Z Axis Move To Place Position
+                            if (_motorZAxis.GetInPos(_actPositionZ))
+                            {
+                                _placeCase = 20;
+                            }
+                            else if (!MotorMoving)
+                                _motorZAxis.MoveToPosition(_actPositionZ, _actVelocityZ);
+                            break;
+
+                        case 20: // Clamper Open to Place Cassette
+                            if (Check_ClamperOpen || _sim_pass_clamper)
+                            {
+                                _placeCase = 30;
+                            }
+                            else if (!Command_ClamperOpen)
+                                ClamperOpenOP(true);
+
+                            break;
+
+                        case 30: // Z Axis Move To Original Position (P1)
+                            if (_motorZAxis.GetInPos(0))
+                            {
+                                _placeCase = 40;
+                            }
+                            else if (!MotorMoving)
+                                _motorZAxis.MoveToPosition(0, _actVelocityZ);
+
+                            break;
+
+                        case 40: // Check Cassette Exist
+                            if (IsEmpty || _sim_pass_clamper)
+                            {
+                                _cassette = false;
+                                _placeTrigger = false;
+                                _placeCase = 0;
+                            }
+                            else
+                            {
+                                _placeCase = -99;
+                            }
+                            break;
+
+                        default:
+                        case -99:
+                            _placeProcedureError = true;
+                            _placeTrigger = false;
+                            break;
+
+                    }
+                }
             }
 
             // Check Cassette of Tank Procedure

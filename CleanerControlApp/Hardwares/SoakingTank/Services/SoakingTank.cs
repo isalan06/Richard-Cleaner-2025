@@ -64,6 +64,8 @@ namespace CleanerControlApp.Hardwares.SoakingTank.Services
         private string _homeStatus = "";
         private string _moveStatus = "";
 
+        private bool _manualShaking = false;
+
         #endregion
 
         #region constructor
@@ -736,6 +738,21 @@ namespace CleanerControlApp.Hardwares.SoakingTank.Services
             }
         }
 
+        public void ManualStartToShaking()
+        {
+            if (!_auto && MotorHome && MotorIdle)
+            {
+                _manualShaking = true;
+            }
+        }
+
+        public void ManualStopShaking()
+        {
+            _manualShaking = false;
+        }
+
+        public bool ManaulShaking => _manualShaking;
+
         #endregion
 
         #region Function
@@ -791,9 +808,25 @@ namespace CleanerControlApp.Hardwares.SoakingTank.Services
                 if (Ultrasonic) UltrasonicOP(false);
             }
 
-            await AutoProcedure();
+            await AutoProcedure(); 
+            ManualShakingFunction();
 
             await Task.Yield();
+        }
+
+        private void ManualShakingFunction()
+        {
+            if (_manualShaking)
+            {
+                if (!InPos3 && MotorIdle && !_motor_commanding)
+                {
+                    MoveToPosition(2, 0);
+                }
+                else if (InPos3 && MotorIdle && !_motor_commanding)
+                {
+                    MoveToPosition(1, 0);
+                }
+            }
         }
 
         #endregion

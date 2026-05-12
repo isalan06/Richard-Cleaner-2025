@@ -80,6 +80,8 @@ namespace CleanerControlApp.Hardwares.Sink.Services
         private string _homeStatus = "";
         private string _moveStatus = "";
 
+        private bool _manualShaking = false;
+
         #endregion
 
         #region constructor
@@ -365,6 +367,7 @@ namespace CleanerControlApp.Hardwares.Sink.Services
         {
             _autoStopFlag = false;
             _pausing = false;
+            _manualShaking = false;
             if (!_auto && _initialized && IsNormalStatus)
             {
                 _auto = true;
@@ -420,6 +423,8 @@ namespace CleanerControlApp.Hardwares.Sink.Services
         {
             if (_plcService != null && !MotorAlarm && MotorServoOn && !_auto && !_plcService.Axis3CommandProcedure && !_plcService.Axis3HomeProcedure)
             {
+                _manualShaking = false; // 進入Jog操作先關閉手動晃動旗標，避免干擾Jog程序
+
                 if (speed == 2)
                     _plcService.Command_Axis3JogSpeedH = true;
                 else if (speed == 1)
@@ -454,6 +459,7 @@ namespace CleanerControlApp.Hardwares.Sink.Services
             {
                 try
                 {
+                    _manualShaking = false; // 回原點時先關閉手動晃動旗標，避免干擾回原點程序
                     _plcService.Command_Axis3Home = true;
 
                     // fire-and-forget task to reset the command after a delay
@@ -720,6 +726,20 @@ namespace CleanerControlApp.Hardwares.Sink.Services
             }
         }
 
+        public void ManualStartToShaking()
+        {
+            if (!_auto && MotorHome && MotorIdle)
+            {
+                _manualShaking = true;
+            }
+        }
+
+        public void ManualStopShaking()
+        {
+                _manualShaking = false;
+        }
+
+        public bool ManaulShaking => _manualShaking;
 
         #endregion
 
@@ -777,8 +797,24 @@ namespace CleanerControlApp.Hardwares.Sink.Services
             }
 
             AutoProcedure();
+            ManualShakingFunction();
 
             await Task.Yield();
+        }
+
+        private void ManualShakingFunction()
+        {
+            if (_manualShaking)
+            {
+                if (!InPos3 && MotorIdle && !_motor_commanding)
+                {
+                    MoveToPosition(2, 0);
+                }
+                else if (InPos3 && MotorIdle && !_motor_commanding)
+                {
+                    MoveToPosition(1, 0);
+                }
+            }
         }
 
         #endregion
@@ -807,6 +843,7 @@ namespace CleanerControlApp.Hardwares.Sink.Services
             _autoStopFlag = false;
             _motor_commanding = false;
             _motor_air_retry_count = 0;
+            _manualShaking = false;
 
             ResetTimeoutFlag();
             _initialized = true;
@@ -832,6 +869,7 @@ namespace CleanerControlApp.Hardwares.Sink.Services
 
             _auto = false;
             _initialized = false;
+            _manualShaking = false;
 
             HS_ClamperMoving = false;
             _elapsedTime = new TimeSpan();
@@ -904,11 +942,11 @@ namespace CleanerControlApp.Hardwares.Sink.Services
                         else
                         {
                             // 馬達往復搖擺流程
-                            if(InPos3 && MotorIdle && !_motor_commanding && !_pausing)
+                            if(!InPos3 && MotorIdle && !_motor_commanding && !_pausing)
                             {
                                 MoveToPosition(2, 0);
                             }
-                            else if(InPos2 && MotorIdle && !_motor_commanding && !_pausing)
+                            else if(InPos3 && MotorIdle && !_motor_commanding && !_pausing)
                             {
                                 MoveToPosition(1, 0);
                             }

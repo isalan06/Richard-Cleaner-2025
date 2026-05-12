@@ -106,5 +106,9 @@ namespace CleanerControlApp.Hardwares.Sink.Interfaces
         string HomeStatus { get; }
         string MoveStatus { get; }
 
+        void ManualStartToShaking();
+        public void ManualStopShaking();
+        bool ManaulShaking { get; }
+
     }
 }

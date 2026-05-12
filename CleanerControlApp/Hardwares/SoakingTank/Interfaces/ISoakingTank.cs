@@ -109,5 +109,9 @@ namespace CleanerControlApp.Hardwares.SoakingTank.Interfaces
         string JogStatus { get; }
         string HomeStatus { get; }
         string MoveStatus { get; }
+
+        void ManualStartToShaking();
+        public void ManualStopShaking();
+        bool ManaulShaking { get; }
     }
 }

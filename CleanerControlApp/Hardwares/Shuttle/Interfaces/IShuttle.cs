@@ -73,8 +73,8 @@ namespace CleanerControlApp.Hardwares.Shuttle.Interfaces
         bool HasCassette { get; }
         bool IsEmpty { get; }
 
-        bool PickCassette(int position);
-        bool PlaceCassette(int position);
+        bool PickCassette(int position, bool dryRun = false);
+        bool PlaceCassette(int position, bool dryRun = false);
         bool BackToOriginalPosition();
         bool CheckTankCassetteExist();
 

@@ -30,6 +30,7 @@ namespace CleanerControlApp.Vision.Template
         private bool _inPos1;
         private bool _inPos2;
         private bool _inPos3;
+        private bool _manaulShaking;
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -105,7 +106,7 @@ namespace CleanerControlApp.Vision.Template
             {
                 _teachHoldTimerP1.Stop();
                 _teachTriggeredP1 = true;
-                try { if (btnTeachP1 != null) btnTeachP1.Background = new SolidColorBrush(Color.FromRgb(0xAD, 0xD8, 0xE6)); } catch { }
+                try { if (btnTeachP1 != null) btnTeachP1.Background = new SolidColorBrush(Color.FromRgb(0xAD,0xD8,0xE6)); } catch { }
 
                 try
                 {
@@ -126,7 +127,7 @@ namespace CleanerControlApp.Vision.Template
             {
                 _teachHoldTimerP2.Stop();
                 _teachTriggeredP2 = true;
-                try { if (btnTeachP2 != null) btnTeachP2.Background = new SolidColorBrush(Color.FromRgb(0xAD, 0xD8, 0xE6)); } catch { }
+                try { if (btnTeachP2 != null) btnTeachP2.Background = new SolidColorBrush(Color.FromRgb(0xAD,0xD8,0xE6)); } catch { }
 
                 try
                 {
@@ -147,7 +148,7 @@ namespace CleanerControlApp.Vision.Template
             {
                 _teachHoldTimerP3.Stop();
                 _teachTriggeredP3 = true;
-                try { if (btnTeachP3 != null) btnTeachP3.Background = new SolidColorBrush(Color.FromRgb(0xAD, 0xD8, 0xE6)); } catch { }
+                try { if (btnTeachP3 != null) btnTeachP3.Background = new SolidColorBrush(Color.FromRgb(0xAD,0xD8,0xE6)); } catch { }
 
                 try
                 {
@@ -179,7 +180,7 @@ namespace CleanerControlApp.Vision.Template
             try
             {
                 _teachHoldTimerP1.Stop();
-                try { if (btnTeachP1 != null) btnTeachP1.Background = new SolidColorBrush(Color.FromRgb(0xAD, 0xD8, 0xE6)); } catch { }
+                try { if (btnTeachP1 != null) btnTeachP1.Background = new SolidColorBrush(Color.FromRgb(0xAD,0xD8,0xE6)); } catch { }
 
                 if (!_teachTriggeredP1)
                 {
@@ -194,7 +195,7 @@ namespace CleanerControlApp.Vision.Template
             try
             {
                 _teachHoldTimerP1.Stop();
-                try { if (btnTeachP1 != null) btnTeachP1.Background = new SolidColorBrush(Color.FromRgb(0xAD, 0xD8, 0xE6)); } catch { }
+                try { if (btnTeachP1 != null) btnTeachP1.Background = new SolidColorBrush(Color.FromRgb(0xAD,0xD8,0xE6)); } catch { }
             }
             catch { }
         }
@@ -216,7 +217,7 @@ namespace CleanerControlApp.Vision.Template
             try
             {
                 _teachHoldTimerP2.Stop();
-                try { if (btnTeachP2 != null) btnTeachP2.Background = new SolidColorBrush(Color.FromRgb(0xAD, 0xD8, 0xE6)); } catch { }
+                try { if (btnTeachP2 != null) btnTeachP2.Background = new SolidColorBrush(Color.FromRgb(0xAD,0xD8,0xE6)); } catch { }
 
                 if (!_teachTriggeredP2)
                 {
@@ -231,7 +232,7 @@ namespace CleanerControlApp.Vision.Template
             try
             {
                 _teachHoldTimerP2.Stop();
-                try { if (btnTeachP2 != null) btnTeachP2.Background = new SolidColorBrush(Color.FromRgb(0xAD, 0xD8, 0xE6)); } catch { }
+                try { if (btnTeachP2 != null) btnTeachP2.Background = new SolidColorBrush(Color.FromRgb(0xAD,0xD8,0xE6)); } catch { }
             }
             catch { }
         }
@@ -253,7 +254,7 @@ namespace CleanerControlApp.Vision.Template
             try
             {
                 _teachHoldTimerP3.Stop();
-                try { if (btnTeachP3 != null) btnTeachP3.Background = new SolidColorBrush(Color.FromRgb(0xAD, 0xD8, 0xE6)); } catch { }
+                try { if (btnTeachP3 != null) btnTeachP3.Background = new SolidColorBrush(Color.FromRgb(0xAD,0xD8,0xE6)); } catch { }
 
                 if (!_teachTriggeredP3)
                 {
@@ -268,7 +269,7 @@ namespace CleanerControlApp.Vision.Template
             try
             {
                 _teachHoldTimerP3.Stop();
-                try { if (btnTeachP3 != null) btnTeachP3.Background = new SolidColorBrush(Color.FromRgb(0xAD, 0xD8, 0xE6)); } catch { }
+                try { if (btnTeachP3 != null) btnTeachP3.Background = new SolidColorBrush(Color.FromRgb(0xAD,0xD8,0xE6)); } catch { }
             }
             catch { }
         }
@@ -282,12 +283,14 @@ namespace CleanerControlApp.Vision.Template
                     InPos1 = _soakingTank.InPos1;
                     InPos2 = _soakingTank.InPos2;
                     InPos3 = _soakingTank.InPos3;
+                    try { ManaulShaking = _soakingTank.ManaulShaking; } catch { }
                 }
                 else
                 {
                     InPos1 = false;
                     InPos2 = false;
                     InPos3 = false;
+                    ManaulShaking = false;
                 }
             }
             catch
@@ -330,6 +333,19 @@ namespace CleanerControlApp.Vision.Template
                 if (_inPos3 != value)
                 {
                     _inPos3 = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        public bool ManaulShaking
+        {
+            get => _manaulShaking;
+            private set
+            {
+                if (_manaulShaking != value)
+                {
+                    _manaulShaking = value;
                     OnPropertyChanged();
                 }
             }
@@ -399,6 +415,25 @@ namespace CleanerControlApp.Vision.Template
 
                 int speed = GetSelectedSpeed();
                 _soakingTank?.MoveToPosition(2, speed);
+            }
+            catch { }
+        }
+
+        // Manual shaking toggle click
+        private void ManualShaking_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (_soakingTank == null) return;
+                if (_soakingTank.ManaulShaking)
+                {
+                    try { _soakingTank.ManualStopShaking(); } catch { }
+                }
+                else
+                {
+                    try { _soakingTank.ManualStartToShaking(); } catch { }
+                }
+                try { ManaulShaking = _soakingTank.ManaulShaking; } catch { }
             }
             catch { }
         }
@@ -518,7 +553,7 @@ namespace CleanerControlApp.Vision.Template
 
                 var border = new Border()
                 {
-                    Background = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(0xEE, 0xFF, 0xCC, 0xCC)), // pale red
+                    Background = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(0xEE,0xFF,0xCC,0xCC)), // pale red
                     BorderBrush = System.Windows.Media.Brushes.DarkRed,
                     BorderThickness = new Thickness(1),
                     CornerRadius = new CornerRadius(6),
@@ -526,12 +561,12 @@ namespace CleanerControlApp.Vision.Template
                 };
 
                 var panel = new StackPanel() { Orientation = Orientation.Vertical };
-                var txt = new TextBlock() { Text = status, FontSize = 14, TextWrapping = TextWrapping.Wrap, Foreground = System.Windows.Media.Brushes.Black, MaxWidth = 300 };
+                var txt = new TextBlock() { Text = status, FontSize =14, TextWrapping = TextWrapping.Wrap, Foreground = System.Windows.Media.Brushes.Black, MaxWidth =300 };
                 panel.Children.Add(txt);
 
                 // countdown text
-                int autoCloseSeconds = 5; // auto close after5 seconds
-                var countdown = new TextBlock() { Text = $"將在 {autoCloseSeconds} 秒後關閉", FontSize = 12, Margin = new Thickness(0, 8, 0, 0), Foreground = System.Windows.Media.Brushes.Black, HorizontalAlignment = HorizontalAlignment.Center };
+                int autoCloseSeconds =5; // auto close after5 seconds
+                var countdown = new TextBlock() { Text = $"將在 {autoCloseSeconds} 秒後關閉", FontSize =12, Margin = new Thickness(0,8,0,0), Foreground = System.Windows.Media.Brushes.Black, HorizontalAlignment = HorizontalAlignment.Center };
                 panel.Children.Add(countdown);
 
                 // setup auto-close timer (declare before button so handler can stop it)
@@ -541,8 +576,8 @@ namespace CleanerControlApp.Vision.Template
                 {
                     try
                     {
-                        remaining -= 1;
-                        if (remaining <= 0)
+                        remaining -=1;
+                        if (remaining <=0)
                         {
                             dt.Stop();
                             try { if (w.IsVisible) w.Close(); } catch { }
@@ -555,7 +590,7 @@ namespace CleanerControlApp.Vision.Template
                     catch { }
                 };
 
-                var btn = new Button() { Content = "關閉", FontSize = 18, Padding = new Thickness(8, 6, 8, 6), Margin = new Thickness(0, 10, 0, 0), HorizontalAlignment = HorizontalAlignment.Center };
+                var btn = new Button() { Content = "關閉", FontSize =18, Padding = new Thickness(8,6,8,6), Margin = new Thickness(0,10,0,0), HorizontalAlignment = HorizontalAlignment.Center };
                 btn.Click += (s, e) =>
                 {
                     try

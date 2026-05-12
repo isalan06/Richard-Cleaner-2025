@@ -35,6 +35,7 @@ namespace CleanerControlApp.Vision.Template
         private bool _inPos1;
         private bool _inPos2;
         private bool _inPos3;
+        private bool _manaulShaking;
 
         // teach long-press timers (one per teach button)
         private readonly DispatcherTimer _teachHoldTimerP1;
@@ -319,6 +320,8 @@ namespace CleanerControlApp.Vision.Template
                     InPos1 = _sink.InPos1;
                     InPos2 = _sink.InPos2;
                     InPos3 = _sink.InPos3;
+                    // update manual shaking state from ISink
+                    try { ManaulShaking = _sink.ManaulShaking; } catch { }
                 }
                 else
                 {
@@ -329,6 +332,7 @@ namespace CleanerControlApp.Vision.Template
                     InPos1 = false;
                     InPos2 = false;
                     InPos3 = false;
+                    ManaulShaking = false;
                 }
             }
             catch
@@ -385,6 +389,19 @@ namespace CleanerControlApp.Vision.Template
                 if (_act != value)
                 {
                     _act = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        public bool ManaulShaking
+        {
+            get => _manaulShaking;
+            private set
+            {
+                if (_manaulShaking != value)
+                {
+                    _manaulShaking = value;
                     OnPropertyChanged();
                 }
             }
@@ -520,6 +537,27 @@ namespace CleanerControlApp.Vision.Template
             {
                 // ignore
             }
+        }
+
+        // Manual shaking toggle click
+        private void ManualShaking_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (_sink == null) return;
+                // if currently ON then stop, else start
+                if (_sink.ManaulShaking)
+                {
+                    try { _sink.ManualStopShaking(); } catch { }
+                }
+                else
+                {
+                    try { _sink.ManualStartToShaking(); } catch { }
+                }
+                // update local state after action (will also be updated on next timer tick)
+                try { ManaulShaking = _sink.ManaulShaking; } catch { }
+            }
+            catch { }
         }
 
         // Move buttons handlers added to resolve XAML event references
