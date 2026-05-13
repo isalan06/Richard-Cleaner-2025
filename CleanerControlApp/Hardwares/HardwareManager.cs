@@ -609,12 +609,30 @@ namespace CleanerControlApp.Hardwares
         {
             get
             {
-                if (!UnloadCassetteInPosition1) return 14;
-                if (!UnloadCassetteInPosition2) return 13;
-                if (!UnloadCassetteInPosition3) return 12;
-                if (!UnloadCassetteInPosition4) return 11;
-                if (!UnloadCassetteInPosition5) return 10;
-                return 0; // no empty position
+                int pos = 0;
+                if (UnloadCassetteInPosition1) return pos;
+                else
+                {
+                    pos = 10;
+                    if (UnloadCassetteInPosition2) return pos;
+                    else
+                    {
+                        pos = 11;
+                        if (UnloadCassetteInPosition3) return pos;
+                        else
+                        {
+                            pos = 12;
+                            if (UnloadCassetteInPosition4) return pos;
+                            else
+                            {
+                                pos = 13;
+                                if (UnloadCassetteInPosition5) return pos;
+                                else pos = 14;
+                            }
+                        }
+                    }
+                }
+                return pos; // no empty position
             }
         }
 
@@ -836,7 +854,7 @@ namespace CleanerControlApp.Hardwares
             if (!_auto_procedure_trigger && !_dryrun_procedure_trigger)
             {
                 _dryrun_procedure_trigger = true;
-                _dryrun_procedure_case = 1; // start from case 1
+                _dryrun_procedure_case = 0; // start from case 0
                 _dryrun_procedure_status = "Dry Run Procedure Started";
                 OperateLog.Log("開始 Dry Run 程序", "開始執行 Dry Run 程序，系統會進行各槽位取放卡匣的動作，無卡匣也可以運作，請確認狀態後再使用此功能。");
                 return true;
@@ -1048,7 +1066,7 @@ namespace CleanerControlApp.Hardwares
                     case 1: // pick from loader
                         if (_shuttle != null)
                         {
-                            bool result = _shuttle.PickCassette(_dryrun_procedure_loader_position);
+                            bool result = _shuttle.PickCassette(_dryrun_procedure_loader_position, true);
                             if (result)
                             {
                                 _dryrun_procedure_status = $"Case 1: Picked from Loader Position: {_dryrun_procedure_loader_position}";
@@ -1070,7 +1088,7 @@ namespace CleanerControlApp.Hardwares
                             if (_shuttle.Cassette && _shuttle.MotorIdle && IsZInOriPos)
                             {
 
-                                bool result = _shuttle.PlaceCassette(_placePosition);
+                                bool result = _shuttle.PlaceCassette(_placePosition, true);
                                 if (result)
                                 {
                                     _dryrun_procedure_case = 3; // move to next case
@@ -1092,7 +1110,7 @@ namespace CleanerControlApp.Hardwares
                             if (_shuttle.IsEmpty && _shuttle.MotorIdle && IsZInOriPos)
                             {
                                 
-                                bool result = _shuttle.PickCassette(_pickPosition);
+                                bool result = _shuttle.PickCassette(_pickPosition, true);
                                 if (result)
                                 {
                                     _dryrun_procedure_case = 4; // move to next case
@@ -1113,7 +1131,7 @@ namespace CleanerControlApp.Hardwares
                             {
                                 int _placePosition = 7; // soaking tank position for dry run
                                 _dryrun_procedure_status = $"Case 4: Placed to Unloader Position: {_placePosition}, Cassette: {_shuttle.Cassette}, Idle: {_shuttle.MotorIdle}, IsZInOriPos: {IsZInOriPos}";
-                                bool result = _shuttle.PlaceCassette(_placePosition);
+                                bool result = _shuttle.PlaceCassette(_placePosition, true);
                                 if (result)
                                 {
                                     _dryrun_procedure_case = 5; // move to next case
@@ -1135,7 +1153,7 @@ namespace CleanerControlApp.Hardwares
                             if (_shuttle.IsEmpty && _shuttle.MotorIdle && IsZInOriPos)
                             {
 
-                                bool result = _shuttle.PickCassette(_pickPosition);
+                                bool result = _shuttle.PickCassette(_pickPosition, true);
                                 if (result)
                                 {
                                     _dryrun_procedure_case = 6; // move to next case
@@ -1156,7 +1174,7 @@ namespace CleanerControlApp.Hardwares
                             _dryrun_procedure_status = $"Case 6: Placed to Drying Tank #1 Position: {_placePosition}, Cassette: {_shuttle.Cassette}, Idle: {_shuttle.MotorIdle}, IsZInOriPos: {IsZInOriPos}";
                             if(_shuttle.Cassette && _shuttle.MotorIdle && IsZInOriPos)
                             {
-                                bool result = _shuttle.PlaceCassette(_placePosition);
+                                bool result = _shuttle.PlaceCassette(_placePosition, true);
                                 if (result)
                                 {
                                     _dryrun_procedure_case = 7; // move to next case
@@ -1177,7 +1195,7 @@ namespace CleanerControlApp.Hardwares
                             _dryrun_procedure_status = $"Case 7: Picked from Drying Tank #1 Position: {_pickPosition}, IsEmpty: {_shuttle.IsEmpty}, Idle: {_shuttle.MotorIdle}, IsZInOriPos: {IsZInOriPos}";
                             if(_shuttle.IsEmpty && _shuttle.MotorIdle && IsZInOriPos)
                             {
-                                bool result = _shuttle.PickCassette(_pickPosition);
+                                bool result = _shuttle.PickCassette(_pickPosition, true);
                                 if (result)
                                 {
                                     _dryrun_procedure_case = 8; // move to next case
@@ -1198,7 +1216,7 @@ namespace CleanerControlApp.Hardwares
                             _dryrun_procedure_status = $"Case 8: Placed to Drying Tank #2 Position: {_placePosition}, Cassette: {_shuttle.Cassette}, Idle: {_shuttle.MotorIdle}, IsZInOriPos: {IsZInOriPos}";
                             if(_shuttle.Cassette && _shuttle.MotorIdle && IsZInOriPos)
                             {
-                                bool result = _shuttle.PlaceCassette(_placePosition);
+                                bool result = _shuttle.PlaceCassette(_placePosition, true);
                                 if (result)
                                 {
                                     _dryrun_procedure_case = 9; // move to next case
@@ -1219,7 +1237,7 @@ namespace CleanerControlApp.Hardwares
                             _dryrun_procedure_status = $"Case 9: Picked from Drying Tank #2 Position: {_pickPosition}, IsEmpty: {_shuttle.IsEmpty}, Idle: {_shuttle.MotorIdle}, IsZInOriPos: {IsZInOriPos}";
                             if(_shuttle.IsEmpty && _shuttle.MotorIdle && IsZInOriPos)
                             {
-                                bool result = _shuttle.PickCassette(_pickPosition);
+                                bool result = _shuttle.PickCassette(_pickPosition, true);
                                 if (result)
                                 {
                                     _dryrun_procedure_case = 10; // move to next case
@@ -1240,7 +1258,7 @@ namespace CleanerControlApp.Hardwares
                             _dryrun_procedure_status = $"Case 10: Placed back to Unloader Position: {_placePosition}, Cassette: {_shuttle.Cassette}, Idle: {_shuttle.MotorIdle}, IsZInOriPos: {IsZInOriPos}";
                             if(_shuttle.Cassette && _shuttle.MotorIdle && IsZInOriPos)
                             {
-                                bool result = _shuttle.PlaceCassette(_placePosition);
+                                bool result = _shuttle.PlaceCassette(_placePosition, true);
                                 if (result)
                                 {
                                     _dryrun_procedure_case = 11; // move to next case

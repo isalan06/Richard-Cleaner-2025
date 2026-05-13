@@ -217,6 +217,33 @@ namespace CleanerControlApp.Modules.DeltaMS300.Services
             _commandQueue.Enqueue(cmd);
         }
 
+        public void SetOutput(int op) // op: 0: stop; 1: forward; 2: reverse
+        {
+            DMCommandFrame cmd = new DMCommandFrame()
+            {
+                Id = 12,
+                Name = "Write Command For Output Control",
+                CommandFrame = new ModbusRTUFrame()
+                {
+                    SlaveAddress = 1,
+                    FunctionCode = 0x6, // Write Single Register
+                    StartAddress = 8192, // 2000H
+                    DataNumber = 1,
+                    Data = new ushort[] { (ushort)0x1 }
+                }
+            };
+            if (op == 1)
+            { 
+                cmd.CommandFrame.Data[0] = 0x12; // forward
+            }
+            else if (op == 2)
+            {
+                cmd.CommandFrame.Data[0] = 0x22; // reverse
+            }
+
+            _commandQueue.Enqueue(cmd);
+        }
+
         public string PortName => _modbusService != null ? _modbusService.PortName : "";
         public int WriteCount => _modbusService != null ? _modbusService.WriteCount : 0;  
         public int ReadCount => _modbusService != null ? _modbusService.ReadCount : 0;

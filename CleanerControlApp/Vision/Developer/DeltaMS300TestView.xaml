@@ -10,6 +10,7 @@
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="215" />
             <ColumnDefinition Width="215" />
+            <ColumnDefinition Width="170" />
         </Grid.ColumnDefinitions>
 
         <TextBlock Text="Delta MS300 測試" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,12,0,0" FontSize="16" FontWeight="Bold" Grid.ColumnSpan="2" />
@@ -247,6 +248,27 @@
                     </StackPanel>
                 </StackPanel>
 
+            </StackPanel>
+        </Border>
+
+        <!-- Third column: Control buttons for both modules -->
+        <Border Grid.Column="2" Margin="6,44,12,12" Background="#FFF8F8F8" BorderBrush="#FFCCCCCC" BorderThickness="1" CornerRadius="4" Padding="8">
+            <StackPanel>
+                <TextBlock Text="馬達控制" FontWeight="Bold" FontSize="14" Margin="0,0,0,12" HorizontalAlignment="Center" />
+
+                <!-- Module 1 controls -->
+                <TextBlock Text="模組1" FontWeight="Bold" FontSize="13" Margin="0,4,0,6" />
+                <Button x:Name="btnMS0Forward" Content="模組1 正轉" Width="140" Height="30" Margin="0,4,0,4" Click="BtnMS0Forward_Click" />
+                <Button x:Name="btnMS0Reverse" Content="模組1 反轉" Width="140" Height="30" Margin="0,4,0,4" Click="BtnMS0Reverse_Click" />
+                <Button x:Name="btnMS0OutputStop" Content="模組1 停止" Width="140" Height="30" Margin="0,4,0,12" Click="BtnMS0OutputStop_Click" />
+
+                <Separator Margin="0,8,0,12" />
+
+                <!-- Module 2 controls -->
+                <TextBlock Text="模組2" FontWeight="Bold" FontSize="13" Margin="0,4,0,6" />
+                <Button x:Name="btnMS1Forward" Content="模組2 正轉" Width="140" Height="30" Margin="0,4,0,4" Click="BtnMS1Forward_Click" />
+                <Button x:Name="btnMS1Reverse" Content="模組2 反轉" Width="140" Height="30" Margin="0,4,0,4" Click="BtnMS1Reverse_Click" />
+                <Button x:Name="btnMS1OutputStop" Content="模組2 停止" Width="140" Height="30" Margin="0,4,0,4" Click="BtnMS1OutputStop_Click" />
             </StackPanel>
         </Border>
 

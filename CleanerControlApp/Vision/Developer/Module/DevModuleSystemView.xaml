@@ -9,27 +9,30 @@
  <Grid Background="White" Margin="0,0,-270,-151">
  <TextBlock Text="Dev Module System View" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="10" FontSize="16" FontWeight="Bold"/>
  <Border Margin="10,44,10,152" BorderBrush="Gray" BorderThickness="1" CornerRadius="4" Background="#FFF8F8F8">
- <!-- Embedded Template_System inside a Canvas -->
- <Canvas Background="Transparent">
- <template:Template_System Canvas.Left="0" Canvas.Top="0" />
- </Canvas>
- 
- </Border>
+            <Grid>
+                <!-- Embedded Template_System inside a Canvas -->
+                <Canvas Background="Transparent">
+                    <template:Template_System Canvas.Left="0" Canvas.Top="0" />
+                    <StackPanel Orientation="Vertical" VerticalAlignment="Bottom" HorizontalAlignment="Left" Margin="10,0,0,66">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="系統 測試各點位 啟動狀態: " FontSize="16" VerticalAlignment="Center"/>
+                            <TextBlock x:Name="txtDryRunStatus" Text="False" FontSize="16" VerticalAlignment="Center" FontWeight="Bold"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+                            <TextBlock Text="測試各點位 狀態: " FontSize="16" VerticalAlignment="Center"/>
+                            <TextBlock x:Name="txtDryRunStatusString" Text="" FontSize="16" VerticalAlignment="Center" FontWeight="Bold"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                            <Button x:Name="btnStartDryRun" FontSize="20" Content="啟動測試" Click="BtnStartDryRun_Click" Width="100" Margin="0,0,8,0"/>
+                            <Button x:Name="btnStopDryRun" FontSize="20" Content="停止測試" Click="BtnStopDryRun_Click" Width="100" />
+                        </StackPanel>
+                    </StackPanel>
+                </Canvas>
+                
+            </Grid>
+        </Border>
 
  <!-- Dry run status and controls placed at bottom -->
- <StackPanel Orientation="Vertical" VerticalAlignment="Bottom" HorizontalAlignment="Left" Margin="10,0,0,66">
- <StackPanel Orientation="Horizontal">
- <TextBlock Text="系統 測試各點位 啟動狀態: " FontSize="16" VerticalAlignment="Center"/>
- <TextBlock x:Name="txtDryRunStatus" Text="False" FontSize="16" VerticalAlignment="Center" FontWeight="Bold"/>
- </StackPanel>
- <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
- <TextBlock Text="測試各點位 狀態: " FontSize="16" VerticalAlignment="Center"/>
- <TextBlock x:Name="txtDryRunStatusString" Text="" FontSize="16" VerticalAlignment="Center" FontWeight="Bold"/>
- </StackPanel>
- <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
- <Button x:Name="btnStartDryRun" FontSize="20" Content="啟動測試" Click="BtnStartDryRun_Click" Width="100" Margin="0,0,8,0"/>
-                <Button x:Name="btnStopDryRun" FontSize="20" Content="停止測試" Click="BtnStopDryRun_Click" Width="100" />
- </StackPanel>
- </StackPanel>
+ 
  </Grid>
 </UserControl>

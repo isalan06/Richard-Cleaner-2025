@@ -71,6 +71,8 @@
             <Button x:Name="btnTeachP1" FontSize="20" Content="Teach" Click="btnTeachP1_Click" Background="LightSeaGreen" Height="48" Canvas.Left="327" Canvas.Top="374" Width="113" HorizontalAlignment="Left" VerticalAlignment="Top"/>
             <Button x:Name="btnTeachP2" FontSize="20" Content="Teach" Click="btnTeachP2_Click" Background="LightSeaGreen" Height="48" Canvas.Left="327" Canvas.Top="433" Width="113" HorizontalAlignment="Left" VerticalAlignment="Top"/>
             <Button x:Name="btnTeachP3" FontSize="20" Content="Teach" Click="btnTeachP3_Click" Background="LightSeaGreen" Height="48" Canvas.Left="327" Canvas.Top="494" Width="113" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+            <TextBlock Text="Teach按鈕" FontSize="20" Foreground="#333333" TextAlignment="Center" Width="124" Height="25" Canvas.Left="324" Canvas.Top="317" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+            <TextBlock Text="請長按一秒" FontSize="20" Foreground="#333333" TextAlignment="Center" Width="119" Height="25" Canvas.Left="327" Canvas.Top="344" HorizontalAlignment="Left" VerticalAlignment="Top"/>
             <Button FontSize="18" Content="錯誤重置" Click="ResetAlarm_Click" Background="#ADD8E6" Height="60" Width="121" Canvas.Left="1016" Canvas.Top="444" HorizontalAlignment="Left" VerticalAlignment="Center"/>
             <Button x:Name="btnManualShaking" FontSize="18" Content="手動搖擺" Click="ManualShaking_Click" Height="60" Width="121" Canvas.Left="1160" Canvas.Top="444" HorizontalAlignment="Left" VerticalAlignment="Center">
                 <Button.Style>

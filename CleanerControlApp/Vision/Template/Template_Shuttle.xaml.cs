@@ -105,12 +105,12 @@ namespace CleanerControlApp.Vision.Template
             };
             _timer.Tick += Timer_Tick;
 
-            // teach hold timer (3 seconds)
-            _teachHoldTimer = new DispatcherTimer(DispatcherPriority.Normal) { Interval = TimeSpan.FromSeconds(3) };
+            // teach hold timer (1 second)
+            _teachHoldTimer = new DispatcherTimer(DispatcherPriority.Normal) { Interval = TimeSpan.FromSeconds(1) };
             _teachHoldTimer.Tick += TeachHoldTimer_Tick;
 
             // teach hold timer for Z
-            _teachHoldTimerZ = new DispatcherTimer(DispatcherPriority.Normal) { Interval = TimeSpan.FromSeconds(3) };
+            _teachHoldTimerZ = new DispatcherTimer(DispatcherPriority.Normal) { Interval = TimeSpan.FromSeconds(1) };
             _teachHoldTimerZ.Tick += TeachHoldTimerZ_Tick;
 
             Loaded += (s, e) =>
@@ -424,12 +424,7 @@ namespace CleanerControlApp.Vision.Template
 
         private void btnTeachP1_Click(object sender, RoutedEventArgs e)
         {
-            try
-            {
-                // short click: show hint to long-press
-                MessageBox.Show("請長按3 秒以進行 Teach", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
-            }
-            catch { }
+            // No action for short click
         }
 
         // Long-press handlers for X Teach
@@ -439,7 +434,7 @@ namespace CleanerControlApp.Vision.Template
             {
                 _teachHoldTimer.Stop();
                 _teachTriggered = true;
-                try { if (btnTeachX != null) btnTeachX.Background = new SolidColorBrush(Color.FromRgb(0xAD,0xD8,0xE6)); } catch { }
+                try { if (btnTeachX != null) btnTeachX.Background = Brushes.LightSeaGreen; } catch { }
 
                 int pos = GetSelectedPositionX();
                 try
@@ -474,13 +469,7 @@ namespace CleanerControlApp.Vision.Template
             {
                 _teachHoldTimer.Stop();
                 // restore background
-                try { if (btnTeachX != null) btnTeachX.Background = new SolidColorBrush(Color.FromRgb(0xAD,0xD8,0xE6)); } catch { }
-
-                // if not triggered, do short-press action (show hint)
-                if (!_teachTriggered)
-                {
-                    try { MessageBox.Show("請長按3 秒以進行 Teach", "提示", MessageBoxButton.OK, MessageBoxImage.Information); } catch { }
-                }
+                try { if (btnTeachX != null) btnTeachX.Background = Brushes.LightSeaGreen; } catch { }
             }
             catch { }
         }
@@ -490,7 +479,7 @@ namespace CleanerControlApp.Vision.Template
             try
             {
                 _teachHoldTimer.Stop();
-                try { if (btnTeachX != null) btnTeachX.Background = new SolidColorBrush(Color.FromRgb(0xAD,0xD8,0xE6)); } catch { }
+                try { if (btnTeachX != null) btnTeachX.Background = Brushes.LightSeaGreen; } catch { }
             }
             catch { }
         }
@@ -515,12 +504,7 @@ namespace CleanerControlApp.Vision.Template
 
         private void btnTeachZ_Click(object sender, RoutedEventArgs e)
         {
-            try
-            {
-                // short click: show hint to long-press
-                MessageBox.Show("請長按3 秒以進行 Teach", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
-            }
-            catch { }
+            // No action for short click
         }
 
         // Long-press handlers for Z Teach
@@ -530,7 +514,7 @@ namespace CleanerControlApp.Vision.Template
             {
                 _teachHoldTimerZ.Stop();
                 _teachTriggeredZ = true;
-                try { if (btnTeachZ != null) btnTeachZ.Background = new SolidColorBrush(Color.FromRgb(0xAD,0xD8,0xE6)); } catch { }
+                try { if (btnTeachZ != null) btnTeachZ.Background = Brushes.LightSeaGreen; } catch { }
 
                 int pos = GetSelectedPositionZ();
                 try
@@ -565,13 +549,7 @@ namespace CleanerControlApp.Vision.Template
             {
                 _teachHoldTimerZ.Stop();
                 // restore background
-                try { if (btnTeachZ != null) btnTeachZ.Background = new SolidColorBrush(Color.FromRgb(0xAD,0xD8,0xE6)); } catch { }
-
-                // if not triggered, do short-press action (show hint)
-                if (!_teachTriggeredZ)
-                {
-                    try { MessageBox.Show("請長按3 秒以進行 Teach", "提示", MessageBoxButton.OK, MessageBoxImage.Information); } catch { }
-                }
+                try { if (btnTeachZ != null) btnTeachZ.Background = Brushes.LightSeaGreen; } catch { }
             }
             catch { }
         }
@@ -581,7 +559,7 @@ namespace CleanerControlApp.Vision.Template
             try
             {
                 _teachHoldTimerZ.Stop();
-                try { if (btnTeachZ != null) btnTeachZ.Background = new SolidColorBrush(Color.FromRgb(0xAD,0xD8,0xE6)); } catch { }
+                try { if (btnTeachZ != null) btnTeachZ.Background = Brushes.LightSeaGreen; } catch { }
             }
             catch { }
         }

@@ -41,6 +41,8 @@ namespace CleanerControlApp.Modules.DeltaMS300.Interfaces
 
         void SetFrequency(float value);
 
+        void SetOutput(int op); // op: 0 = stop, 1 = forward, 2 = reverse
+
         string PortName { get; }
         int WriteCount { get; }
         int ReadCount { get; }

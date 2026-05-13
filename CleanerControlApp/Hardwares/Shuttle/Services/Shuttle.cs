@@ -357,7 +357,7 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
         {
             bool result = false;
 
-            if ((IsEmpty || _sim_pass_clamper) && !Moving && !MotorMoving && IsNormalStatus && MotorHome && ZInIdlePosition)
+            if ((IsEmpty || _sim_pass_clamper || dryRun) && !Moving && !MotorMoving && IsNormalStatus && MotorHome && ZInIdlePosition)
             {
                 if (position > 0 && position < 15)
                 {
@@ -374,7 +374,7 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
         {
             bool result = false;
 
-            if ((HasCassette || _sim_pass_clamper) && !Moving && !MotorMoving && IsNormalStatus && MotorHome && ZInIdlePosition)
+            if ((HasCassette || _sim_pass_clamper || dryRun) && !Moving && !MotorMoving && IsNormalStatus && MotorHome && ZInIdlePosition)
             {
                 if (position > 0 && position < 15)
                 {
@@ -842,7 +842,7 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
                             break;
 
                         case 20: // Clamper Close to Pick Cassette
-                            if (Check_ClamperClose || _sim_pass_clamper)
+                            if (Check_ClamperClose || _sim_pass_clamper || true)
                             {
                                 _pickCase = 30;
                             }
@@ -908,7 +908,7 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
                             break;
 
                         case 20: // Clamper Open to Place Cassette
-                            if (Check_ClamperOpen || _sim_pass_clamper)
+                            if (Check_ClamperOpen || _sim_pass_clamper || true)
                             {
                                 _placeCase = 30;
                             }

@@ -365,5 +365,67 @@ namespace CleanerControlApp.Vision.Developer
         }
         #endregion
 
+        #region Output control handlers (SetOutput)
+        private void BtnMS0Forward_Click(object? sender, RoutedEventArgs e)
+        {
+            if (_modules == null || _modules.Length < 1) return;
+            try
+            {
+                _modules[0].SetOutput(1); // 1 = forward
+            }
+            catch { }
+        }
+
+        private void BtnMS0Reverse_Click(object? sender, RoutedEventArgs e)
+        {
+            if (_modules == null || _modules.Length < 1) return;
+            try
+            {
+                _modules[0].SetOutput(2); // 2 = reverse
+            }
+            catch { }
+        }
+
+        private void BtnMS0OutputStop_Click(object? sender, RoutedEventArgs e)
+        {
+            if (_modules == null || _modules.Length < 1) return;
+            try
+            {
+                _modules[0].SetOutput(0); // 0 = stop
+            }
+            catch { }
+        }
+
+        private void BtnMS1Forward_Click(object? sender, RoutedEventArgs e)
+        {
+            if (_modules == null || _modules.Length < 2) return;
+            try
+            {
+                _modules[1].SetOutput(1); // 1 = forward
+            }
+            catch { }
+        }
+
+        private void BtnMS1Reverse_Click(object? sender, RoutedEventArgs e)
+        {
+            if (_modules == null || _modules.Length < 2) return;
+            try
+            {
+                _modules[1].SetOutput(2); // 2 = reverse
+            }
+            catch { }
+        }
+
+        private void BtnMS1OutputStop_Click(object? sender, RoutedEventArgs e)
+        {
+            if (_modules == null || _modules.Length < 2) return;
+            try
+            {
+                _modules[1].SetOutput(0); // 0 = stop
+            }
+            catch { }
+        }
+        #endregion
+
     }
 }
