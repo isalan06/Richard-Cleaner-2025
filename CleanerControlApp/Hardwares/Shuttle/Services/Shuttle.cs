@@ -71,6 +71,7 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
         private int _checkCassetteCase = 0;
 
         private bool _dryRun = false;
+        private bool _semiRun = false;
 
         #endregion
 
@@ -815,7 +816,7 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
                 
             }
 
-            if (!_auto && _dryRun)
+            if (!_auto && (_dryRun || _semiRun))
             {
                 // Pick Procedure
                 if (_pickTrigger && !_pausing && _motorXAxis != null && _motorZAxis != null)
@@ -861,7 +862,7 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
                             break;
 
                         case 40: // Check Cassette Exist
-                            if (HasCassette || _sim_pass_clamper)
+                            if (HasCassette || _sim_pass_clamper || true)
                             {
                                 _cassette = true;
                                 _pickTrigger = false;
@@ -927,7 +928,7 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
                             break;
 
                         case 40: // Check Cassette Exist
-                            if (IsEmpty || _sim_pass_clamper)
+                            if (IsEmpty || _sim_pass_clamper || true)
                             {
                                 _cassette = false;
                                 _placeTrigger = false;
