@@ -35,7 +35,9 @@ namespace CleanerControlApp.Hardwares.HeatingTank.Services
         // background loop
         private CancellationTokenSource? _cts;
         private Task? _loopTask;
-        private readonly TimeSpan _loopInterval = TimeSpan.FromMilliseconds(10);
+        // private readonly TimeSpan _loopInterval = TimeSpan.FromMilliseconds(10);
+        // Increase loop interval to reduce CPU usage and relieve USB/RS485 communication delays
+        private readonly TimeSpan _loopInterval = TimeSpan.FromMilliseconds(50);
 
         //private IModbusRTUService? _modbusService;
 
@@ -417,6 +419,7 @@ namespace CleanerControlApp.Hardwares.HeatingTank.Services
                     return false;
 
                 _deltaMS300.SetFrequency(_moduleSettings.HeatingTank != null ? _moduleSettings.HeatingTank.INV_High :0f);
+                _deltaMS300.SetOutput(1); // 1: forware; 2: reserve (視現場調整)
                 _inv_op_index =2;
                 _lastDeltaFrequencyCommand = DateTime.UtcNow;
                 result = true;
@@ -432,6 +435,7 @@ namespace CleanerControlApp.Hardwares.HeatingTank.Services
                     return false;
 
                 _deltaMS300.SetFrequency(_moduleSettings.HeatingTank != null ? _moduleSettings.HeatingTank.INV_Low :0f);
+                _deltaMS300.SetOutput(1); // 1: forware; 2: reserve (視現場調整)
                 _inv_op_index =1;
                 _lastDeltaFrequencyCommand = DateTime.UtcNow;
                 result = true;
@@ -447,6 +451,7 @@ namespace CleanerControlApp.Hardwares.HeatingTank.Services
                     return false;
 
                 _deltaMS300.SetFrequency(_moduleSettings.HeatingTank != null ? _moduleSettings.HeatingTank.INV_Zero :0f);
+                _deltaMS300.SetOutput(0); // 0: stop
                 _inv_op_index =0;
                 _lastDeltaFrequencyCommand = DateTime.UtcNow;
                 result = true;
@@ -671,7 +676,7 @@ namespace CleanerControlApp.Hardwares.HeatingTank.Services
         private void AutoProcedure()
         {
             // Water System Error handling: if Waste Water High Alarm is on, stop water in and out regardless of other conditions; if Liquid HH alarm is on, stop water in and allow water out; if Liquid LL alarm is on, stop water out and allow water in
-            if ((_private_waste_HAlarm || _tankHHAlarm || _tankLLAlarm) && false)
+            if (_private_waste_HAlarm || _tankHHAlarm || _tankLLAlarm)
             {
                 if(!IsZeroFrequency) ZeroFrequencyOP();
                 if(Heating) HeatingOP(false);

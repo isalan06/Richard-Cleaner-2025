@@ -73,6 +73,18 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
         private bool _dryRun = false;
         private bool _semiRun = false;
 
+        // Timeout handling for pick/place/check triggers
+        private DateTime? _triggerStartTime = null;
+        private readonly TimeSpan _triggerTimeout = TimeSpan.FromMinutes(5);
+
+        // Flags raised when timeout occurs; caller will handle these alarms later
+        private bool _triggerTimeoutAutoAlarm = false;
+        private bool _triggerTimeoutDrySemiAlarm = false;
+
+        // Track OP mode transitions: do not execute the manual-entry actions on the very first read after startup.
+        private bool _prevOpModeManual = false;
+        private bool _opModeFirstRead = true;
+
         #endregion
 
         #region constructor
@@ -115,6 +127,9 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
                 AlarmManager.AttachFlagGetter("ALM115", () => _pickProcedureError);
                 AlarmManager.AttachFlagGetter("ALM116", () => _placeProcedureError);
                 AlarmManager.AttachFlagGetter("ALM117", () => _checkCassetteProcedureError);
+                // Trigger timeout alarms
+                AlarmManager.AttachFlagGetter("ALM118", () => _triggerTimeoutAutoAlarm);
+                AlarmManager.AttachFlagGetter("ALM119", () => _triggerTimeoutDrySemiAlarm);
 
                 StartLoop();
 
@@ -198,6 +213,8 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
         public bool Sensor_ClamperBackClose => _plcService != null && _plcService.ShuttleZBClamperClose;
         public bool Sensor_ClamperOpen => _plcService != null && _plcService.ShuttleZClamperOpenSign;
         public bool Sensor_ClamperClose => _plcService != null && _plcService.ShuttleZClamperCloseSign;
+        public bool Sensor_OpMode_Auto => Sensor_ClamperOpen;
+        public bool Sensor_OpMode_Manual => Sensor_ClamperClose;
 
         public bool Check_ClamperOpen => Sensor_ClamperFrontOpen && Sensor_ClamperBackOpen && Sensor_ClamperOpen;
         public bool Check_ClamperClose => Sensor_ClamperFrontClose && Sensor_ClamperBackClose && Sensor_ClamperClose;
@@ -504,7 +521,7 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
                     sb.AppendLine(" - 機台空閒且有卡匣：可呼叫 PlaceCassette(position) 將卡匣放至目標位置，或讓自動流程繼續。 ");
             }
 
-            sb.AppendLine(" - 若出現警告/錯誤，請先處理後再繼續自動流程。 ");
+            sb.AppendLine(" - 若出現警告/錯誤，請先處理後再續自動流程。 ");
 
             return sb.ToString();
         }
@@ -558,6 +575,7 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
             RefreshTimeoutValue();
             CheckTimeout();
 
+            CheckOPMode();
 
             AutoProcedure();
 
@@ -670,11 +688,63 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
 
         private void AutoProcedure()
         {
-            if (!_pickTrigger && _pickCase != 0) _pickCase = 0;
-            if (!_placeTrigger && _placeCase != 0) _placeCase = 0;
-            if (!_checkCassetteTrigger && _checkCassetteCase != 0) _checkCassetteCase = 0;
+            // Start/stop timeout timer for triggers
+            bool anyTrigger = _pickTrigger || _placeTrigger || _checkCassetteTrigger;
 
-            if (_auto && !_dryRun)
+            if (anyTrigger)
+            {
+                if (_triggerStartTime == null)
+                    _triggerStartTime = DateTime.UtcNow;
+                else
+                {
+                    var elapsed = DateTime.UtcNow - _triggerStartTime.Value;
+                    if (elapsed >= _triggerTimeout)
+                    {
+                        // Timeout occurred - set appropriate alarm flags and clear triggers
+                        if (_auto)
+                        {
+                            // Log timeout for Auto mode
+                            OperateLog.Log("超時: 移載組在自動模式觸發超時，已清除觸發並停止自動流程", "Alarm");
+                            _logger?.LogWarning("Shuttle trigger timeout (auto mode): cleared triggers and stopped auto.");
+
+                            // Auto-mode timeout alarm: clear triggers and stop
+                            _pickTrigger = false;
+                            _placeTrigger = false;
+                            _checkCassetteTrigger = false;
+                            _auto = false;
+                            _triggerTimeoutAutoAlarm = true;
+                        }
+                        else if (_dryRun || _semiRun)
+                        {
+                            // Log timeout for dry/semi run
+                            OperateLog.Log("超時: 移載組在 Dry/SemiRun 模式觸發超時，已清除觸發並停用 dryRun/semiRun", "Alarm");
+                            _logger?.LogWarning("Shuttle trigger timeout (dry/semi run): cleared triggers and disabled dryRun/semiRun.");
+
+                            // Dry/semi run timeout alarm: clear triggers and disable dry/semi run
+                            _pickTrigger = false;
+                            _placeTrigger = false;
+                            _checkCassetteTrigger = false;
+                            _dryRun = false;
+                            _semiRun = false;
+                            _triggerTimeoutDrySemiAlarm = true;
+                        }
+
+                        // reset timer after handling
+                        _triggerStartTime = null;
+                    }
+                }
+            }
+            else
+            {
+                // no active triggers -> reset timer
+                _triggerStartTime = null;
+            }
+            
+            if (!_pickTrigger && _pickCase !=0) _pickCase =0;
+            if (!_placeTrigger && _placeCase !=0) _placeCase =0;
+            if (!_checkCassetteTrigger && _checkCassetteCase !=0) _checkCassetteCase =0;
+
+            if (_auto && !_dryRun && !_semiRun)
             {
                 if (Idle && _autoStopFlag && !_pickTrigger && !_placeTrigger && !_moving)
                 {
@@ -842,7 +912,7 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
                             break;
 
                         case 20: // Clamper Close to Pick Cassette
-                            if (Check_ClamperClose || _sim_pass_clamper || true)
+                            if (Check_ClamperClose || _sim_pass_clamper)
                             {
                                 _pickCase = 30;
                             }
@@ -862,7 +932,7 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
                             break;
 
                         case 40: // Check Cassette Exist
-                            if (HasCassette || _sim_pass_clamper || true)
+                            if (HasCassette || _sim_pass_clamper)
                             {
                                 _cassette = true;
                                 _pickTrigger = false;
@@ -908,7 +978,7 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
                             break;
 
                         case 20: // Clamper Open to Place Cassette
-                            if (Check_ClamperOpen || _sim_pass_clamper || true)
+                            if (Check_ClamperOpen || _sim_pass_clamper)
                             {
                                 _placeCase = 30;
                             }
@@ -928,7 +998,7 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
                             break;
 
                         case 40: // Check Cassette Exist
-                            if (IsEmpty || _sim_pass_clamper || true)
+                            if (IsEmpty || _sim_pass_clamper)
                             {
                                 _cassette = false;
                                 _placeTrigger = false;
@@ -1125,6 +1195,32 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
                     }
                 }
             }
+        }
+
+        private void CheckOPMode()
+        { 
+            // Read current manual OP mode state
+            bool currentManual = Sensor_OpMode_Manual;
+
+            // On first read after startup, just record state and don't trigger actions
+            if (_opModeFirstRead)
+            {
+                _prevOpModeManual = currentManual;
+                _opModeFirstRead = false;
+                return;
+            }
+
+            // Trigger action only when transitioning from false -> true
+            if (!_prevOpModeManual && currentManual)
+            {
+
+                // When entering manual mode (rising edge), ensure cassette state cleared and clamper opened
+                _cassette = false;
+                ClamperOpenOP(true);
+            }
+
+            // Update previous state
+            _prevOpModeManual = currentManual;
         }
 
         #endregion

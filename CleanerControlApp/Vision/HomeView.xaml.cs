@@ -22,7 +22,7 @@ namespace CleanerControlApp.Vision
     public partial class HomeView : UserControl
     {
         private CancellationTokenSource? _resetCts;
-        private const int HoldMilliseconds = 3000; //3 seconds
+        private const int HoldMilliseconds = 1000; //1 second (changed from 3000)
         private DispatcherTimer? _progressTimer;
         private DateTime _holdStart;
         private Brush? _btnResetOriginalBackground;
@@ -968,8 +968,8 @@ namespace CleanerControlApp.Vision
                     // set owner and size relative to owner (1.5x)
                     win.Owner = owner;
 
-                    double w = owner.ActualWidth >0 ? owner.ActualWidth *1.5 :600 *1.5;
-                    double h = owner.ActualHeight >0 ? owner.ActualHeight *1.5 :420 *1.5;
+                    double w = owner.ActualWidth > 0 ? owner.ActualWidth * 1.5 : 600 * 1.5;
+                    double h = owner.ActualHeight > 0 ? owner.ActualHeight * 1.5 : 420 * 1.5;
 
                     // ensure it does not exceed available work area
                     w = Math.Min(w, SystemParameters.WorkArea.Width);

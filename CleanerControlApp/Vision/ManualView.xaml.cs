@@ -22,8 +22,9 @@ namespace CleanerControlApp.Vision
         private ManualSoakingTankView? _soakingView;
         private ManualDryingTankView? _dryingView;
         private ManualHeatingTankView? _heatingView;
+        private ManualSemiOpView? _semiOpView;
 
-        private enum Tab { System, Shuttle, Sink, Soaking, Drying, Heating }
+        private enum Tab { System, SemiOp, Shuttle, Sink, Soaking, Drying, Heating }
 
         public ManualView()
         {
@@ -41,6 +42,7 @@ namespace CleanerControlApp.Vision
         private void InitializeTabButtons()
         {
             BtnSystem.Background = _unselectedBg; BtnSystem.Foreground = _unselectedFg;
+            BtnSemiOp.Background = _unselectedBg; BtnSemiOp.Foreground = _unselectedFg;
             BtnShuttle.Background = _unselectedBg; BtnShuttle.Foreground = _unselectedFg;
             BtnSink.Background = _unselectedBg; BtnSink.Foreground = _unselectedFg;
             BtnSoakingTank.Background = _unselectedBg; BtnSoakingTank.Foreground = _unselectedFg;
@@ -48,6 +50,7 @@ namespace CleanerControlApp.Vision
             BtnHeatingTank.Background = _unselectedBg; BtnHeatingTank.Foreground = _unselectedFg;
 
             BtnSystem.Focusable = false;
+            BtnSemiOp.Focusable = false;
             BtnShuttle.Focusable = false;
             BtnSink.Focusable = false;
             BtnSoakingTank.Focusable = false;
@@ -58,6 +61,7 @@ namespace CleanerControlApp.Vision
         private void SelectTab(Tab tab)
         {
             BtnSystem.Background = _unselectedBg; BtnSystem.Foreground = _unselectedFg;
+            BtnSemiOp.Background = _unselectedBg; BtnSemiOp.Foreground = _unselectedFg;
             BtnShuttle.Background = _unselectedBg; BtnShuttle.Foreground = _unselectedFg;
             BtnSink.Background = _unselectedBg; BtnSink.Foreground = _unselectedFg;
             BtnSoakingTank.Background = _unselectedBg; BtnSoakingTank.Foreground = _unselectedFg;
@@ -70,6 +74,11 @@ namespace CleanerControlApp.Vision
                     BtnSystem.Background = _selectedBg; BtnSystem.Foreground = _selectedFg;
                     if (_systemView == null) _systemView = new ManualSystemView();
                     ManualContentPlaceholder.Content = _systemView;
+                    break;
+                case Tab.SemiOp:
+                    BtnSemiOp.Background = _selectedBg; BtnSemiOp.Foreground = _selectedFg;
+                    if (_semiOpView == null) _semiOpView = new ManualSemiOpView();
+                    ManualContentPlaceholder.Content = _semiOpView;
                     break;
                 case Tab.Shuttle:
                     BtnShuttle.Background = _selectedBg; BtnShuttle.Foreground = _selectedFg;
@@ -102,6 +111,11 @@ namespace CleanerControlApp.Vision
         private void BtnSystem_Click(object sender, RoutedEventArgs e)
         {
             SelectTab(Tab.System);
+        }
+
+        private void BtnSemiOp_Click(object sender, RoutedEventArgs e)
+        {
+            SelectTab(Tab.SemiOp);
         }
 
         private void BtnShuttle_Click(object sender, RoutedEventArgs e)

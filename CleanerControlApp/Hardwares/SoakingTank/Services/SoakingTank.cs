@@ -32,7 +32,9 @@ namespace CleanerControlApp.Hardwares.SoakingTank.Services
         // background loop
         private CancellationTokenSource? _cts;
         private Task? _loopTask;
-        private readonly TimeSpan _loopInterval = TimeSpan.FromMilliseconds(10);
+        // private readonly TimeSpan _loopInterval = TimeSpan.FromMilliseconds(10);
+        // Increase loop interval to reduce CPU usage and relieve USB/RS485 communication delays
+        private readonly TimeSpan _loopInterval = TimeSpan.FromMilliseconds(50);
 
         private bool _running;
 
@@ -905,9 +907,9 @@ namespace CleanerControlApp.Hardwares.SoakingTank.Services
                     _auto = false;
                 }
 
-                if (Ultrasonic) // 沖水過程
+                if (Ultrasonic) // 沌水過程
                 {
-                    if (_pausing || !Sensor_Liquid_H) // 沖水過程中暫停
+                    if (_pausing || !Sensor_Liquid_H) // 沌水過程中暫停
                     {
                         UltrasonicOP(false);
                     }

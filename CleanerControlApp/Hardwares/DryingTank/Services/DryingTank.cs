@@ -36,7 +36,8 @@ namespace CleanerControlApp.Hardwares.DryingTank.Services
         // background loop
         private CancellationTokenSource? _cts;
         private Task? _loopTask;
-        private readonly TimeSpan _loopInterval = TimeSpan.FromMilliseconds(10);
+        // Increase loop interval to reduce CPU usage and relieve USB/RS485 communication delays
+        private readonly TimeSpan _loopInterval = TimeSpan.FromMilliseconds(50);
 
         //private IModbusRTUService? _modbusService;
 

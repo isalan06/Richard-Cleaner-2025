@@ -36,7 +36,9 @@ namespace CleanerControlApp.Hardwares.Sink.Services
         // background loop
         private CancellationTokenSource? _cts;
         private Task? _loopTask;
-        private readonly TimeSpan _loopInterval = TimeSpan.FromMilliseconds(10);
+        // private readonly TimeSpan _loopInterval = TimeSpan.FromMilliseconds(10);
+        // Increase loop interval to reduce CPU usage and relieve USB/RS485 communication delays
+        private readonly TimeSpan _loopInterval = TimeSpan.FromMilliseconds(50);
 
         //private IModbusRTUService? _modbusService;
         private IDeltaMS300? _deltaMS300;
@@ -266,6 +268,7 @@ namespace CleanerControlApp.Hardwares.Sink.Services
                 if (HS_WaterSystemError && pressure) pressure = false;
 
                 SetSV(pressure ? _moduleSettings.Sink.SV_High : _moduleSettings.Sink.SV_Low);
+                _deltaMS300?.SetOutput(pressure ? 1 : 0); // set bit for pressure command; 0: stop; 1:forward; 2:reverse(看現場接線決定)
                 _pressure = pressure;
                 result = true;
             }

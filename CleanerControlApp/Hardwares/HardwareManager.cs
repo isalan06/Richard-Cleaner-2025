@@ -1080,83 +1080,130 @@ namespace CleanerControlApp.Hardwares
                         }
                         break;
 
-                    case 2: // place to sink
+                    case 2: // wait for finish of picking fron loader
                         if (_shuttle != null)
                         {
-                            int _placePosition = 6; // Sink position for dry run
-                            _dryrun_procedure_status = $"Case 2: Placed to Sink Position: {_placePosition}, Cassette: {_shuttle.Cassette}, Idle: {_shuttle.MotorIdle}, IsZInOriPos: {IsZInOriPos}";
+                            _dryrun_procedure_status = $"Case 2: Finished picking from Loader Position: {_dryrun_procedure_loader_position}, Cassette: {_shuttle.Cassette}, Idle: {_shuttle.MotorIdle}, IsZInOriPos: {IsZInOriPos}";
                             if (_shuttle.Cassette && _shuttle.MotorIdle && IsZInOriPos)
                             {
-
-                                bool result = _shuttle.PlaceCassette(_placePosition, true);
-                                if (result)
-                                {
-                                    _dryrun_procedure_case = 3; // move to next case
-                                }
-                                else
-                                {
-                                    _dryrun_procedure_status = $"Case 2: Failed to place to Sink Position: {_placePosition}";
-                                    _dryrun_procedure_case = 99; // error case
-                                }
+                                _dryrun_procedure_case = 3; // move to next case
                             }
                         }
                         break;
 
-                    case 3: // pick from sink
+                    case 3: // place to sink
                         if (_shuttle != null)
                         {
-                            int _pickPosition = 6; // Sink position for pick
-                            _dryrun_procedure_status = $"Case 3: Picked from Sink Position: {_pickPosition}, IsEmpty: {_shuttle.IsEmpty}, Idle: {_shuttle.MotorIdle}, IsZInOriPos: {IsZInOriPos}";
-                            if (_shuttle.IsEmpty && _shuttle.MotorIdle && IsZInOriPos)
+                            int _placePosition = 6; // Sink position for dry run
+                            _dryrun_procedure_status = $"Case 3: Placed to Sink Position: {_placePosition}, Cassette: {_shuttle.Cassette}, NormalStatus: {_shuttle.IsNormalStatus}";
+                            if (_shuttle.Cassette && _shuttle.IsNormalStatus)
                             {
-                                
-                                bool result = _shuttle.PickCassette(_pickPosition, true);
+
+                                bool result = _shuttle.PlaceCassette(_placePosition, true);
                                 if (result)
                                 {
                                     _dryrun_procedure_case = 4; // move to next case
                                 }
                                 else
                                 {
-                                    _dryrun_procedure_status = $"Case 3: Failed to pick from Sink Position: {_pickPosition}";
+                                    _dryrun_procedure_status = $"Case 3: Failed to place to Sink Position: {_placePosition}";
                                     _dryrun_procedure_case = 99; // error case
                                 }
                             }
                         }
                         break;
 
-                    case 4: // place to soaking tank
+                    case 4: // wait for finish of placing to sink
                         if (_shuttle != null)
                         {
-                            if (_shuttle.Cassette && _shuttle.MotorIdle && IsZInOriPos)
+                            int _placePosition = 6; // Sink position for dry run
+                            _dryrun_procedure_status = $"Case 4: Finished placing to Sink Position: {_placePosition}, Cassette: {_shuttle.Cassette}, Idle: {_shuttle.MotorIdle}, IsZInOriPos: {IsZInOriPos}";
+                            if (!_shuttle.Cassette && _shuttle.MotorIdle && IsZInOriPos)
                             {
-                                int _placePosition = 7; // soaking tank position for dry run
-                                _dryrun_procedure_status = $"Case 4: Placed to Unloader Position: {_placePosition}, Cassette: {_shuttle.Cassette}, Idle: {_shuttle.MotorIdle}, IsZInOriPos: {IsZInOriPos}";
-                                bool result = _shuttle.PlaceCassette(_placePosition, true);
+                                _dryrun_procedure_case = 5; // move to next case
+                            }
+                        }
+                        break;
+
+                    case 5: // pick from sink
+                        if (_shuttle != null)
+                        {
+                            int _pickPosition = 6; // Sink position for pick
+                            _dryrun_procedure_status = $"Case 5: Picked from Sink Position: {_pickPosition}, IsEmpty: {_shuttle.IsEmpty}, NormalStatus: {_shuttle.IsNormalStatus}";
+                            if (_shuttle.IsEmpty && _shuttle.IsNormalStatus)
+                            {
+                                
+                                bool result = _shuttle.PickCassette(_pickPosition, true);
                                 if (result)
                                 {
-                                    _dryrun_procedure_case = 5; // move to next case
+                                    _dryrun_procedure_case = 6; // move to next case
                                 }
                                 else
                                 {
-                                    _dryrun_procedure_status = $"Case 4: Failed to place to Unloader Position: {_placePosition}";
+                                    _dryrun_procedure_status = $"Case 5: Failed to pick from Sink Position: {_pickPosition}";
                                     _dryrun_procedure_case = 99; // error case
                                 }
                             }
                         }
                         break;
 
-                    case 5: // pick from soaking tank
+                    case 6: // wait for finish of picking from sink
+                        if (_shuttle != null)
+                        {
+                            int _pickPosition = 6; // Sink position for pick
+                            _dryrun_procedure_status = $"Case 6: Finished picking from Sink Position: {_pickPosition}, IsEmpty: {_shuttle.IsEmpty}, Idle: {_shuttle.MotorIdle}, IsZInOriPos: {IsZInOriPos}";
+                            if (_shuttle.IsEmpty && _shuttle.MotorIdle && IsZInOriPos)
+                            {
+                                _dryrun_procedure_case = 7; // move to next case
+                            }
+                        }
+                        break;
+
+                    case 7: // place to soaking tank
+                        if (_shuttle != null)
+                        {
+                            if (_shuttle.Cassette && _shuttle.IsNormalStatus)
+                            {
+                                int _placePosition = 7; // soaking tank position for dry run
+                                _dryrun_procedure_status = $"Case 7: Placed to Unloader Position: {_placePosition}, Cassette: {_shuttle.Cassette}, NormalStatus: {_shuttle.IsNormalStatus}";
+                                bool result = _shuttle.PlaceCassette(_placePosition, true);
+                                if (result)
+                                {
+                                    _dryrun_procedure_case = 8; // move to next case
+                                }
+                                else
+                                {
+                                    _dryrun_procedure_status = $"Case 7: Failed to place to Unloader Position: {_placePosition}";
+                                    _dryrun_procedure_case = 99; // error case
+                                }
+                            }
+                        }
+                        break;
+
+                    case 8: // wait for finish of placing to soaking tank
+                        if (_shuttle != null)
+                        {
+                            int _placePosition = 7; // soaking tank position for dry run
+                            _dryrun_procedure_status = $"Case 8: Finished placing to Soaking Tank Position: {_placePosition}, Cassette: {_shuttle.Cassette}, Idle: {_shuttle.MotorIdle}, IsZInOriPos: {IsZInOriPos}";
+                            if (!_shuttle.Cassette && _shuttle.MotorIdle && IsZInOriPos)
+                            {
+                                _dryrun_procedure_case = 9; // move to next case
+                            }
+                        }
+                        break;
+
+                    case 9: // pick from soaking tank
                         if (_shuttle != null)
                         {
                             int _pickPosition = 7; // soaking tank position for pick
-                            _dryrun_procedure_status = $"Case 5: Picked from Soaking Tank Position: {_pickPosition}, IsEmpty: {_shuttle.IsEmpty}, Idle: {_shuttle.MotorIdle}, IsZInOriPos: {IsZInOriPos}";
-                            if (_shuttle.IsEmpty && _shuttle.MotorIdle && IsZInOriPos)
+                            _dryrun_procedure_status = $"Case 9: Picked from Soaking Tank Position: {_pickPosition}, IsEmpty: {_shuttle.IsEmpty}, NormalStatus: {_shuttle.IsNormalStatus}";
+                            if (_shuttle.IsEmpty && _shuttle.IsNormalStatus)
                             {
 
                                 bool result = _shuttle.PickCassette(_pickPosition, true);
                                 if (result)
                                 {
-                                    _dryrun_procedure_case = 6; // move to next case
+                                    _dryrun_procedure_case = 10; // move to next case
                                 }
                                 else
                                 {
@@ -1167,125 +1214,197 @@ namespace CleanerControlApp.Hardwares
                         }
                         break;
 
-                    case 6: // place to drying tank #1
+                    case 10: // wait for finish of picking from soaking tank
+                        if (_shuttle != null)
+                        {
+                            int _pickPosition = 7; // soaking tank position for pick
+                            _dryrun_procedure_status = $"Case 10: Finished picking from Soaking Tank Position: {_pickPosition}, IsEmpty: {_shuttle.IsEmpty}, Idle: {_shuttle.MotorIdle}, IsZInOriPos: {IsZInOriPos}";
+                            if (_shuttle.IsEmpty && _shuttle.MotorIdle && IsZInOriPos)
+                            {
+                                _dryrun_procedure_case = 11; // move to next case
+                            }
+                        }
+                        break;
+
+                    case 11: // place to drying tank #1
                         if (_shuttle != null)
                         { 
                             int _placePosition = 8; // Drying Tank #1 position for dry run 
-                            _dryrun_procedure_status = $"Case 6: Placed to Drying Tank #1 Position: {_placePosition}, Cassette: {_shuttle.Cassette}, Idle: {_shuttle.MotorIdle}, IsZInOriPos: {IsZInOriPos}";
-                            if(_shuttle.Cassette && _shuttle.MotorIdle && IsZInOriPos)
+                            _dryrun_procedure_status = $"Case 11: Placed to Drying Tank #1 Position: {_placePosition}, Cassette: {_shuttle.Cassette}, NormalStatus: {_shuttle.IsNormalStatus}";
+                            if(_shuttle.Cassette && _shuttle.IsNormalStatus)
                             {
                                 bool result = _shuttle.PlaceCassette(_placePosition, true);
-                                if (result)
-                                {
-                                    _dryrun_procedure_case = 7; // move to next case
-                                }
-                                else
-                                {
-                                    _dryrun_procedure_status = $"Case 6: Failed to place to Drying Tank #1 Position: {_placePosition}";
-                                    _dryrun_procedure_case = 99; // error case
-                                }
-                            }
-                        }
-                        break;
-
-                    case 7: // pick from drying tank #1
-                        if (_shuttle != null)
-                        { 
-                            int _pickPosition = 8; // Drying Tank #1 position for pick
-                            _dryrun_procedure_status = $"Case 7: Picked from Drying Tank #1 Position: {_pickPosition}, IsEmpty: {_shuttle.IsEmpty}, Idle: {_shuttle.MotorIdle}, IsZInOriPos: {IsZInOriPos}";
-                            if(_shuttle.IsEmpty && _shuttle.MotorIdle && IsZInOriPos)
-                            {
-                                bool result = _shuttle.PickCassette(_pickPosition, true);
-                                if (result)
-                                {
-                                    _dryrun_procedure_case = 8; // move to next case
-                                }
-                                else
-                                {
-                                    _dryrun_procedure_status = $"Case 7: Failed to pick from Drying Tank #1 Position: {_pickPosition}";
-                                    _dryrun_procedure_case = 99; // error case
-                                }
-                            }
-                        }
-                        break;
-
-                    case 8: // place to drying tank #2
-                        if (_shuttle != null)
-                        { 
-                            int _placePosition = 9; // Drying Tank #2 position for dry run
-                            _dryrun_procedure_status = $"Case 8: Placed to Drying Tank #2 Position: {_placePosition}, Cassette: {_shuttle.Cassette}, Idle: {_shuttle.MotorIdle}, IsZInOriPos: {IsZInOriPos}";
-                            if(_shuttle.Cassette && _shuttle.MotorIdle && IsZInOriPos)
-                            {
-                                bool result = _shuttle.PlaceCassette(_placePosition, true);
-                                if (result)
-                                {
-                                    _dryrun_procedure_case = 9; // move to next case
-                                }
-                                else
-                                {
-                                    _dryrun_procedure_status = $"Case 8: Failed to place to Drying Tank #2 Position: {_placePosition}";
-                                    _dryrun_procedure_case = 99; // error case
-                                }
-                            }
-                        }
-                        break;
-
-                    case 9: // pick from drying tank #2
-                        if (_shuttle != null)
-                        { 
-                            int _pickPosition = 9; // Drying Tank #2 position for pick
-                            _dryrun_procedure_status = $"Case 9: Picked from Drying Tank #2 Position: {_pickPosition}, IsEmpty: {_shuttle.IsEmpty}, Idle: {_shuttle.MotorIdle}, IsZInOriPos: {IsZInOriPos}";
-                            if(_shuttle.IsEmpty && _shuttle.MotorIdle && IsZInOriPos)
-                            {
-                                bool result = _shuttle.PickCassette(_pickPosition, true);
-                                if (result)
-                                {
-                                    _dryrun_procedure_case = 10; // move to next case
-                                }
-                                else
-                                {
-                                    _dryrun_procedure_status = $"Case 9: Failed to pick from Drying Tank #2 Position: {_pickPosition}";
-                                    _dryrun_procedure_case = 99; // error case
-                                }
-                            }
-                        }
-                        break;
-
-                    case 10: // place back to unloader
-                        if (_shuttle != null)
-                        {
-                            int _placePosition = _dryrun_procedure_unloader_position; // place back to unloader position for dry run
-                            _dryrun_procedure_status = $"Case 10: Placed back to Unloader Position: {_placePosition}, Cassette: {_shuttle.Cassette}, Idle: {_shuttle.MotorIdle}, IsZInOriPos: {IsZInOriPos}";
-                            if(_shuttle.Cassette && _shuttle.MotorIdle && IsZInOriPos)
-                            {
-                                bool result = _shuttle.PlaceCassette(_placePosition, true);
-                                if (result)
-                                {
-                                    _dryrun_procedure_case = 11; // move to next case
-                                }
-                                else
-                                {
-                                    _dryrun_procedure_status = $"Case 10: Failed to place back to Unloader Position: {_placePosition}";
-                                    _dryrun_procedure_case = 99; // error case
-                                }
-                            }
-                        }
-                        break;
-
-                    case 11: // check shuttle is empty and back to original position
-                        if (_shuttle != null)
-                        { 
-                            _dryrun_procedure_status = $"Case 11: Checking if shuttle is empty and back to original position. Cassette: {_shuttle.Cassette}, Idle: {_shuttle.MotorIdle}, IsZInOriPos: {IsZInOriPos}";
-                            if (_shuttle.IsEmpty && _shuttle.MotorIdle && IsZInOriPos)
-                            {
-                                bool result = _shuttle.BackToOriginalPosition();
                                 if (result)
                                 {
                                     _dryrun_procedure_case = 12; // move to next case
                                 }
                                 else
                                 {
-                                    _dryrun_procedure_status = $"Case 11: Waiting for shuttle to be empty and back to original position. Cassette: {_shuttle.Cassette}, Idle: {_shuttle.MotorIdle}, IsZInOriPos: {IsZInOriPos}";
+                                    _dryrun_procedure_status = $"Case 11: Failed to place to Drying Tank #1 Position: {_placePosition}";
+                                    _dryrun_procedure_case = 99; // error case
+                                }
+                            }
+                        }
+                        break;
+
+                    case 12: // wait for finish of placing to drying tank #1
+                        if (_shuttle != null)
+                        { 
+                            int _placePosition = 8; // Drying Tank #1 position for dry run 
+                            _dryrun_procedure_status = $"Case 12: Finished placing to Drying Tank #1 Position: {_placePosition}, Cassette: {_shuttle.Cassette}, Idle: {_shuttle.MotorIdle}, IsZInOriPos: {IsZInOriPos}";
+                            if (!_shuttle.Cassette && _shuttle.MotorIdle && IsZInOriPos)
+                            {
+                                _dryrun_procedure_case = 13; // move to next case
+                            }
+                        }
+                        break;
+
+                    case 13: // pick from drying tank #1
+                        if (_shuttle != null)
+                        { 
+                            int _pickPosition = 8; // Drying Tank #1 position for pick
+                            _dryrun_procedure_status = $"Case 13: Picked from Drying Tank #1 Position: {_pickPosition}, IsEmpty: {_shuttle.IsEmpty}, NormalStatus: {_shuttle.IsNormalStatus}";
+                            if(_shuttle.IsEmpty && _shuttle.IsNormalStatus)
+                            {
+                                bool result = _shuttle.PickCassette(_pickPosition, true);
+                                if (result)
+                                {
+                                    _dryrun_procedure_case = 14; // move to next case
+                                }
+                                else
+                                {
+                                    _dryrun_procedure_status = $"Case 13: Failed to pick from Drying Tank #1 Position: {_pickPosition}";
+                                    _dryrun_procedure_case = 99; // error case
+                                }
+                            }
+                        }
+                        break;
+
+                    case 14: // wait for finish of picking from drying tank #1
+                        if (_shuttle != null)
+                        { 
+                            int _pickPosition = 8; // Drying Tank #1 position for pick
+                            _dryrun_procedure_status = $"Case 14: Finished picking from Drying Tank #1 Position: {_pickPosition}, IsEmpty: {_shuttle.IsEmpty}, Idle: {_shuttle.MotorIdle}, IsZInOriPos: {IsZInOriPos}";
+                            if (_shuttle.IsEmpty && _shuttle.MotorIdle && IsZInOriPos)
+                            {
+                                _dryrun_procedure_case = 15; // move to next case
+                            }
+                        }
+                        break;
+
+                    case 15: // place to drying tank #2
+                        if (_shuttle != null)
+                        { 
+                            int _placePosition = 9; // Drying Tank #2 position for dry run
+                            _dryrun_procedure_status = $"Case 15: Placed to Drying Tank #2 Position: {_placePosition}, Cassette: {_shuttle.Cassette}, NormalStatus: {_shuttle.IsNormalStatus}";
+                            if(_shuttle.Cassette && _shuttle.IsNormalStatus)
+                            {
+                                bool result = _shuttle.PlaceCassette(_placePosition, true);
+                                if (result)
+                                {
+                                    _dryrun_procedure_case = 16; // move to next case
+                                }
+                                else
+                                {
+                                    _dryrun_procedure_status = $"Case 15: Failed to place to Drying Tank #2 Position: {_placePosition}";
+                                    _dryrun_procedure_case = 99; // error case
+                                }
+                            }
+                        }
+                        break;
+
+                    case 16: // wait for finish of placing to drying tank #2
+                        if (_shuttle != null)
+                        { 
+                            int _placePosition = 9; // Drying Tank #2 position for dry run
+                            _dryrun_procedure_status = $"Case 16: Finished placing to Drying Tank #2 Position: {_placePosition}, Cassette: {_shuttle.Cassette}, Idle: {_shuttle.MotorIdle}, IsZInOriPos: {IsZInOriPos}";
+                            if (!_shuttle.Cassette && _shuttle.MotorIdle && IsZInOriPos)
+                            {
+                                _dryrun_procedure_case = 17; // move to next case
+                            }
+                        }
+                        break;
+
+                    case 17: // pick from drying tank #2
+                        if (_shuttle != null)
+                        { 
+                            int _pickPosition = 9; // Drying Tank #2 position for pick
+                            _dryrun_procedure_status = $"Case 17: Picked from Drying Tank #2 Position: {_pickPosition}, IsEmpty: {_shuttle.IsEmpty}, NormalStatus: {_shuttle.IsNormalStatus}";
+                            if(_shuttle.IsEmpty && _shuttle.IsNormalStatus)
+                            {
+                                bool result = _shuttle.PickCassette(_pickPosition, true);
+                                if (result)
+                                {
+                                    _dryrun_procedure_case = 18; // move to next case
+                                }
+                                else
+                                {
+                                    _dryrun_procedure_status = $"Case 17: Failed to pick from Drying Tank #2 Position: {_pickPosition}";
+                                    _dryrun_procedure_case = 99; // error case
+                                }
+                            }
+                        }
+                        break;
+
+                    case 18: // wait for finish of picking from drying tank #2
+                        if (_shuttle != null)
+                        { 
+                            int _pickPosition = 9; // Drying Tank #2 position for pick
+                            _dryrun_procedure_status = $"Case 18: Finished picking from Drying Tank #2 Position: {_pickPosition}, IsEmpty: {_shuttle.IsEmpty}, Idle: {_shuttle.MotorIdle}, IsZInOriPos: {IsZInOriPos}";
+                            if (_shuttle.IsEmpty && _shuttle.MotorIdle && IsZInOriPos)
+                            {
+                                _dryrun_procedure_case = 19; // move to next case
+                            }
+                        }
+                        break;
+
+                    case 19: // place back to unloader
+                        if (_shuttle != null)
+                        {
+                            int _placePosition = _dryrun_procedure_unloader_position; // place back to unloader position for dry run
+                            _dryrun_procedure_status = $"Case 19: Placed back to Unloader Position: {_placePosition}, Cassette: {_shuttle.Cassette}, NormalStatus: {_shuttle.IsNormalStatus}";
+                            if(_shuttle.Cassette && _shuttle.IsNormalStatus)
+                            {
+                                bool result = _shuttle.PlaceCassette(_placePosition, true);
+                                if (result)
+                                {
+                                    _dryrun_procedure_case = 20; // move to next case
+                                }
+                                else
+                                {
+                                    _dryrun_procedure_status = $"Case 19: Failed to place back to Unloader Position: {_placePosition}";
+                                    _dryrun_procedure_case = 99; // error case
+                                }
+                            }
+                        }
+                        break;
+
+                    case 20: // wait for finish of placing back to unloader
+                        if (_shuttle != null)
+                        {
+                            int _placePosition = _dryrun_procedure_unloader_position; // place back to unloader position for dry run
+                            _dryrun_procedure_status = $"Case 20: Finished placing back to Unloader Position: {_placePosition}, Cassette: {_shuttle.Cassette}, Idle: {_shuttle.MotorIdle}, IsZInOriPos: {IsZInOriPos}";
+                            if (!_shuttle.Cassette && _shuttle.MotorIdle && IsZInOriPos)
+                            {
+                                _dryrun_procedure_case = 21; // move to next case
+                            }
+                        }
+                        break;
+
+                    case 21: // check shuttle is empty and back to original position
+                        if (_shuttle != null)
+                        { 
+                            _dryrun_procedure_status = $"Case 21: Checking if shuttle is empty and back to original position. Cassette: {_shuttle.Cassette}, NormalStatus: {_shuttle.IsNormalStatus}";
+                            if (_shuttle.IsEmpty && _shuttle.IsNormalStatus)
+                            {
+                                bool result = _shuttle.BackToOriginalPosition();
+                                if (result)
+                                {
+                                    _dryrun_procedure_case = 22; // move to next case
+                                }
+                                else
+                                {
+                                    _dryrun_procedure_status = $"Case 21: Waiting for shuttle to be empty and back to original position. Cassette: {_shuttle.Cassette}, Idle: {_shuttle.MotorIdle}, IsZInOriPos: {IsZInOriPos}";
                                     _dryrun_procedure_case = 99; // error case
                                 }
                             }
@@ -1293,14 +1412,14 @@ namespace CleanerControlApp.Hardwares
                         }
                         break;
 
-                    case 12: // dry run procedure completed
+                    case 22: // dry run procedure completed
                         if (_shuttle != null)
                         { 
-                            _dryrun_procedure_status = $"Case 12: Dry run procedure completed., Idle: {_shuttle.MotorIdle}, IsXInOriPos: {IsXInOriPos}";
+                            _dryrun_procedure_status = $"Case 22: Waiting for Dry run procedure completed., Idle: {_shuttle.MotorIdle}, IsXInOriPos: {IsXInOriPos}";
                             if(_shuttle.MotorIdle && IsXInOriPos)
                             {
-                                _dryrun_procedure_case = 13; // final case to default value for finishing procedure
-                                _dryrun_procedure_status = $"Case 12: Dry run procedure completed successfully.";
+                                _dryrun_procedure_case = 24; // final case to default value for finishing procedure
+                                _dryrun_procedure_status = $"Case 22: Dry run procedure completed successfully.";
                             }
                         }
                         break;
