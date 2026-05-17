@@ -84,6 +84,10 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
         private bool _prevOpModeManual = false;
         private bool _opModeFirstRead = true;
 
+        // Delay CheckOPMode execution for 10 seconds after startup
+        private DateTime? _loopStartTime = null;
+        private readonly TimeSpan _opModeCheckDelay = TimeSpan.FromSeconds(10);
+
         #endregion
 
         #region constructor
@@ -215,8 +219,8 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
         public bool Sensor_OpMode_Auto => Sensor_ClamperOpen;
         public bool Sensor_OpMode_Manual => Sensor_ClamperClose;
 
-        public bool Check_ClamperOpen => Sensor_ClamperFrontOpen && Sensor_ClamperBackOpen && Sensor_ClamperOpen;
-        public bool Check_ClamperClose => Sensor_ClamperFrontClose && Sensor_ClamperBackClose && Sensor_ClamperClose;
+        public bool Check_ClamperOpen => Sensor_ClamperFrontOpen && Sensor_ClamperBackOpen;
+        public bool Check_ClamperClose => Sensor_ClamperFrontClose && Sensor_ClamperBackClose;
 
         public bool Sensor_CassetteExist1 => _plcService != null && _plcService.ShuttleZClamperExist1;
         public bool Sensor_CassetteExist2 => _plcService != null && _plcService.ShuttleZClamperExist2;
@@ -373,7 +377,7 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
         {
             bool result = false;
 
-            if ((IsEmpty || _sim_pass_clamper || dryRun) && !Moving && !MotorMoving && IsNormalStatus && MotorHome && ZInIdlePosition)
+            if ((IsEmpty || _sim_pass_clamper || dryRun || (semiRun && !Cassette)) && !Moving && !MotorMoving && IsNormalStatus && MotorHome && ZInIdlePosition)
             {
                 if (position > 0 && position < 15)
                 {
@@ -391,7 +395,7 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
         {
             bool result = false;
 
-            if ((HasCassette || _sim_pass_clamper || dryRun) && !Moving && !MotorMoving && IsNormalStatus && MotorHome && ZInIdlePosition)
+            if ((HasCassette || _sim_pass_clamper || dryRun || (semiRun && Cassette) )&& !Moving && !MotorMoving && IsNormalStatus && MotorHome && ZInIdlePosition)
             {
                 if (position > 0 && position < 15)
                 {
@@ -568,7 +572,7 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
                 {
                     if (MotorIdle && !_auto && MotorHome && MotorServoOn && !_semiRun && !_dryRun)
                     {
-                        result = this.PickCassette(semiPosIndex, semiRun: true);
+                        result = this.PickCassette(xPos, semiRun: true);
                     }
                 }
             }
@@ -588,7 +592,7 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
                 {
                     if (MotorIdle && !_auto && MotorHome && MotorServoOn && !_semiRun && !_dryRun)
                     {
-                        result = this.PlaceCassette(semiPosIndex, semiRun: true);
+                        result = this.PlaceCassette(xPos, semiRun: true);
                     }
                 }
             }
@@ -608,11 +612,18 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
 
             _cts = new CancellationTokenSource();
             var token = _cts.Token;
-            _loopTask = Task.Run(() => LoopAsync(token), token);
+            // Use LongRunning to create a dedicated thread for continuous shuttle control
+            _loopTask = Task.Factory.StartNew(
+                () => LoopAsync(token).GetAwaiter().GetResult(),
+                token,
+                TaskCreationOptions.LongRunning,
+                TaskScheduler.Default);
         }
 
         private async Task LoopAsync(CancellationToken token)
         {
+            _loopStartTime = DateTime.UtcNow;
+
             while (!token.IsCancellationRequested)
             {
                 var sw = Stopwatch.StartNew();
@@ -646,7 +657,11 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
             RefreshTimeoutValue();
             CheckTimeout();
 
-            CheckOPMode();
+            // Wait 10 seconds after loop start before executing CheckOPMode
+            if (_loopStartTime != null && (DateTime.UtcNow - _loopStartTime.Value) >= _opModeCheckDelay)
+            {
+                CheckOPMode();
+            }
 
             AutoProcedure();
 
@@ -978,7 +993,7 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
                             {
                                 _pickCase = 20;
                             }
-                            else if (!MotorMoving)
+                            else if (!MotorMoving)  
                                 _motorZAxis.MoveToPosition(_actPositionZ, _actVelocityZ);
                             break;
 
@@ -1003,10 +1018,12 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
                             break;
 
                         case 40: // Check Cassette Exist
-                            if (HasCassette || _sim_pass_clamper)
+                            if (HasCassette || _sim_pass_clamper || _dryRun || _semiRun)
                             {
                                 _cassette = true;
                                 _pickTrigger = false;
+                                _dryRun = false;
+                                _semiRun = false;
                                 _pickCase = 0;
                             }
                             else
@@ -1020,6 +1037,8 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
                         case -99:
                             _pickProcedureError = true;
                             _pickTrigger = false;
+                            _dryRun = false;
+                            _semiRun = false;
                             break;
 
                     }
@@ -1069,10 +1088,12 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
                             break;
 
                         case 40: // Check Cassette Exist
-                            if (IsEmpty || _sim_pass_clamper)
+                            if (IsEmpty || _sim_pass_clamper || _dryRun || _semiRun)
                             {
                                 _cassette = false;
                                 _placeTrigger = false;
+                                _dryRun = false;
+                                _semiRun = false;
                                 _placeCase = 0;
                             }
                             else
@@ -1084,6 +1105,8 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
                         default:
                         case -99:
                             _placeProcedureError = true;
+                            _dryRun = false;
+                            _semiRun = false;
                             _placeTrigger = false;
                             break;
 

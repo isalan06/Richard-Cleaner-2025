@@ -261,7 +261,12 @@ namespace CleanerControlApp.Modules.DeltaMS300.Services
 
             _cts = new CancellationTokenSource();
             var token = _cts.Token;
-            _loopTask = Task.Run(() => LoopAsync(token), token);
+            // Use LongRunning to create a dedicated thread for continuous polling
+            _loopTask = Task.Factory.StartNew(
+                () => LoopAsync(token).GetAwaiter().GetResult(),
+                token,
+                TaskCreationOptions.LongRunning,
+                TaskScheduler.Default);
         }
 
         private async Task LoopAsync(CancellationToken token)

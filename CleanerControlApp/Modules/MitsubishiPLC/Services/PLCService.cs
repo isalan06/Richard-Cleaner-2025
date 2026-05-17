@@ -189,8 +189,12 @@ namespace CleanerControlApp.Modules.MitsubishiPLC.Services
                 Command_Axis4ServoOn = true;
             }
 
-            // start background loop
-            _loopTask = Task.Run(() => LoopAsync(token), token);
+            // start background loop with dedicated thread to avoid ThreadPool contention
+            _loopTask = Task.Factory.StartNew(
+                () => LoopAsync(token).GetAwaiter().GetResult(),
+                token,
+                TaskCreationOptions.LongRunning,
+                TaskScheduler.Default);
         }
 
         private async Task LoopAsync(CancellationToken token)

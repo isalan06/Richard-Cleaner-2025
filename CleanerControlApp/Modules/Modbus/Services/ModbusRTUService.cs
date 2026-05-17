@@ -176,7 +176,7 @@ namespace CleanerControlApp.Modules.Modbus.Services
         {
 
             CancellationToken ct = source.Token;
-            return Task.Run(() =>
+            return Task.Factory.StartNew(() =>
             {
                 while (!ct.IsCancellationRequested && IsRunning)
                 {
@@ -186,9 +186,9 @@ namespace CleanerControlApp.Modules.Modbus.Services
 
 
 
-                    Thread.Sleep(10); // Adjust the delay as needed
+                    Thread.Sleep(100); // Modbus RTU polling interval
                 }
-            }, ct);
+            }, ct, TaskCreationOptions.LongRunning, TaskScheduler.Default);
         }
 
         #endregion
