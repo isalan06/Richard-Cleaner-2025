@@ -11,8 +11,8 @@
  <Grid>
  <Canvas x:Name="MainCanvasMotor1"
  Background="Transparent"
- Width="464"
- Height="292"
+ Width="480"
+ Height="320"
  Canvas.Left="0"
  Canvas.Top="0"
  HorizontalAlignment="Left"
@@ -93,10 +93,10 @@
  </ComboBox>
 
  <!-- Jog buttons -->
- <Button x:Name="btnJogMinus" Tag="1" Canvas.Left="362" Canvas.Top="102" Width="68" Height="88" Content="JOG -" Background="Aquamarine"
+ <Button x:Name="btnJogMinus" Tag="1" Canvas.Left="407" Canvas.Top="102" Width="68" Height="88" Content="JOG -" Background="Aquamarine"
  PreviewMouseLeftButtonDown="JogButton_PreviewMouseLeftButtonDown" 
  PreviewMouseLeftButtonUp="JogButton_PreviewMouseLeftButtonUp" HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="20"/>
- <Button x:Name="btnJogPlus" Tag="0" Canvas.Left="289" Canvas.Top="102" Width="68" Height="88" Content="JOG +" Background="Aquamarine"
+ <Button x:Name="btnJogPlus" Tag="0" Canvas.Left="334" Canvas.Top="102" Width="68" Height="88" Content="JOG +" Background="Aquamarine"
  PreviewMouseLeftButtonDown="JogButton_PreviewMouseLeftButtonDown" 
  PreviewMouseLeftButtonUp="JogButton_PreviewMouseLeftButtonUp" HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="20"/>
  <TextBlock Canvas.Left="60" Canvas.Top="169" Text="位置(mm):" FontSize="20" Foreground="Black" HorizontalAlignment="Left" VerticalAlignment="Center" />

@@ -75,8 +75,8 @@ namespace CleanerControlApp.Hardwares.Shuttle.Interfaces
         bool HasCassette { get; }
         bool IsEmpty { get; }
 
-        bool PickCassette(int position, bool dryRun = false);
-        bool PlaceCassette(int position, bool dryRun = false);
+        bool PickCassette(int position, bool dryRun = false, bool semiRun = false);
+        bool PlaceCassette(int position, bool dryRun = false, bool semiRun = false);
         bool BackToOriginalPosition();
         bool CheckTankCassetteExist();
 
@@ -88,6 +88,13 @@ namespace CleanerControlApp.Hardwares.Shuttle.Interfaces
         bool HS_Check_Cassette_Finished { get; set; }
 
         string Hint();
+
+        bool GetInSemiPosition(int semiPosIndex);
+        void TeachSemiPosition(int semiPosIndex);
+
+        bool SemiPickCassette(int semiPosIndex);
+        bool SemiPlaceCassette(int semiPosIndex);
+
 
     }
 }

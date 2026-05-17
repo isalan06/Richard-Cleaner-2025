@@ -1,4 +1,5 @@
 ﻿using CleanerControlApp.Hardwares.Shuttle.Interfaces;
+using CleanerControlApp.Hardwares.Shuttle.Models;
 using CleanerControlApp.Modules.DeltaMS300.Interfaces;
 using CleanerControlApp.Modules.DeltaMS300.Services;
 using CleanerControlApp.Modules.MitsubishiPLC.Interfaces;
@@ -21,8 +22,6 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
 {
     public class Shuttle : IShuttle, IDisposable
     {
-
-
 
         #region attribute
 
@@ -370,7 +369,7 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
         public bool IsEmpty => !_cassette && Check_ClamperOpen && !Check_ClamperCassetteExist;
 
         // position 1~14 for pick/place position, 0 for original position
-        public bool PickCassette(int position, bool dryRun = false)
+        public bool PickCassette(int position, bool dryRun = false, bool semiRun = false)
         {
             bool result = false;
 
@@ -381,13 +380,14 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
                     GetActParameters(position, out _actPositionX, out _actVelocityX, out _actPositionZ, out _actVelocityZ);
                     _pickTrigger = true;
                     _dryRun = dryRun;
+                    _semiRun = semiRun;
                     result = true;
                 }
             }
 
             return result;
         }
-        public bool PlaceCassette(int position, bool dryRun = false)
+        public bool PlaceCassette(int position, bool dryRun = false, bool semiRun = false)
         {
             bool result = false;
 
@@ -398,6 +398,7 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
                     GetActParameters(position, out _actPositionX, out _actVelocityX, out _actPositionZ, out _actVelocityZ);
                     _placeTrigger = true;
                     _dryRun = dryRun;
+                    _semiRun = semiRun;
                     result = true;
                 }
 
@@ -525,6 +526,76 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
 
             return sb.ToString();
         }
+
+        public bool GetInSemiPosition(int semiPosIndex)
+        {
+            int xPos = -1, zPos = -1;
+
+            ShuttleSemiPositionList.GetSemiPositionTransferToRealPoint(semiPosIndex, out xPos, out zPos);
+
+            if(xPos < 0 || zPos < 0)
+            {
+                return false;
+            }
+
+            return _motorXAxis != null && _motorXAxis.GetInPos(xPos) && _motorZAxis != null && _motorZAxis.GetInPos(zPos); 
+        }
+        public void TeachSemiPosition(int semiPosIndex)
+        {
+            int xPos = -1, zPos = -1;
+
+            ShuttleSemiPositionList.GetSemiPositionTransferToRealPoint(semiPosIndex, out xPos, out zPos);
+
+            if (xPos < 0 || zPos < 0)
+            {
+                if (_motorXAxis != null && _motorZAxis != null)
+                { 
+                    _motorXAxis.Teach(xPos);
+                    _motorZAxis.Teach(zPos);
+                }
+            }
+        }
+
+        public bool SemiPickCassette(int semiPosIndex)
+        { 
+            bool result = false;
+
+            if(_motorXAxis != null && _motorZAxis != null)
+            {
+                int xPos = -1, zPos = -1;
+                ShuttleSemiPositionList.GetSemiPositionTransferToRealPoint(semiPosIndex, out xPos, out zPos);
+                if (xPos >= 0 && zPos >= 0)
+                {
+                    if (MotorIdle && !_auto && MotorHome && MotorServoOn && !_semiRun && !_dryRun)
+                    {
+                        result = this.PickCassette(semiPosIndex, semiRun: true);
+                    }
+                }
+            }
+
+            return result;
+        }
+
+        public bool SemiPlaceCassette(int semiPosIndex)
+        {
+            bool result = false;
+
+            if (_motorXAxis != null && _motorZAxis != null)
+            {
+                int xPos = -1, zPos = -1;
+                ShuttleSemiPositionList.GetSemiPositionTransferToRealPoint(semiPosIndex, out xPos, out zPos);
+                if (xPos >= 0 && zPos >= 0)
+                {
+                    if (MotorIdle && !_auto && MotorHome && MotorServoOn && !_semiRun && !_dryRun)
+                    {
+                        result = this.PlaceCassette(semiPosIndex, semiRun: true);
+                    }
+                }
+            }
+
+            return result;
+        }
+
         #endregion
 
         #region Function
