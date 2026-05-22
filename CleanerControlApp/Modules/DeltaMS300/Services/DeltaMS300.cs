@@ -61,6 +61,8 @@ namespace CleanerControlApp.Modules.DeltaMS300.Services
         // timeout duration for retry (changed to 5 seconds)
         private static readonly TimeSpan DeviceTimeoutClearDelay = TimeSpan.FromSeconds(10);
 
+        private int _operation = 0; // 0: stop, 1: forward, 2: reverse
+
         #endregion
 
         #region constructor
@@ -242,12 +244,17 @@ namespace CleanerControlApp.Modules.DeltaMS300.Services
                 cmd.CommandFrame.Data[0] = 0x22; // reverse
             }
 
+            _operation = op;
+
             _commandQueue.Enqueue(cmd);
         }
 
         public string PortName => _modbusService != null ? _modbusService.PortName : "";
         public int WriteCount => _modbusService != null ? _modbusService.WriteCount : 0;  
         public int ReadCount => _modbusService != null ? _modbusService.ReadCount : 0;
+
+        public int OperationMode => _operation;
+        public bool Operation => _operation != 0;
 
         #endregion
 

@@ -137,9 +137,13 @@ namespace CleanerControlApp.Vision.SettingViews
             var tbMx1 = GetTextBox("Txt_MotorX_Vel1");
             var tbMz0 = GetTextBox("Txt_MotorZ_Vel0");
             var tbMz1 = GetTextBox("Txt_MotorZ_Vel1");
+            var tbMove = GetTextBox("Txt_Shuttle_Procedure_MoveEndDelayTime_ms");
+            var tbClamper = GetTextBox("Txt_Shuttle_Procedure_ClamperActDelayTime_ms");
             // positions now per-control
 
             if (tbStable != null) tbStable.Text = sh?.Shuttle_ZAxis_StableTime_Second.ToString(CultureInfo.InvariantCulture) ?? string.Empty;
+            if (tbMove != null) tbMove.Text = sh?.Shuttle_Procedure_MoveEndDelayTime_ms.ToString(CultureInfo.InvariantCulture) ?? string.Empty;
+            if (tbClamper != null) tbClamper.Text = sh?.Shuttle_Procedure_ClamperActDelayTime_ms.ToString(CultureInfo.InvariantCulture) ?? string.Empty;
 
             // determine unit transfer for motors[0] and motors[1]
             float unitTransferX = 1f;
@@ -280,12 +284,19 @@ namespace CleanerControlApp.Vision.SettingViews
             var tbMx1 = GetTextBox("Txt_MotorX_Vel1");
             var tbMz0 = GetTextBox("Txt_MotorZ_Vel0");
             var tbMz1 = GetTextBox("Txt_MotorZ_Vel1");
+            var tbMove = GetTextBox("Txt_Shuttle_Procedure_MoveEndDelayTime_ms");
+            var tbClamper = GetTextBox("Txt_Shuttle_Procedure_ClamperActDelayTime_ms");
             // positions per-control
 
             var errors = new StringBuilder();
 
             int stable = 0;
             int.TryParse(tbStable?.Text, NumberStyles.Integer, CultureInfo.InvariantCulture, out stable);
+
+            int moveDelay = 0;
+            int clamperDelay = 0;
+            int.TryParse(tbMove?.Text, NumberStyles.Integer, CultureInfo.InvariantCulture, out moveDelay);
+            int.TryParse(tbClamper?.Text, NumberStyles.Integer, CultureInfo.InvariantCulture, out clamperDelay);
 
             // determine unit transfer for motors
             float unitTransferX = 1f;
@@ -354,6 +365,8 @@ namespace CleanerControlApp.Vision.SettingViews
             while (_moduleSettings.Motors.Count < 2) _moduleSettings.Motors.Add(new MS_Motor());
 
             _moduleSettings.Shuttle.Shuttle_ZAxis_StableTime_Second = stable;
+            _moduleSettings.Shuttle.Shuttle_Procedure_MoveEndDelayTime_ms = moveDelay;
+            _moduleSettings.Shuttle.Shuttle_Procedure_ClamperActDelayTime_ms = clamperDelay;
             _moduleSettings.Motors[0].Velocities = mxvels;
             _moduleSettings.Motors[1].Velocities = mzvels;
             _moduleSettings.Motors[0].Positions = listMxPos;

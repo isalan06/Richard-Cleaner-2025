@@ -79,5 +79,9 @@ namespace CleanerControlApp.Hardwares.HeatingTank.Interfaces
         bool ManualFrequencyOP(int freq);
 
         string Hint();
+
+        string MessageForOperation { get; }
+
+        bool FrequencyOn { get; }
     }
 }

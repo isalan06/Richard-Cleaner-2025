@@ -103,6 +103,20 @@ Source="/CleanerControlApp;component/Pictures/INV.png" />
             <Button Canvas.Left="294" Canvas.Top="37" Width="120" Height="45" FontSize="18" Content="高頻-出水" Click="INV_High_Click" Background="#ADD8E6" HorizontalAlignment="Left" VerticalAlignment="Center"/>
             <Button FontSize="18" Content="低頻-回流" Click="INV_Low_Click" Background="#ADD8E6" HorizontalAlignment="Left" Height="45" Canvas.Left="294" Canvas.Top="88" VerticalAlignment="Center" Width="120"/>
             <Button FontSize="18" Content="零頻-停止" Click="INV_Zero_Click" Background="#ADD8E6" Height="45" Canvas.Left="294" Canvas.Top="138" Width="120" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+            <Border Canvas.Left="82" Canvas.Top="160" BorderBrush="#2E993E" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding INVOn, ElementName=RootControl}" Height="26" Width="44" HorizontalAlignment="Left" VerticalAlignment="Top">
+                <Border.Style>
+                    <Style TargetType="{x:Type Border}">
+                        <Setter Property="Background" Value="#FFFFFF"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding INVOn, ElementName=RootControl}" Value="True">
+                                <Setter Property="Background" Value="Red"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Border.Style>
+                <TextBlock Text="On" FontSize="14" Foreground="Black" HorizontalAlignment="Center" Margin="0,0,0,-3"/>
+
+            </Border>
 
         </Canvas>
     </Grid>

@@ -83,9 +83,11 @@ namespace CleanerControlApp.Hardwares.HeatingTank.Services
         private bool _sim_inv_low = false;
 
         private int _inv_op_index =0; //0: Zero;1: Low;2: High
- // prevent spamming SetFrequency: shared cooldown for delta frequency commands
- private DateTime _lastDeltaFrequencyCommand = DateTime.MinValue;
- private static readonly TimeSpan DeltaFrequencyCommandCooldown = TimeSpan.FromSeconds(3);
+                                      // prevent spamming SetFrequency: shared cooldown for delta frequency commands
+        private DateTime _lastDeltaFrequencyCommand = DateTime.MinValue;
+        private static readonly TimeSpan DeltaFrequencyCommandCooldown = TimeSpan.FromSeconds(3);
+
+        private string _messageForOperation = string.Empty;
 
  #endregion
 
@@ -283,11 +285,20 @@ namespace CleanerControlApp.Hardwares.HeatingTank.Services
         public bool WaterInOP(bool water)
         {
             bool result = false;
+            _messageForOperation = string.Empty;
 
             if (_plcService != null && !_tankHHAlarm && !_private_waste_HAlarm)
             {
                 Command_WaterIn = water;
                 result = true;
+            }
+            else
+            { 
+                _messageForOperation = "無法切換進水: " + 
+                    (_plcService == null ? "PLC未連接; " : "") +
+                    (_tankHHAlarm ? "水位過高; " : "") +
+                    (_private_waste_HAlarm ? "廢水高位警告; " : "");
+                OperateLog.Log($"加熱槽 無法切換進水", _messageForOperation);
             }
 
             return result;
@@ -307,11 +318,21 @@ namespace CleanerControlApp.Hardwares.HeatingTank.Services
         public bool WaterOutOP(bool water)
         {
             bool result = false;
+            _messageForOperation = string.Empty;
 
             if (_plcService != null && !_tankHHAlarm && (!_tankLLAlarm || !_auto) && !_private_waste_HAlarm)
             {
                 Command_WaterOut = water;
                 result = true;
+            }
+            else 
+            { 
+                _messageForOperation = "無法切換出水: " + 
+                    (_plcService == null ? "PLC未連接; " : "") +
+                    (_tankHHAlarm ? "水位過高; " : "") +
+                    ((!_auto && _tankLLAlarm) ? "水位過低; " : "") +
+                    (_private_waste_HAlarm ? "廢水高位警告; " : "");
+                OperateLog.Log($"加熱槽 無法切換出水", _messageForOperation);
             }
 
             return result;
@@ -418,27 +439,46 @@ namespace CleanerControlApp.Hardwares.HeatingTank.Services
                 if (DateTime.UtcNow - _lastDeltaFrequencyCommand < DeltaFrequencyCommandCooldown)
                     return false;
 
-                _deltaMS300.SetFrequency(_moduleSettings.HeatingTank != null ? _moduleSettings.HeatingTank.INV_High :0f);
+                _deltaMS300.SetFrequency(_moduleSettings.HeatingTank != null ? _moduleSettings.HeatingTank.INV_High : 0f);
                 _deltaMS300.SetOutput(1); // 1: forware; 2: reserve (視現場調整)
-                _inv_op_index =2;
+                _inv_op_index = 2;
                 _lastDeltaFrequencyCommand = DateTime.UtcNow;
                 result = true;
+            }
+            else
+            { 
+                _messageForOperation = "無法切換到高頻: " + 
+                    (_deltaMS300 == null ? "變頻器未連接; " : "") +
+                    (_tankLLAlarm ? "水位過低; " : "") +
+                    (_tankHHAlarm ? "水位過高; " : "") +
+                    (_private_waste_HAlarm ? "廢水高位警告; " : "");
+                OperateLog.Log($"加熱槽 無法切換到高頻", _messageForOperation);
             }
             return result;
         }
         public bool LowFrequencyOP()
         {
             bool result = false;
+            _messageForOperation = string.Empty;
             if (_deltaMS300 != null && !_tankLLAlarm && !_tankLLAlarm && !_private_waste_HAlarm)
             {
                 if (DateTime.UtcNow - _lastDeltaFrequencyCommand < DeltaFrequencyCommandCooldown)
                     return false;
 
-                _deltaMS300.SetFrequency(_moduleSettings.HeatingTank != null ? _moduleSettings.HeatingTank.INV_Low :0f);
+                _deltaMS300.SetFrequency(_moduleSettings.HeatingTank != null ? _moduleSettings.HeatingTank.INV_Low : 0f);
                 _deltaMS300.SetOutput(1); // 1: forware; 2: reserve (視現場調整)
-                _inv_op_index =1;
+                _inv_op_index = 1;
                 _lastDeltaFrequencyCommand = DateTime.UtcNow;
                 result = true;
+            }
+            else
+            { 
+                _messageForOperation = "無法切換到低頻: " + 
+                    (_deltaMS300 == null ? "變頻器未連接; " : "") +
+                    (_tankLLAlarm ? "水位過低; " : "") +
+                    (_tankHHAlarm ? "水位過高; " : "") +
+                    (_private_waste_HAlarm ? "廢水高位警告; " : "");
+                OperateLog.Log($"加熱槽 無法切換到低頻", _messageForOperation);
             }
             return result;
         }
@@ -447,8 +487,8 @@ namespace CleanerControlApp.Hardwares.HeatingTank.Services
             bool result = false;
             if (_deltaMS300 != null)
             {
-                if (DateTime.UtcNow - _lastDeltaFrequencyCommand < DeltaFrequencyCommandCooldown)
-                    return false;
+                //if (DateTime.UtcNow - _lastDeltaFrequencyCommand < DeltaFrequencyCommandCooldown)
+                //    return false;
 
                 _deltaMS300.SetFrequency(_moduleSettings.HeatingTank != null ? _moduleSettings.HeatingTank.INV_Zero :0f);
                 _deltaMS300.SetOutput(0); // 0: stop
@@ -499,18 +539,18 @@ namespace CleanerControlApp.Hardwares.HeatingTank.Services
             // Alarms / warnings
             if (HasAlarm)
             {
-                sb.AppendLine(" - 模組發生嚴重錯誤(Alarm)。請先排除水位或其他硬體錯誤，必要時停止自動與手動處理。可呼叫 AlarmReset() 嘗試清除逾時旗標。");
+                sb.AppendLine(" - 模組發生嚴重錯誤(Alarm)。請先排除水位或其他硬體錯誤，必要時停止自動與手動處理。可長按 [錯誤重置]1秒 嘗試清除逾錯誤。");
             }
             if (HasWarning)
             {
-                sb.AppendLine(" - 模組發生警告(Warning)。請檢查 PV/SV 與變頻器狀態，或檢視 INV 錯誤代碼並處理。必要時呼叫 WarningStop() 暫停自動。");
+                sb.AppendLine(" - 模組發生警告(Warning)。請檢查 PV/SV 與變頻器狀態，或檢視 INV 錯誤代碼並處理。可長按 [錯誤重置]1秒 嘗試清除逾警告。");
                 sb.AppendLine($" INV 錯誤碼: {InvErrorCode}, 警告碼: {InvWarningCode}");
             }
 
             // Initialization guidance
             if (!_initialized)
             {
-                sb.AppendLine(" - 尚未初始化：請呼叫 ModuleReset() 或 Initialize()以初始化模組（會設定頻率、設定水系統初始狀態等）。");
+                sb.AppendLine(" - 尚未初始化：請按下 [初始化] 以初始化模組（會設定頻率、設定水系統初始狀態等）。");
                 return sb.ToString();
             }
 
@@ -518,15 +558,15 @@ namespace CleanerControlApp.Hardwares.HeatingTank.Services
             if (!_auto)
             {
                 if (IsNormalStatus)
-                    sb.AppendLine(" - 模組已初始化且狀態正常：可呼叫 AutoStart() 開始自動流程。");
+                    sb.AppendLine(" - 模組已初始化且狀態正常：可按下 [啟動] 開始自動流程。");
                 else
                     sb.AppendLine(" - 模組狀態不完全正常，請先解除警告/錯誤後再啟動自動。");
 
                 sb.AppendLine(" - 手動操作建議:");
-                sb.AppendLine(" * 呼叫 HeatingOP(true/false) 手動開關加熱。 ");
-                sb.AppendLine(" * 呼叫 ManualWaterInOP(true/false) 或 ManualWaterOutOP(true/false) 控制進/出水。 ");
-                sb.AppendLine(" * 呼叫 ManualFrequencyOP(1/2/other) 設定變頻器頻率 (1=低,2=高,其他=關/0頻率)。 ");
-                sb.AppendLine(" * 可呼叫 SetSV(value) 調整目標溫度。 ");
+                sb.AppendLine(" * 手動開關加熱。 ");
+                sb.AppendLine(" * 手動控制進/出水。 ");
+                sb.AppendLine(" * 設定變頻器頻率 (1=低,2=高,其他=關/0頻率)。 ");
+                sb.AppendLine(" * 調整目標溫度。 ");
 
                 return sb.ToString();
             }
@@ -534,9 +574,9 @@ namespace CleanerControlApp.Hardwares.HeatingTank.Services
             // Auto mode guidance
             sb.AppendLine(" - 模組處於自動模式：");
             if (_autoStopFlag)
-                sb.AppendLine(" * 自動流程已被要求停止，系統會在空閒時停止，請觀察 Idle 狀態確認是否已停止。 ");
+                sb.AppendLine(" * 自動流程已被要求停止，系統會在空閒時停止，請觀察所有模組確認是否已停止。 ");
             if (_pausing)
-                sb.AppendLine(" * 自動流程暫停中：呼叫 AutoStart() 恢復，或 AutoStop(force=true) 強制停止。 ");
+                sb.AppendLine(" * 自動流程暫停中：按下[啟動] 恢復，或 長按 [停止]1秒 強制停止。 ");
 
             // Water system and INV guidance derived from AutoProcedure
             if (_private_waste_HAlarm || _tankHHAlarm || _tankLLAlarm)
@@ -546,18 +586,18 @@ namespace CleanerControlApp.Hardwares.HeatingTank.Services
 
             // Water controls
             if (!Command_WaterIn && !Sensor_Liquid_L && !_private_waste_HAlarm)
-                sb.AppendLine(" * 水位過低 (L=false)：系統會啟動注水 (WaterInOP)。如需手動操作請呼叫 ManualWaterInOP(true)。");
+                sb.AppendLine(" * 水位過低：系統會啟動注水。如需手動操作請手動注水。");
             if (Command_WaterIn && Sensor_Liquid_H)
-                sb.AppendLine(" * 水位已達 H：系統會停止注水 (WaterInOP=false)。");
+                sb.AppendLine(" * 水位已達高位：系統會停止注水。");
 
             if (Command_WaterOut && !IsHighFrequency)
-                sb.AppendLine(" * 若開啟出水且變頻器未切到高頻，系統會設定為高頻 (HighFrequencyOP)。");
+                sb.AppendLine(" * 若開啟出水且變頻器未切到高頻，系統會設定為高頻。");
             if (!Command_WaterOut && IsHighFrequency)
-                sb.AppendLine(" * 未要求出水但變頻器處於高頻：系統會嘗試切回低頻 (LowFrequencyOP)。");
+                sb.AppendLine(" * 未要求出水但變頻器處於高頻：系統會嘗試切回低頻。");
 
             // Heating guidance
             if (!_heating && Sensor_Liquid_L)
-                sb.AppendLine(" * 水位充足且未加熱：系統會啟動加熱 (HeatingOP(true))。如需手動操作可呼叫 ManualHeatingOP(true)。");
+                sb.AppendLine(" * 水位充足且未加熱：系統會啟動加熱。如需手動操作可手動加熱。");
             if (Heating)
             {
                 sb.AppendLine(" * 正在加熱中，若出現 PV 高/低逾時或異常，系統會自動關閉加熱。請檢查 PV/SV 與溫度控制器。 ");
@@ -579,6 +619,10 @@ namespace CleanerControlApp.Hardwares.HeatingTank.Services
 
             return sb.ToString();
         }
+
+        public string MessageForOperation => _messageForOperation;
+
+        public bool FrequencyOn => _deltaMS300 != null && _deltaMS300.Operation;
 
         #endregion
 
@@ -680,11 +724,11 @@ namespace CleanerControlApp.Hardwares.HeatingTank.Services
             {
                 if(!IsZeroFrequency) ZeroFrequencyOP();
                 if(Heating) HeatingOP(false);
-                if (_private_waste_HAlarm || _tankHHAlarm)
+                if ((_private_waste_HAlarm || _tankHHAlarm) && Command_WaterIn)
                 {
                     WaterInOP(false);
                 }
-                else if (_tankLLAlarm && _auto)
+                else if (_tankLLAlarm && _auto && Command_WaterOut)
                 {
                     WaterOutOP(false);
                 }

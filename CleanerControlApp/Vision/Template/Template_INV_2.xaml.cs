@@ -26,7 +26,7 @@ namespace CleanerControlApp.Vision.Template
     public partial class Template_INV_2 : UserControl
     {
         private readonly DispatcherTimer _timer;
-        private readonly IHeatingTank? _heatingTank;
+        private IHeatingTank? _heatingTank;
 
         // Dependency properties so XAML ElementName bindings and DataTriggers update correctly
         public static readonly DependencyProperty HighINVProperty = DependencyProperty.Register(
@@ -37,6 +37,10 @@ namespace CleanerControlApp.Vision.Template
 
         public static readonly DependencyProperty ZeroINVProperty = DependencyProperty.Register(
             nameof(ZeroINV), typeof(bool), typeof(Template_INV_2), new PropertyMetadata(false));
+
+        // New dependency property to represent INV On/Off status mapped to IHeatingTank.FrequencyOn
+        public static readonly DependencyProperty INVOnProperty = DependencyProperty.Register(
+            nameof(INVOn), typeof(bool), typeof(Template_INV_2), new PropertyMetadata(false));
 
         public bool HighINV
         {
@@ -56,12 +60,19 @@ namespace CleanerControlApp.Vision.Template
             set => SetValue(ZeroINVProperty, value);
         }
 
+        public bool INVOn
+        {
+            get => (bool)GetValue(INVOnProperty);
+            set => SetValue(INVOnProperty, value);
+        }
+
         public Template_INV_2()
         {
             InitializeComponent();
 
             try
             {
+                // try to resolve once at construction (may be null in designer or early startup)
                 _heatingTank = App.AppHost?.Services.GetService<IHeatingTank>();
             }
             catch
@@ -75,10 +86,54 @@ namespace CleanerControlApp.Vision.Template
             };
             _timer.Tick += Timer_Tick;
 
-            Loaded += (s, e) => _timer.Start();
+            Loaded += Template_INV_2_Loaded;
             Unloaded += (s, e) => _timer.Stop();
 
             UpdateFields();
+        }
+
+        private void Template_INV_2_Loaded(object? sender, RoutedEventArgs e)
+        {
+            _timer.Start();
+
+            // Ensure visual elements are hit-testable; do not attach click handlers here because XAML already binds Click events
+            try
+            {
+                if (MainCanvas != null)
+                {
+                    MainCanvas.IsHitTestVisible = true;
+
+                    // make any direct Button children hittable
+                    var buttons = MainCanvas.Children.OfType<Button>().ToList();
+                    if (buttons.Count ==0)
+                    {
+                        var nested = FindVisualChildren<Button>(MainCanvas).ToList();
+                        buttons = nested;
+                    }
+
+                    foreach (var btn in buttons)
+                    {
+                        btn.IsHitTestVisible = true;
+                        btn.IsEnabled = true;
+                        try { Panel.SetZIndex(btn,1000); } catch { }
+                    }
+                }
+            }
+            catch
+            {
+                // ignore
+            }
+        }
+
+        private static IEnumerable<T> FindVisualChildren<T>(DependencyObject depObj) where T : DependencyObject
+        {
+            if (depObj == null) yield break;
+            for (int i =0; i < VisualTreeHelper.GetChildrenCount(depObj); i++)
+            {
+                var child = VisualTreeHelper.GetChild(depObj, i);
+                if (child is T t) yield return t;
+                foreach (var childOfChild in FindVisualChildren<T>(child)) yield return childOfChild;
+            }
         }
 
         private void Timer_Tick(object? sender, EventArgs e)
@@ -90,6 +145,12 @@ namespace CleanerControlApp.Vision.Template
         {
             try
             {
+                // attempt to re-resolve service if it was null earlier
+                if (_heatingTank == null)
+                {
+                    try { _heatingTank = App.AppHost?.Services.GetService<IHeatingTank>(); } catch { _heatingTank = null; }
+                }
+
                 if (_heatingTank != null)
                 {
                     txtCmdFreq.Text = _heatingTank.InvCommandFrequency.ToString("0.00");
@@ -101,6 +162,9 @@ namespace CleanerControlApp.Vision.Template
                     HighINV = _heatingTank.IsHighFrequency;
                     LowINV = _heatingTank.IsLowFrequency;
                     ZeroINV = _heatingTank.IsZeroFrequency;
+
+                    // Map FrequencyOn to INVOn for the On indicator
+                    try { INVOn = _heatingTank.FrequencyOn; } catch { INVOn = false; }
                 }
                 else
                 {
@@ -112,6 +176,7 @@ namespace CleanerControlApp.Vision.Template
                     HighINV = false;
                     LowINV = false;
                     ZeroINV = false;
+                    INVOn = false;
                 }
             }
             catch
@@ -120,12 +185,37 @@ namespace CleanerControlApp.Vision.Template
             }
         }
 
+        // Helper to get heating tank at time of action and show friendly message if not available
+        private IHeatingTank? GetHeatingTankOrShowError()
+        {
+            if (_heatingTank == null)
+            {
+                try { _heatingTank = App.AppHost?.Services.GetService<IHeatingTank>(); } catch { _heatingTank = null; }
+            }
+
+            if (_heatingTank == null)
+            {
+                try { CleanerControlApp.Vision.Shared.StatusPopup.Show("HeatingTank service not available.", Window.GetWindow(this),3); } catch { }
+            }
+
+            return _heatingTank;
+        }
+
         // INV button handlers -> call ManualFrequencyOP with specified codes
         private void INV_High_Click(object sender, RoutedEventArgs e)
         {
             try
             {
-                _heatingTank?.ManualFrequencyOP(2);
+                var ht = GetHeatingTankOrShowError();
+                if (ht != null)
+                {
+                    ht.ManualFrequencyOP(2);
+                    var status = ht.MessageForOperation;
+                    if (!string.IsNullOrEmpty(status))
+                    {
+                        ShowStatusPopup(status);
+                    }
+                }
             }
             catch
             {
@@ -138,7 +228,16 @@ namespace CleanerControlApp.Vision.Template
         {
             try
             {
-                _heatingTank?.ManualFrequencyOP(1);
+                var ht = GetHeatingTankOrShowError();
+                if (ht != null)
+                {
+                    ht.ManualFrequencyOP(1);
+                    var status = ht.MessageForOperation;
+                    if (!string.IsNullOrEmpty(status))
+                    {
+                        ShowStatusPopup(status);
+                    }
+                }
             }
             catch
             {
@@ -151,13 +250,26 @@ namespace CleanerControlApp.Vision.Template
         {
             try
             {
-                _heatingTank?.ManualFrequencyOP(0);
+                var ht = GetHeatingTankOrShowError();
+                if (ht != null)
+                {
+                    ht.ManualFrequencyOP(0);
+                }
             }
             catch
             {
                 // ignore
             }
             UpdateFields();
+        }
+
+        private void ShowStatusPopup(string status)
+        {
+            try
+            {
+                CleanerControlApp.Vision.Shared.StatusPopup.Show(status, Window.GetWindow(this),10);
+            }
+            catch { }
         }
     }
 }

@@ -125,6 +125,8 @@ namespace CleanerControlApp.Utilities
     public class MS_Shuttle
     {
         public int Shuttle_ZAxis_StableTime_Second { get; set; }
+        public int Shuttle_Procedure_ClamperActDelayTime_ms { get; set; }
+        public int Shuttle_Procedure_MoveEndDelayTime_ms { get; set; }
     }
 
     public class MS_Motor

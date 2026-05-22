@@ -46,5 +46,8 @@ namespace CleanerControlApp.Modules.DeltaMS300.Interfaces
         string PortName { get; }
         int WriteCount { get; }
         int ReadCount { get; }
+
+        int OperationMode { get; } // 0 = stop, 1 = forward, 2 = reverse
+        bool Operation { get; }
     }
 }

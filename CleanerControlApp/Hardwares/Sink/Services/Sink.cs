@@ -84,6 +84,8 @@ namespace CleanerControlApp.Hardwares.Sink.Services
 
         private bool _manualShaking = false;
 
+        private string _messageForOperation = "";
+
         #endregion
 
         #region constructor
@@ -261,11 +263,16 @@ namespace CleanerControlApp.Hardwares.Sink.Services
         public bool PressureOP(bool pressure)
         {
             bool result = false;
-
+            _messageForOperation = string.Empty;
 
             if (_moduleSettings.Sink != null)
             {
-                if (HS_WaterSystemError && pressure) pressure = false;
+                if (HS_WaterSystemError && pressure)
+                {
+                    pressure = false;
+                    _messageForOperation = "無法啟動沖水：水壓系統異常。請先檢查水壓系統狀態並解除異常後再嘗試。";
+                    OperateLog.Log("沖水槽 無法啟動沖水", "沖水槽 無法啟動沖水 - 水壓系統異常");
+                }
 
                 SetSV(pressure ? _moduleSettings.Sink.SV_High : _moduleSettings.Sink.SV_Low);
                 _deltaMS300?.SetOutput(pressure ? 1 : 0); // set bit for pressure command; 0: stop; 1:forward; 2:reverse(看現場接線決定)
@@ -598,17 +605,17 @@ namespace CleanerControlApp.Hardwares.Sink.Services
             // Alarms / warnings
             if (HasAlarm)
             {
-                sb.AppendLine(" - 模組發生錯誤(Alarm)。請先排除錯誤。可呼叫 AlarmReset()以嘗試重置馬達警報，或針對硬體排除問題。");
+                sb.AppendLine(" - 模組發生錯誤(Alarm)。請先排除錯誤。可長按 [錯誤重置]1秒以嘗試重置馬達警報，或針對硬體排除問題。");
             }
             if (HasWarning)
             {
-                sb.AppendLine(" - 模組發生警告(Warning)。建議檢查 PV/蓋子狀態或其他警告來源，並視情況呼叫 WarningStop()。");
+                sb.AppendLine(" - 模組發生警告(Warning)。建議檢查 PV/蓋子狀態或其他警告來源，。");
             }
 
             // Initialization guidance
             if (!_initialized)
             {
-                sb.AppendLine(" - 尚未初始化：請呼叫 ModuleReset() 或 Initialize()以啟動模組初始化流程（會啟動 Servo、Home 等）。");
+                sb.AppendLine(" - 尚未初始化：請按下 [初始化]以啟動模組初始化流程（會啟動 Servo、Home 等）。");
                 return sb.ToString(); // many other suggestions require initialization
             }
 
@@ -617,7 +624,7 @@ namespace CleanerControlApp.Hardwares.Sink.Services
             {
                 if (IsNormalStatus)
                 {
-                    sb.AppendLine(" - 模組已初始化且狀態正常：可呼叫 AutoStart() 開始自動流程。");
+                    sb.AppendLine(" - 模組已初始化且狀態正常：可按下 [啟動] 開始自動流程。");
                 }
                 else
                 {
@@ -626,24 +633,24 @@ namespace CleanerControlApp.Hardwares.Sink.Services
 
                 sb.AppendLine(" - 若需手動操作，建議步驟：");
                 if (!MotorServoOn)
-                    sb.AppendLine(" * 呼叫 ServoOn(true) 開啟馬達伺服。 ");
+                    sb.AppendLine(" * 按下 [Servo] 開啟馬達伺服。 ");
                 if (!MotorHome && MotorServoOn && MotorIdle)
-                    sb.AppendLine(" * 呼叫 Home()進行回原點。 ");
+                    sb.AppendLine(" * 按下 [Home] 進行回原點。 ");
                 if (MotorServoOn && MotorIdle)
-                    sb.AppendLine(" * 可使用 MoveToPosition(position, speed) 或 Jog(...) 做手動定位/換位。 ");
+                    sb.AppendLine(" * 可做手動定位/Jog。 ");
 
                 if (!_cassette && Sensor_CoverOpen)
                     sb.AppendLine(" * 蓋子已開，請放入卡匣後由夾爪完成放置，或手動控制馬達至上方位置確保放置位置正確。 ");
                 if (_cassette && !Sensor_CoverClose)
-                    sb.AppendLine(" * 已偵測卡匣但蓋子尚未關閉：可呼叫 CoverClose(true) 關蓋。 ");
+                    sb.AppendLine(" * 已偵測卡匣但蓋子尚未關閉：可手動 關蓋。 ");
 
                 sb.AppendLine(" - 手動噴水/氣刀控制：");
                 if (!Pressure)
-                    sb.AppendLine(" * 可呼叫 ManualPressureOP(true) 開啟沖水（若無自動）。");
+                    sb.AppendLine(" * 可手動開啟沖水（若無自動）。");
                 else
-                    sb.AppendLine(" * 若要提前停止沖水可呼叫 ManualPressureOP(false)。");
+                    sb.AppendLine(" * 若要提前停止沖水可手動關閉沖水。");
 
-                sb.AppendLine(" * 可用 ManualAirOP(true/false) 控制氣刀。 ");
+                sb.AppendLine(" * 可手動控制氣刀。 ");
 
                 return sb.ToString();
             }
@@ -652,10 +659,10 @@ namespace CleanerControlApp.Hardwares.Sink.Services
                 sb.AppendLine(" - 模組處於自動模式：");
 
                 if (_autoStopFlag)
-                    sb.AppendLine(" * 自動流程已被要求停止，系統會在空閒時停止。可觀察 Idle 狀態。 ");
+                    sb.AppendLine(" * 自動流程已被要求停止，系統會在空閒時停止。可觀察 所有模組 狀態。 ");
 
                 if (_pausing)
-                    sb.AppendLine(" * 自動流程暫停中：呼叫 AutoStart() 可恢復，或 AutoStop(force=true) 強制停止。 ");
+                    sb.AppendLine(" * 自動流程暫停中：按下[啟動] 恢復，或 長按 [停止]1秒 強制停止。 ");
 
                 // 未完成烘乾前 (act not finished)
                 if (!_actFinished)
@@ -665,9 +672,9 @@ namespace CleanerControlApp.Hardwares.Sink.Services
                     if (!_cassette)
                     {
                         if (Command_CleanerCoverClose)
-                            sb.AppendLine(" - 蓋子目前要求關閉：若未放入卡匣，呼叫 CoverClose(false) 可打開蓋子以放入卡匣。");
+                            sb.AppendLine(" - 蓋子目前要求關閉：若未放入卡匣，可手動打開蓋子以放入卡匣。");
                         if (Sensor_CoverOpen && MotorIdle && !InPos1)
-                            sb.AppendLine(" - 蓋子開啟且馬達空閒，但馬達不在上方：可呼叫 MoveToPosition(0,0) 將馬達移至上方以便放卡匣。");
+                            sb.AppendLine(" - 蓋子開啟且馬達空閒，但馬達不在上方：可 [Move] 將馬達移至上方以便放卡匣。");
                     }
                     else // 有卡匣
                     {
@@ -675,7 +682,7 @@ namespace CleanerControlApp.Hardwares.Sink.Services
                             sb.AppendLine(" - 已放入卡匣且需要關蓋：系統會自動移動馬達至放置位置並關蓋。若延遲太久請檢查馬達狀態。");
 
                         if (Sensor_CoverClose && !Pressure && !_pausing)
-                            sb.AppendLine(" - 卡匣已關蓋且未在沖水：系統會開始沖水流程（SetSV/PressureOP）。");
+                            sb.AppendLine(" - 卡匣已關蓋且未在沖水：系統會開始沖水流程。");
 
                         if (Pressure)
                             sb.AppendLine(" - 正在沖水中：等待計時完成或系統暫停/停止。");
@@ -691,10 +698,10 @@ namespace CleanerControlApp.Hardwares.Sink.Services
                         sb.AppendLine(" - 蓋子開啟且馬達不在上方：系統會嘗試將馬達移至上方(位置1)。");
 
                     if (_cassette && InPos1 && MotorIdle && !_motor_commanding && !RetryAirFinished)
-                        sb.AppendLine(" - 系統正在進行風刀反覆吹氣，直到 RetryAirFinished 條件滿足。");
+                        sb.AppendLine(" - 系統正在進行風刀反覆吹氣，直到條件滿足。");
 
                     if (!RetryAirFinished && !_motor_air_up_flag)
-                        sb.AppendLine(" - 若想手動結束吹氣可呼叫 ManualAirOP(false)。");
+                        sb.AppendLine(" - 若想手動結束吹氣可手動關閉風刀。");
                 }
 
                 sb.AppendLine(" - 自動模式下若發生 Alarm/Warning，系統會暫停/停止。請先處理警報再繼續。 ");
@@ -731,9 +738,14 @@ namespace CleanerControlApp.Hardwares.Sink.Services
 
         public void ManualStartToShaking()
         {
+            _messageForOperation = string.Empty;
             if (!_auto && MotorHome && MotorIdle)
             {
                 _manualShaking = true;
+            }
+            else
+            { 
+                _messageForOperation = "無法啟動手動搖擺：請確保系統不在自動模式，且馬達已回原點且空閒。";
             }
         }
 
@@ -743,6 +755,9 @@ namespace CleanerControlApp.Hardwares.Sink.Services
         }
 
         public bool ManaulShaking => _manualShaking;
+
+        public string MessageForOperation => _messageForOperation;
+
 
         #endregion
 

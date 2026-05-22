@@ -68,6 +68,8 @@ namespace CleanerControlApp.Hardwares.SoakingTank.Services
 
         private bool _manualShaking = false;
 
+        private string _messageForOperation = string.Empty;
+
         #endregion
 
         #region constructor
@@ -263,11 +265,21 @@ namespace CleanerControlApp.Hardwares.SoakingTank.Services
         public bool WaterOutputOP(bool water)
         {
             bool result = false;
+            _messageForOperation = string.Empty;
 
-            if(_plcService != null)
+            if (_plcService != null)
             {
-                Command_CleanerWaterOutputOpen = water;
-                result = true;
+                if (!HS_WaterSystemError || !water)
+                {
+                    Command_CleanerWaterOutputOpen = water;
+                    result = true;
+                }
+                else
+                {
+                    _messageForOperation = "無法操作排水閥，水系統異常中。請先檢查水路是否有已滿或漏水情形，並確認水系統恢復正常後再操作。";
+                    OperateLog.Log($"浸泡槽 嘗試操作排水閥為 " + (water ? "開" : "關") + " 但水系統異常", $"嘗試操作排水閥為 " + (water ? "開" : "關") + " 但水系統異常");
+                }
+
             }
 
             return result;
@@ -313,13 +325,22 @@ namespace CleanerControlApp.Hardwares.SoakingTank.Services
         public bool UltrasonicOP(bool ultrasonic)
         {
             bool result = false;
+            _messageForOperation = string.Empty;
 
-            if(_ultrasonicDevice != null)
+            if (_ultrasonicDevice != null)
             {
-                if(ultrasonic) SetCurrent(_moduleSettings.SoakingTank != null ? _moduleSettings.SoakingTank.UltrasonicSetCurrent : 1f);
-                Command_CleanerUltrasonicOpen = ultrasonic;
-                _ultrasonic = ultrasonic;
-                result = true;
+                if (Sensor_Liquid_H)
+                {
+                    if (ultrasonic) SetCurrent(_moduleSettings.SoakingTank != null ? _moduleSettings.SoakingTank.UltrasonicSetCurrent : 1f);
+                    Command_CleanerUltrasonicOpen = ultrasonic;
+                    _ultrasonic = ultrasonic;
+                    result = true;
+                }
+                else
+                { 
+                    _messageForOperation = "無法操作超音波，水位不足。請確認水位達到要求後再操作。";
+                    OperateLog.Log($"浸泡槽 嘗試操作超音波為 " + (ultrasonic ? "開" : "關") + " 但水位不足", $"嘗試操作超音波為 " + (ultrasonic ? "開" : "關") + " 但水位不足");
+                }
             }
 
             return result;
@@ -612,17 +633,17 @@ namespace CleanerControlApp.Hardwares.SoakingTank.Services
             // Alarms / warnings
             if (HasAlarm)
             {
-                sb.AppendLine(" - 模組發生錯誤(Alarm)。請先排除錯誤。可呼叫 AlarmReset()以嘗試重置馬達警報或針對硬體排查問題。");
+                sb.AppendLine(" - 模組發生錯誤(Alarm)。請先排除錯誤。可長按 [錯誤重置]1秒以嘗試重置馬達警報或針對硬體排查問題。");
             }
             if (HasWarning)
             {
-                sb.AppendLine(" - 模組發生警告(Warning)。請檢查蓋子/水位/馬達狀態，必要時呼叫 WarningStop() 暫停自動。");
+                sb.AppendLine(" - 模組發生警告(Warning)。請檢查蓋子/水位/馬達狀態，。");
             }
 
             // Initialization guidance
             if (!_initialized)
             {
-                sb.AppendLine(" - 尚未初始化：請呼叫 ModuleReset() 或 Initialize() 啟動模組初始化（會開啟伺服並回原點）。");
+                sb.AppendLine(" - 尚未初始化：請按下 [初始化] 啟動模組初始化（會開啟伺服並回原點）。");
                 return sb.ToString();
             }
 
@@ -630,27 +651,27 @@ namespace CleanerControlApp.Hardwares.SoakingTank.Services
             if (!_auto)
             {
                 if (IsNormalStatus)
-                    sb.AppendLine(" - 模組已初始化且狀態正常：可呼叫 AutoStart() 開始自動流程。");
+                    sb.AppendLine(" - 模組已初始化且狀態正常：可按下 [啟動] 開始自動流程。");
                 else
                     sb.AppendLine(" - 模組狀態不完全正常，請先解除警告/錯誤後再啟動自動。");
 
                 sb.AppendLine(" - 手動操作建議:");
                 if (!MotorServoOn)
-                    sb.AppendLine(" * 呼叫 ServoOn(true) 開啟馬達伺服。");
+                    sb.AppendLine(" * 按下 [Servo] 開啟馬達伺服。");
                 if (!MotorHome && MotorServoOn && MotorIdle)
-                    sb.AppendLine(" * 呼叫 Home()進行回原點。");
+                    sb.AppendLine(" * 按下 [Home] 進行回原點。");
                 if (MotorServoOn && MotorIdle)
-                    sb.AppendLine(" * 可用 MoveToPosition(position, speed) 或 Jog(...)進行手動定位/換位。");
+                    sb.AppendLine(" * 可進行手動定位/Jog。");
 
                 if (!_cassette && Sensor_CoverOpen)
                     sb.AppendLine(" * 蓋子已開，放入卡匣後由夾爪完成放置，或手動將馬達移至上方位置以協助放置。");
                 if (_cassette && !Sensor_CoverClose)
-                    sb.AppendLine(" * 偵測到卡匣但蓋子尚未關閉：可呼叫 CoverClose(true) 關蓋。");
+                    sb.AppendLine(" * 偵測到卡匣但蓋子尚未關閉：可手動關蓋。");
 
                 sb.AppendLine(" - 手動超音波/注水/排水控制：");
-                sb.AppendLine(" * 呼叫 ManualUltrasonicOP(true/false) 控制超音波。 ");
-                sb.AppendLine(" * 呼叫 ManualWaterInOP(true/false) 控制注水（與加熱槽互動）。");
-                sb.AppendLine(" * 呼叫 ManualWaterOutputOP(true/false) 控制排水。 ");
+                sb.AppendLine(" * 手動控制超音波。 ");
+                sb.AppendLine(" * 手動控制注水（與加熱槽互動）。");
+                sb.AppendLine(" * 手動控制排水。 ");
 
                 return sb.ToString();
             }
@@ -659,9 +680,9 @@ namespace CleanerControlApp.Hardwares.SoakingTank.Services
                 sb.AppendLine(" - 模組處於自動模式：");
 
                 if (_autoStopFlag)
-                    sb.AppendLine(" * 自動流程已被要求停止，系統會在空閒時停止。觀察 Idle 狀態以確認是否已停止。 ");
+                    sb.AppendLine(" * 自動流程已被要求停止，系統會在空閒時停止。觀察 所有模組 狀態以確認是否已停止。 ");
                 if (_pausing)
-                    sb.AppendLine(" * 自動流程暫停中：呼叫 AutoStart() 可恢復，或 AutoStop(force=true) 強制停止。 ");
+                    sb.AppendLine(" * 自動流程暫停中：按下[啟動] 恢復，或 長按 [停止]1秒 強制停止。 ");
 
                 // 未完成處理階段
                 if (!_actFinished)
@@ -671,9 +692,9 @@ namespace CleanerControlApp.Hardwares.SoakingTank.Services
                     if (!_cassette)
                     {
                         if (Command_CleanerCoverClose)
-                            sb.AppendLine(" - 蓋子目前要求關閉：若需放入卡匣可呼叫 CoverClose(false) 打開蓋子。");
+                            sb.AppendLine(" - 蓋子目前要求關閉：若需放入卡匣可手動打開蓋子。");
                         if (Sensor_CoverOpen && MotorIdle && !InPos1)
-                            sb.AppendLine(" - 蓋子開啟且馬達空閒但不在上方：呼叫 MoveToPosition(0,0) 將馬達移至上方以便放入卡匣。");
+                            sb.AppendLine(" - 蓋子開啟且馬達空閒但不在上方：按下 [Move] 將馬達移至上方以便放入卡匣。");
                     }
                     else // 有卡匣
                     {
@@ -701,10 +722,10 @@ namespace CleanerControlApp.Hardwares.SoakingTank.Services
                         sb.AppendLine(" - 蓋子開啟且馬達不在上方：系統會嘗試將馬達移至上方(位置1)。");
 
                     if (_cassette && InPos1 && MotorIdle && !_motor_commanding && !RetryAirFinished)
-                        sb.AppendLine(" - 系統正在進行風刀反覆吹氣，直到 RetryAirFinished 條件滿足。");
+                        sb.AppendLine(" - 系統正在進行風刀反覆吹氣，直到條件滿足。");
 
                     if (!RetryAirFinished)
-                        sb.AppendLine(" - 若想手動結束吹氣可呼叫 AirOP(false) 或 ManualAirOP(false)。");
+                        sb.AppendLine(" - 若想手動結束吹氣可手動控制風刀。");
                 }
 
                 sb.AppendLine(" - 自動模式下若發生 Alarm/Warning，系統會暫停/停止。請先處理警報再繼續。 ");
@@ -742,10 +763,13 @@ namespace CleanerControlApp.Hardwares.SoakingTank.Services
 
         public void ManualStartToShaking()
         {
+            _messageForOperation = string.Empty;
             if (!_auto && MotorHome && MotorIdle)
             {
                 _manualShaking = true;
             }
+            else
+                _messageForOperation = "無法開始晃動，請確認目前未在自動模式且馬達已復歸且空閒。";
         }
 
         public void ManualStopShaking()
@@ -754,6 +778,8 @@ namespace CleanerControlApp.Hardwares.SoakingTank.Services
         }
 
         public bool ManaulShaking => _manualShaking;
+
+        public string MessageForOperation => _messageForOperation;
 
         #endregion
 

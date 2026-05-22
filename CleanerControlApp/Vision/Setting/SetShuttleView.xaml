@@ -39,9 +39,11 @@
  <ScrollViewer Grid.Column="0" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
  <Border Padding="12" BorderBrush="LightGray" BorderThickness="1" CornerRadius="4" Background="White">
  <StackPanel>
- <TextBlock Text="移載組 /速度" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,8" />
+ <TextBlock Text="移載組 參數" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,8" />
  <Grid>
  <Grid.RowDefinitions>
+ <RowDefinition Height="Auto" />
+ <RowDefinition Height="Auto" />
  <RowDefinition Height="Auto" />
  <RowDefinition Height="Auto" />
  <RowDefinition Height="Auto" />
@@ -67,6 +69,14 @@
 
  <TextBlock Text="Z軸速度 高 (mm/s):" Grid.Row="4" Grid.Column="0" VerticalAlignment="Center" Height="15" />
  <TextBox x:Name="Txt_MotorZ_Vel1" Grid.Row="4" Grid.Column="1" Margin="2,2,0,2" />
+
+ <!-- New fields: 馬達移動穩定時間 and夾爪動作穩定時間 -->
+ <TextBlock Text="馬達穩定時間 (ms):" Grid.Row="5" Grid.Column="0" VerticalAlignment="Center" Height="15" />
+ <TextBox x:Name="Txt_Shuttle_Procedure_MoveEndDelayTime_ms" Grid.Row="5" Grid.Column="1" Margin="2,2,0,2" />
+
+ <TextBlock Text="夾爪穩定時間 (ms):" Grid.Row="6" Grid.Column="0" VerticalAlignment="Center" Height="15" />
+ <TextBox x:Name="Txt_Shuttle_Procedure_ClamperActDelayTime_ms" Grid.Row="6" Grid.Column="1" Margin="2,2,0,2" />
+ 
 
  </Grid>
  </StackPanel>

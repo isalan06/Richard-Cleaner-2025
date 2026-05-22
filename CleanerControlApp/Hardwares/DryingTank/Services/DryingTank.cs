@@ -510,17 +510,17 @@ namespace CleanerControlApp.Hardwares.DryingTank.Services
             // Alarms / warnings
             if (HasAlarm)
             {
-                sb.AppendLine(" - 模組發生錯誤(Alarm)。請先排除錯誤後再繼續操作。可呼叫 AlarmReset() 嘗試清除逾時或馬達錯誤（視實作而定）。");
+                sb.AppendLine(" - 模組發生錯誤(Alarm)。請先排除錯誤後再繼續操作。可長按 [錯誤重置]1秒 嘗試清除逾錯誤。");
             }
             if (HasWarning)
             {
-                sb.AppendLine(" - 模組發生警告(Warning)。請檢查溫度/蓋子感測或其他警告來源，必要時呼叫 WarningStop() 暫停自動。");
+                sb.AppendLine(" - 模組發生警告(Warning)。請檢查溫度/蓋子感測或其他警告來源，可長按 [錯誤重置]1秒 嘗試清除逾警告。");
             }
 
             // Initialization guidance
             if (!_initialized)
             {
-                sb.AppendLine(" - 尚未初始化：請呼叫 ModuleReset() 或 Initialize() 啟動模組初始化流程。初始化會重設狀態並準備開始自動運作。");
+                sb.AppendLine(" - 尚未初始化：請按下 [初始化] 啟動模組初始化流程。初始化會重設狀態並準備開始自動運作。");
                 return sb.ToString();
             }
 
@@ -528,15 +528,15 @@ namespace CleanerControlApp.Hardwares.DryingTank.Services
             if (!_auto)
             {
                 if (IsNormalStatus)
-                    sb.AppendLine(" - 模組已初始化且狀態正常：可呼叫 AutoStart() 開始自動流程。");
+                    sb.AppendLine(" - 模組已初始化且狀態正常：可按下 [啟動] 開始自動流程。");
                 else
                     sb.AppendLine(" - 模組狀態不完全正常，請先解除警告/錯誤後再啟動自動。");
 
                 sb.AppendLine(" - 手動操作建議：");
-                sb.AppendLine(" * 可呼叫 HeatingOP(true/false)進行手動加熱開/關。");
-                sb.AppendLine(" * 可呼叫 ManualBlowerOP(true/false) 控制風扇；ManualAirOP(true/false) 控制氣閥。 ");
-                sb.AppendLine(" * 可呼叫 CoverClose(true/false) 控制蓋子。 ");
-                sb.AppendLine(" * 可呼叫 SetSV(value) 設定目標溫度(SV)。");
+                sb.AppendLine(" * 進行手動加熱開/關。");
+                sb.AppendLine(" * 手動控制風扇或控制氣閥。 ");
+                sb.AppendLine(" * 手動控制蓋子。 ");
+                sb.AppendLine(" * 手動 設定目標溫度(SV)。");
 
                 return sb.ToString();
             }
@@ -546,7 +546,7 @@ namespace CleanerControlApp.Hardwares.DryingTank.Services
             if (_autoStopFlag)
                 sb.AppendLine(" * 自動流程已被要求停止，系統會在空閒時停止，請觀察 Idle 狀態。");
             if (_pausing)
-                sb.AppendLine(" * 自動流程暫停中：呼叫 AutoStart() 可恢復，或 AutoStop(force=true) 強制停止以結束自動。");
+                sb.AppendLine(" * 自動流程暫停中：按下[啟動] 恢復，或 長按 [停止]1秒 強制停止以結束自動。");
 
             if (!_actFinished)
             {
@@ -555,7 +555,7 @@ namespace CleanerControlApp.Hardwares.DryingTank.Services
                 if (!_cassette)
                 {
                     if (Command_HeaterCoverClose)
-                        sb.AppendLine(" - 蓋子目前要求關閉：若需放入卡匣可呼叫 CoverClose(false) 打開蓋子並放入卡匣。 ");
+                        sb.AppendLine(" - 蓋子目前要求關閉：若需放入卡匣可手動打開蓋子並放入卡匣。 ");
                     if (Sensor_CoverOpen && !Idle)
                         sb.AppendLine(" - 蓋子已開但模組不在完全空閒狀態，確認馬達/機構狀態後再放入卡匣。 ");
                 }
@@ -581,7 +581,7 @@ namespace CleanerControlApp.Hardwares.DryingTank.Services
             {
                 sb.AppendLine(" * 已完成烘乾階段：");
                 if (_cassette && Command_HeaterCoverClose && !_heating)
-                    sb.AppendLine(" - 系統會打開蓋子以便取出卡匣；若需立即取卡可暫停自動或呼叫 AutoStop()。 ");
+                    sb.AppendLine(" - 系統會打開蓋子以便取出卡匣；若需立即取卡可按下[暫停] 或 [停止]。 ");
 
                 if (HS_ClamperPickFinished)
                     sb.AppendLine(" -夾爪已取卡完成，系統會重置狀態準備下一循環。 ");

@@ -279,6 +279,11 @@ namespace CleanerControlApp.Vision.Template
             try
             {
                 _heatingTank?.ManualWaterInOP(true);
+                var status = _heatingTank?.MessageForOperation;
+                if (!string.IsNullOrEmpty(status))
+                {
+                    ShowStatusPopup(status);
+                }
             }
             catch { }
         }
@@ -298,6 +303,11 @@ namespace CleanerControlApp.Vision.Template
             try
             {
                 _heatingTank?.ManualWaterOutOP(true);
+                var status = _heatingTank?.MessageForOperation;
+                if (!string.IsNullOrEmpty(status))
+                {
+                    ShowStatusPopup(status);
+                }
             }
             catch { }
         }
@@ -322,6 +332,15 @@ namespace CleanerControlApp.Vision.Template
             {
                 // ignore
             }
+        }
+
+        private void ShowStatusPopup(string status)
+        {
+            try
+            {
+                CleanerControlApp.Vision.Shared.StatusPopup.Show(status, Window.GetWindow(this), 10);
+            }
+            catch { }
         }
     }
 }

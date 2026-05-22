@@ -43,7 +43,7 @@
  <TextBlock Text="浸泡槽" FontSize="18" FontWeight="Bold" Foreground="Black" Canvas.Left="538" Canvas.Top="103" />
 
  <!-- Add visual elements for the heating tank here -->
- <local:Template_INV_2 x:Name="INV2Control" Canvas.Left="386" Canvas.Top="251" IsHitTestVisible="False" />
+ <local:Template_INV_2 x:Name="INV2Control" Canvas.Left="386" Canvas.Top="251" />
  <local:Template_Tank_Heating x:Name="TankHeatingControl" Canvas.Left="10" Canvas.Top="42" Height="52" Width="93" IsHitTestVisible="False" />
 
  <!-- Water flow icons -->

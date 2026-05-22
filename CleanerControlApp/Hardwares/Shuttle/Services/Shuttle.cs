@@ -88,6 +88,12 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
         private DateTime? _loopStartTime = null;
         private readonly TimeSpan _opModeCheckDelay = TimeSpan.FromSeconds(10);
 
+        // Move-end delay tracking timestamps (non-blocking)
+        private DateTime? _moveEndDelayStart;
+        private DateTime? _clampEndDelayStart;
+
+        private string _messageForPickPlace = string.Empty;
+
         #endregion
 
         #region constructor
@@ -376,6 +382,7 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
         public bool PickCassette(int position, bool dryRun = false, bool semiRun = false)
         {
             bool result = false;
+            _messageForPickPlace = string.Empty;
 
             if ((IsEmpty || _sim_pass_clamper || dryRun || (semiRun && !Cassette)) && !Moving && !MotorMoving && IsNormalStatus && MotorHome && ZInIdlePosition)
             {
@@ -387,15 +394,20 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
                     _semiRun = semiRun;
                     result = true;
                 }
+                else
+                    _messageForPickPlace = $"Pick Procedure Start Error: 無效的位置參數: {position}。請提供1~14的值。";
             }
+            else
+                _messageForPickPlace = $"Pick Procedure Start Error: 條件不符。IsEmpty(true)={IsEmpty}, Moving(false)={Moving}, MotorMoving(false)={MotorMoving}, IsNormalStatus(true)={IsNormalStatus}, MotorHome(true)={MotorHome}, ZInIdlePosition(true)={ZInIdlePosition}.";
 
             return result;
         }
         public bool PlaceCassette(int position, bool dryRun = false, bool semiRun = false)
         {
             bool result = false;
+            _messageForPickPlace = string.Empty;
 
-            if ((HasCassette || _sim_pass_clamper || dryRun || (semiRun && Cassette) )&& !Moving && !MotorMoving && IsNormalStatus && MotorHome && ZInIdlePosition)
+            if ((HasCassette || _sim_pass_clamper || dryRun || (semiRun && Cassette)) && !Moving && !MotorMoving && IsNormalStatus && MotorHome && ZInIdlePosition)
             {
                 if (position > 0 && position < 15)
                 {
@@ -405,8 +417,11 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
                     _semiRun = semiRun;
                     result = true;
                 }
-
+                else
+                    _messageForPickPlace = $"Place Procedure Start Error: 無效的位置參數: {position}。請提供1~14的值。";
             }
+            else
+                _messageForPickPlace = $"Place Procedure Start Error: 條件不符。HasCassette(true)={HasCassette}, Moving(false)={Moving}, MotorMoving(false)={MotorMoving}, IsNormalStatus(true)={IsNormalStatus}, MotorHome(true)={MotorHome}, ZInIdlePosition(true)={ZInIdlePosition}.";
 
             return result;
         }
@@ -460,17 +475,17 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
             // Alarms / warnings
             if (HasAlarm)
             {
-                sb.AppendLine(" - 模組發生錯誤(Alarm)。請先排除硬體或馬達問題，必要時呼叫 AlarmReset() 清除並重置。");
+                sb.AppendLine(" - 模組發生錯誤(Alarm)。請先排除硬體或馬達問題，再長按 [錯誤重置]1秒 清除並重置。");
             }
             if (HasWarning)
             {
-                sb.AppendLine(" - 模組發生警告(Warning)。請檢查夾爪/馬達狀態或回原點後再繼續。可呼叫 WarningStop() 暫停。 ");
+                sb.AppendLine(" - 模組發生警告(Warning)。請檢查夾爪/馬達狀態或回原點後再繼續。。 ");
             }
 
             // Initialization guidance
             if (!_initialized)
             {
-                sb.AppendLine(" - 尚未初始化：請呼叫 ModuleReset() 或 Initialize()進行初始化（會啟動伺服並回原點）。");
+                sb.AppendLine(" - 尚未初始化：請按下 [初始化] 以初始化模組 進行初始化（會啟動伺服並回原點）。");
                 return sb.ToString();
             }
 
@@ -478,25 +493,25 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
             if (!_auto)
             {
                 if (IsNormalStatus)
-                    sb.AppendLine(" - 模組已初始化且狀態正常：可呼叫 AutoStart() 開始自動流程。");
+                    sb.AppendLine(" - 模組已初始化且狀態正常：可按下 [啟動] 開始自動流程。");
                 else
                     sb.AppendLine(" - 模組狀態不完全正常，請先解除警告/錯誤後再啟動自動。");
 
                 sb.AppendLine(" - 手動操作建議：");
-                if (!MotorServoOn) sb.AppendLine(" * 呼叫 ShuttleXMotor.ServoOn(true) / ShuttleZMotor.ServoOn(true) 開啟馬達伺服 (或使用 SimMotorPass 測試)。");
-                if (!MotorHome && MotorServoOn && MotorIdle) sb.AppendLine(" * 呼叫 Home()讓馬達回原點。 ");
-                if (MotorServoOn && MotorIdle) sb.AppendLine(" * 可呼叫 ShuttleXMotor.MoveToPosition(...) 或 ShuttleZMotor.MoveToPosition(...)進行手動定位。 ");
-                sb.AppendLine(" * 呼叫 ClamperCloseOP(true/false) 或 ClamperOpenOP(true/false) 控制夾爪開關。");
-                sb.AppendLine(" * 呼叫 PickCassette(position) / PlaceCassette(position)來測試取放序列 (位置編號1~14)。");
-                sb.AppendLine(" * 呼叫 CheckTankCassetteExist()以檢查各槽的卡匣存在狀態。");
+                if (!MotorServoOn) sb.AppendLine(" * 開啟馬達伺服 (ServoOn)。");
+                if (!MotorHome && MotorServoOn && MotorIdle) sb.AppendLine(" * 呼叫 [Home] 讓馬達回原點。 ");
+                if (MotorServoOn && MotorIdle) sb.AppendLine(" * 可呼叫 [Move]進行手動定位。 ");
+                sb.AppendLine(" * 手動控制夾爪開關。");
+                sb.AppendLine(" * 半自動取/放程序來測試取放序列 (位置編號1~14)。");
+                sb.AppendLine(" * 初始化會檢查各槽的卡匣存在狀態。");
 
                 return sb.ToString();
             }
 
             // Auto mode guidance
             sb.AppendLine(" - 模組處於自動模式：");
-            if (_autoStopFlag) sb.AppendLine(" * 自動流程已被要求停止，系統會在空閒時停止，請觀察 Idle 狀態確認是否已停止。 ");
-            if (_pausing) sb.AppendLine(" * 自動流程暫停中：呼叫 AutoStart() 可恢復，或 AutoStop() 強制停止。 ");
+            if (_autoStopFlag) sb.AppendLine(" * 自動流程已被要求停止，系統會在空閒時停止，請觀察所有模組狀態確認是否已停止。 ");
+            if (_pausing) sb.AppendLine(" * 自動流程暫停中：按下[啟動] 恢復，或 長按 [停止]1秒 強制停止。 ");
 
             // Pick/place in-progress guidance
             if (_pickTrigger)
@@ -521,9 +536,9 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
             if (!_moving && !_pickTrigger && !_placeTrigger && !_checkCassetteTrigger)
             {
                 if (!_cassette)
-                    sb.AppendLine(" - 機台空閒且無卡匣：若要放入卡匣請開啟蓋子/將卡匣放到 Loader/Unloader 或使用 PickCassette(...)進行取卡。");
+                    sb.AppendLine(" - 機台空閒且無卡匣：若要放入卡匣請開啟蓋子/將卡匣放到 Loader/Unloader 或使用半自動Pick程序進行取卡。");
                 else
-                    sb.AppendLine(" - 機台空閒且有卡匣：可呼叫 PlaceCassette(position) 將卡匣放至目標位置，或讓自動流程繼續。 ");
+                    sb.AppendLine(" - 機台空閒且有卡匣：可使用半自動Place程序將卡匣放至目標位置，或讓自動流程繼續。 ");
             }
 
             sb.AppendLine(" - 若出現警告/錯誤，請先處理後再續自動流程。 ");
@@ -563,8 +578,9 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
         public bool SemiPickCassette(int semiPosIndex)
         { 
             bool result = false;
+            _messageForPickPlace = string.Empty;
 
-            if(_motorXAxis != null && _motorZAxis != null)
+            if (_motorXAxis != null && _motorZAxis != null)
             {
                 int xPos = -1, zPos = -1;
                 ShuttleSemiPositionList.GetSemiPositionTransferToRealPoint(semiPosIndex, out xPos, out zPos);
@@ -574,7 +590,11 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
                     {
                         result = this.PickCassette(xPos, semiRun: true);
                     }
+                    else
+                        _messageForPickPlace = $"Pick 啟動條件不符。Idle(true)={MotorIdle}, Auto(false)={_auto}, Home(true)={MotorHome}, ServoOn(true)={MotorServoOn}, SemiRun(false)={_semiRun}, DryRun(false)={_dryRun}.";
                 }
+                else
+                    _messageForPickPlace = $"Pick 啟動條件不符: 無效的半自動位置參數: {semiPosIndex}。請提供有效的半自動位置索引。";
             }
 
             return result;
@@ -583,6 +603,7 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
         public bool SemiPlaceCassette(int semiPosIndex)
         {
             bool result = false;
+            _messageForPickPlace = string.Empty;
 
             if (_motorXAxis != null && _motorZAxis != null)
             {
@@ -594,11 +615,17 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
                     {
                         result = this.PlaceCassette(xPos, semiRun: true);
                     }
+                    else
+                        _messageForPickPlace = $"Place 啟動條件不符。Idle(true)={MotorIdle}, Auto(false)={_auto}, Home(true)={MotorHome}, ServoOn(true)={MotorServoOn}, SemiRun(false)={_semiRun}, DryRun(false)={_dryRun}.";
                 }
+                else
+                    _messageForPickPlace = $"Place 啟動條件不符: 無效的半自動位置參數: {semiPosIndex}。請提供有效的半自動位置索引。";
             }
 
             return result;
         }
+
+        public string MessageForPickPlace => _messageForPickPlace;
 
         #endregion
 
@@ -671,6 +698,59 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
         #endregion
 
         #region Auto Procedure
+
+        // Non-blocking move end delay checker using ModuleSettings value.
+        // Returns true when the condition has been continuously true for the configured ms.
+        private bool MoveEndDelayPassed(ref DateTime? startTimestamp, bool condition)
+        {
+            try
+            {
+                int ms = _moduleSettings?.MS_Shuttle?.Shuttle_Procedure_MoveEndDelayTime_ms ?? 0;
+                if (ms <= 0) return condition; // no delay configured
+
+                if (!condition)
+                {
+                    startTimestamp = null;
+                    return false;
+                }
+
+                if (startTimestamp == null)
+                    startTimestamp = DateTime.UtcNow;
+
+                return (DateTime.UtcNow - startTimestamp.Value) >= TimeSpan.FromMilliseconds(ms);
+            }
+            catch
+            {
+                // on error, behave as no delay
+                startTimestamp = null;
+                return condition;
+            }
+        }
+        private bool ClamperEndDelayPassed(ref DateTime? startTimestamp, bool condition)
+        {
+            try
+            {
+                int ms = _moduleSettings?.MS_Shuttle?.Shuttle_Procedure_ClamperActDelayTime_ms ?? 0;
+                if (ms <= 0) return condition; // no delay configured
+
+                if (!condition)
+                {
+                    startTimestamp = null;
+                    return false;
+                }
+
+                if (startTimestamp == null)
+                    startTimestamp = DateTime.UtcNow;
+
+                return (DateTime.UtcNow - startTimestamp.Value) >= TimeSpan.FromMilliseconds(ms);
+            }
+            catch
+            {
+                // on error, behave as no delay
+                startTimestamp = null;
+                return condition;
+            }
+        }
 
         private void GetActParameters(int position, out int posX, out int velX, out int posZ, out int velZ)
         {
@@ -804,7 +884,7 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
                         {
                             // Log timeout for dry/semi run
                             OperateLog.Log("超時: 移載組在 Dry/SemiRun 模式觸發超時，已清除觸發並停用 dryRun/semiRun", "Alarm");
-                            _logger?.LogWarning("Shuttle trigger timeout (dry/semi run): cleared triggers and disabled dryRun/semiRun.");
+                            _logger?.LogWarning("Shuttle trigger timeout (dry/semi run): cleared triggers and disabled dry/semi run.");
 
                             // Dry/semi run timeout alarm: clear triggers and disable dry/semi run
                             _pickTrigger = false;
@@ -849,16 +929,36 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
                                 _pickCase = 10;
                             }
                             else if (!MotorMoving)
+                            {
                                 _motorXAxis.MoveToPosition(_actPositionX, _actVelocityX);
+                                _pickCase = 1; // wait state for X axis
+                            }
+                            break;
+
+                        case 1: // X Axis Move End Delay
+                            if (MoveEndDelayPassed(ref _moveEndDelayStart, _motorXAxis.GetInPos(_actPositionX) && MotorIdle))
+                            {
+                                _pickCase = 10;
+                            }
                             break;
 
                         case 10: // Z Axis Move To Pick Position
-                            if (_motorZAxis.GetInPos(_actPositionZ))
+                            if (_motorZAxis.GetInPos(_actPositionZ) && MotorIdle)
                             {
                                 _pickCase = 20;
                             }
                             else if (!MotorMoving)
+                            {
                                 _motorZAxis.MoveToPosition(_actPositionZ, _actVelocityZ);
+                                _pickCase = 11; // wait state for Z axis
+                            }
+                            break;
+
+                        case 11: // Z Axis Move End Delay
+                            if (MoveEndDelayPassed(ref _moveEndDelayStart, _motorZAxis.GetInPos(_actPositionZ) && MotorIdle))
+                            {
+                                _pickCase = 20;
+                            }
                             break;
 
                         case 20: // Clamper Close to Pick Cassette
@@ -867,18 +967,36 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
                                 _pickCase = 30;
                             }
                             else if (!Command_ClamperClose)
+                            {
                                 ClamperCloseOP(true);
+                                _pickCase = 21; // clamper action wait
+                            }
+                            break;
 
+                        case 21: // Clamper Close Delay
+                            if (ClamperEndDelayPassed(ref _clampEndDelayStart, Check_ClamperClose || _sim_pass_clamper))
+                            {
+                                _pickCase = 30;
+                            }
                             break;
 
                         case 30: // Z Axis Move To Original Position (P1)
-                            if (_motorZAxis.GetInPos(0))
+                            if (_motorZAxis.GetInPos(0) && MotorIdle)
                             {
                                 _pickCase = 40;
                             }
                             else if (!MotorMoving)
+                            {
                                 _motorZAxis.MoveToPosition(0, _actVelocityZ);
+                                _pickCase = 31; // wait for Z return
+                            }
+                            break;
 
+                        case 31: // Z Axis Return Move End Delay
+                            if (MoveEndDelayPassed(ref _moveEndDelayStart, _motorZAxis.GetInPos(0) && MotorIdle))
+                            {
+                                _pickCase = 40;
+                            }
                             break;
 
                         case 40: // Check Cassette Exist
@@ -915,16 +1033,36 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
                                 _placeCase = 10;
                             }
                             else if (!MotorMoving)
+                            {
                                 _motorXAxis.MoveToPosition(_actPositionX, _actVelocityX);
+                                _placeCase = 1; // wait for X
+                            }
+                            break;
+
+                        case 1: // X Axis Move End Delay
+                            if (MoveEndDelayPassed(ref _moveEndDelayStart, _motorXAxis.GetInPos(_actPositionX) && MotorIdle))
+                            {
+                                _placeCase = 10;
+                            }
                             break;
 
                         case 10: // Z Axis Move To Place Position
-                            if (_motorZAxis.GetInPos(_actPositionZ))
+                            if (_motorZAxis.GetInPos(_actPositionZ) && MotorIdle)
                             {
                                 _placeCase = 20;
                             }
                             else if (!MotorMoving)
+                            {
                                 _motorZAxis.MoveToPosition(_actPositionZ, _actVelocityZ);
+                                _placeCase = 11; // wait for Z
+                            }
+                            break;
+
+                        case 11: // Z Axis Move End Delay
+                            if (MoveEndDelayPassed(ref _moveEndDelayStart, _motorZAxis.GetInPos(_actPositionZ) && MotorIdle))
+                            {
+                                _placeCase = 20;
+                            }
                             break;
 
                         case 20: // Clamper Open to Place Cassette
@@ -933,18 +1071,38 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
                                 _placeCase = 30;
                             }
                             else if (!Command_ClamperOpen)
+                            {
                                 ClamperOpenOP(true);
+                                _placeCase = 21; // clamper open wait
+                            }
 
                             break;
 
+                        case 21: // Clamper Open Delay
+                            if (ClamperEndDelayPassed(ref _clampEndDelayStart, Check_ClamperOpen || _sim_pass_clamper))
+                            {
+                                _placeCase = 30;
+                            }
+                            break;
+
                         case 30: // Z Axis Move To Original Position (P1)
-                            if (_motorZAxis.GetInPos(0))
+                            if (_motorZAxis.GetInPos(0) && MotorIdle)
                             {
                                 _placeCase = 40;
                             }
                             else if (!MotorMoving)
+                            {
                                 _motorZAxis.MoveToPosition(0, _actVelocityZ);
+                                _placeCase = 31; // wait for Z return
+                            }
 
+                            break;
+
+                        case 31: // Z Axis Return Move End Delay
+                            if (MoveEndDelayPassed(ref _moveEndDelayStart, _motorZAxis.GetInPos(0) && MotorIdle))
+                            {
+                                _placeCase = 40;
+                            }
                             break;
 
                         case 40: // Check Cassette Exist
@@ -974,7 +1132,7 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
 
             if (!_auto && (_dryRun || _semiRun))
             {
-                // Pick Procedure
+                // Pick Procedure (non-auto dry/semi)
                 if (_pickTrigger && !_pausing && _motorXAxis != null && _motorZAxis != null)
                 {
                     switch (_pickCase)
@@ -985,16 +1143,36 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
                                 _pickCase = 10;
                             }
                             else if (!MotorMoving)
+                            {
                                 _motorXAxis.MoveToPosition(_actPositionX, _actVelocityX);
+                                _pickCase = 1; // wait state for X
+                            }
+                            break;
+
+                        case 1: // X Axis Move End Delay
+                            if (MoveEndDelayPassed(ref _moveEndDelayStart, _motorXAxis.GetInPos(_actPositionX) && MotorIdle))
+                            {
+                                _pickCase = 10;
+                            }
                             break;
 
                         case 10: // Z Axis Move To Pick Position
-                            if (_motorZAxis.GetInPos(_actPositionZ))
+                            if (_motorZAxis.GetInPos(_actPositionZ) && MotorIdle)
                             {
                                 _pickCase = 20;
                             }
-                            else if (!MotorMoving)  
+                            else if (!MotorMoving)
+                            {
                                 _motorZAxis.MoveToPosition(_actPositionZ, _actVelocityZ);
+                                _pickCase = 11; // wait state for Z
+                            }
+                            break;
+
+                        case 11: // Z Axis Move End Delay
+                            if (MoveEndDelayPassed(ref _moveEndDelayStart, _motorZAxis.GetInPos(_actPositionZ) && MotorIdle))
+                            {
+                                _pickCase = 20;
+                            }
                             break;
 
                         case 20: // Clamper Close to Pick Cassette
@@ -1003,18 +1181,37 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
                                 _pickCase = 30;
                             }
                             else if (!Command_ClamperClose)
+                            {
                                 ClamperCloseOP(true);
+                                _pickCase = 21; // clamper action wait
+                            }
 
                             break;
 
+                        case 21: // Clamper Close Delay
+                            if (ClamperEndDelayPassed(ref _clampEndDelayStart, Check_ClamperClose || _sim_pass_clamper))
+                            {
+                                _pickCase = 30;
+                            }
+                            break;
+
                         case 30: // Z Axis Move To Original Position (P1)
-                            if (_motorZAxis.GetInPos(0))
+                            if (_motorZAxis.GetInPos(0) && MotorIdle)
                             {
                                 _pickCase = 40;
                             }
                             else if (!MotorMoving)
+                            {
                                 _motorZAxis.MoveToPosition(0, _actVelocityZ);
+                                _pickCase = 31; // wait for Z return
+                            }
+                            break;
 
+                        case 31: // Z Axis Return Move End Delay
+                            if (MoveEndDelayPassed(ref _moveEndDelayStart, _motorZAxis.GetInPos(0) && MotorIdle))
+                            {
+                                _pickCase = 40;
+                            }
                             break;
 
                         case 40: // Check Cassette Exist
@@ -1044,7 +1241,7 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
                     }
                 }
 
-                // Place Procedure
+                // Place Procedure (non-auto dry/semi)
                 if (_placeTrigger && !_pausing && _motorXAxis != null && _motorZAxis != null)
                 {
                     switch (_placeCase)
@@ -1055,16 +1252,36 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
                                 _placeCase = 10;
                             }
                             else if (!MotorMoving)
+                            {
                                 _motorXAxis.MoveToPosition(_actPositionX, _actVelocityX);
+                                _placeCase = 1; // wait for X
+                            }
+                            break;
+
+                        case 1: // X Axis Move End Delay
+                            if (MoveEndDelayPassed(ref _moveEndDelayStart, _motorXAxis.GetInPos(_actPositionX) && MotorIdle))
+                            {
+                                _placeCase = 10;
+                            }
                             break;
 
                         case 10: // Z Axis Move To Place Position
-                            if (_motorZAxis.GetInPos(_actPositionZ))
+                            if (_motorZAxis.GetInPos(_actPositionZ) && MotorIdle)
                             {
                                 _placeCase = 20;
                             }
                             else if (!MotorMoving)
+                            {
                                 _motorZAxis.MoveToPosition(_actPositionZ, _actVelocityZ);
+                                _placeCase = 11; // wait for Z
+                            }
+                            break;
+
+                        case 11: // Z Axis Move End Delay
+                            if (MoveEndDelayPassed(ref _moveEndDelayStart, _motorZAxis.GetInPos(_actPositionZ) && MotorIdle))
+                            {
+                                _placeCase = 20;
+                            }
                             break;
 
                         case 20: // Clamper Open to Place Cassette
@@ -1073,18 +1290,36 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
                                 _placeCase = 30;
                             }
                             else if (!Command_ClamperOpen)
+                            {
                                 ClamperOpenOP(true);
+                                _placeCase = 21; // clamper open wait
+                            }
+                            break;
 
+                        case 21: // Clamper Open Delay
+                            if (ClamperEndDelayPassed(ref _clampEndDelayStart, Check_ClamperOpen || _sim_pass_clamper))
+                            {
+                                _placeCase = 30;
+                            }
                             break;
 
                         case 30: // Z Axis Move To Original Position (P1)
-                            if (_motorZAxis.GetInPos(0))
+                            if (_motorZAxis.GetInPos(0) && MotorIdle)
                             {
                                 _placeCase = 40;
                             }
                             else if (!MotorMoving)
+                            {
                                 _motorZAxis.MoveToPosition(0, _actVelocityZ);
+                                _placeCase = 31; // wait for Z return
+                            }
+                            break;
 
+                        case 31: // Z Axis Return Move End Delay
+                            if (MoveEndDelayPassed(ref _moveEndDelayStart, _motorZAxis.GetInPos(0) && MotorIdle))
+                            {
+                                _placeCase = 40;
+                            }
                             break;
 
                         case 40: // Check Cassette Exist
@@ -1117,8 +1352,6 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
             // Check Cassette of Tank Procedure
             if (_checkCassetteTrigger && !_pausing && _motorXAxis != null && _motorZAxis != null)
             {
-
-
                 if (_sim_pass_motor)
                 {
                     HS_Check_Cassette_Finished = true;
@@ -1134,25 +1367,49 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
                                 _checkCassetteCase = 10;
                             }
                             else if (!MotorMoving)
-                                _motorZAxis.MoveToPosition(0, 1);
+                            {
+                                _motorZAxis.MoveToPosition(0,1);
+                                _checkCassetteCase = 1; // wait for Z
+                            }
+                            break;
+
+                        case 1: // wait for Z original
+                            if (MoveEndDelayPassed(ref _moveEndDelayStart, _motorZAxis.GetInPos(0) && MotorIdle))
+                                _checkCassetteCase = 10;
                             break;
 
                         case 10: // Axis X Move To Sink (P17)
-                            if (_motorXAxis.GetInPos(16))
+                            if (_motorXAxis.GetInPos(16) && MotorIdle)
                             {
                                 _checkCassetteCase = 20;
                             }
                             else if (!MotorMoving)
-                                _motorXAxis.MoveToPosition(16, 1);
+                            {
+                                _motorXAxis.MoveToPosition(16,1);
+                                _checkCassetteCase = 11; // wait for X
+                            }
+                            break;
+
+                        case 11: // wait for X
+                            if (MoveEndDelayPassed(ref _moveEndDelayStart, _motorXAxis.GetInPos(16) && MotorIdle))
+                                _checkCassetteCase = 20;
                             break;
 
                         case 20: // Axis Z Move To Sink (P8)
-                            if (_motorZAxis.GetInPos(7))
+                            if ( _motorZAxis.GetInPos(7) && MotorIdle)
                             {
                                 _checkCassetteCase = 30;
                             }
                             else if (!MotorMoving)
-                                _motorZAxis.MoveToPosition(7, 1);
+                            {
+                                _motorZAxis.MoveToPosition(7,1);
+                                _checkCassetteCase = 21; // wait for Z
+                            }
+                            break;
+
+                        case 21: // wait for Z
+                            if (MoveEndDelayPassed(ref _moveEndDelayStart, _motorZAxis.GetInPos(7) && MotorIdle))
+                                _checkCassetteCase = 30;
                             break;
 
                         case 30: // Check Cassette
@@ -1161,30 +1418,54 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
                             break;
 
                         case 100: // Axis Z Back To Original
-                            if (_motorZAxis.GetInPos(0))
+                            if ( _motorZAxis.GetInPos(0))
                             {
                                 _checkCassetteCase = 110;
                             }
                             else if (!MotorMoving)
-                                _motorZAxis.MoveToPosition(0, 1);
+                            {
+                                _motorZAxis.MoveToPosition(0,1);
+                                _checkCassetteCase = 101; // wait
+                            }
+                            break;
+
+                        case 101:
+                            if (MoveEndDelayPassed(ref _moveEndDelayStart, _motorZAxis.GetInPos(0) && MotorIdle))
+                                _checkCassetteCase = 110;
                             break;
 
                         case 110: // Axis X Move To Soaking Tank (P18)
-                            if (_motorXAxis.GetInPos(17))
+                            if (_motorXAxis.GetInPos(17) && MotorIdle)
                             {
                                 _checkCassetteCase = 120;
                             }
                             else if (!MotorMoving)
-                                _motorXAxis.MoveToPosition(17, 1);
+                            {
+                                _motorXAxis.MoveToPosition(17,1);
+                                _checkCassetteCase = 111; // wait
+                            }
+                            break;
+
+                        case 111:
+                            if (MoveEndDelayPassed(ref _moveEndDelayStart, _motorXAxis.GetInPos(17) && MotorIdle))
+                                _checkCassetteCase = 120;
                             break;
 
                         case 120: // Axis Z Move To Sink (P9)
-                            if (_motorZAxis.GetInPos(8))
+                            if (_motorZAxis.GetInPos(8) && MotorIdle)
                             {
                                 _checkCassetteCase = 130;
                             }
                             else if (!MotorMoving)
-                                _motorZAxis.MoveToPosition(8, 1);
+                            {
+                                _motorZAxis.MoveToPosition(8,1);
+                                _checkCassetteCase = 121;
+                            }
+                            break;
+
+                        case 121:
+                            if (MoveEndDelayPassed(ref _moveEndDelayStart, _motorZAxis.GetInPos(8) && MotorIdle))
+                                _checkCassetteCase = 130;
                             break;
 
                         case 130: // Check Cassette
@@ -1198,25 +1479,49 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
                                 _checkCassetteCase = 210;
                             }
                             else if (!MotorMoving)
-                                _motorZAxis.MoveToPosition(0, 1);
+                            {
+                                _motorZAxis.MoveToPosition(0,1);
+                                _checkCassetteCase = 201;
+                            }
                             break;
 
-                        case 210: // Axis X Move To Drying Tank 1 (P19)
-                            if (_motorXAxis.GetInPos(18))
+                        case 201:
+                            if (MoveEndDelayPassed(ref _moveEndDelayStart, _motorZAxis.GetInPos(0) && MotorIdle))
+                                _checkCassetteCase = 210;
+                            break;
+
+                        case 210: // Axis X Move To Drying Tank1 (P19)
+                            if (_motorXAxis.GetInPos(18) && MotorIdle)
                             {
                                 _checkCassetteCase = 220;
                             }
                             else if (!MotorMoving)
-                                _motorXAxis.MoveToPosition(18, 1);
+                            {
+                                _motorXAxis.MoveToPosition(18,1);
+                                _checkCassetteCase = 211;
+                            }
+                            break;
+
+                        case 211:
+                            if (MoveEndDelayPassed(ref _moveEndDelayStart, _motorXAxis.GetInPos(18) && MotorIdle))
+                                _checkCassetteCase = 220;
                             break;
 
                         case 220: // Axis Z Move To Sink (P10)
-                            if (_motorZAxis.GetInPos(9))
+                            if (_motorZAxis.GetInPos(9) && MotorIdle)
                             {
                                 _checkCassetteCase = 230;
                             }
                             else if (!MotorMoving)
-                                _motorZAxis.MoveToPosition(9, 1);
+                            {
+                                _motorZAxis.MoveToPosition(9,1);
+                                _checkCassetteCase = 221;
+                            }
+                            break;
+
+                        case 221:
+                            if (MoveEndDelayPassed(ref _moveEndDelayStart, _motorZAxis.GetInPos(9) && MotorIdle))
+                                _checkCassetteCase = 230;
                             break;
 
                         case 230: // Check Cassette
@@ -1230,16 +1535,32 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
                                 _checkCassetteCase = 310;
                             }
                             else if (!MotorMoving)
-                                _motorZAxis.MoveToPosition(0, 1);
+                            {
+                                _motorZAxis.MoveToPosition(0,1);
+                                _checkCassetteCase = 301;
+                            }
                             break;
 
-                        case 310: // Axis X Move To Drying Tank 2 (P20)
-                            if (_motorXAxis.GetInPos(19))
+                        case 301:
+                            if (MoveEndDelayPassed(ref _moveEndDelayStart, _motorZAxis.GetInPos(0) && MotorIdle))
+                                _checkCassetteCase = 310;
+                            break;
+
+                        case 310: // Axis X Move To Drying Tank2 (P20)
+                            if (_motorXAxis.GetInPos(19) && MotorIdle)
                             {
                                 _checkCassetteCase = 320;
                             }
                             else if (!MotorMoving)
-                                _motorXAxis.MoveToPosition(19, 1);
+                            {
+                                _motorXAxis.MoveToPosition(19,1);
+                                _checkCassetteCase = 311;
+                            }
+                            break;
+
+                        case 311:
+                            if (MoveEndDelayPassed(ref _moveEndDelayStart, _motorXAxis.GetInPos(19) && MotorIdle))
+                                _checkCassetteCase = 320;
                             break;
 
                         case 320: // Axis Z Move To Sink (P11)
@@ -1248,7 +1569,15 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
                                 _checkCassetteCase = 330;
                             }
                             else if (!MotorMoving)
-                                _motorZAxis.MoveToPosition(10, 1);
+                            {
+                                _motorZAxis.MoveToPosition(10,1);
+                                _checkCassetteCase = 321;
+                            }
+                            break;
+
+                        case 321:
+                            if (MoveEndDelayPassed(ref _moveEndDelayStart, _motorZAxis.GetInPos(10) && MotorIdle))
+                                _checkCassetteCase = 330;
                             break;
 
                         case 330: // Check Cassette
@@ -1262,7 +1591,15 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
                                 _checkCassetteCase = 410;
                             }
                             else if (!MotorMoving)
-                                _motorZAxis.MoveToPosition(0, 1);
+                            {
+                                _motorZAxis.MoveToPosition(0,1);
+                                _checkCassetteCase = 401;
+                            }
+                            break;
+
+                        case 401:
+                            if (MoveEndDelayPassed(ref _moveEndDelayStart, _motorZAxis.GetInPos(0) && MotorIdle))
+                                _checkCassetteCase = 410;
                             break;
 
                         case 410: // Axis X Back To Original
@@ -1271,7 +1608,15 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
                                 _checkCassetteCase = 420;
                             }
                             else if (!MotorMoving)
-                                _motorXAxis.MoveToPosition(0, 1);
+                            {
+                                _motorXAxis.MoveToPosition(0,1);
+                                _checkCassetteCase = 411;
+                            }
+                            break;
+
+                        case 411:
+                            if (MoveEndDelayPassed(ref _moveEndDelayStart, _motorXAxis.GetInPos(0) && MotorIdle))
+                                _checkCassetteCase = 420;
                             break;
 
                         case 420: // Finish

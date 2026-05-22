@@ -113,5 +113,7 @@ namespace CleanerControlApp.Hardwares.SoakingTank.Interfaces
         void ManualStartToShaking();
         public void ManualStopShaking();
         bool ManaulShaking { get; }
+
+        string MessageForOperation { get; }
     }
 }

@@ -433,8 +433,8 @@ namespace CleanerControlApp
                 }
                 catch { }
 
-                // Re-throw to allow debugging if desired
-                throw;
+                // Do not re-throw here; OnStartup checks AppHost and will shutdown gracefully
+                // Rethrowing would become an unhandled exception and crash the process.
             }
         }
 

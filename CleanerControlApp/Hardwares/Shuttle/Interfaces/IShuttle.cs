@@ -95,6 +95,8 @@ namespace CleanerControlApp.Hardwares.Shuttle.Interfaces
         bool SemiPickCassette(int semiPosIndex);
         bool SemiPlaceCassette(int semiPosIndex);
 
+        string MessageForPickPlace { get; }
+
 
     }
 }
