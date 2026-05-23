@@ -101,6 +101,7 @@ namespace CleanerControlApp.Hardwares
                 AlarmManager.AttachFlagGetter("ALM006", () => _wasteTankH_alarm);
                 AlarmManager.AttachFlagGetter("ALM007", () => _checkCassette_alarm);
                 AlarmManager.AttachFlagGetter("ALM008", () => _initializingTimeout_alarm);
+                AlarmManager.AttachFlagGetter("ALM009", () => _plc_System_alarm);
 
                 StartLoop();
 
@@ -453,6 +454,8 @@ namespace CleanerControlApp.Hardwares
 
         private bool _initializingTimeout_alarm { get; set; }
 
+        private bool _plc_System_alarm => _plcOperator != null &&_plcOperator.SystemError;
+
 
         public bool HasAlarm => _communication_alarm || _emo_alarm || _leakage_alarm || _wasteTankH_alarm || _checkCassette_alarm || _initializingTimeout_alarm;
         public bool HasWarning => _main_air_alarm || _door_alarm;
@@ -494,8 +497,28 @@ namespace CleanerControlApp.Hardwares
                 }
             }
             if (_heatingTank != null) _heatingTank.AlarmReset();
+            if (_plcOperator != null)
+            {
+                // 立刻下達 PLC 錯誤重置命令
+                _plcOperator.Command_AlarmReset = true;
 
-            await Task.Delay(_loopInterval);
+                // 非同步背景任務：1 秒後清除指令（fire-and-forget，不阻塞呼叫端）
+                var plcRef = _plcOperator;
+                _ = Task.Run(async () =>
+                {
+                    try
+                    {
+                        await Task.Delay(TimeSpan.FromSeconds(1)).ConfigureAwait(false);
+                        try { plcRef.Command_AlarmReset = false; } catch { }
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger?.LogError(ex, "Background task clearing PLC Command_AlarmReset failed");
+                    }
+                });
+            }
+
+            await Task.Delay(_loopInterval).ConfigureAwait(false);
 
             _firstAlarm = false;
             _firstWarning = false;

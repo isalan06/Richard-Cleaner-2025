@@ -495,6 +495,23 @@ namespace CleanerControlApp.Vision.Template
                     return;
                 }
 
+                // If clamper is not open, ask user to confirm continuing with Z move
+                try
+                {
+                    if (_shuttle != null && _shuttle.Check_ClamperOpen != true)
+                    {
+                        bool confirm = CleanerControlApp.Vision.Shared.InfoAskPopup.Ask(
+                            "夾爪並未打開，請確認是否要執行移載組Z軸升降? 若下方有卡匣可能造成撞機!!",
+                            Window.GetWindow(this));
+                        if (!confirm)
+                        {
+                            e.Handled = true;
+                            return;
+                        }
+                    }
+                }
+                catch { }
+
                 int pos = GetSelectedPositionZ();
                 int speed = GetSelectedSpeedZ();
                 _shuttle?.ShuttleZMotor?.MoveToPosition(pos, speed);

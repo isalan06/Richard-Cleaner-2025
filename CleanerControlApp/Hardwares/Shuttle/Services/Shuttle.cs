@@ -384,7 +384,7 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
             bool result = false;
             _messageForPickPlace = string.Empty;
 
-            if ((IsEmpty || _sim_pass_clamper || dryRun || (semiRun && !Cassette)) && !Moving && !MotorMoving && IsNormalStatus && MotorHome && ZInIdlePosition)
+            if ((IsEmpty || _sim_pass_clamper || dryRun || (semiRun && !Cassette)) && !Moving && !MotorMoving && IsNormalStatus && MotorHome && ZInIdlePosition && Check_ClamperOpen)
             {
                 if (position > 0 && position < 15)
                 {
@@ -398,7 +398,7 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
                     _messageForPickPlace = $"Pick Procedure Start Error: 無效的位置參數: {position}。請提供1~14的值。";
             }
             else
-                _messageForPickPlace = $"Pick Procedure Start Error: 條件不符。IsEmpty(true)={IsEmpty}, Moving(false)={Moving}, MotorMoving(false)={MotorMoving}, IsNormalStatus(true)={IsNormalStatus}, MotorHome(true)={MotorHome}, ZInIdlePosition(true)={ZInIdlePosition}.";
+                _messageForPickPlace = $"Pick Procedure Start Error: 條件不符。IsEmpty(true)={IsEmpty}, Moving(false)={Moving}, MotorMoving(false)={MotorMoving}, IsNormalStatus(true)={IsNormalStatus}, MotorHome(true)={MotorHome}, ZInIdlePosition(true)={ZInIdlePosition}, Check_ClamperOpen(true)={Check_ClamperOpen}.";
 
             return result;
         }
@@ -407,7 +407,7 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
             bool result = false;
             _messageForPickPlace = string.Empty;
 
-            if ((HasCassette || _sim_pass_clamper || dryRun || (semiRun && Cassette)) && !Moving && !MotorMoving && IsNormalStatus && MotorHome && ZInIdlePosition)
+            if ((HasCassette || _sim_pass_clamper || dryRun || (semiRun && Cassette)) && !Moving && !MotorMoving && IsNormalStatus && MotorHome && ZInIdlePosition && Check_ClamperClose)
             {
                 if (position > 0 && position < 15)
                 {
@@ -421,7 +421,7 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
                     _messageForPickPlace = $"Place Procedure Start Error: 無效的位置參數: {position}。請提供1~14的值。";
             }
             else
-                _messageForPickPlace = $"Place Procedure Start Error: 條件不符。HasCassette(true)={HasCassette}, Moving(false)={Moving}, MotorMoving(false)={MotorMoving}, IsNormalStatus(true)={IsNormalStatus}, MotorHome(true)={MotorHome}, ZInIdlePosition(true)={ZInIdlePosition}.";
+                _messageForPickPlace = $"Place Procedure Start Error: 條件不符。HasCassette(true)={HasCassette}, Moving(false)={Moving}, MotorMoving(false)={MotorMoving}, IsNormalStatus(true)={IsNormalStatus}, MotorHome(true)={MotorHome}, ZInIdlePosition(true)={ZInIdlePosition}, Check_ClamperClose(true)={Check_ClamperClose}.";
 
             return result;
         }

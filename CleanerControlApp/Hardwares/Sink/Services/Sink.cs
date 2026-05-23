@@ -1178,7 +1178,9 @@ namespace CleanerControlApp.Hardwares.Sink.Services
                         {
                             await Task.Delay(TimeSpan.FromSeconds(3)).ConfigureAwait(false);
                             if (_plcService != null)
+                            {
                                 _plcService.Command_Axis3AlarmReset = false;
+                            }
                         }
                         catch
                         {
