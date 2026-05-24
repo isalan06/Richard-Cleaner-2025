@@ -684,7 +684,7 @@ namespace CleanerControlApp.Hardwares.DryingTank.Services
         private void ActStartStatus()
         {
             HeatingOP(false);
-            AirOP(true);
+            AirOP(false);
             BlowerOP(false);
             CoverClose(false);
         }
@@ -765,6 +765,8 @@ namespace CleanerControlApp.Hardwares.DryingTank.Services
                             if (_elapsedTime >= TimeSpan.FromSeconds((double)(_moduleSettings.DryingTanks != null ? _moduleSettings.DryingTanks[_moduleIndex].ActTime_Second : 60.0)))
                             {
                                 HeatingOP(false);
+                                BlowerOP(false);
+                                AirOP(false);
                                 _actFinished = true;
                             }
                         }
@@ -798,6 +800,7 @@ namespace CleanerControlApp.Hardwares.DryingTank.Services
                         _cassette = false;
                         _actFinished = false;
                         BlowerOP(false);
+                        AirOP(false);
                         _elapsedTime = new TimeSpan();
                     }
                 }

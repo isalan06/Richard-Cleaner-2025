@@ -362,8 +362,18 @@ namespace CleanerControlApp.Hardwares.SoakingTank.Services
         {
             bool result = false;
 
+            _messageForOperation = string.Empty;
+
             if (_heatingTank != null)
             {
+                _heatingTank.ManualWaterOutOP(water); // 同步控制加熱槽排水以確保水路流動
+                if(_heatingTank.MessageForOperation != string.Empty)
+                {
+                    _messageForOperation = "無法操作注水，因加熱槽: " + _heatingTank.MessageForOperation;
+                    OperateLog.Log($"浸泡槽 嘗試操作注水為 " + (water ? "開" : "關") + " 但加熱槽狀態異常: " + _heatingTank.MessageForOperation, $"嘗試操作注水為 " + (water ? "開" : "關") + " 但加熱槽狀態異常: " + _heatingTank.MessageForOperation);
+                    return false;
+                }
+
                 _heatingTank.HS_RequestWater = water;
                 return result;
             }
@@ -1018,11 +1028,11 @@ namespace CleanerControlApp.Hardwares.SoakingTank.Services
                             // 馬達往復搖擺流程
                             if (InPos3 && MotorIdle && !_motor_commanding && !_pausing)
                             {
-                                MoveToPosition(2, 0);
+                                MoveToPosition(1, 0);
                             }
                             else if (InPos2 && MotorIdle && !_motor_commanding && !_pausing)
                             {
-                                MoveToPosition(1, 0);
+                                MoveToPosition(2, 0);
                             }
 
 
@@ -1041,7 +1051,8 @@ namespace CleanerControlApp.Hardwares.SoakingTank.Services
                     {
                         // reset timer when condition no longer holds
                         _heatingStartTime = null;
-                        MotorStop();
+                        if(_pausing && !MotorIdle)
+                            MotorStop();
                     }
 
 

@@ -91,7 +91,7 @@ namespace CleanerControlApp.Hardwares.HeatingTank.Services
 
  #endregion
 
- #region constructor
+        #region constructor
 
         public HeatingTank(ILogger<HeatingTank>? logger, IPLCOperator? plcService, ITemperatureControllers? temperatureControllers, UnitSettings unitSettings, ModuleSettings moduleSettings, IDeltaMS300 deltaMS300)
         {
@@ -260,15 +260,22 @@ namespace CleanerControlApp.Hardwares.HeatingTank.Services
         {
             bool result = false;
 
-
-            if (_moduleSettings.HeatingTank != null)
+            _messageForOperation = string.Empty;
+            if (_moduleSettings.HeatingTank != null && Sensor_Liquid_L)
             {
                 SetSV(heating ? _moduleSettings.HeatingTank.SV_High : _moduleSettings.HeatingTank.SV_Low);
                 _heating = heating;
                 result = true;
             }
+            else
+            { 
+                _messageForOperation = "無法切換加熱: " + 
+                    (_moduleSettings.HeatingTank == null ? "模組設定缺失; " : "") +
+                    (!Sensor_Liquid_L ? "水位過低(沒有到 L的位置; " : "");
+                OperateLog.Log($"加熱槽 無法切換加熱", _messageForOperation);
+            }
 
-            return result;
+                return result;
         }
         public bool ManualHeatingOP(bool heating)
         {
@@ -736,18 +743,23 @@ namespace CleanerControlApp.Hardwares.HeatingTank.Services
 
             if (!_private_waste_HAlarm && !_tankHHAlarm && _initialized)
             {
-                if (!Sensor_Liquid_L && !Command_WaterIn) WaterInOP(true);
+                if (_auto)
+                {
+                    if (!Sensor_Liquid_L && !Command_WaterIn) WaterInOP(true);
 
-                if (Sensor_Liquid_H && Command_WaterIn) WaterInOP(false);
+                    if (Sensor_Liquid_H && Command_WaterIn) WaterInOP(false);
 
-                if (Command_WaterOut && !IsHighFrequency) HighFrequencyOP();
+                    if (Command_WaterOut && !IsHighFrequency) HighFrequencyOP();
 
-                if (!Command_WaterOut && IsHighFrequency) LowFrequencyOP();
+                    if (!Command_WaterOut && IsHighFrequency) LowFrequencyOP();
 
-                if(!Heating && Sensor_Liquid_L) HeatingOP(true);
+                    if (!Heating && Sensor_Liquid_L) HeatingOP(true);
 
-                if (HS_RequestWater && !Command_WaterOut) WaterOutOP(true);
-                else if (!HS_RequestWater && Command_WaterOut) WaterOutOP(false);
+                    if (HS_RequestWater && !Command_WaterOut) WaterOutOP(true);
+                    else if (!HS_RequestWater && Command_WaterOut) WaterOutOP(false);
+                }
+
+                
             }
 
             if (_PV_High_Timeout && Heating) HeatingOP(false);

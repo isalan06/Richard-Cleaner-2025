@@ -1003,7 +1003,8 @@ namespace CleanerControlApp.Hardwares.Sink.Services
                     {
                         // reset timer when condition no longer holds
                         _heatingStartTime = null;
-                        MotorStop();
+                        if (_pausing && !MotorIdle)
+                            MotorStop();
                     }
 
 
@@ -1011,6 +1012,7 @@ namespace CleanerControlApp.Hardwares.Sink.Services
                     if (HS_ClamperPlaceFinished)
                     {
                         HS_ClamperPlaceFinished = false;
+                        MotorStop();
                         _cassette = true;
                     }
                 }

@@ -58,6 +58,26 @@ namespace CleanerControlApp.Vision.Template
             set => SetValue(Command_WaterOutProperty, value);
         }
 
+        // Expose Command_Heating as a dependency property so XAML ElementName bindings update
+        public static readonly DependencyProperty Command_HeatingProperty = DependencyProperty.Register(
+            "Command_Heating", typeof(bool), typeof(Template_HeatingTank), new PropertyMetadata(false));
+
+        public bool Command_Heating
+        {
+            get => (bool)GetValue(Command_HeatingProperty);
+            set => SetValue(Command_HeatingProperty, value);
+        }
+
+        // Legacy/alternate name used by XAML: HeatingStatus maps to IHeatingTank.Heating
+        public static readonly DependencyProperty HeatingStatusProperty = DependencyProperty.Register(
+            "HeatingStatus", typeof(bool), typeof(Template_HeatingTank), new PropertyMetadata(false));
+
+        public bool HeatingStatus
+        {
+            get => (bool)GetValue(HeatingStatusProperty);
+            set => SetValue(HeatingStatusProperty, value);
+        }
+
         public Template_HeatingTank()
         {
             InitializeComponent();
@@ -98,9 +118,12 @@ namespace CleanerControlApp.Vision.Template
                 bool initialIn = _heatingTank?.Command_WaterIn ?? false;
                 bool initialOut = _heatingTank?.Command_WaterOut ?? false;
                 bool initialZero = _heatingTank != null ? _heatingTank.IsZeroFrequency : true;
+                bool initialHeating = _heatingTank?.Heating ?? false;
 
                 Command_WaterIn = initialIn;
                 Command_WaterOut = initialOut;
+                Command_Heating = initialHeating;
+                HeatingStatus = initialHeating;
 
                 UpdateWaterInAnimation(initialIn);
                 // Right flow now controlled by frequency (IsZeroFrequency == false)
@@ -153,10 +176,13 @@ namespace CleanerControlApp.Vision.Template
                 bool waterIn = _heatingTank?.Command_WaterIn ?? false;
                 bool waterOut = _heatingTank?.Command_WaterOut ?? false;
                 bool isZero = _heatingTank != null ? _heatingTank.IsZeroFrequency : true;
+                bool heating = _heatingTank?.Heating ?? false;
 
                 // keep dependency properties in sync for XAML bindings
                 Command_WaterIn = waterIn;
                 Command_WaterOut = waterOut;
+                Command_Heating = heating;
+                HeatingStatus = heating;
 
                 UpdateWaterInAnimation(waterIn);
                 // Right flow controlled by frequency (IsZeroFrequency == false)
@@ -317,6 +343,30 @@ namespace CleanerControlApp.Vision.Template
             try
             {
                 _heatingTank?.ManualWaterOutOP(false);
+            }
+            catch { }
+        }
+
+        // Button handlers to control heating manually (wired from XAML)
+        public void StartHeating_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                _heatingTank?.ManualHeatingOP(true);
+                var status = _heatingTank?.MessageForOperation;
+                if (!string.IsNullOrEmpty(status))
+                {
+                    ShowStatusPopup(status);
+                }
+            }
+            catch { }
+        }
+
+        public void StopHeating_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                _heatingTank?.ManualHeatingOP(false);
             }
             catch { }
         }
