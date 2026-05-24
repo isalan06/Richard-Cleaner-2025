@@ -23,6 +23,8 @@ namespace CleanerControlApp.Hardwares.Sink.Interfaces
         float PV_Value { get; }
         float SV_Value { get; }
 
+        float PV_Value_M { get; }
+
         void SetSV(int value);
         void SetSV(float value);
 

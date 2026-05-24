@@ -229,6 +229,19 @@ namespace CleanerControlApp.Hardwares.Sink.Services
         {
             get => (_temperatureController != null && _unitSettings.Sink != null) ? (float)(_temperatureController.PV * _unitSettings.Sink.UnitTransfer) : 0f;
         }
+        public float PV_Value_M
+        { 
+            get
+            {
+                float result = 0f;
+
+                if (PV_Value <= 20f) result = 0f;
+                else if (PV_Value >= 380f) result = 3f;
+                else result = (float)Math.Round((PV_Value - 20f) / 360f * 30f,2); // 20~380對應0~3，並四捨五入到小數點第二位
+
+                return result;
+            }
+        }
         public float SV_Value
         {
             get => (_temperatureController != null && _unitSettings.Sink != null) ? (float)(_temperatureController.SV * _unitSettings.Sink.UnitTransfer) : 0f;

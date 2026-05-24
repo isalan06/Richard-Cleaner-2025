@@ -294,7 +294,7 @@ namespace CleanerControlApp.Vision.Template
                 {
                     HighTC = _sink.HighPressure;
                     LowTC = _sink.LowPressure;
-                    PV = _sink.PV_Value;
+                    PV = _sink.PV_Value_M;
                     Act = _sink.Pressure;
                     InPos1 = _sink.InPos1;
                     InPos2 = _sink.InPos2;
