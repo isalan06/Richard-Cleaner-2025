@@ -938,6 +938,7 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
                         case 1: // X Axis Move End Delay
                             if (MoveEndDelayPassed(ref _moveEndDelayStart, _motorXAxis.GetInPos(_actPositionX) && MotorIdle))
                             {
+                                RecordCurrentPosition();
                                 _pickCase = 10;
                             }
                             break;
@@ -957,6 +958,7 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
                         case 11: // Z Axis Move End Delay
                             if (MoveEndDelayPassed(ref _moveEndDelayStart, _motorZAxis.GetInPos(_actPositionZ) && MotorIdle))
                             {
+                                RecordCurrentPosition();
                                 _pickCase = 20;
                             }
                             break;
@@ -995,6 +997,7 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
                         case 31: // Z Axis Return Move End Delay
                             if (MoveEndDelayPassed(ref _moveEndDelayStart, _motorZAxis.GetInPos(0) && MotorIdle))
                             {
+                                RecordCurrentPosition();
                                 _pickCase = 40;
                             }
                             break;
@@ -1042,6 +1045,7 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
                         case 1: // X Axis Move End Delay
                             if (MoveEndDelayPassed(ref _moveEndDelayStart, _motorXAxis.GetInPos(_actPositionX) && MotorIdle))
                             {
+                                RecordCurrentPosition();
                                 _placeCase = 10;
                             }
                             break;
@@ -1061,6 +1065,7 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
                         case 11: // Z Axis Move End Delay
                             if (MoveEndDelayPassed(ref _moveEndDelayStart, _motorZAxis.GetInPos(_actPositionZ) && MotorIdle))
                             {
+                                RecordCurrentPosition();
                                 _placeCase = 20;
                             }
                             break;
@@ -1101,6 +1106,7 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
                         case 31: // Z Axis Return Move End Delay
                             if (MoveEndDelayPassed(ref _moveEndDelayStart, _motorZAxis.GetInPos(0) && MotorIdle))
                             {
+                                RecordCurrentPosition();
                                 _placeCase = 40;
                             }
                             break;
@@ -1152,6 +1158,7 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
                         case 1: // X Axis Move End Delay
                             if (MoveEndDelayPassed(ref _moveEndDelayStart, _motorXAxis.GetInPos(_actPositionX) && MotorIdle))
                             {
+                                RecordCurrentPosition();
                                 _pickCase = 10;
                             }
                             break;
@@ -1171,6 +1178,7 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
                         case 11: // Z Axis Move End Delay
                             if (MoveEndDelayPassed(ref _moveEndDelayStart, _motorZAxis.GetInPos(_actPositionZ) && MotorIdle))
                             {
+                                RecordCurrentPosition();
                                 _pickCase = 20;
                             }
                             break;
@@ -1210,6 +1218,7 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
                         case 31: // Z Axis Return Move End Delay
                             if (MoveEndDelayPassed(ref _moveEndDelayStart, _motorZAxis.GetInPos(0) && MotorIdle))
                             {
+                                RecordCurrentPosition();
                                 _pickCase = 40;
                             }
                             break;
@@ -1261,6 +1270,7 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
                         case 1: // X Axis Move End Delay
                             if (MoveEndDelayPassed(ref _moveEndDelayStart, _motorXAxis.GetInPos(_actPositionX) && MotorIdle))
                             {
+                                RecordCurrentPosition();
                                 _placeCase = 10;
                             }
                             break;
@@ -1280,6 +1290,7 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
                         case 11: // Z Axis Move End Delay
                             if (MoveEndDelayPassed(ref _moveEndDelayStart, _motorZAxis.GetInPos(_actPositionZ) && MotorIdle))
                             {
+                                RecordCurrentPosition();
                                 _placeCase = 20;
                             }
                             break;
@@ -1318,6 +1329,7 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
                         case 31: // Z Axis Return Move End Delay
                             if (MoveEndDelayPassed(ref _moveEndDelayStart, _motorZAxis.GetInPos(0) && MotorIdle))
                             {
+                                RecordCurrentPosition();
                                 _placeCase = 40;
                             }
                             break;
@@ -1375,7 +1387,10 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
 
                         case 1: // wait for Z original
                             if (MoveEndDelayPassed(ref _moveEndDelayStart, _motorZAxis.GetInPos(0) && MotorIdle))
+                            {
+                                RecordCurrentPosition();
                                 _checkCassetteCase = 10;
+                            }
                             break;
 
                         case 10: // Axis X Move To Sink (P17)
@@ -1392,7 +1407,10 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
 
                         case 11: // wait for X
                             if (MoveEndDelayPassed(ref _moveEndDelayStart, _motorXAxis.GetInPos(16) && MotorIdle))
+                            {
+                                RecordCurrentPosition();
                                 _checkCassetteCase = 20;
+                            }
                             break;
 
                         case 20: // Axis Z Move To Sink (P8)
@@ -1409,7 +1427,10 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
 
                         case 21: // wait for Z
                             if (MoveEndDelayPassed(ref _moveEndDelayStart, _motorZAxis.GetInPos(7) && MotorIdle))
+                            {
+                                RecordCurrentPosition();
                                 _checkCassetteCase = 30;
+                            }
                             break;
 
                         case 30: // Check Cassette
@@ -1431,7 +1452,10 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
 
                         case 101:
                             if (MoveEndDelayPassed(ref _moveEndDelayStart, _motorZAxis.GetInPos(0) && MotorIdle))
+                            {
+                                RecordCurrentPosition();
                                 _checkCassetteCase = 110;
+                            }
                             break;
 
                         case 110: // Axis X Move To Soaking Tank (P18)
@@ -1448,7 +1472,10 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
 
                         case 111:
                             if (MoveEndDelayPassed(ref _moveEndDelayStart, _motorXAxis.GetInPos(17) && MotorIdle))
+                            {
+                                RecordCurrentPosition();
                                 _checkCassetteCase = 120;
+                            }
                             break;
 
                         case 120: // Axis Z Move To Sink (P9)
@@ -1465,7 +1492,10 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
 
                         case 121:
                             if (MoveEndDelayPassed(ref _moveEndDelayStart, _motorZAxis.GetInPos(8) && MotorIdle))
+                            {
+                                RecordCurrentPosition();
                                 _checkCassetteCase = 130;
+                            }
                             break;
 
                         case 130: // Check Cassette
@@ -1487,7 +1517,10 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
 
                         case 201:
                             if (MoveEndDelayPassed(ref _moveEndDelayStart, _motorZAxis.GetInPos(0) && MotorIdle))
+                            {
+                                RecordCurrentPosition();
                                 _checkCassetteCase = 210;
+                            }
                             break;
 
                         case 210: // Axis X Move To Drying Tank1 (P19)
@@ -1504,7 +1537,10 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
 
                         case 211:
                             if (MoveEndDelayPassed(ref _moveEndDelayStart, _motorXAxis.GetInPos(18) && MotorIdle))
+                            {
+                                RecordCurrentPosition();
                                 _checkCassetteCase = 220;
+                            }
                             break;
 
                         case 220: // Axis Z Move To Sink (P10)
@@ -1521,7 +1557,10 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
 
                         case 221:
                             if (MoveEndDelayPassed(ref _moveEndDelayStart, _motorZAxis.GetInPos(9) && MotorIdle))
+                            {
+                                RecordCurrentPosition();
                                 _checkCassetteCase = 230;
+                            }
                             break;
 
                         case 230: // Check Cassette
@@ -1543,7 +1582,10 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
 
                         case 301:
                             if (MoveEndDelayPassed(ref _moveEndDelayStart, _motorZAxis.GetInPos(0) && MotorIdle))
+                            {
+                                RecordCurrentPosition();
                                 _checkCassetteCase = 310;
+                            }
                             break;
 
                         case 310: // Axis X Move To Drying Tank2 (P20)
@@ -1560,7 +1602,10 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
 
                         case 311:
                             if (MoveEndDelayPassed(ref _moveEndDelayStart, _motorXAxis.GetInPos(19) && MotorIdle))
+                            {
+                                RecordCurrentPosition();
                                 _checkCassetteCase = 320;
+                            }
                             break;
 
                         case 320: // Axis Z Move To Sink (P11)
@@ -1577,7 +1622,10 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
 
                         case 321:
                             if (MoveEndDelayPassed(ref _moveEndDelayStart, _motorZAxis.GetInPos(10) && MotorIdle))
+                            {
+                                RecordCurrentPosition();
                                 _checkCassetteCase = 330;
+                            }
                             break;
 
                         case 330: // Check Cassette
@@ -1599,7 +1647,10 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
 
                         case 401:
                             if (MoveEndDelayPassed(ref _moveEndDelayStart, _motorZAxis.GetInPos(0) && MotorIdle))
+                            {
+                                RecordCurrentPosition();
                                 _checkCassetteCase = 410;
+                            }
                             break;
 
                         case 410: // Axis X Back To Original
@@ -1616,7 +1667,10 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
 
                         case 411:
                             if (MoveEndDelayPassed(ref _moveEndDelayStart, _motorXAxis.GetInPos(0) && MotorIdle))
+                            {
+                                RecordCurrentPosition();
                                 _checkCassetteCase = 420;
+                            }
                             break;
 
                         case 420: // Finish
@@ -1660,6 +1714,22 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
 
             // Update previous state
             _prevOpModeManual = currentManual;
+        }
+
+        private void RecordCurrentPosition()
+        {
+            if (_plcService != null)
+            {
+                int _xCommandPos = _plcService.Axis1Pos;
+                int _xEncoderPos = _plcService.Axis1EncoderPos;
+                int _zCommandPos = _plcService.Axis2Pos;
+                int _zEncoderPos = _plcService.Axis2EncoderPos;
+                float _xRatio = (float)_xEncoderPos / (float)(_xCommandPos == 0 ? 1 : _xCommandPos);
+                float _zRatio = (float)_zEncoderPos / (float)(_zCommandPos == 0 ? 1 : _zCommandPos);
+
+                OperateLog.Log("Shuttle Position", $"Command X: {_xCommandPos}, Encoder X: {_xEncoderPos}, Command Z: {_zCommandPos}, Encoder Z: {_zEncoderPos}, X Ratio: {_xRatio}, Z Ratio: {_zRatio}");
+            }
+
         }
 
         #endregion
