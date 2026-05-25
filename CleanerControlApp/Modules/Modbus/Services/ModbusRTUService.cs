@@ -238,8 +238,8 @@ namespace CleanerControlApp.Modules.Modbus.Services
                     _serialPort.StopBits = _stopBits;
 
                     // keep reasonable timeouts
-                    _serialPort.ReadTimeout =1000;
-                    _serialPort.WriteTimeout =1000;
+                    _serialPort.ReadTimeout =2000;
+                    _serialPort.WriteTimeout =2000;
 
                     if (wasOpen && !doNotReopen)
                     {
