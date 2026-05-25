@@ -31,12 +31,11 @@ Freq-4
 380 => 3 kg
 
 #20260524
-1. 新增Recipe
-2. 風刀往復動作確認次數
-3. 手動顯示動作燈號
-4. Auto 空跑
-5. TC-4設定
-
+1. 新增Recipe - Done
+2. 風刀往復動作確認次數-Done
+3. 手動顯示動作燈號 - Done
+4. Auto 空跑 - Done
+5. TC-4設定 - Done
 
 bug
 Unobserved task exception: System.AggregateException: A Task's exception(s) were not observed either by Waiting on the Task or accessing its Exception property. As a result, the unobserved exception was rethrown by the finalizer thread. (零值的 Hwnd 是無效的。)
@@ -49,6 +48,8 @@ Checksums failed to match 255, 255, 255 != 255, 255, 255, 255, 255
 Maximum amount of data 127 registers. (Parameter 'NumberOfPoints')
 Checksums failed to match 255, 255, 255 != 255, 255, 255, 2, 3
 Checksums failed to match 255, 255, 255 != 255, 255, 255, 255, 255
+
+#20260525
 
 # 待確認工作流程（請先確認，再執行下一步）
 

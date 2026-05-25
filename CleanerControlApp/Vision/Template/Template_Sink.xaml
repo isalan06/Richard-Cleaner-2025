@@ -66,10 +66,10 @@
 
             <Button Canvas.Left="764" Canvas.Top="128" Width="120" Height="60" FontSize="18" Content="開啟上蓋" Click="OpenCover_Click" Background="#ADD8E6" HorizontalAlignment="Left" VerticalAlignment="Top"/>
             <Button Canvas.Left="904" Canvas.Top="128" Width="120" Height="60" FontSize="18" Content="關閉上蓋" Click="CloseCover_Click" Background="#ADD8E6" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-            <Button FontSize="18" Content="開始沖水" Click="OpenPressure_Click" Background="#ADD8E6" Height="60" Canvas.Left="764" Canvas.Top="209" VerticalAlignment="Top" Width="121"/>
-            <Button FontSize="18" Content="停止沖水" Click="ClosePressure_Click" Background="#ADD8E6" Height="60" Canvas.Left="904" Canvas.Top="209" VerticalAlignment="Top" Width="121"/>
-            <Button FontSize="18" Content="開啟風刀" Click="OpenAir_Click" Background="#ADD8E6" Height="60" Canvas.Left="764" Canvas.Top="288" VerticalAlignment="Top" Width="120"/>
-            <Button FontSize="18" Content="關閉風刀" Click="CloseAir_Click" Background="#ADD8E6" Height="60" Canvas.Left="904" Canvas.Top="288" VerticalAlignment="Top" Width="121"/>
+            <Button FontSize="18" Content="開始沖水" Click="OpenPressure_Click" Background="#ADD8E6" Height="60" Canvas.Left="764" Canvas.Top="288" VerticalAlignment="Top" Width="121"/>
+            <Button FontSize="18" Content="停止沖水" Click="ClosePressure_Click" Background="#ADD8E6" Height="60" Canvas.Left="904" Canvas.Top="288" VerticalAlignment="Top" Width="121"/>
+            <Button FontSize="18" Content="開啟風刀" Click="OpenAir_Click" Background="#ADD8E6" Height="60" Canvas.Left="764" Canvas.Top="209" VerticalAlignment="Top" Width="120" HorizontalAlignment="Center"/>
+            <Button FontSize="18" Content="關閉風刀" Click="CloseAir_Click" Background="#ADD8E6" Height="60" Canvas.Left="904" Canvas.Top="209" VerticalAlignment="Top" Width="121" HorizontalAlignment="Center"/>
             <Button FontSize="18" Content="錯誤重置" Click="ResetAlarm_Click" Background="#ADD8E6" Height="60" Width="121" HorizontalAlignment="Left" Canvas.Left="904" Canvas.Top="376" VerticalAlignment="Center"/>
 
             <!-- New ComboBox for speed mode -->
@@ -140,6 +140,20 @@
             </Button>
             <TextBlock Text="Teach按鈕" FontSize="20" Foreground="#333333" TextAlignment="Center" Width="124" Height="25" Canvas.Left="347" Canvas.Top="324" HorizontalAlignment="Left" VerticalAlignment="Center"/>
             <TextBlock Text="請長按一秒" FontSize="20" Foreground="#333333" TextAlignment="Center" Width="119" Height="25" Canvas.Left="350" Canvas.Top="351" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+            <Border Canvas.Left="712" Canvas.Top="303" BorderBrush="#2E993E" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding HighTC, ElementName=RootControl}" HorizontalAlignment="Left" VerticalAlignment="Center">
+                <Border.Style>
+                    <Style TargetType="{x:Type Border}">
+                        <Setter Property="Background" Value="#FFFFFF"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Act, ElementName=RootControl}" Value="True">
+                                <Setter Property="Background" Value="Red"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Border.Style>
+                <TextBlock Text="沖水" FontSize="18" Foreground="Black"/>
+
+            </Border>
 
         </Canvas>
     </Grid>

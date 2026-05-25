@@ -76,7 +76,7 @@ namespace CleanerControlApp.Hardwares.Sink.Services
         private bool _motor_commanding = false;
         private int _motor_air_retry_count = 0;
         private bool _motor_air_up_flag = false;
-        private bool RetryAirFinished => _moduleSettings.Sink != null && _moduleSettings.Sink.AirKnifeRetryCount == _motor_air_retry_count;
+        private bool RetryAirFinished => _moduleSettings.Sink != null && _moduleSettings.Sink.AirKnifeRetryCount <= _motor_air_retry_count;
 
         private string _jogStatus = "";
         private string _homeStatus = "";
@@ -227,19 +227,14 @@ namespace CleanerControlApp.Hardwares.Sink.Services
         }
         public float PV_Value
         {
-            get => (_temperatureController != null && _unitSettings.Sink != null) ? (float)(_temperatureController.PV * _unitSettings.Sink.UnitTransfer) : 0f;
+            get => (_temperatureController != null && _unitSettings.Sink != null) ? (float)(_temperatureController.PV * _unitSettings.Sink.UnitTransfer) :0f;
         }
         public float PV_Value_M
         { 
             get
             {
-                float result = 0f;
-
-                if (PV_Value <= 20f) result = 0f;
-                else if (PV_Value >= 380f) result = 3f;
-                else result = (float)Math.Round((PV_Value - 20f) / 360f * 30f,2); // 20~380對應0~3，並四捨五入到小數點第二位
-
-                return result;
+                // use helper for conversion so other views can reuse
+                return ConvertPVValueToPV_M(PV_Value);
             }
         }
         public float SV_Value
@@ -776,6 +771,7 @@ namespace CleanerControlApp.Hardwares.Sink.Services
 
         #region Function
 
+
         private void StartLoop()
         {
             // ensure previous canceled
@@ -1177,6 +1173,8 @@ namespace CleanerControlApp.Hardwares.Sink.Services
 
         #region Alarm
 
+        
+
         private void ResetMotorAlarm()
         {
             if (_plcService != null)
@@ -1218,6 +1216,41 @@ namespace CleanerControlApp.Hardwares.Sink.Services
 
         private bool _invErrorAlarm => (_deltaMS300 != null) && (_deltaMS300.ErrorCode != 0);
         private bool _invWarningAlarm => (_deltaMS300 != null) && (_deltaMS300.WarningCode != 0);
+
+        #endregion
+
+        #region static function
+
+        // Conversion helpers for PV <-> PV_M (placed here for reuse by other views)
+        // Mapping: PV_Value in [20,380] -> PV_M in [0,3], rounded to2 decimal places
+        public static float ConvertPVValueToPV_M(float pvValue)
+        {
+            const float inMin = 20f;
+            const float inMax = 380f;
+            const float outMin = 0f;
+            const float outMax = 3f;
+
+            if (pvValue <= inMin) return outMin;
+            if (pvValue >= inMax) return outMax;
+
+            float scaled = (pvValue - inMin) / (inMax - inMin) * (outMax - outMin) + outMin;
+            return (float)Math.Round(scaled, 2);
+        }
+
+        // Reverse conversion: PV_M (0..3) -> PV_Value (20..380)
+        public static float ConvertPV_MToPVValue(float pvM)
+        {
+            const float inMin = 0f;
+            const float inMax = 3f;
+            const float outMin = 20f;
+            const float outMax = 380f;
+
+            if (pvM <= inMin) return outMin;
+            if (pvM >= inMax) return outMax;
+
+            float scaled = (pvM - inMin) / (inMax - inMin) * (outMax - outMin) + outMin;
+            return (float)Math.Round(scaled, 2);
+        }
 
         #endregion
     }

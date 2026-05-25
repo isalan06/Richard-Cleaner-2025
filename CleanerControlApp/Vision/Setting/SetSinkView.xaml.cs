@@ -1,3 +1,4 @@
+using CleanerControlApp.Hardwares.Sink.Services;
 using CleanerControlApp.Utilities;
 using System;
 using System.Globalization;
@@ -54,6 +55,29 @@ namespace CleanerControlApp.Vision.SettingViews
                 tbAir.LostFocus += Txt_AirKnifeRetryCount_LostFocus;
                 DataObject.AddPastingHandler(tbAir, OnAirRetryPaste);
             }
+
+            // subscribe to module settings updates so UI refreshes when recipe applied
+            try
+            {
+                ConfigLoader.ModuleSettingsUpdated += OnModuleSettingsUpdated;
+            }
+            catch { }
+        }
+
+        private void OnModuleSettingsUpdated(ModuleSettings ms)
+        {
+            try
+            {
+                Dispatcher.Invoke(() =>
+                {
+                    if (ms != null)
+                    {
+                        _moduleSettings = ms;
+                        LoadToUI();
+                    }
+                });
+            }
+            catch { }
         }
 
         // helper to safely assign unit fields
@@ -74,8 +98,8 @@ namespace CleanerControlApp.Vision.SettingViews
             var transfer = (u != null && Math.Abs(u.UnitTransfer) >0.000001f) ? u.UnitTransfer :1f;
             var motorTransfer = (u != null && Math.Abs(u.MotorUnitTransfer) >0.000001f) ? u.MotorUnitTransfer :1f;
 
-            float displaySVLow = m.SV_Low * transfer;
-            float displaySVHigh = m.SV_High * transfer;
+            float displaySVLow = Sink.ConvertPVValueToPV_M(m.SV_Low * transfer);
+            float displaySVHigh = Sink.ConvertPVValueToPV_M(m.SV_High * transfer);
 
             var tbLow = GetTextBox("Txt_SV_Low");
             var tbHigh = GetTextBox("Txt_SV_High");
@@ -207,8 +231,8 @@ namespace CleanerControlApp.Vision.SettingViews
             if (!parsed_mvel2) errors.AppendLine("沖水槽:馬達速度 #2 格式錯誤");
             if (!parsed_airRetry) errors.AppendLine("沖水槽:風刀往復次數格式錯誤");
 
-            int conv_low = parsed_low ? (int)Math.Round(input_low / transfer) :0;
-            int conv_high = parsed_high ? (int)Math.Round(input_high / transfer) :0;
+            int conv_low = parsed_low ? (int)Math.Round(Sink.ConvertPV_MToPVValue(input_low) / transfer) :0;
+            int conv_high = parsed_high ? (int)Math.Round(Sink.ConvertPV_MToPVValue(input_high) / transfer) :0;
 
             if (parsed_low && parsed_high)
             {
@@ -218,13 +242,17 @@ namespace CleanerControlApp.Vision.SettingViews
             // enforce unit limits for sink SV low/high
             if (parsed_low && _unitSettings?.Sink != null)
             {
-                var limLow = _unitSettings.Sink.SV_Low_Limit;
-                if (conv_low < limLow) errors.AppendLine($"沖水槽:低設定 ({conv_low}) 小於下限 ({limLow})");
+                //var limLow = _unitSettings.Sink.SV_Low_Limit;
+                //if (conv_low < limLow) errors.AppendLine($"沖水槽:低設定 ({conv_low}) 小於下限 ({limLow})");
+                var limLow = 0f; // default to 0 if no unit limit provided
+                if (input_low < limLow) errors.AppendLine($"沖水槽:低設定 ({input_low}) 小於下限 ({limLow})");
             }
             if (parsed_high && _unitSettings?.Sink != null)
             {
-                var limHigh = _unitSettings.Sink.SV_High_Limit;
-                if (conv_high > limHigh) errors.AppendLine($"沖水槽: 高設定 ({conv_high}) 大於上限 ({limHigh})");
+                //var limHigh = _unitSettings.Sink.SV_High_Limit;
+                //if (conv_high > limHigh) errors.AppendLine($"沖水槽: 高設定 ({conv_high}) 大於上限 ({limHigh})");
+                var limHigh = 3f; // default to no upper limit if not provided
+                if (input_high > limHigh) errors.AppendLine($"沖水槽: 高設定 ({input_high}) 大於上限 ({limHigh})");
             }
 
             if (parsed_time && _unitSettings?.Sink != null)

@@ -5,7 +5,7 @@
  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
  mc:Ignorable="d"
  d:DesignHeight="300" Width="862" x:Name="RootControl">
-    <Grid Background="Transparent" Margin="10,19,0,0">
+    <Grid Background="Transparent" Margin="10,19,0,-54">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="0*"/>
             <ColumnDefinition Width="10*"/>
@@ -638,14 +638,14 @@
         <Button FontSize="20" Content="停止烘乾" Click="CloseHeaterLeft_Click" Background="#ADD8E6" Grid.Column="2" Margin="618,60,-7,0" Height="60" VerticalAlignment="Top"/>
         <Button FontSize="20" Content="開始烘乾" Click="OpenHeaterRight_Click" Background="#ADD8E6" Margin="-138,60,0,0" Height="60" VerticalAlignment="Top" HorizontalAlignment="Left" Width="120"/>
         <Button FontSize="20" Content="停止烘乾" Click="CloseHeaterRight_Click" Background="#ADD8E6" Grid.Column="1" Margin="0,60,1,0" Height="60" VerticalAlignment="Top"/>
-        <Button FontSize="20" Content="開鼓風機" Click="OpenBlowerLeft_Click" Background="#ADD8E6" Grid.Column="2" Margin="481,126,131,0" Height="60" VerticalAlignment="Top"/>
-        <Button FontSize="20" Content="關鼓風機" Click="CloseBlowerLeft_Click" Background="#ADD8E6" Grid.Column="2" Margin="618,126,-7,0" Height="60" VerticalAlignment="Top"/>
-        <Button FontSize="20" Content="開啟正壓" Click="OpenAirLeft_Click" Background="#ADD8E6" Grid.Column="2" Margin="0,193,131,0" HorizontalAlignment="Right" Width="120" Height="60" VerticalAlignment="Top"/>
-        <Button FontSize="20" Content="關閉正壓" Click="CloseAirLeft_Click" Background="#ADD8E6" Grid.Column="2" Margin="618,193,-7,0" Height="60" VerticalAlignment="Top"/>
-        <Button FontSize="20" Content="開鼓風機" Click="OpenBlowerRight_Click" Background="#ADD8E6" Margin="-137,126,0,0" Height="60" VerticalAlignment="Top" HorizontalAlignment="Left" Width="120"/>
-        <Button FontSize="20" Content="關鼓風機" Click="CloseBlowerRight_Click" Background="#ADD8E6" Margin="0,126,1,0" Grid.ColumnSpan="2" Height="60" VerticalAlignment="Top"/>
-        <Button FontSize="20" Content="開啟正壓" Click="OpenAirRight_Click" Background="#ADD8E6" Margin="-137,193,0,0" Height="60" VerticalAlignment="Top" HorizontalAlignment="Left" Width="120"/>
-        <Button FontSize="20" Content="關閉正壓" Click="CloseAirRight_Click" Background="#ADD8E6" Margin="1,193,0,0" Grid.ColumnSpan="2" Height="60" VerticalAlignment="Top"/>
+        <Button FontSize="20" Content="開鼓風機" Click="OpenBlowerLeft_Click" Background="#ADD8E6" Grid.Column="2" Margin="481,256,131,0" Height="60" VerticalAlignment="Top"/>
+        <Button FontSize="20" Content="關鼓風機" Click="CloseBlowerLeft_Click" Background="#ADD8E6" Grid.Column="2" Margin="618,256,-7,0" Height="60" VerticalAlignment="Top"/>
+        <Button FontSize="20" Content="開啟正壓" Click="OpenAirLeft_Click" Background="#ADD8E6" Grid.Column="2" Margin="0,323,131,0" HorizontalAlignment="Right" Width="120" Height="60" VerticalAlignment="Top"/>
+        <Button FontSize="20" Content="關閉正壓" Click="CloseAirLeft_Click" Background="#ADD8E6" Grid.Column="2" Margin="618,323,-7,0" Height="60" VerticalAlignment="Top"/>
+        <Button FontSize="20" Content="開鼓風機" Click="OpenBlowerRight_Click" Background="#ADD8E6" Margin="-137,256,0,0" Height="60" VerticalAlignment="Top" HorizontalAlignment="Left" Width="120"/>
+        <Button FontSize="20" Content="關鼓風機" Click="CloseBlowerRight_Click" Background="#ADD8E6" Margin="0,256,1,0" Grid.ColumnSpan="2" Height="60" VerticalAlignment="Top"/>
+        <Button FontSize="20" Content="開啟正壓" Click="OpenAirRight_Click" Background="#ADD8E6" Margin="-137,323,0,0" Height="60" VerticalAlignment="Top" HorizontalAlignment="Left" Width="120"/>
+        <Button FontSize="20" Content="關閉正壓" Click="CloseAirRight_Click" Background="#ADD8E6" Margin="1,323,0,0" Grid.ColumnSpan="2" Height="60" VerticalAlignment="Top"/>
         <Button FontSize="20" Content="錯誤重置" Click="ResetAlarmLeft_Click" Background="#ADD8E6" Grid.Column="2" Margin="0,323,0,0" Height="60" VerticalAlignment="Top" HorizontalAlignment="Center" Width="148"/>
         <Button FontSize="20" Content="錯誤重置" Click="ResetAlarmRight_Click" Background="#ADD8E6" Grid.Column="2" Margin="55,323,0,0" HorizontalAlignment="Left" Width="149" Height="60" VerticalAlignment="Top"/>
         <Border BorderBrush="Black" BorderThickness="1" CornerRadius="3" Padding="4" ToolTip="{Binding PickFinishedLeft, ElementName=RootControl}" Grid.Column="2" Margin="376,-100,0,0" HorizontalAlignment="Left" Width="100" Height="22" VerticalAlignment="Top">

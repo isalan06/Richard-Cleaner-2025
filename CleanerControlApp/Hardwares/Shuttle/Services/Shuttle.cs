@@ -93,6 +93,7 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
         private DateTime? _clampEndDelayStart;
 
         private string _messageForPickPlace = string.Empty;
+        private bool _passClamperCheckCassette = false;
 
         #endregion
 
@@ -627,6 +628,12 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
 
         public string MessageForPickPlace => _messageForPickPlace;
 
+        public bool PassClamperCheckCassette
+        {
+            get => _passClamperCheckCassette;
+            set => _passClamperCheckCassette = value;
+        }
+
         #endregion
 
         #region Function
@@ -801,6 +808,8 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
             { 
                 _motorZAxis.Home();
 
+                await Task.Delay(1000);
+
                 while (!_motorZAxis.MotorHome && !_motorZAxis.ErrorHomeTimeout && !_motorZAxis.MotorAlarm && !_sim_pass_motor)
                 { 
                     await Task.Delay(500);
@@ -809,6 +818,9 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
                 if (!_motorZAxis.ErrorHomeTimeout && !_motorZAxis.MotorAlarm && !_motorZAxis.ErrorCommandTimeout)
                 { 
                     _motorXAxis.Home();
+
+                    await Task.Delay(1000);
+
                     while (!_motorXAxis.MotorHome && !_motorXAxis.ErrorHomeTimeout && !_motorXAxis.MotorAlarm && !_sim_pass_motor)
                     {
                         await Task.Delay(500);
@@ -931,7 +943,7 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
                             else if (!MotorMoving)
                             {
                                 _motorXAxis.MoveToPosition(_actPositionX, _actVelocityX);
-                                _pickCase = 1; // wait state for X axis
+                                //_pickCase = 1; // wait state for X axis
                             }
                             break;
 
@@ -951,7 +963,7 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
                             else if (!MotorMoving)
                             {
                                 _motorZAxis.MoveToPosition(_actPositionZ, _actVelocityZ);
-                                _pickCase = 11; // wait state for Z axis
+                                //_pickCase = 11; // wait state for Z axis
                             }
                             break;
 
@@ -990,7 +1002,7 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
                             else if (!MotorMoving)
                             {
                                 _motorZAxis.MoveToPosition(0, _actVelocityZ);
-                                _pickCase = 31; // wait for Z return
+                                //_pickCase = 31; // wait for Z return
                             }
                             break;
 
@@ -1003,7 +1015,7 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
                             break;
 
                         case 40: // Check Cassette Exist
-                            if (HasCassette || _sim_pass_clamper)
+                            if (HasCassette || _sim_pass_clamper || _passClamperCheckCassette)
                             {
                                 _cassette = true;
                                 _pickTrigger = false;
@@ -1038,7 +1050,7 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
                             else if (!MotorMoving)
                             {
                                 _motorXAxis.MoveToPosition(_actPositionX, _actVelocityX);
-                                _placeCase = 1; // wait for X
+                                //_placeCase = 1; // wait for X
                             }
                             break;
 
@@ -1058,7 +1070,7 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
                             else if (!MotorMoving)
                             {
                                 _motorZAxis.MoveToPosition(_actPositionZ, _actVelocityZ);
-                                _placeCase = 11; // wait for Z
+                                //_placeCase = 11; // wait for Z
                             }
                             break;
 
@@ -1098,7 +1110,7 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
                             else if (!MotorMoving)
                             {
                                 _motorZAxis.MoveToPosition(0, _actVelocityZ);
-                                _placeCase = 31; // wait for Z return
+                                //_placeCase = 31; // wait for Z return
                             }
 
                             break;
@@ -1112,7 +1124,7 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
                             break;
 
                         case 40: // Check Cassette Exist
-                            if (IsEmpty || _sim_pass_clamper)
+                            if (IsEmpty || _sim_pass_clamper || _passClamperCheckCassette)
                             {
                                 _cassette = false;
                                 _placeTrigger = false;

@@ -35,6 +35,16 @@ namespace CleanerControlApp.Vision.SettingViews
 
             // Fall back to null; LoadToUI handles null-safety
             LoadToUI();
+
+            // subscribe to module settings updates so UI refreshes when recipe applied
+            try
+            {
+                ConfigLoader.ModuleSettingsUpdated += (ms) =>
+                {
+                    try { Dispatcher.Invoke(() => { if (ms != null) { _moduleSettings = ms; LoadToUI(); } }); } catch { }
+                };
+            }
+            catch { }
         }
 
         private void LoadToUI()

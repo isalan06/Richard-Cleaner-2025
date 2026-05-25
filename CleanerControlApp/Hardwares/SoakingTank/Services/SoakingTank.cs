@@ -60,7 +60,7 @@ namespace CleanerControlApp.Hardwares.SoakingTank.Services
         private bool _motor_commanding = false;
         private int _motor_air_retry_count = 0;
         private bool _motor_air_up_flag = false;
-        private bool RetryAirFinished => _moduleSettings.Sink != null && _moduleSettings.Sink.AirKnifeRetryCount == _motor_air_retry_count;
+        private bool RetryAirFinished => _moduleSettings.Sink != null && _moduleSettings.Sink.AirKnifeRetryCount <= _motor_air_retry_count;
 
         private string _jogStatus = "";
         private string _homeStatus = "";
@@ -233,6 +233,7 @@ namespace CleanerControlApp.Hardwares.SoakingTank.Services
         public bool Auto => _auto;
         public bool Pausing => _pausing;
         public bool Ultrasonic => _ultrasonic && _ultrasonicDevice != null && (_ultrasonicDevice.UltrasonicEnabled || _sim_pass_motor);
+        public bool UltrasonicSign => _ultrasonic;
         public bool Cassette => _cassette;
         public bool Initialized => _initialized && (_sim_pass_motor || MotorHome);
         public bool Idle => Sensor_CoverOpen && !_ultrasonic && !_cassette && _initialized && IsNormalStatus && (_sim_pass_motor || (MotorServoOn && MotorIdle && MotorHome));

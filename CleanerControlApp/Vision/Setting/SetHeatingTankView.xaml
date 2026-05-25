@@ -49,19 +49,19 @@
  <ColumnDefinition Width="202" />
  </Grid.ColumnDefinitions>
 
- <TextBlock Text="低溫設定值 (℃):" Grid.Column="0" VerticalAlignment="Center" />
+                        <TextBlock Text="低溫設定值 (℃):" Grid.Column="0" VerticalAlignment="Center" FontWeight="DemiBold"/>
  <TextBox x:Name="Txt_SV_Low" Grid.Row="0" Grid.Column="1" Margin="4,4,0,4" />
 
- <TextBlock Text="高溫設定值 (℃):" Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" />
+                        <TextBlock Text="高溫設定值 (℃):" Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" FontWeight="DemiBold"/>
  <TextBox x:Name="Txt_SV_High" Grid.Row="1" Grid.Column="1" Margin="4,4,0,4" />
 
- <TextBlock Text="INV 高 (Hz):" Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" />
+                        <TextBlock Text="INV 高 (Hz):" Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" FontWeight="DemiBold"/>
  <TextBox x:Name="Txt_INV_High" Grid.Row="2" Grid.Column="1" Margin="4,4,0,4" />
 
- <TextBlock Text="INV低 (Hz):" Grid.Row="3" Grid.Column="0" VerticalAlignment="Center" />
+                        <TextBlock Text="INV低 (Hz):" Grid.Row="3" Grid.Column="0" VerticalAlignment="Center" FontWeight="DemiBold"/>
  <TextBox x:Name="Txt_INV_Low" Grid.Row="3" Grid.Column="1" Margin="4,4,0,4" />
 
- <TextBlock Text="INV 零點 (Hz):" Grid.Row="4" Grid.Column="0" VerticalAlignment="Center" />
+                        <TextBlock Text="INV 零點 (Hz):" Grid.Row="4" Grid.Column="0" VerticalAlignment="Center" FontWeight="DemiBold"/>
  <TextBox x:Name="Txt_INV_Zero" Grid.Row="4" Grid.Column="1" Margin="4,4,0,4" />
 
  <TextBlock Text="高水位檢查延遲 (秒):" Grid.Row="5" Grid.Column="0" VerticalAlignment="Center" />

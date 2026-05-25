@@ -47,6 +47,7 @@ namespace CleanerControlApp.Vision.Template
         private bool _sensorCoverClose;
         private bool _commandAirOpen;
         private bool _commandUltrasonicOpen;
+        private bool _ultrasonic; // maps to ISoakingTank.Ultrasonic
 
         // HS_ properties
         private bool _pickFinished;
@@ -88,6 +89,20 @@ namespace CleanerControlApp.Vision.Template
             Unloaded += (s, e) => _timer.Stop();
 
             UpdateFromSoakingTank();
+        }
+
+        // Ultrasonic state (maps to ISoakingTank.Ultrasonic)
+        public bool Ultrasonic
+        {
+            get => _ultrasonic;
+            private set
+            {
+                if (_ultrasonic != value)
+                {
+                    _ultrasonic = value;
+                    OnPropertyChanged();
+                }
+            }
         }
 
         public bool AutoStatus
@@ -433,6 +448,8 @@ namespace CleanerControlApp.Vision.Template
                     SensorCoverClose = _soakingTank.Sensor_CoverClose;
                     CommandAirOpen = _soakingTank.Command_CleanerAirOpen;
                     CommandUltrasonicOpen = _soakingTank.Command_CleanerUltrasonicOpen;
+                    // use UltrasonicSign from ISoakingTank for UI indicator
+                    Ultrasonic = _soakingTank.UltrasonicSign;
                     RequestWater = _soakingTank.HS_RequestWater;
                     CommandWaterOut = _soakingTank.Command_CleanerWaterOutputOpen;
                     TankH = _soakingTank.Sensor_Liquid_H;
@@ -496,6 +513,7 @@ namespace CleanerControlApp.Vision.Template
                     TankL = false;
                     CommandUltrasonicOpen = false;
                     CommandWaterOut = false;
+                    Ultrasonic = false;
 
                     PickFinished = false;
                     PlaceFinished = false;

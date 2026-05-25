@@ -43,6 +43,27 @@ namespace CleanerControlApp.Vision.SettingViews
             }
 
             LoadToUI();
+
+            // subscribe to module settings updates so UI can refresh when recipe applied
+            try
+            {
+                ConfigLoader.ModuleSettingsUpdated += (ms) =>
+                {
+                    try
+                    {
+                        Dispatcher.Invoke(() =>
+                        {
+                            if (ms != null)
+                            {
+                                _moduleSettings = ms;
+                                LoadToUI();
+                            }
+                        });
+                    }
+                    catch { }
+                };
+            }
+            catch { }
         }
 
         private void _unit_settings_assign(UnitSettings? unit)

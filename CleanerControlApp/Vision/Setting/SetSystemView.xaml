@@ -27,12 +27,13 @@
  </StackPanel>
  </Grid>
 
- <Grid Grid.Row="1">
+ <Grid Grid.Row="1" Margin="0,0,-298,-32">
  <Grid.ColumnDefinitions>
+ <ColumnDefinition Width="480" />
  <ColumnDefinition Width="480" />
  </Grid.ColumnDefinitions>
 
- <Border Grid.Column="0" Padding="12" BorderBrush="LightGray" BorderThickness="1" CornerRadius="4" Background="White"  VerticalAlignment="Top" Margin="0,0,-2,0">
+ <Border Grid.Column="0" Padding="12" BorderBrush="LightGray" BorderThickness="1" CornerRadius="4" Background="White" VerticalAlignment="Top" Margin="0,0,-2,0">
  <StackPanel>
  <TextBlock x:Name="HdrSystem" Text="&#x7CFB;&#x7D71;" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,8" />
  <Grid>
@@ -48,22 +49,57 @@
  <ColumnDefinition Width="180" />
  </Grid.ColumnDefinitions>
 
- <TextBlock x:Name="TB_SinkModulePass_Label" Text="沖水槽模組跳過設定:" Grid.Column="0" VerticalAlignment="Center" Height="20" />
+                        <TextBlock x:Name="TB_SinkModulePass_Label" Text="沖水槽模組跳過設定:" Grid.Column="0" VerticalAlignment="Center" Height="20" FontWeight="DemiBold"/>
  <TextBox x:Name="Txt_SinkModulePass" Grid.Row="0" Grid.Column="1" Margin="4,4,0,4" />
 
- <TextBlock x:Name="TB_SoakingModulePass_Label" Text="浸泡槽模組跳過設定:" Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" Height="20" />
+                        <TextBlock x:Name="TB_SoakingModulePass_Label" Text="浸泡槽模組跳過設定:" Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" Height="20" FontWeight="DemiBold"/>
  <TextBox x:Name="Txt_SoakingTankModulePass" Grid.Row="1" Grid.Column="1" Margin="4,4,0,4" />
 
- <TextBlock x:Name="TB_Drying1ModulePass_Label" Text="烘乾槽#1模組跳過設定:" Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" Height="20" />
+                        <TextBlock x:Name="TB_Drying1ModulePass_Label" Text="烘乾槽#1模組跳過設定:" Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" Height="20" FontWeight="DemiBold"/>
  <TextBox x:Name="Txt_DryingTank1ModulePass" Grid.Row="2" Grid.Column="1" Margin="4,4,0,4" />
 
- <TextBlock x:Name="TB_Drying2ModulePass_Label" Text="烘乾槽#2模組跳過設定:" Grid.Row="3" Grid.Column="0" VerticalAlignment="Center" Height="20" />
+                        <TextBlock x:Name="TB_Drying2ModulePass_Label" Text="烘乾槽#2模組跳過設定:" Grid.Row="3" Grid.Column="0" VerticalAlignment="Center" Height="20" FontWeight="DemiBold"/>
  <TextBox x:Name="Txt_DryingTank2ModulePass" Grid.Row="3" Grid.Column="1" Margin="4,4,0,4" />
 
  <TextBlock x:Name="TB_WriteMotionParam_Label" Text="初始寫入馬達參數到PLC:" Grid.Row="4" Grid.Column="0" VerticalAlignment="Center" Height="20" />
  <TextBox x:Name="Txt_WriteMotionParameterAfterInitialization" Grid.Row="4" Grid.Column="1" Margin="4,4,0,4" />
 
  </Grid>
+ </StackPanel>
+ </Border>
+
+ <!-- Recipe panel on the right -->
+ <Border Grid.Column="1" Padding="12" BorderBrush="LightGray" BorderThickness="1" CornerRadius="4" Background="White" VerticalAlignment="Top" Margin="8,0,0,0">
+ <StackPanel>
+ <TextBlock x:Name="HdrRecipe" Text="配方" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,8" />
+ <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,8,8">
+ <TextBlock Text="現在使用配方:" VerticalAlignment="Center" />
+ <TextBlock x:Name="Txt_CurrentRecipeName" Text="(未設定)" FontWeight="Normal" Margin="6,0,0,0" VerticalAlignment="Center" />
+ </StackPanel>
+ <!-- Put Add button and instruction on one horizontal row -->
+ <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,0,6">
+ <Button x:Name="BtnAddRecipe" Content="新增" Width="80" Height="28" Click="BtnAddRecipe_Click" />
+ <TextBlock Text="在配方列中可雙擊選擇配方" VerticalAlignment="Center" Margin="8,0,0,0" Foreground="Gray" />
+ </StackPanel>
+
+ <!-- Filter box and sort button -->
+ <StackPanel Orientation="Horizontal" Margin="0,8,0,8" VerticalAlignment="Center">
+ <TextBox x:Name="Txt_RecipeFilter" Width="260" Height="26" Margin="0,0,8,0" VerticalAlignment="Center" 
+ ToolTip="輸入關鍵字以模糊搜尋，空白顯示全部" 
+ TextChanged="Txt_RecipeFilter_TextChanged" />
+ <Button x:Name="BtnSortRecipes" Width="100" Height="26" Click="BtnSortRecipes_Click">排序：名稱↑</Button>
+ </StackPanel>
+
+ <!-- Recipe list -->
+ <ListBox x:Name="Lst_RecipeNames" Height="380" MinHeight="120" ScrollViewer.VerticalScrollBarVisibility="Auto" SelectionMode="Single" 
+ MouseDoubleClick="Lst_RecipeNames_MouseDoubleClick" SelectionChanged="Lst_RecipeNames_SelectionChanged">
+ <ListBox.ItemsPanel>
+ <ItemsPanelTemplate>
+ <VirtualizingStackPanel />
+ </ItemsPanelTemplate>
+ </ListBox.ItemsPanel>
+ </ListBox>
+
  </StackPanel>
  </Border>
  </Grid>

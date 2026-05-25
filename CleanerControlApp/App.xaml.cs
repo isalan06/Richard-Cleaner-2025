@@ -465,12 +465,33 @@ namespace CleanerControlApp
         {
             try
             {
-                var msg = $"Unobserved task exception: {e.Exception.GetType().FullName}: {e.Exception.Message}";
-                Console.WriteLine(msg);
-                MessageBox.Show(msg, "Task Exception", MessageBoxButton.OK, MessageBoxImage.Error);
+                // Log detailed exception without showing UI modal dialogs because this handler may run on a non-UI/finalizer thread
+                var logger = AppHost?.Services.GetService(typeof(ILogger<App>)) as ILogger<App>;
+                try
+                {
+                    if (logger != null)
+                    {
+                        logger.LogError(e.Exception, "UnobservedTaskException caught");
+                    }
+                    else
+                    {
+                        Console.WriteLine("UnobservedTaskException: " + e.Exception.ToString());
+                    }
+                }
+                catch
+                {
+                    // fallback to console
+                    try { Console.WriteLine("UnobservedTaskException (logging failed): " + e.Exception.ToString()); } catch { }
+                }
+
+                // Mark as observed to prevent exception from being rethrown by the finalizer
                 e.SetObserved();
             }
-            catch { }
+            catch
+            {
+                // swallow any exceptions from the handler itself
+                try { e.SetObserved(); } catch { }
+            }
         }
 
         /// <summary>

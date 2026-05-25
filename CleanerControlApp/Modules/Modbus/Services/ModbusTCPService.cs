@@ -243,6 +243,17 @@ namespace CleanerControlApp.Modules.Modbus.Services
                         ModbusFunctionCode functionCode = ExecuteFrame.FunctionCodeName;
                         ushort startAddress = ExecuteFrame.StartAddress;
                         ushort dataNumber = ExecuteFrame.DataNumber;
+
+                        // enforce Modbus register read/write limits (safeguard)
+                        const int MaxRegisters = 125; // safe max for Modbus Read/Write Multiple Registers
+                        if (dataNumber > MaxRegisters)
+                        {
+                            // clamp and log warning
+                            _logger?.LogWarning("Requested DataNumber {DataNumber} exceeds Modbus max {MaxRegisters}. Clamping to {MaxRegisters}.", dataNumber, MaxRegisters, MaxRegisters);
+                            dataNumber = (ushort)MaxRegisters;
+                            ExecuteFrame.DataNumber = dataNumber;
+                        }
+
                         var readData = ExecuteFrame.Data != null ? (ushort[])ExecuteFrame.Data.Clone() : null;
                         var boolData = ExecuteFrame.BoolData != null ? (bool[])ExecuteFrame.BoolData.Clone() : null;
                         if (ExecuteFrame.IsRead)
@@ -286,9 +297,11 @@ namespace CleanerControlApp.Modules.Modbus.Services
                             }
                             catch (Exception ex)
                             {
-                                // optionally log
+                                // log more context to help diagnose intermittent checksum/length issues
                                 if (_logger != null)
-                                    _logger.LogError(ex, "Modbus TCP讀取失敗: {Message}", ex.Message);
+                                {
+                                    _logger.LogError(ex, "Modbus TCP讀取失敗. Slave={Slave}, Function={Function}, Start={Start}, Count={Count}. Exception: {Message}", slaveAddress, functionCode, startAddress, dataNumber, ex.Message);
+                                }
                                 else
                                     System.Diagnostics.Debug.WriteLine($"Modbus TCP讀取失敗: {ex.Message}");
                             }
@@ -325,7 +338,18 @@ namespace CleanerControlApp.Modules.Modbus.Services
                                     case ModbusFunctionCode.WriteMultipleRegisters:
                                         if (ExecuteFrame.Data != null)
                                         {
-                                            _master.WriteMultipleRegisters(slaveAddress, startAddress, ExecuteFrame.Data);
+                                            // ensure not writing more than allowed per request
+                                            if (ExecuteFrame.Data.Length > MaxRegisters)
+                                            {
+                                                _logger?.LogWarning("Attempting to write {WriteCount} registers, which exceeds Modbus max {MaxRegisters}. Clamping to first {MaxRegisters} registers.", ExecuteFrame.Data.Length, MaxRegisters, MaxRegisters);
+                                                var truncated = new ushort[MaxRegisters];
+                                                Array.Copy(ExecuteFrame.Data, truncated, MaxRegisters);
+                                                _master.WriteMultipleRegisters(slaveAddress, startAddress, truncated);
+                                            }
+                                            else
+                                            {
+                                                _master.WriteMultipleRegisters(slaveAddress, startAddress, ExecuteFrame.Data);
+                                            }
                                             result = true;
                                         }
                                         break;
@@ -336,7 +360,7 @@ namespace CleanerControlApp.Modules.Modbus.Services
                             {
                                 // optionally log
                                 if (_logger != null)
-                                    _logger.LogError(ex, "Modbus TCP 寫入失敗: {Message}", ex.Message);
+                                    _logger.LogError(ex, "Modbus TCP 寫入失敗: {Message}. Slave={Slave}, Function={Function}, Start={Start}, Count={Count}", ex.Message, slaveAddress, functionCode, startAddress, dataNumber);
                                 else
                                     System.Diagnostics.Debug.WriteLine($"Modbus TCP 寫入失敗: {ex.Message}");
                             }
@@ -378,59 +402,96 @@ namespace CleanerControlApp.Modules.Modbus.Services
                         ushort startAddress = localFrame.StartAddress;
                         ushort dataNumber = localFrame.DataNumber;
 
+                        // enforce Modbus max
+                        const int MaxRegisters = 125;
+                        if (dataNumber > MaxRegisters)
+                        {
+                            _logger?.LogWarning("Async request DataNumber {DataNumber} > {Max}. Clamping to {Max}.", dataNumber, MaxRegisters, MaxRegisters);
+                            dataNumber = (ushort)MaxRegisters;
+                            localFrame.DataNumber = dataNumber;
+                        }
+
                         ushort[]? readData = localFrame.Data != null ? (ushort[])localFrame.Data.Clone() : null;
                         bool[]? boolData = localFrame.BoolData != null ? (bool[])localFrame.BoolData.Clone() : null;
 
                         if (localFrame.IsRead)
                         {
-                            switch (functionCode)
+                            try
                             {
-                                case ModbusFunctionCode.ReadCoils:
-                                    boolData = _master.ReadCoils(slaveAddress, startAddress, dataNumber);
-                                    break;
-                                case ModbusFunctionCode.ReadDiscreteInputs:
-                                    boolData = _master.ReadInputs(slaveAddress, startAddress, dataNumber);
-                                    break;
-                                case ModbusFunctionCode.ReadHoldingRegisters:
-                                    readData = _master.ReadHoldingRegisters(slaveAddress, startAddress, dataNumber);
-                                    break;
-                                case ModbusFunctionCode.ReadInputRegisters:
-                                    readData = _master.ReadInputRegisters(slaveAddress, startAddress, dataNumber);
-                                    break;
+                                switch (functionCode)
+                                {
+                                    case ModbusFunctionCode.ReadCoils:
+                                        boolData = _master.ReadCoils(slaveAddress, startAddress, dataNumber);
+                                        break;
+                                    case ModbusFunctionCode.ReadDiscreteInputs:
+                                        boolData = _master.ReadInputs(slaveAddress, startAddress, dataNumber);
+                                        break;
+                                    case ModbusFunctionCode.ReadHoldingRegisters:
+                                        readData = _master.ReadHoldingRegisters(slaveAddress, startAddress, dataNumber);
+                                        break;
+                                    case ModbusFunctionCode.ReadInputRegisters:
+                                        readData = _master.ReadInputRegisters(slaveAddress, startAddress, dataNumber);
+                                        break;
+                                }
+
+                                if (readData != null)
+                                    localFrame.Set(readData);
+
+                                if (boolData != null)
+                                    localFrame.BoolData = (bool[])boolData.Clone();
+
+                                return localFrame;
                             }
-
-                            if (readData != null)
-                                localFrame.Set(readData);
-
-                            if (boolData != null)
-                                localFrame.BoolData = (bool[])boolData.Clone();
-
-                            return localFrame;
+                            catch (Exception ex)
+                            {
+                                _logger?.LogError(ex, "Modbus TCP Async read failed. Slave={Slave}, Function={Function}, Start={Start}, Count={Count}. Err={Message}", slaveAddress, functionCode, startAddress, dataNumber, ex.Message);
+                                return null;
+                            }
                         }
                         else
                         {
-                            // write
-                            switch (functionCode)
+                            try
                             {
-                                case ModbusFunctionCode.WriteSingleCoil:
-                                    if (localFrame.BoolData != null && localFrame.BoolData.Length > 0)
-                                        _master.WriteSingleCoil(slaveAddress, startAddress, localFrame.BoolData[0]);
-                                    break;
-                                case ModbusFunctionCode.WriteSingleRegister:
-                                    if (localFrame.Data != null && localFrame.Data.Length > 0)
-                                        _master.WriteSingleRegister(slaveAddress, startAddress, localFrame.Data[0]);
-                                    break;
-                                case ModbusFunctionCode.WriteMultipleCoils:
-                                    if (localFrame.BoolData != null)
-                                        _master.WriteMultipleCoils(slaveAddress, startAddress, localFrame.BoolData);
-                                    break;
-                                case ModbusFunctionCode.WriteMultipleRegisters:
-                                    if (localFrame.Data != null)
-                                        _master.WriteMultipleRegisters(slaveAddress, startAddress, localFrame.Data);
-                                    break;
-                            }
+                                // write
+                                switch (functionCode)
+                                {
+                                    case ModbusFunctionCode.WriteSingleCoil:
+                                        if (localFrame.BoolData != null && localFrame.BoolData.Length > 0)
+                                            _master.WriteSingleCoil(slaveAddress, startAddress, localFrame.BoolData[0]);
+                                        break;
+                                    case ModbusFunctionCode.WriteSingleRegister:
+                                        if (localFrame.Data != null && localFrame.Data.Length > 0)
+                                            _master.WriteSingleRegister(slaveAddress, startAddress, localFrame.Data[0]);
+                                        break;
+                                    case ModbusFunctionCode.WriteMultipleCoils:
+                                        if (localFrame.BoolData != null)
+                                            _master.WriteMultipleCoils(slaveAddress, startAddress, localFrame.BoolData);
+                                        break;
+                                    case ModbusFunctionCode.WriteMultipleRegisters:
+                                        if (localFrame.Data != null)
+                                        {
+                                            if (localFrame.Data.Length > MaxRegisters)
+                                            {
+                                                _logger?.LogWarning("Async write multiple registers count {Count} exceeds max {Max}, truncating.", localFrame.Data.Length, MaxRegisters);
+                                                var truncated = new ushort[MaxRegisters];
+                                                Array.Copy(localFrame.Data, truncated, MaxRegisters);
+                                                _master.WriteMultipleRegisters(slaveAddress, startAddress, truncated);
+                                            }
+                                            else
+                                            {
+                                                _master.WriteMultipleRegisters(slaveAddress, startAddress, localFrame.Data);
+                                            }
+                                        }
+                                        break;
+                                }
 
-                            return localFrame;
+                                return localFrame;
+                            }
+                            catch (Exception ex)
+                            {
+                                _logger?.LogError(ex, "Modbus TCP Async write failed. Slave={Slave}, Function={Function}, Start={Start}, Count={Count}. Err={Message}", slaveAddress, functionCode, startAddress, dataNumber, ex.Message);
+                                return null;
+                            }
                         }
                     }
                     catch (Exception ex)

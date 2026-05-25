@@ -273,6 +273,16 @@
 
                 </Border>
                 <Border Canvas.Left="156" Canvas.Top="113" Background="White" BorderBrush="Black" BorderThickness="1" CornerRadius="3" Padding="4" Height="25" Width="84" HorizontalAlignment="Left" VerticalAlignment="Top">
+                    <Border.Style>
+                        <Style TargetType="{x:Type Border}">
+                            <Setter Property="Background" Value="White"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Ultrasonic, ElementName=RootControl}" Value="True">
+                                    <Setter Property="Background" Value="Red"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Border.Style>
 
                     <TextBlock Text="超音波" FontSize="18" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black"/>
                 </Border>
@@ -316,8 +326,8 @@
                     <Style TargetType="{x:Type Border}">
                         <Setter Property="Background" Value="White"/>
                         <Style.Triggers>
-                            <DataTrigger Binding="{Binding CommandUltrasonicOpen, ElementName=RootControl}" Value="True">
-                                <Setter Property="Background" Value="#CCFFCC"/>
+                            <DataTrigger Binding="{Binding Ultrasonic, ElementName=RootControl}" Value="True">
+                                <Setter Property="Background" Value="Red"/>
                             </DataTrigger>
                         </Style.Triggers>
                     </Style>

@@ -71,6 +71,29 @@ namespace CleanerControlApp.Vision.SettingViews
                 tbUl.PreviewTextInput += Txt_Ultrasonic_PreviewTextInput;
                 DataObject.AddPastingHandler(tbUl, OnUltrasonicPaste);
             }
+
+            // subscribe to module settings updates so UI refreshes when recipe applied
+            try
+            {
+                ConfigLoader.ModuleSettingsUpdated += OnModuleSettingsUpdated;
+            }
+            catch { }
+        }
+
+        private void OnModuleSettingsUpdated(ModuleSettings ms)
+        {
+            try
+            {
+                Dispatcher.Invoke(() =>
+                {
+                    if (ms != null)
+                    {
+                        _moduleSettings = ms;
+                        LoadToUI();
+                    }
+                });
+            }
+            catch { }
         }
 
         // helper to safely assign unit fields

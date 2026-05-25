@@ -20,6 +20,8 @@ using CleanerControlApp.Modules.UserManagement.Services;
 using Microsoft.Extensions.DependencyInjection;
 using CleanerControlApp.Modules.UserManagement.Models;
 using CleanerControlApp.Hardwares;
+using CleanerControlApp.Utilities;
+using CleanerControlApp.Vision.SettingViews;
 
 namespace CleanerControlApp
 {
@@ -42,6 +44,8 @@ namespace CleanerControlApp
 
         // timer for polling hardware manager status
         private DispatcherTimer? _statusTimer;
+
+        private Action<ModuleSettings>? _moduleSettingsUpdatedHandler;
 
         /// <summary>
         /// 建構式，注入 Logger
@@ -118,6 +122,44 @@ namespace CleanerControlApp
 
             // run initial update
             UpdateStatusIndicators();
+
+            // set initial current recipe display
+            try
+            {
+                ModuleSettings ms = null;
+                try { ms = _services.GetService(typeof(ModuleSettings)) as ModuleSettings; } catch { }
+                if (ms == null)
+                {
+                    try { ConfigLoader.Load(); ms = ConfigLoader.GetModuleSettings(); } catch { }
+                }
+
+                if (ms != null && !string.IsNullOrWhiteSpace(ms.RecipeName))
+                    CurrentRecipeText.Text = $"配方: {ms.RecipeName}";
+                else
+                    CurrentRecipeText.Text = "配方: -";
+            }
+            catch { }
+
+            // subscribe to module settings updates to refresh current recipe display
+            try
+            {
+                _moduleSettingsUpdatedHandler = (ms) =>
+                {
+                    try
+                    {
+                        Dispatcher.Invoke(() =>
+                        {
+                            if (ms != null && !string.IsNullOrWhiteSpace(ms.RecipeName))
+                                CurrentRecipeText.Text = $"配方: {ms.RecipeName}";
+                            else
+                                CurrentRecipeText.Text = "配方: -";
+                        });
+                    }
+                    catch { }
+                };
+                ConfigLoader.ModuleSettingsUpdated += _moduleSettingsUpdatedHandler;
+            }
+            catch { }
         }
 
         private void UpdateStatusIndicators()
@@ -153,6 +195,14 @@ namespace CleanerControlApp
                     _statusTimer.Stop();
                     _statusTimer = null;
                 }
+            }
+            catch { }
+
+            // unsubscribe module settings event
+            try
+            {
+                if (_moduleSettingsUpdatedHandler != null)
+                    ConfigLoader.ModuleSettingsUpdated -= _moduleSettingsUpdatedHandler;
             }
             catch { }
         }
@@ -310,6 +360,43 @@ namespace CleanerControlApp
                 // User cancelled or failed login -> exit app
                 Application.Current.Shutdown();
             }
+        }
+
+        private void BtnChangeRecipe_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                var win = new RecipePickerWindow() { Owner = this };
+                var ok = win.ShowDialog();
+                if (ok == true && !string.IsNullOrWhiteSpace(win.SelectedRecipe))
+                {
+                    var name = win.SelectedRecipe;
+                    // load recipe to module settings and persist
+                    try
+                    {
+                        ModuleSettings ms = null;
+                        try { ms = _services.GetService(typeof(ModuleSettings)) as ModuleSettings; } catch { }
+                        if (ms == null) { try { ConfigLoader.Load(); ms = ConfigLoader.GetModuleSettings(); } catch { } }
+                        if (ms == null) ms = new ModuleSettings();
+
+                        var okLoad = ConfigLoader.LoadRecipeToModuleSettings(ms, name);
+                        if (okLoad)
+                        {
+                            ConfigLoader.SetModuleSettingsAndSave(ms);
+                            MessageBox.Show($"已套用配方: {name}", "資訊", MessageBoxButton.OK, MessageBoxImage.Information);
+                        }
+                        else
+                        {
+                            MessageBox.Show($"載入配方失敗: {name}", "錯誤", MessageBoxButton.OK, MessageBoxImage.Error);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"套用配方時發生錯誤: {ex.Message}", "錯誤", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                }
+            }
+            catch { }
         }
     }
 }

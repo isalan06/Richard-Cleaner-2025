@@ -696,6 +696,21 @@ namespace CleanerControlApp.Hardwares
         public bool SystemAuto => ShuttleAuto && SinkAuto && SoakingTankAuto && DryingTank1Auto && DryingTank2Auto && HeatingTankAuto;
         public bool HasAutoStatus => ShuttleAuto || SinkAuto || SoakingTankAuto || DryingTank1Auto || DryingTank2Auto || HeatingTankAuto;
 
+        // Expose PassClamperCheckCassette from shuttle for UI toggling
+        public bool ShuttlePassClamperCheckCassette
+        {
+            get => _shuttle != null && _shuttle.PassClamperCheckCassette;
+            set
+            {
+                try
+                {
+                    if (_shuttle != null)
+                        _shuttle.PassClamperCheckCassette = value;
+                }
+                catch { }
+            }
+        }
+
         #endregion
 
         #region Initial
@@ -829,8 +844,18 @@ namespace CleanerControlApp.Hardwares
                     {
                         if (_sink.Initialized && _shuttle.Initialized)
                         {
+                            if(!_sink.InPos1 && _sink.MotorHome && _sink.MotorIdle && _sink.Sensor_CoverOpen)
+                            {
+                                _sink.MoveToPosition(0, 0);
+                            }
+
+                            if(!_soakingTank.InPos1 && _soakingTank.MotorHome && _soakingTank.MotorIdle && _soakingTank.Sensor_CoverOpen)
+                            {
+                                _soakingTank.MoveToPosition(0, 0);
+                            }
+
                             // Check Procedure
-                            if (!_shuttle_check_cassette_trigger)
+                            if (!_shuttle_check_cassette_trigger && _sink.InPos1 && _soakingTank.InPos1)
                             {
                                 _shuttle_check_cassette_trigger = true;
                                 _shuttle.CheckTankCassetteExist();

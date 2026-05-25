@@ -379,6 +379,27 @@ namespace CleanerControlApp.Modules.Modbus.Services
                     {
                         _writeCount++;
 
+                        // enforce Modbus limits
+                        const int MaxRegisters =125;
+                        if (_frame.IsRead)
+                        {
+                            if (_frame.DataNumber > MaxRegisters)
+                            {
+                                _logger?.LogWarning("RTU read DataNumber {Count} > {Max}. Clamping to {Max}.", _frame.DataNumber, MaxRegisters, MaxRegisters);
+                                _frame.DataNumber = (ushort)MaxRegisters;
+                            }
+                        }
+                        else
+                        {
+                            if (_frame.Data != null && _frame.Data.Length > MaxRegisters)
+                            {
+                                _logger?.LogWarning("RTU write Data count {Count} > {Max}. Truncating to first {Max}.", _frame.Data.Length, MaxRegisters, MaxRegisters);
+                                var trunc = new ushort[MaxRegisters];
+                                Array.Copy(_frame.Data, trunc, MaxRegisters);
+                                _frame.Data = trunc;
+                            }
+                        }
+
                         switch (_frame.FunctionCode)
                         {
                             case 0x1:
@@ -428,12 +449,13 @@ namespace CleanerControlApp.Modules.Modbus.Services
                     { 
                         _frame.HasTimeout = true;
                         _frame.HasException = true;
+                        _logger?.LogWarning("Modbus RTU timeout. Slave={Slave}, Function={Func}, Start={Start}, Count={Count}", _frame.SlaveAddress, _frame.FunctionCode, _frame.StartAddress, _frame.DataNumber);
                     }
                     catch(Exception ex)
                     {
                         _frame.HasException = true;
                         if (_logger != null)
-                            _logger.LogError(ex, $"Error during Modbus RTU Act: {ex.Message}");
+                            _logger.LogError(ex, "Error during Modbus RTU Act: {Message}. Slave={Slave}, Func={Func}, Start={Start}, Count={Count}", ex.Message, _frame.SlaveAddress, _frame.FunctionCode, _frame.StartAddress, _frame.DataNumber);
                         else
                             Console.WriteLine(ex.Message);
                     }

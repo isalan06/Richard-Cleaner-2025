@@ -51,13 +51,13 @@
  <ColumnDefinition Width="202" />
  </Grid.ColumnDefinitions>
 
- <TextBlock Text="低壓設定值 (kg/cm2):" Grid.Column="0" VerticalAlignment="Center" />
+ <TextBlock Text="低壓設定值 (kg/cm2):" Grid.Column="0" VerticalAlignment="Center" FontWeight="DemiBold" />
  <TextBox x:Name="Txt_SV_Low" Grid.Row="0" Grid.Column="1" Margin="4,4,0,4" />
 
- <TextBlock Text="高壓設定值 (kg/cm2):" Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" />
+                        <TextBlock Text="高壓設定值 (kg/cm2):" Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" FontWeight="DemiBold"/>
  <TextBox x:Name="Txt_SV_High" Grid.Row="1" Grid.Column="1" Margin="4,4,0,4" />
 
- <TextBlock Text="清洗動作時間(秒):" Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" />
+                        <TextBlock Text="清洗動作時間(秒):" Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" FontWeight="DemiBold"/>
  <TextBox x:Name="Txt_ActTime" Grid.Row="2" Grid.Column="1" Margin="4,4,0,4" />
 
  <TextBlock Text="馬達位置 #1-承接位(mm):" Grid.Row="3" Grid.Column="0" VerticalAlignment="Center" />
@@ -76,7 +76,7 @@
  <TextBox x:Name="Txt_MotorVel2" Grid.Row="7" Grid.Column="1" Margin="4,4,0,4" />
 
  <!-- NumericUpDown-like control for AirKnifeRetryCount -->
- <TextBlock Text="風刀往復次數:" Grid.Row="8" Grid.Column="0" VerticalAlignment="Center" />
+                        <TextBlock Text="風刀往復次數:" Grid.Row="8" Grid.Column="0" VerticalAlignment="Center" FontWeight="DemiBold"/>
  <Grid Grid.Row="8" Grid.Column="1" Margin="4,4,0,4">
  <Grid.ColumnDefinitions>
  <ColumnDefinition Width="Auto" />

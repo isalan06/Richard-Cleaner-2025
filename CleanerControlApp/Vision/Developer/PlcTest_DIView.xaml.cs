@@ -191,7 +191,7 @@ namespace CleanerControlApp.Vision.Developer
             Description = description;
             _plc = plc;
 
-            // compute mapping from address to DIO_X[word].Bit
+            // compute mapping from address to DIO_X[word]..Bit
             // address format: Xnn (e.g., X0, X10, X20, X100)
             if (int.TryParse(address.TrimStart('X', 'x'), out int num))
             {
@@ -199,6 +199,20 @@ namespace CleanerControlApp.Vision.Developer
                 int units = num %10;
                 _wordIndex = tens /2; // every two 'tens' groups map to next word
                 _bitIndex = units + (tens %2) *8; // tens odd -> high byte (bits8..15)
+
+                // clamp word index to available PLC arrays to avoid out-of-range indices
+                try
+                {
+                    int avail =0;
+                    if (_plc != null && _plc.DIO_X != null) avail = _plc.DIO_X.Length;
+                    // fallback to at least1 to keep indexes valid
+                    if (avail <=0) avail =1;
+                    if (_wordIndex >= avail) _wordIndex = avail -1;
+                }
+                catch
+                {
+                    // ignore and leave computed indexes
+                }
             }
             else
             {

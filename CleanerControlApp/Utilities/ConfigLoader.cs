@@ -14,12 +14,37 @@ namespace CleanerControlApp.Utilities
     {
         private static IConfiguration? _configuration;
 
+        // Event raised when ModuleSettings are saved/updated so UI can refresh
+        public static event Action<ModuleSettings>? ModuleSettingsUpdated;
+
         public static void Load()
         {
             var builder = new ConfigurationBuilder()
                 .SetBasePath(AppContext.BaseDirectory)
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
             _configuration = builder.Build();
+
+            // Ensure the Recipes folder exists and create a default recipe if there are no recipe files
+            try
+            {
+                EnsureRecipesFolder();
+                var hasAny = Directory.EnumerateFiles(RecipesFolder, "*.json").Any();
+                if (!hasAny)
+                {
+                    // Export current ModuleSettings (from appsettings.json) into a default recipe
+                    var moduleSettings = GetModuleSettings();
+                    if (moduleSettings != null)
+                    {
+                        var defaultName = string.IsNullOrWhiteSpace(moduleSettings.RecipeName) ? "Default" : moduleSettings.RecipeName!;
+                        // Use convenience method to save and set metadata
+                        SaveRecipeForModuleSettings(moduleSettings, defaultName);
+                    }
+                }
+            }
+            catch
+            {
+                // Ignore errors here to avoid breaking configuration load; recipe persistence can be retried later
+            }
         }
 
         public static AppSettings GetSettings()
@@ -47,6 +72,46 @@ namespace CleanerControlApp.Utilities
         { 
             var moduleSettings = new ModuleSettings();
             _configuration?.GetSection($"{nameof(ModuleSettings)}")?.Bind(moduleSettings);
+
+            try
+            {
+                // If no recipe specified, try to load Default and persist the RecipeName
+                if (string.IsNullOrWhiteSpace(moduleSettings?.RecipeName))
+                {
+                    var defaultRecipe = LoadRecipe("Default");
+                    if (defaultRecipe != null)
+                    {
+                        moduleSettings.ApplyRecipe(defaultRecipe);
+                        moduleSettings.RecipeName = "Default";
+                        // Persist the selected recipe name back into appsettings.json
+                        try { SetModuleSettings(moduleSettings); } catch { }
+                    }
+                }
+                else
+                {
+                    // Try loading the named recipe; if missing, fallback to Default and persist
+                    var recipe = LoadRecipe(moduleSettings.RecipeName!);
+                    if (recipe != null)
+                    {
+                        moduleSettings.ApplyRecipe(recipe);
+                    }
+                    else
+                    {
+                        var defaultRecipe = LoadRecipe("Default");
+                        if (defaultRecipe != null)
+                        {
+                            moduleSettings.ApplyRecipe(defaultRecipe);
+                            moduleSettings.RecipeName = "Default";
+                            try { SetModuleSettings(moduleSettings); } catch { }
+                        }
+                    }
+                }
+            }
+            catch
+            {
+                // Swallow errors to avoid breaking configuration reads; calling code can decide next steps
+            }
+
             return moduleSettings;
         }
 
@@ -200,6 +265,158 @@ namespace CleanerControlApp.Utilities
                 .SetBasePath(AppContext.BaseDirectory)
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
             _configuration = builder.Build();
+
+            // If ModuleSettings specifies a RecipeName, also save the linked recipe file to keep it in sync
+            try
+            {
+                if (!string.IsNullOrWhiteSpace(moduleSettings.RecipeName))
+                {
+                    SaveRecipeForModuleSettings(moduleSettings, moduleSettings.RecipeName!);
+                }
+            }
+            catch
+            {
+                // Ignore recipe persistence errors to avoid breaking config save
+            }
+        }
+
+        // --- Recipe file helpers ---
+        private static string RecipesFolder => Path.Combine(AppContext.BaseDirectory, "Recipes");
+
+        private static string SanitizeFileName(string name)
+        {
+            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Recipe name is empty.", nameof(name));
+            var invalid = Path.GetInvalidFileNameChars();
+            var sb = new StringBuilder(name.Length);
+            foreach (var ch in name)
+            {
+                sb.Append(invalid.Contains(ch) ? '_' : ch);
+            }
+            return sb.ToString();
+        }
+
+        private static string GetRecipeFilePath(string name)
+        {
+            var safe = SanitizeFileName(name);
+            return Path.Combine(RecipesFolder, safe + ".json");
+        }
+
+        public static void EnsureRecipesFolder()
+        {
+            if (!Directory.Exists(RecipesFolder)) Directory.CreateDirectory(RecipesFolder);
+        }
+
+        public static void SaveRecipe(Recipe recipe)
+        {
+            if (recipe == null) throw new ArgumentNullException(nameof(recipe));
+            if (string.IsNullOrWhiteSpace(recipe.Name)) throw new ArgumentException("Recipe must have a Name.", nameof(recipe));
+
+            EnsureRecipesFolder();
+            var path = GetRecipeFilePath(recipe.Name!);
+
+            var options = new JsonSerializerOptions { WriteIndented = true };
+            var json = JsonSerializer.Serialize(recipe, options);
+            File.WriteAllText(path, json, Encoding.UTF8);
+        }
+
+        public static Recipe? LoadRecipe(string name)
+        {
+            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Recipe name is empty.", nameof(name));
+            var path = GetRecipeFilePath(name);
+            if (!File.Exists(path)) return null;
+
+            var json = File.ReadAllText(path, Encoding.UTF8);
+            try
+            {
+                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                var recipe = JsonSerializer.Deserialize<Recipe>(json, options);
+                return recipe;
+            }
+            catch (JsonException)
+            {
+                return null;
+            }
+        }
+
+        public static bool DeleteRecipe(string name)
+        {
+            if (string.IsNullOrWhiteSpace(name)) return false;
+            var path = GetRecipeFilePath(name);
+            if (!File.Exists(path)) return false;
+            File.Delete(path);
+            return true;
+        }
+
+        public static List<string> ListRecipeNames()
+        {
+            EnsureRecipesFolder();
+            var list = new List<string>();
+            foreach (var file in Directory.EnumerateFiles(RecipesFolder, "*.json"))
+            {
+                try
+                {
+                    var name = Path.GetFileNameWithoutExtension(file);
+                    list.Add(name);
+                }
+                catch { }
+            }
+            return list;
+        }
+
+        // Convenience: export current ModuleSettings to a recipe file
+        public static void SaveRecipeForModuleSettings(ModuleSettings moduleSettings, string recipeName)
+        {
+            if (moduleSettings == null) throw new ArgumentNullException(nameof(moduleSettings));
+            if (string.IsNullOrWhiteSpace(recipeName)) throw new ArgumentException("Recipe name required.", nameof(recipeName));
+
+            var recipe = moduleSettings.ExportRecipe(recipeName);
+            SaveRecipe(recipe);
+
+            // Optionally update ModuleSettings metadata
+            moduleSettings.RecipeName = recipeName;
+        }
+
+        // Convenience: load a recipe file and apply to ModuleSettings (and set RecipeName)
+        public static bool LoadRecipeToModuleSettings(ModuleSettings moduleSettings, string recipeName)
+        {
+            if (moduleSettings == null) throw new ArgumentNullException(nameof(moduleSettings));
+            if (string.IsNullOrWhiteSpace(recipeName)) throw new ArgumentException("Recipe name required.", nameof(recipeName));
+
+            var recipe = LoadRecipe(recipeName);
+            if (recipe == null) return false;
+
+            moduleSettings.ApplyRecipe(recipe);
+            moduleSettings.RecipeName = recipeName;
+            return true;
+        }
+
+        public static void SetModuleSettingsAndSave(ModuleSettings moduleSettings)
+        {
+            // Persist ModuleSettings to appsettings.json
+            SetModuleSettings(moduleSettings);
+
+            // If a recipe name is selected, also save that recipe file so external recipe files stay in sync
+            try
+            {
+                if (!string.IsNullOrWhiteSpace(moduleSettings?.RecipeName))
+                {
+                    SaveRecipeForModuleSettings(moduleSettings, moduleSettings.RecipeName!);
+                }
+            }
+            catch
+            {
+                // ignore recipe save failures
+            }
+
+            // Notify subscribers that ModuleSettings have been updated
+            try
+            {
+                ModuleSettingsUpdated?.Invoke(moduleSettings);
+            }
+            catch
+            {
+                // ignore subscriber exceptions
+            }
         }
 
         public static void Save()

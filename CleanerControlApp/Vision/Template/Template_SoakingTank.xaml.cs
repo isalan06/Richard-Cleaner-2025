@@ -31,6 +31,7 @@ namespace CleanerControlApp.Vision.Template
         private bool _inPos2;
         private bool _inPos3;
         private bool _manaulShaking;
+        private bool _act;
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -268,6 +269,7 @@ namespace CleanerControlApp.Vision.Template
                     InPos1 = _soakingTank.InPos1;
                     InPos2 = _soakingTank.InPos2;
                     InPos3 = _soakingTank.InPos3;
+                    Act = _soakingTank.HS_RequestWater;
                     try { ManaulShaking = _soakingTank.ManaulShaking; } catch { }
                 }
                 else
@@ -275,12 +277,26 @@ namespace CleanerControlApp.Vision.Template
                     InPos1 = false;
                     InPos2 = false;
                     InPos3 = false;
+                    Act = false;
                     ManaulShaking = false;
                 }
             }
             catch
             {
                 // ignore
+            }
+        }
+
+        public bool Act
+        {
+            get => _act;
+            private set
+            {
+                if (_act != value)
+                {
+                    _act = value;
+                    OnPropertyChanged();
+                }
             }
         }
 

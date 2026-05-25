@@ -3,6 +3,8 @@ using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Windows.Controls;
 using System.Windows.Threading;
+using System.Windows;
+using System.Windows.Media;
 
 namespace CleanerControlApp.Vision.Developer.Module
 {
@@ -45,11 +47,18 @@ namespace CleanerControlApp.Vision.Developer.Module
  {
  txtDryRunStatus.Text = _hw.DryRunProcedureStatus.ToString();
  txtDryRunStatusString.Text = _hw.DryRunProcedureStatusString ?? string.Empty;
+
+ // update PassClamperCheckCassette button appearance
+ bool pass = _hw.ShuttlePassClamperCheckCassette;
+ btnPassClamperCheckCassette.Background = pass ? Brushes.LightGreen : Brushes.LightGray;
+ btnPassClamperCheckCassette.Content = pass ? "自動不檢查卡匣: ON" : "自動不檢查卡匣: OFF";
  }
  else
  {
  txtDryRunStatus.Text = "N/A";
  txtDryRunStatusString.Text = string.Empty;
+ btnPassClamperCheckCassette.Background = Brushes.LightGray;
+ btnPassClamperCheckCassette.Content = "自動不檢查卡匣";
  }
  }
  catch { }
@@ -70,6 +79,20 @@ namespace CleanerControlApp.Vision.Developer.Module
  try
  {
  _hw?.StopDryRunProcedure();
+ UpdateStatus();
+ }
+ catch { }
+ }
+
+ // Click handler for Pass Clamper Check Cassette button
+ private void btnPassClamperCheckCassette_Click(object sender, RoutedEventArgs e)
+ {
+ try
+ {
+ if (_hw != null)
+ {
+ _hw.ShuttlePassClamperCheckCassette = !_hw.ShuttlePassClamperCheckCassette;
+ }
  UpdateStatus();
  }
  catch { }

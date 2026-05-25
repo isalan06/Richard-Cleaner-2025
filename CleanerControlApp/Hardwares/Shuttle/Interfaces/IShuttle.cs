@@ -97,6 +97,8 @@ namespace CleanerControlApp.Hardwares.Shuttle.Interfaces
 
         string MessageForPickPlace { get; }
 
+        bool PassClamperCheckCassette { get; set; }
+
 
     }
 }

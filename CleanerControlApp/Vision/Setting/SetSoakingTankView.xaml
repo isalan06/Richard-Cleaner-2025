@@ -52,7 +52,7 @@
  <ColumnDefinition Width="202" />
  </Grid.ColumnDefinitions>
 
- <TextBlock x:Name="TB_ActTime_Label" Text="浸泡時間(秒):" Grid.Column="0" VerticalAlignment="Center" />
+                        <TextBlock x:Name="TB_ActTime_Label" Text="浸泡時間(秒):" Grid.Column="0" VerticalAlignment="Center" FontWeight="DemiBold"/>
  <TextBox x:Name="Txt_ActTime" Grid.Row="0" Grid.Column="1" Margin="4,4,0,4" />
 
  <TextBlock x:Name="TB_MotorPos1_Label" Text="馬達位置 #1-承接位(mm):" Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" />
@@ -67,15 +67,16 @@
  <TextBlock x:Name="TB_MotorVel1_Label" Text="馬達速度 #1-升降(mm/s):" Grid.Row="4" Grid.Column="0" VerticalAlignment="Center" />
  <TextBox x:Name="Txt_MotorVel1" Grid.Row="4" Grid.Column="1" Margin="4,4,0,4" />
 
- <TextBlock x:Name="TB_MotorVel2_Label" Text="馬達速度 #2-搖擺(mm/s):" Grid.Row="5" Grid.Column="0" VerticalAlignment="Center" />
+                        <TextBlock x:Name="TB_MotorVel2_Label" Text="馬達速度 #2-搖擺(mm/s):" Grid.Row="5" Grid.Column="0" VerticalAlignment="Center" FontWeight="DemiBold"/>
  <TextBox x:Name="Txt_MotorVel2" Grid.Row="5" Grid.Column="1" Margin="4,4,0,4" />
 
  <!-- Ultrasonic Set Current -->
- <TextBlock x:Name="TB_UltrasonicSet_Label" Text="超音波設定電流 (mA):" Grid.Row="6" Grid.Column="0" VerticalAlignment="Center" />
+                        <TextBlock x:Name="TB_UltrasonicSet_Label" Text="超音波設定電流 (mA):" Grid.Row="6" Grid.Column="0" VerticalAlignment="Center" FontWeight="DemiBold"/>
  <TextBox x:Name="Txt_UltrasonicSetCurrent" Grid.Row="6" Grid.Column="1" Margin="4,4,0,4" />
 
  <!-- NumericUpDown-like control for AirKnifeRetryCount -->
- <TextBlock x:Name="TB_AirRetry_Label" Text="風刀往復次數:" Grid.Row="7" Grid.Column="0" VerticalAlignment="Center" />
+
+                        <TextBlock x:Name="TB_AirRetry_Label" Text="風刀往復次數:" Grid.Row="7" Grid.Column="0" VerticalAlignment="Center" FontWeight="DemiBold"/>
  <Grid Grid.Row="7" Grid.Column="1" Margin="4,4,0,4">
  <Grid.ColumnDefinitions>
  <ColumnDefinition Width="Auto" />

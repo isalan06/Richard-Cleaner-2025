@@ -26,8 +26,10 @@
                 <Border DockPanel.Dock="Left" Background="#FF3A3A3A" Padding="8" Margin="0,0,8,0" CornerRadius="4" Height="124">
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                         <StackPanel Orientation="Vertical" Margin="0,0,8,0" VerticalAlignment="Center">
-                            <TextBlock x:Name="CurrentUserNameText" Text="帳號: -" Foreground="White" FontWeight="Bold"/>
-                            <TextBlock x:Name="CurrentUserRoleText" Text="權限: -" Foreground="White" FontSize="12"/>
+                            <TextBlock x:Name="CurrentUserNameText" Text="帳號: -" Foreground="White" FontWeight="Bold" FontSize="18"/>
+                            <TextBlock x:Name="CurrentUserRoleText" Text="權限: -" Foreground="White" FontSize="18"/>
+                            <TextBlock x:Name="CurrentRecipeText" Text="配方: -" Foreground="White" FontSize="18"/>
+                            <Button x:Name="BtnChangeRecipe" Content="變更" Width="80" Height="48" Margin="8,0,0,0" Click="BtnChangeRecipe_Click" FontSize="20" />
                         </StackPanel>
                         <Button x:Name="LogoutButton" FontSize="20" Content="登出" Margin="6,0,0,0" Padding="10,8" Height="80" Click="LogoutButton_Click"/>
                     </StackPanel>

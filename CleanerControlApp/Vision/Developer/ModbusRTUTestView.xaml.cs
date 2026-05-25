@@ -17,6 +17,7 @@ namespace CleanerControlApp.Vision.Developer
     {
         private readonly IModbusRTUService _modbusService;
         private readonly DispatcherTimer _timer;
+        private const int MaxRegisters =125;
 
         public ModbusRTUTestView()
         {
@@ -272,6 +273,12 @@ namespace CleanerControlApp.Vision.Developer
             {
                 AppendLog(err);
                 return;
+            }
+
+            if (number > MaxRegisters)
+            {
+                AppendLog($"Requested number {number} exceeds Modbus safe limit {MaxRegisters}. Please reduce the count or split requests.");
+                number = MaxRegisters;
             }
 
             var frame = new ModbusRTUFrame();
