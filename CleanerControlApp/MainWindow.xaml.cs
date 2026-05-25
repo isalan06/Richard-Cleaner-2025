@@ -362,6 +362,11 @@ namespace CleanerControlApp
             }
         }
 
+        private void CloseButton_Click(object sender, RoutedEventArgs e)
+        {
+            //Application.Current.Shutdown();
+        }
+
         private void BtnChangeRecipe_Click(object sender, RoutedEventArgs e)
         {
             try

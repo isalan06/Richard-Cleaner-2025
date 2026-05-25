@@ -99,6 +99,8 @@ namespace CleanerControlApp.Hardwares.Shuttle.Interfaces
 
         bool PassClamperCheckCassette { get; set; }
 
+        void ModuleClose();
+
 
     }
 }

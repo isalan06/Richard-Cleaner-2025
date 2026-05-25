@@ -1,6 +1,7 @@
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Threading;
@@ -13,6 +14,8 @@ namespace CleanerControlApp.Vision.Template
     {
         private readonly DispatcherTimer _timer;
         private readonly IDryingTank[]? _dryingTanks;
+        private bool _isSvLeftInputInitialized;
+        private bool _isSvRightInputInitialized;
 
         public Template_DryingTank()
         {
@@ -281,6 +284,62 @@ namespace CleanerControlApp.Vision.Template
             }
         }
 
+        private void BtnWrite_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (_dryingTanks == null || _dryingTanks.Length == 0) return;
+
+                if (!float.TryParse(SVLeftInput, NumberStyles.Float, CultureInfo.InvariantCulture, out var value) &&
+                    !float.TryParse(SVLeftInput, NumberStyles.Float, CultureInfo.CurrentCulture, out value))
+                {
+                    MessageBox.Show("請輸入可轉換為浮點數的數值", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+
+                if (float.IsNaN(value) || float.IsInfinity(value) || value < 0f || value > 120f)
+                {
+                    MessageBox.Show("設定溫度範圍必須為 0~120", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+
+                _dryingTanks[0].SetSV(value);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"BtnWrite_Click exception: {ex}");
+            }
+        }
+
+        private void BtnWriteRight_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (_dryingTanks == null || _dryingTanks.Length <= 1) return;
+
+                var text = Txt_SV_Value_Right?.Text ?? string.Empty;
+
+                if (!float.TryParse(text, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out var value) &&
+                    !float.TryParse(text, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.CurrentCulture, out value))
+                {
+                    MessageBox.Show("請輸入可轉換為浮點數的數值", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+
+                if (float.IsNaN(value) || float.IsInfinity(value) || value < 0f || value > 120f)
+                {
+                    MessageBox.Show("設定溫度範圍必須為 0~120", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+
+                _dryingTanks[1].SetSV(value);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"BtnWriteRight_Click exception: {ex}");
+            }
+        }
+
         // Heating flags for UI
         private bool _heatingLeft;
         public bool HeatingLeft
@@ -318,6 +377,12 @@ namespace CleanerControlApp.Vision.Template
                 if (_dryingTanks.Length > 0)
                 {
                     PVLeft = _dryingTanks[0].PV_Value;
+                    SVLeft = _dryingTanks[0].SV_Value;
+                    if (!_isSvLeftInputInitialized)
+                    {
+                        SVLeftInput = _dryingTanks[0].SV_Value.ToString("F0", CultureInfo.InvariantCulture);
+                        _isSvLeftInputInitialized = true;
+                    }
                     HighTemperatureLeft = _dryingTanks[0].HighTemperature;
                     LowTemperatureLeft = _dryingTanks[0].LowTemperature;
                     SensorCoverOpenLeft = _dryingTanks[0].Sensor_CoverOpen;
@@ -355,6 +420,13 @@ namespace CleanerControlApp.Vision.Template
                 if (_dryingTanks.Length > 1)
                 {
                     PVRight = _dryingTanks[1].PV_Value;
+                    // keep SVRight in sync with the hardware value
+                    SVRight = _dryingTanks[1].SV_Value;
+                    if (!_isSvRightInputInitialized)
+                    {
+                        SVRightInput = _dryingTanks[1].SV_Value.ToString("F0", System.Globalization.CultureInfo.InvariantCulture);
+                        _isSvRightInputInitialized = true;
+                    }
                     HighTemperatureRight = _dryingTanks[1].HighTemperature;
                     LowTemperatureRight = _dryingTanks[1].LowTemperature;
                     SensorCoverOpenRight = _dryingTanks[1].Sensor_CoverOpen;
@@ -424,6 +496,34 @@ namespace CleanerControlApp.Vision.Template
             }
         }
 
+        private float _svLeft;
+        public float SVLeft
+        {
+            get => _svLeft;
+            set
+            {
+                if (_svLeft != value)
+                {
+                    _svLeft = value;
+                    OnPropertyChanged(nameof(SVLeft));
+                }
+            }
+        }
+
+        private string _svLeftInput = string.Empty;
+        public string SVLeftInput
+        {
+            get => _svLeftInput;
+            set
+            {
+                if (_svLeftInput != value)
+                {
+                    _svLeftInput = value;
+                    OnPropertyChanged(nameof(SVLeftInput));
+                }
+            }
+        }
+
         private float _pvRight;
         public float PVRight
         {
@@ -434,6 +534,34 @@ namespace CleanerControlApp.Vision.Template
                 {
                     _pvRight = value;
                     OnPropertyChanged(nameof(PVRight));
+                }
+            }
+        }
+
+        private float _svRight;
+        public float SVRight
+        {
+            get => _svRight;
+            set
+            {
+                if (_svRight != value)
+                {
+                    _svRight = value;
+                    OnPropertyChanged(nameof(SVRight));
+                }
+            }
+        }
+
+        private string _svRightInput = string.Empty;
+        public string SVRightInput
+        {
+            get => _svRightInput;
+            set
+            {
+                if (_svRightInput != value)
+                {
+                    _svRightInput = value;
+                    OnPropertyChanged(nameof(SVRightInput));
                 }
             }
         }

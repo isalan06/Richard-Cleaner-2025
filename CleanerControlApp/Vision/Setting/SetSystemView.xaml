@@ -79,7 +79,7 @@
  <!-- Put Add button and instruction on one horizontal row -->
  <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,0,6">
  <Button x:Name="BtnAddRecipe" Content="新增" Width="80" Height="28" Click="BtnAddRecipe_Click" />
- <TextBlock Text="在配方列中可雙擊選擇配方" VerticalAlignment="Center" Margin="8,0,0,0" Foreground="Gray" />
+ <TextBlock Text="在配方列中可雙擊選擇配方，按下[Delete]可以刪除" VerticalAlignment="Center" Margin="8,0,0,0" Foreground="Gray" />
  </StackPanel>
 
  <!-- Filter box and sort button -->

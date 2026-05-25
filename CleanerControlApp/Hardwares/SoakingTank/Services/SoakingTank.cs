@@ -69,6 +69,7 @@ namespace CleanerControlApp.Hardwares.SoakingTank.Services
         private bool _manualShaking = false;
 
         private string _messageForOperation = string.Empty;
+        private DateTime? _alarmCheckStartTime = DateTime.UtcNow;
 
         #endregion
 
@@ -160,8 +161,14 @@ namespace CleanerControlApp.Hardwares.SoakingTank.Services
 
 
         public bool IsRunning => _running;
-        public void Start() { _running = true; }
-        public void Stop() { _running = false; }
+        public void Start()
+        {
+            _running = true;
+        }
+        public void Stop()
+        {
+            _running = false;
+        }
 
         public bool Sensor_CoverOpen
         {
@@ -402,7 +409,7 @@ namespace CleanerControlApp.Hardwares.SoakingTank.Services
         public bool HS_RequestWater => _heatingTank != null && _heatingTank.HS_RequestWater;
 
         public int ElpasedPressureTime_Seconds => (int)(_elapsedTime != null ? _elapsedTime.Value.TotalSeconds : 0);
-        public int RemainingPressureTime_Seconds => (_moduleSettings.Sink != null) ? _moduleSettings.Sink.ActTime_Second - ElpasedPressureTime_Seconds : 0;
+        public int RemainingPressureTime_Seconds => (_moduleSettings.SoakingTank != null) ? _moduleSettings.SoakingTank.ActTime_Second - ElpasedPressureTime_Seconds : 0;
 
         public bool ModulePass { get; set; }
         public bool HasWarning => _Cover_Open_Timeout || _Cover_Close_Timeout || _motorAlarmHomeTimeout || _motorAlarmMoveTimeout;
@@ -461,7 +468,8 @@ namespace CleanerControlApp.Hardwares.SoakingTank.Services
         public bool MotorDownLimit => _plcService != null && _plcService.TankZLimitP;
         public bool MotorIdle => _plcService != null && _plcService.TankZIdle && !_plcService.Axis4CommandDriving && !_plcService.Axis4CommandProcedure && !_plcService.Axis4HomeProcedure;
         public bool MotorBusy => !MotorIdle && _plcService != null && MotorServoOn;
-        public bool MotorAlarm => _plcService != null && _plcService.TankZAlarm;
+        public bool MotorAlarm =>_plcService != null && _plcService.TankZAlarm;
+
         public bool MotorHoming => _plcService != null && _plcService.Axis4HomeProcedure;
         public bool MotorMoving => _plcService != null && _plcService.Axis4CommandProcedure;
         public bool MotorHome => _plcService != null && _plcService.Axis4HomeComplete;
@@ -792,6 +800,16 @@ namespace CleanerControlApp.Hardwares.SoakingTank.Services
 
         public string MessageForOperation => _messageForOperation;
 
+        public void ModuleClose()
+        {
+            AlarmStop();
+            AirOP(false);
+            WaterOutputOP(false);
+            CoverClose(false);
+            UltrasonicOP(false);
+            WaterInOP(false);
+        }
+
         #endregion
 
         #region Function
@@ -1040,7 +1058,7 @@ namespace CleanerControlApp.Hardwares.SoakingTank.Services
                             // 計算時間
                             _elapsedTime += DateTime.UtcNow - _heatingStartTime.Value;
                             _heatingStartTime = DateTime.UtcNow;
-                            if (_elapsedTime >= TimeSpan.FromSeconds((double)(_moduleSettings.Sink != null ? _moduleSettings.Sink.ActTime_Second : 60.0)))
+                            if (_elapsedTime >= TimeSpan.FromSeconds((double)(_moduleSettings.SoakingTank != null ? _moduleSettings.SoakingTank.ActTime_Second : 60.0)))
                             {
                                 UltrasonicOP(false);
                                 _actFinished = true;
@@ -1215,11 +1233,52 @@ namespace CleanerControlApp.Hardwares.SoakingTank.Services
             }
         }
 
-        private bool _motorAlarm => (_plcService != null) && _plcService.Axis4ErrorAlarm;
-        private bool _motorAlarmLimitN => (_plcService != null) && _plcService.Axis4ErrorLimitN;
-        private bool _motorAlarmLimitP => (_plcService != null) && _plcService.Axis4ErrorLimitP;
-        private bool _motorAlarmHomeTimeout => (_plcService != null) && _plcService.Axis4ErrorHomeTimeout;
-        private bool _motorAlarmMoveTimeout => (_plcService != null) && _plcService.Axis4ErrorCommandTimeout;
+
+        private bool _motorAlarm
+        {
+            get
+            {
+                if (_alarmCheckStartTime != null && DateTime.UtcNow - _alarmCheckStartTime.Value < TimeSpan.FromSeconds(10))
+                    return false;
+                return (_plcService != null) && _plcService.Axis4ErrorAlarm;
+            }
+        }
+        private bool _motorAlarmLimitN
+        {
+            get
+            {
+                if (_alarmCheckStartTime != null && DateTime.UtcNow - _alarmCheckStartTime.Value < TimeSpan.FromSeconds(10))
+                    return false;
+                return (_plcService != null) && _plcService.Axis4ErrorLimitN;
+            }
+        }
+        private bool _motorAlarmLimitP
+        {
+            get
+            {
+                if (_alarmCheckStartTime != null && DateTime.UtcNow - _alarmCheckStartTime.Value < TimeSpan.FromSeconds(10))
+                    return false;
+                return (_plcService != null) && _plcService.Axis4ErrorLimitP;
+            }
+        }
+        private bool _motorAlarmHomeTimeout
+        {
+            get
+            {
+                if (_alarmCheckStartTime != null && DateTime.UtcNow - _alarmCheckStartTime.Value < TimeSpan.FromSeconds(10))
+                    return false;
+                return (_plcService != null) && _plcService.Axis4ErrorHomeTimeout;
+            }
+        }
+        private bool _motorAlarmMoveTimeout
+        {
+            get
+            {
+                if (_alarmCheckStartTime != null && DateTime.UtcNow - _alarmCheckStartTime.Value < TimeSpan.FromSeconds(10))
+                    return false;
+                return (_plcService != null) && _plcService.Axis4ErrorCommandTimeout;
+            }
+        }
 
         private bool _private_waste_HAlarm => (_plcService != null) && !_plcService.WasteWaterPosH;
 

@@ -59,6 +59,8 @@ namespace CleanerControlApp.Hardwares
         private readonly TimeSpan _loopInterval = TimeSpan.FromSeconds(1);
 
         private bool _running;
+        // suppress alarm evaluation for initial period after Start to avoid false positives
+        private DateTime? _alarmCheckStartTime = DateTime.UtcNow;
 
         #endregion
 
@@ -378,8 +380,14 @@ namespace CleanerControlApp.Hardwares
         #region Task
 
         public bool IsRunning => _running;
-        public void Start() { _running = true; }
-        public void Stop() { _running = false; }
+        public void Start()
+        {
+            _running = true;
+        }
+        public void Stop()
+        {
+            _running = false;
+        }
 
         private void StartLoop()
         {
@@ -444,17 +452,75 @@ namespace CleanerControlApp.Hardwares
 
         #region Alarm
 
-        private bool _communication_alarm => !Check_All_Modbus_Connected;
-        private bool _emo_alarm => EMOSign;
-        private bool _main_air_alarm => !MainAirSign;
-        private bool _door_alarm => !FrontDoor1Sign || !FrontDoor2Sign || !FrontDoor3Sign || !FrontDoor4Sign || !SideDoor1Sign || !SideDoor2Sign;
-        private bool _leakage_alarm => !Leakage1Sign || !Leakage2Sign;
-        private bool _wasteTankH_alarm => WasteTankH;
+
+
+        private bool _communication_alarm
+        {
+            get
+            {
+                if (_alarmCheckStartTime != null && DateTime.UtcNow - _alarmCheckStartTime.Value < TimeSpan.FromSeconds(10))
+                    return false;
+                return !Check_All_Modbus_Connected;
+            }
+        }
+        private bool _emo_alarm
+        {
+            get
+            {
+                if (_alarmCheckStartTime != null && DateTime.UtcNow - _alarmCheckStartTime.Value < TimeSpan.FromSeconds(10))
+                    return false;
+                return EMOSign;
+            }
+        }
+        private bool _main_air_alarm
+        {
+            get
+            {
+                if (_alarmCheckStartTime != null && DateTime.UtcNow - _alarmCheckStartTime.Value < TimeSpan.FromSeconds(10))
+                    return false;
+                return !MainAirSign;
+            }
+        }
+        private bool _door_alarm
+        {
+            get
+            {
+                if (_alarmCheckStartTime != null && DateTime.UtcNow - _alarmCheckStartTime.Value < TimeSpan.FromSeconds(10))
+                    return false;
+                return !FrontDoor1Sign || !FrontDoor2Sign || !FrontDoor3Sign || !FrontDoor4Sign || !SideDoor1Sign || !SideDoor2Sign;
+            }
+        }
+        private bool _leakage_alarm
+        {
+            get
+            {
+                if (_alarmCheckStartTime != null && DateTime.UtcNow - _alarmCheckStartTime.Value < TimeSpan.FromSeconds(10))
+                    return false;
+                return !Leakage1Sign || !Leakage2Sign;
+            }
+        }
+        private bool _wasteTankH_alarm
+        {
+            get
+            {
+                if (_alarmCheckStartTime != null && DateTime.UtcNow - _alarmCheckStartTime.Value < TimeSpan.FromSeconds(10))
+                    return false;
+                return WasteTankH;
+            }
+        }
         private bool _checkCassette_alarm { get; set; }
 
         private bool _initializingTimeout_alarm { get; set; }
 
-        private bool _plc_System_alarm => _plcOperator != null &&_plcOperator.SystemError;
+        private bool _plc_System_alarm
+        {
+            get
+            {
+                if (_alarmCheckStartTime != null && DateTime.UtcNow - _alarmCheckStartTime.Value < TimeSpan.FromSeconds(10))
+                    return false;
+                return _plcOperator != null && _plcOperator.SystemError;
+            }
+        }
 
 
         public bool HasAlarm => _communication_alarm || _emo_alarm || _leakage_alarm || _wasteTankH_alarm || _checkCassette_alarm || _initializingTimeout_alarm;

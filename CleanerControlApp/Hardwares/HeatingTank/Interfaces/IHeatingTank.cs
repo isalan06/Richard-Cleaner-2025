@@ -83,5 +83,7 @@ namespace CleanerControlApp.Hardwares.HeatingTank.Interfaces
         string MessageForOperation { get; }
 
         bool FrequencyOn { get; }
+
+        void ModuleClose();
     }
 }

@@ -94,6 +94,7 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
 
         private string _messageForPickPlace = string.Empty;
         private bool _passClamperCheckCassette = false;
+        private DateTime? _alarmCheckStartTime = DateTime.UtcNow;
 
         #endregion
 
@@ -211,8 +212,14 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
         #region IShuttle
 
         public bool IsRunning => _running;
-        public void Start() { _running = true; }
-        public void Stop() { _running = false; }
+        public void Start()
+        {
+            _running = true;
+        }
+        public void Stop()
+        {
+            _running = false;
+        }
 
         public ISingleAxisMotor? ShuttleXMotor => _motorXAxis;
         public ISingleAxisMotor? ShuttleZMotor => _motorZAxis;
@@ -385,7 +392,7 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
             bool result = false;
             _messageForPickPlace = string.Empty;
 
-            if ((IsEmpty || _sim_pass_clamper || dryRun || (semiRun && !Cassette)) && !Moving && !MotorMoving && IsNormalStatus && MotorHome && ZInIdlePosition && Check_ClamperOpen)
+            if ((IsEmpty || _sim_pass_clamper || dryRun || (semiRun && !Cassette) || (_passClamperCheckCassette && _auto)) && !Moving && !MotorMoving && IsNormalStatus && MotorHome && ZInIdlePosition && Check_ClamperOpen)
             {
                 if (position > 0 && position < 15)
                 {
@@ -408,7 +415,7 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
             bool result = false;
             _messageForPickPlace = string.Empty;
 
-            if ((HasCassette || _sim_pass_clamper || dryRun || (semiRun && Cassette)) && !Moving && !MotorMoving && IsNormalStatus && MotorHome && ZInIdlePosition && Check_ClamperClose)
+            if ((HasCassette || _sim_pass_clamper || dryRun || (semiRun && Cassette) || (_passClamperCheckCassette && _auto)) && !Moving && !MotorMoving && IsNormalStatus && MotorHome && ZInIdlePosition && Check_ClamperClose)
             {
                 if (position > 0 && position < 15)
                 {
@@ -632,6 +639,12 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
         {
             get => _passClamperCheckCassette;
             set => _passClamperCheckCassette = value;
+        }
+
+        public void ModuleClose()
+        {
+            AlarmStop();
+            AllMotorStop();
         }
 
         #endregion
@@ -1393,7 +1406,7 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
                             else if (!MotorMoving)
                             {
                                 _motorZAxis.MoveToPosition(0,1);
-                                _checkCassetteCase = 1; // wait for Z
+                                //_checkCassetteCase = 1; // wait for Z
                             }
                             break;
 
@@ -1413,7 +1426,7 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
                             else if (!MotorMoving)
                             {
                                 _motorXAxis.MoveToPosition(16,1);
-                                _checkCassetteCase = 11; // wait for X
+                                //_checkCassetteCase = 11; // wait for X
                             }
                             break;
 
@@ -1433,7 +1446,7 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
                             else if (!MotorMoving)
                             {
                                 _motorZAxis.MoveToPosition(7,1);
-                                _checkCassetteCase = 21; // wait for Z
+                                //_checkCassetteCase = 21; // wait for Z
                             }
                             break;
 
@@ -1458,7 +1471,7 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
                             else if (!MotorMoving)
                             {
                                 _motorZAxis.MoveToPosition(0,1);
-                                _checkCassetteCase = 101; // wait
+                                //_checkCassetteCase = 101; // wait
                             }
                             break;
 
@@ -1478,7 +1491,7 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
                             else if (!MotorMoving)
                             {
                                 _motorXAxis.MoveToPosition(17,1);
-                                _checkCassetteCase = 111; // wait
+                                //_checkCassetteCase = 111; // wait
                             }
                             break;
 
@@ -1498,7 +1511,7 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
                             else if (!MotorMoving)
                             {
                                 _motorZAxis.MoveToPosition(8,1);
-                                _checkCassetteCase = 121;
+                                //_checkCassetteCase = 121;
                             }
                             break;
 
@@ -1523,7 +1536,7 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
                             else if (!MotorMoving)
                             {
                                 _motorZAxis.MoveToPosition(0,1);
-                                _checkCassetteCase = 201;
+                                //_checkCassetteCase = 201;
                             }
                             break;
 
@@ -1543,7 +1556,7 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
                             else if (!MotorMoving)
                             {
                                 _motorXAxis.MoveToPosition(18,1);
-                                _checkCassetteCase = 211;
+                                //_checkCassetteCase = 211;
                             }
                             break;
 
@@ -1563,7 +1576,7 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
                             else if (!MotorMoving)
                             {
                                 _motorZAxis.MoveToPosition(9,1);
-                                _checkCassetteCase = 221;
+                                //_checkCassetteCase = 221;
                             }
                             break;
 
@@ -1588,7 +1601,7 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
                             else if (!MotorMoving)
                             {
                                 _motorZAxis.MoveToPosition(0,1);
-                                _checkCassetteCase = 301;
+                                //_checkCassetteCase = 301;
                             }
                             break;
 
@@ -1608,7 +1621,7 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
                             else if (!MotorMoving)
                             {
                                 _motorXAxis.MoveToPosition(19,1);
-                                _checkCassetteCase = 311;
+                                //_checkCassetteCase = 311;
                             }
                             break;
 
@@ -1628,7 +1641,7 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
                             else if (!MotorMoving)
                             {
                                 _motorZAxis.MoveToPosition(10,1);
-                                _checkCassetteCase = 321;
+                                //_checkCassetteCase = 321;
                             }
                             break;
 
@@ -1653,7 +1666,7 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
                             else if (!MotorMoving)
                             {
                                 _motorZAxis.MoveToPosition(0,1);
-                                _checkCassetteCase = 401;
+                                //_checkCassetteCase = 401;
                             }
                             break;
 
@@ -1673,7 +1686,7 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
                             else if (!MotorMoving)
                             {
                                 _motorXAxis.MoveToPosition(0,1);
-                                _checkCassetteCase = 411;
+                                //_checkCassetteCase = 411;
                             }
                             break;
 
@@ -1875,17 +1888,99 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
             }
         }
 
-        private bool _motorXAlarm => _motorXAxis != null && _motorXAxis.MotorAlarm;
-        private bool _motorXAlarmLimitN => _motorXAxis != null && _motorXAxis.ErrorLimitN;
-        private bool _motorXAlarmLimitP => _motorXAxis != null && _motorXAxis.ErrorLimitP;
-        private bool _motorXAlarmHomeTimeout => _motorXAxis != null && _motorXAxis.ErrorHomeTimeout;
-        private bool _motorXAlarmMoveTimeout => _motorXAxis != null && _motorXAxis.ErrorCommandTimeout;
 
-        private bool _motorZAlarm => _motorZAxis != null && _motorZAxis.MotorAlarm;
-        private bool _motorZAlarmLimitN => _motorZAxis != null && _motorZAxis.ErrorLimitN;
-        private bool _motorZAlarmLimitP => _motorZAxis != null && _motorZAxis.ErrorLimitP;
-        private bool _motorZAlarmHomeTimeout => _motorZAxis != null && _motorZAxis.ErrorHomeTimeout;
-        private bool _motorZAlarmMoveTimeout => _motorZAxis != null && _motorZAxis.ErrorCommandTimeout;
+
+        private bool _motorXAlarm
+        {
+            get
+            {
+                if (_alarmCheckStartTime != null && DateTime.UtcNow - _alarmCheckStartTime.Value < TimeSpan.FromSeconds(10))
+                    return false;
+                return _motorXAxis != null && _motorXAxis.MotorAlarm;
+            }
+        }
+        private bool _motorXAlarmLimitN
+        {
+            get
+            {
+                if (_alarmCheckStartTime != null && DateTime.UtcNow - _alarmCheckStartTime.Value < TimeSpan.FromSeconds(10))
+                    return false;
+                return _motorXAxis != null && _motorXAxis.ErrorLimitN;
+            }
+        }
+        private bool _motorXAlarmLimitP
+        {
+            get
+            {
+                if (_alarmCheckStartTime != null && DateTime.UtcNow - _alarmCheckStartTime.Value < TimeSpan.FromSeconds(10))
+                    return false;
+                return _motorXAxis != null && _motorXAxis.ErrorLimitP;
+            }
+        }
+        private bool _motorXAlarmHomeTimeout
+        {
+            get
+            {
+                if (_alarmCheckStartTime != null && DateTime.UtcNow - _alarmCheckStartTime.Value < TimeSpan.FromSeconds(10))
+                    return false;
+                return _motorXAxis != null && _motorXAxis.ErrorHomeTimeout;
+            }
+        }
+        private bool _motorXAlarmMoveTimeout
+        {
+            get
+            {
+                if (_alarmCheckStartTime != null && DateTime.UtcNow - _alarmCheckStartTime.Value < TimeSpan.FromSeconds(10))
+                    return false;
+                return _motorXAxis != null && _motorXAxis.ErrorCommandTimeout;
+            }
+        }
+
+        private bool _motorZAlarm
+        {
+            get
+            {
+                if (_alarmCheckStartTime != null && DateTime.UtcNow - _alarmCheckStartTime.Value < TimeSpan.FromSeconds(10))
+                    return false;
+                return _motorZAxis != null && _motorZAxis.MotorAlarm;
+            }
+        }
+        private bool _motorZAlarmLimitN
+        {
+            get
+            {
+                if (_alarmCheckStartTime != null && DateTime.UtcNow - _alarmCheckStartTime.Value < TimeSpan.FromSeconds(10))
+                    return false;
+                return _motorZAxis != null && _motorZAxis.ErrorLimitN;
+            }
+        }
+        private bool _motorZAlarmLimitP
+        {
+            get
+            {
+                if (_alarmCheckStartTime != null && DateTime.UtcNow - _alarmCheckStartTime.Value < TimeSpan.FromSeconds(10))
+                    return false;
+                return _motorZAxis != null && _motorZAxis.ErrorLimitP;
+            }
+        }
+        private bool _motorZAlarmHomeTimeout
+        {
+            get
+            {
+                if (_alarmCheckStartTime != null && DateTime.UtcNow - _alarmCheckStartTime.Value < TimeSpan.FromSeconds(10))
+                    return false;
+                return _motorZAxis != null && _motorZAxis.ErrorHomeTimeout;
+            }
+        }
+        private bool _motorZAlarmMoveTimeout
+        {
+            get
+            {
+                if (_alarmCheckStartTime != null && DateTime.UtcNow - _alarmCheckStartTime.Value < TimeSpan.FromSeconds(10))
+                    return false;
+                return _motorZAxis != null && _motorZAxis.ErrorCommandTimeout;
+            }
+        }
 
 
         #endregion

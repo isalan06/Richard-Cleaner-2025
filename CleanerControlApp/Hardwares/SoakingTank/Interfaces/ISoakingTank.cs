@@ -116,5 +116,7 @@ namespace CleanerControlApp.Hardwares.SoakingTank.Interfaces
         bool ManaulShaking { get; }
 
         string MessageForOperation { get; }
+
+        void ModuleClose();
     }
 }

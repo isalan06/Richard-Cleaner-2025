@@ -251,7 +251,7 @@ namespace CleanerControlApp.Vision.SettingViews
             {
                 //var limHigh = _unitSettings.Sink.SV_High_Limit;
                 //if (conv_high > limHigh) errors.AppendLine($"沖水槽: 高設定 ({conv_high}) 大於上限 ({limHigh})");
-                var limHigh = 3f; // default to no upper limit if not provided
+                var limHigh = 4f; // default to no upper limit if not provided
                 if (input_high > limHigh) errors.AppendLine($"沖水槽: 高設定 ({input_high}) 大於上限 ({limHigh})");
             }
 

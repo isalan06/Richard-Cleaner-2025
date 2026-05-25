@@ -220,7 +220,7 @@
                 </TextBlock>
             </Border>
 
-            <!-- Border for Y52 - 閉 (left tank command cover close) -->
+            <!-- Border for Y52 - 關 (left tank command cover close) -->
             <Border Grid.Column="2" BorderBrush="#2E993E" BorderThickness="1" CornerRadius="3" Padding="4" Canvas.Left="221" Canvas.Top="-6" HorizontalAlignment="Left" VerticalAlignment="Center">
                 <Border.Style>
                     <Style TargetType="Border">
@@ -581,6 +581,18 @@
                 </Border.Style>
                 <TextBlock Text="錯誤" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black"/>
             </Border>
+            <TextBlock FontSize="20" Foreground="#333333" TextAlignment="Center" Height="25" Canvas.Left="446" Canvas.Top="127" Width="150" HorizontalAlignment="Left" VerticalAlignment="Center">
+                <Run Text="設定溫度("/>
+                <Run Text="{Binding SVLeft, StringFormat={}{0:F0}}"/>
+                <Run Text="):"/>
+            </TextBlock>
+            <TextBox x:Name="Txt_SV_Value_Left" Height="28" Canvas.Left="601" Canvas.Top="124" Width="96" FontSize="20" HorizontalAlignment="Left" VerticalAlignment="Center"
+                     Text="{Binding SVLeftInput, UpdateSourceTrigger=PropertyChanged}"/>
+            <Button x:Name="BtnSetSV_Value_Left" Content="設定" Width="80" Height="28" Click="BtnWrite_Click" HorizontalAlignment="Left" Canvas.Left="558" VerticalAlignment="Center" Canvas.Top="161" FontSize="20" />
+            <TextBlock FontSize="20" Foreground="#333333" TextAlignment="Center" Height="25" Canvas.Left="-290" Canvas.Top="127" Width="150" HorizontalAlignment="Left" VerticalAlignment="Center"><Run Text="設定溫度("/><Run Text=" "/><Run Text="{Binding SVRight, StringFormat=\{0:F0\}}"/><Run Text=" "/><Run Text="):"/></TextBlock>
+            <TextBox x:Name="Txt_SV_Value_Right" Height="28" Canvas.Left="-135" Canvas.Top="124" Width="96" FontSize="20"
+                Text="{Binding SVRight, StringFormat={}{0:F0}, Mode=OneWay}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+            <Button x:Name="BtnSetSV_Value_Right" Content="設定" Width="80" Height="28" Click="BtnWriteRight_Click" Canvas.Left="-178" Canvas.Top="161" FontSize="20" HorizontalAlignment="Left" VerticalAlignment="Center" />
         </Canvas>
         <Border BorderBrush="#2E993E" BorderThickness="1" CornerRadius="3" Padding="4" Margin="180,-11,0,0" Grid.Column="2" HorizontalAlignment="Left" Width="62" Height="25" VerticalAlignment="Top">
             <Border.Style>
@@ -634,10 +646,10 @@
         <TextBlock Text="{Binding PVRight, StringFormat='{}{0:F1}'}" FontSize="20" Foreground="#333333" TextAlignment="Center" Grid.Column="2" Margin="116,47,0,0" HorizontalAlignment="Left" Width="47" Height="25" VerticalAlignment="Top"/>
         <TextBlock Text="°C" FontSize="20" Foreground="#333333" TextAlignment="Center" Grid.Column="2" Margin="0,47,300,0" HorizontalAlignment="Right" Width="30" Height="25" VerticalAlignment="Top"/>
         <TextBlock Text="°C" FontSize="20" Foreground="#333333" TextAlignment="Center" Grid.Column="2" Margin="159,47,0,0" Height="25" VerticalAlignment="Top" HorizontalAlignment="Left" Width="38"/>
-        <Button FontSize="20" Content="開始烘乾" Click="OpenHeaterLeft_Click" Background="#ADD8E6" Grid.Column="2" Margin="480,60,131,0" Height="60" VerticalAlignment="Top"/>
-        <Button FontSize="20" Content="停止烘乾" Click="CloseHeaterLeft_Click" Background="#ADD8E6" Grid.Column="2" Margin="618,60,-7,0" Height="60" VerticalAlignment="Top"/>
-        <Button FontSize="20" Content="開始烘乾" Click="OpenHeaterRight_Click" Background="#ADD8E6" Margin="-138,60,0,0" Height="60" VerticalAlignment="Top" HorizontalAlignment="Left" Width="120"/>
-        <Button FontSize="20" Content="停止烘乾" Click="CloseHeaterRight_Click" Background="#ADD8E6" Grid.Column="1" Margin="0,60,1,0" Height="60" VerticalAlignment="Top"/>
+        <Button FontSize="20" Content="開加熱器" Click="OpenHeaterLeft_Click" Background="#ADD8E6" Grid.Column="2" Margin="480,60,131,0" Height="60" VerticalAlignment="Top"/>
+        <Button FontSize="20" Content="關加熱器" Click="CloseHeaterLeft_Click" Background="#ADD8E6" Grid.Column="2" Margin="618,60,-7,0" Height="60" VerticalAlignment="Top"/>
+        <Button FontSize="20" Content="開加熱器" Click="OpenHeaterRight_Click" Background="#ADD8E6" Margin="-138,60,0,0" Height="60" VerticalAlignment="Top" HorizontalAlignment="Left" Width="120"/>
+        <Button FontSize="20" Content="關加熱器" Click="CloseHeaterRight_Click" Background="#ADD8E6" Grid.Column="1" Margin="0,60,1,0" Height="60" VerticalAlignment="Top"/>
         <Button FontSize="20" Content="開鼓風機" Click="OpenBlowerLeft_Click" Background="#ADD8E6" Grid.Column="2" Margin="481,256,131,0" Height="60" VerticalAlignment="Top"/>
         <Button FontSize="20" Content="關鼓風機" Click="CloseBlowerLeft_Click" Background="#ADD8E6" Grid.Column="2" Margin="618,256,-7,0" Height="60" VerticalAlignment="Top"/>
         <Button FontSize="20" Content="開啟正壓" Click="OpenAirLeft_Click" Background="#ADD8E6" Grid.Column="2" Margin="0,323,131,0" HorizontalAlignment="Right" Width="120" Height="60" VerticalAlignment="Top"/>

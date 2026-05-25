@@ -73,6 +73,8 @@ namespace CleanerControlApp.Hardwares.DryingTank.Services
         private static int _coverCloseTimeoutThreshold_Value = 30;
 
         private bool _sim_pv = false;
+        // time when timeout checks should start (delay after Start)
+        private DateTime? _timeoutCheckStartTime = null;
 
         #endregion
 
@@ -158,14 +160,26 @@ namespace CleanerControlApp.Hardwares.DryingTank.Services
             GC.SuppressFinalize(this);
         }
 
+        
+
         #endregion
 
         #region IDryingTank
 
 
         public bool IsRunning => _running;
-        public void Start() { _running = true; }
-        public void Stop() { _running = false; }
+        public void Start()
+        {
+            _running = true;
+            // record start time for delaying timeout checks
+            _timeoutCheckStartTime = DateTime.UtcNow;
+        }
+        public void Stop()
+        {
+            _running = false;
+            // clear start time so checks won't run until next Start
+            _timeoutCheckStartTime = null;
+        }
 
         public bool Sensor_CoverOpen
         {
@@ -592,6 +606,14 @@ namespace CleanerControlApp.Hardwares.DryingTank.Services
             return sb.ToString();
         }
 
+        public void ModuleClose()
+        {
+            HeatingOP(false);
+            AirOP(false);
+            BlowerOP(false);
+            CoverClose(false);
+        }
+
         #endregion
 
         #region Function
@@ -859,6 +881,19 @@ namespace CleanerControlApp.Hardwares.DryingTank.Services
 
         private void CheckTimeout()
         { 
+            // Delay timeout judgement for first 10 seconds after Start()
+            //if (_timeoutCheckStartTime != null)
+            //{
+            //    var sinceStart = DateTime.UtcNow - _timeoutCheckStartTime.Value;
+            //    if (sinceStart < TimeSpan.FromSeconds(10))
+            //    {
+            //        // still within initial delay window; skip timeout checks
+            //        return;
+            //    }
+            //    // after delaying once, clear to avoid repeated subtraction cost (optional)
+            //    _timeoutCheckStartTime = null;
+            //}
+
             // Conditions to monitor (per request):
             // PV low timeout condition active when: !Heating && !LowTemperature
             bool pvLowCondition = !Heating && !LowTemperature && false; // 因為低溫目的是在將加熱關掉，在本專案溫度控制器並無法降溫，所以暫時不啟用此條件

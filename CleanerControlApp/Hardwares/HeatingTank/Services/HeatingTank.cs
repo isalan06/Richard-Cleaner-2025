@@ -88,6 +88,8 @@ namespace CleanerControlApp.Hardwares.HeatingTank.Services
         private static readonly TimeSpan DeltaFrequencyCommandCooldown = TimeSpan.FromSeconds(3);
 
         private string _messageForOperation = string.Empty;
+        // delay initial alarm evaluation to avoid false alarms when signals haven't returned yet
+        private DateTime? _alarmCheckStartTime = DateTime.UtcNow;
 
  #endregion
 
@@ -185,8 +187,14 @@ namespace CleanerControlApp.Hardwares.HeatingTank.Services
 
 
         public bool IsRunning => _running;
-        public void Start() { _running = true; }
-        public void Stop() { _running = false; }
+        public void Start()
+        {
+            _running = true;
+        }
+        public void Stop()
+        {
+            _running = false;
+        }
 
         public bool Sensor_Liquid_HH => _plcService != null && !_plcService.HotWaterPosHH;
         public bool Sensor_Liquid_H => _plcService != null && !_plcService.HotWaterPosH;
@@ -631,6 +639,13 @@ namespace CleanerControlApp.Hardwares.HeatingTank.Services
 
         public bool FrequencyOn => _deltaMS300 != null && _deltaMS300.Operation;
 
+        public void ModuleClose()
+        {
+            HeatingOP(false);
+            WaterInOP(false);
+            WaterOutOP(false);
+        }
+
         #endregion
 
         #region Function
@@ -924,12 +939,53 @@ namespace CleanerControlApp.Hardwares.HeatingTank.Services
         #region Alarm
 
 
-        private bool _invErrorAlarm => (_deltaMS300 != null) && (_deltaMS300.ErrorCode != 0);
-        private bool _invWarningAlarm => (_deltaMS300 != null) && (_deltaMS300.WarningCode != 0);
-        private bool _tankLLAlarm => !Sensor_Liquid_LL;
-        private bool _tankHHAlarm => Sensor_Liquid_HH;
 
-        private bool _private_waste_HAlarm => (_plcService != null) && !_plcService.WasteWaterPosH;
+        private bool _invErrorAlarm
+        {
+            get
+            {
+                if (_alarmCheckStartTime != null && DateTime.UtcNow - _alarmCheckStartTime.Value < TimeSpan.FromSeconds(10))
+                    return false;
+                return (_deltaMS300 != null) && (_deltaMS300.ErrorCode != 0);
+            }
+        }
+        private bool _invWarningAlarm
+        {
+            get
+            {
+                if (_alarmCheckStartTime != null && DateTime.UtcNow - _alarmCheckStartTime.Value < TimeSpan.FromSeconds(10))
+                    return false;
+                return (_deltaMS300 != null) && (_deltaMS300.WarningCode != 0);
+            }
+        }
+        private bool _tankLLAlarm
+        {
+            get
+            {
+                if (_alarmCheckStartTime != null && DateTime.UtcNow - _alarmCheckStartTime.Value < TimeSpan.FromSeconds(10))
+                    return false;
+                return !Sensor_Liquid_LL;
+            }
+        }
+        private bool _tankHHAlarm
+        {
+            get
+            {
+                if (_alarmCheckStartTime != null && DateTime.UtcNow - _alarmCheckStartTime.Value < TimeSpan.FromSeconds(10))
+                    return false;
+                return Sensor_Liquid_HH;
+            }
+        }
+
+        private bool _private_waste_HAlarm
+        {
+            get
+            {
+                if (_alarmCheckStartTime != null && DateTime.UtcNow - _alarmCheckStartTime.Value < TimeSpan.FromSeconds(10))
+                    return false;
+                return (_plcService != null) && !_plcService.WasteWaterPosH;
+            }
+        }
 
         #endregion
     }

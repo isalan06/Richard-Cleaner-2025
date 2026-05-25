@@ -85,6 +85,7 @@ namespace CleanerControlApp.Hardwares.Sink.Services
         private bool _manualShaking = false;
 
         private string _messageForOperation = "";
+        private DateTime? _alarmCheckStartTime = DateTime.UtcNow;
 
         #endregion
 
@@ -184,8 +185,14 @@ namespace CleanerControlApp.Hardwares.Sink.Services
 
 
         public bool IsRunning => _running;
-        public void Start() { _running = true; }
-        public void Stop() { _running = false; }
+        public void Start()
+        {
+            _running = true;
+        }
+        public void Stop()
+        {
+            _running = false;
+        }
 
         public bool Sensor_CoverOpen
         {
@@ -766,6 +773,14 @@ namespace CleanerControlApp.Hardwares.Sink.Services
 
         public string MessageForOperation => _messageForOperation;
 
+        public void ModuleClose()
+        {
+            AlarmStop();
+            PressureOP(false);
+            AirOP(false);
+            CoverClose(false);
+        }
+
 
         #endregion
 
@@ -1208,48 +1223,107 @@ namespace CleanerControlApp.Hardwares.Sink.Services
             }
         }
 
-        private bool _motorAlarm => (_plcService != null) && _plcService.Axis3ErrorAlarm;
-        private bool _motorAlarmLimitN => (_plcService != null) && _plcService.Axis3ErrorLimitN;
-        private bool _motorAlarmLimitP => (_plcService != null) && _plcService.Axis3ErrorLimitP;
-        private bool _motorAlarmHomeTimeout => (_plcService != null) && _plcService.Axis3ErrorHomeTimeout;
-        private bool _motorAlarmMoveTimeout => (_plcService != null) && _plcService.Axis3ErrorCommandTimeout;
 
-        private bool _invErrorAlarm => (_deltaMS300 != null) && (_deltaMS300.ErrorCode != 0);
-        private bool _invWarningAlarm => (_deltaMS300 != null) && (_deltaMS300.WarningCode != 0);
+        private bool _motorAlarm
+        {
+            get
+            {
+                if (_alarmCheckStartTime != null && DateTime.UtcNow - _alarmCheckStartTime.Value < TimeSpan.FromSeconds(10))
+                    return false;
+                return (_plcService != null) && _plcService.Axis3ErrorAlarm;
+            }
+        }
+        private bool _motorAlarmLimitN
+        {
+            get
+            {
+                if (_alarmCheckStartTime != null && DateTime.UtcNow - _alarmCheckStartTime.Value < TimeSpan.FromSeconds(10))
+                    return false;
+                return (_plcService != null) && _plcService.Axis3ErrorLimitN;
+            }
+        }
+        private bool _motorAlarmLimitP
+        {
+            get
+            {
+                if (_alarmCheckStartTime != null && DateTime.UtcNow - _alarmCheckStartTime.Value < TimeSpan.FromSeconds(10))
+                    return false;
+                return (_plcService != null) && _plcService.Axis3ErrorLimitP;
+            }
+        }
+        private bool _motorAlarmHomeTimeout
+        {
+            get
+            {
+                if (_alarmCheckStartTime != null && DateTime.UtcNow - _alarmCheckStartTime.Value < TimeSpan.FromSeconds(10))
+                    return false;
+                return (_plcService != null) && _plcService.Axis3ErrorHomeTimeout;
+            }
+        }
+        private bool _motorAlarmMoveTimeout
+        {
+            get
+            {
+                if (_alarmCheckStartTime != null && DateTime.UtcNow - _alarmCheckStartTime.Value < TimeSpan.FromSeconds(10))
+                    return false;
+                return (_plcService != null) && _plcService.Axis3ErrorCommandTimeout;
+            }
+        }
+
+        private bool _invErrorAlarm
+        {
+            get
+            {
+                if (_alarmCheckStartTime != null && DateTime.UtcNow - _alarmCheckStartTime.Value < TimeSpan.FromSeconds(10))
+                    return false;
+                return (_deltaMS300 != null) && (_deltaMS300.ErrorCode != 0);
+            }
+        }
+        private bool _invWarningAlarm
+        {
+            get
+            {
+                if (_alarmCheckStartTime != null && DateTime.UtcNow - _alarmCheckStartTime.Value < TimeSpan.FromSeconds(10))
+                    return false;
+                return (_deltaMS300 != null) && (_deltaMS300.WarningCode != 0);
+            }
+        }
 
         #endregion
 
         #region static function
 
         // Conversion helpers for PV <-> PV_M (placed here for reuse by other views)
-        // Mapping: PV_Value in [20,380] -> PV_M in [0,3], rounded to2 decimal places
+        // Mapping: use 20 -> 0 as baseline and use 380 -> 3 as a scaling reference.
+        // PV values greater than 380 are allowed and will continue to scale linearly (no upper clamp).
         public static float ConvertPVValueToPV_M(float pvValue)
         {
             const float inMin = 20f;
-            const float inMax = 380f;
-            const float outMin = 0f;
-            const float outMax = 3f;
+            const float inMaxForScale = 380f; // reference point for scaling
+            const float outMaxForScale = 3f;  // reference output at inMaxForScale
 
-            if (pvValue <= inMin) return outMin;
-            if (pvValue >= inMax) return outMax;
+            if (pvValue <= inMin) return 0f;
 
-            float scaled = (pvValue - inMin) / (inMax - inMin) * (outMax - outMin) + outMin;
+            // scale factor derived from reference points: (outMaxForScale) / (inMaxForScale - inMin)
+            float scale = outMaxForScale / (inMaxForScale - inMin);
+            float scaled = (pvValue - inMin) * scale;
             return (float)Math.Round(scaled, 2);
         }
 
-        // Reverse conversion: PV_M (0..3) -> PV_Value (20..380)
+        // Reverse conversion: PV_M -> PV_Value
+        // Since PV_M is now unbounded above, convert back using the same linear scale.
         public static float ConvertPV_MToPVValue(float pvM)
         {
-            const float inMin = 0f;
-            const float inMax = 3f;
-            const float outMin = 20f;
-            const float outMax = 380f;
+            const float inMinPV = 20f; // PV corresponding to pvM == 0
+            const float inMaxForScale = 380f; // reference PV for pvM == 3
+            const float outMaxForScale = 3f;  // reference PV_M at inMaxForScale
 
-            if (pvM <= inMin) return outMin;
-            if (pvM >= inMax) return outMax;
+            if (pvM <= 0f) return inMinPV;
 
-            float scaled = (pvM - inMin) / (inMax - inMin) * (outMax - outMin) + outMin;
-            return (float)Math.Round(scaled, 2);
+            float scale = outMaxForScale / (inMaxForScale - inMinPV);
+            // invert: pvValue = pvM / scale + inMinPV
+            float pvValue = pvM / scale + inMinPV;
+            return (float)Math.Round(pvValue, 2);
         }
 
         #endregion

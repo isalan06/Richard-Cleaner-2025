@@ -50,6 +50,267 @@ Checksums failed to match 255, 255, 255 != 255, 255, 255, 2, 3
 Checksums failed to match 255, 255, 255 != 255, 255, 255, 255, 255
 
 #20260525
+1. 加熱槽 在 L跟 LL沒有關掉.....要確認
+
+
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 255, 255
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 255, 255
+Array networkBytes must contain an even number of bytes.
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 255, 255
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 255, 255
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 255, 255
+Checksums failed to match 255, 254, 255 != 255, 254, 255, 255, 255
+Checksums failed to match 254, 255, 255 != 254, 255, 255, 254, 255
+Checksums failed to match 255, 247, 255 != 255, 247, 255, 247, 223
+Checksums failed to match 255, 252, 255 != 255, 252, 255, 254, 255
+Checksums failed to match 254, 254, 252 != 254, 254, 252, 255, 190
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 255, 255
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 255, 254
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 255, 254
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 250, 255
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 255, 255
+Checksums failed to match 255, 253, 255 != 255, 253, 255, 254, 254
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 255, 254
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 255, 255
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 255, 253
+Checksums failed to match 255, 239, 239 != 255, 239, 239, 239, 239
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 255, 255
+Checksums failed to match 255, 255, 254 != 255, 255, 254, 255, 254
+Checksums failed to match 254, 255, 255 != 254, 255, 255, 255, 255
+Checksums failed to match 253, 255, 255 != 253, 255, 255, 255, 255
+Checksums failed to match 255, 255, 127 != 255, 255, 127, 254, 254
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 255, 127
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 255, 255
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 254, 255
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 255, 255
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 255, 255
+Checksums failed to match 191, 255, 255 != 191, 255, 255, 255, 255
+Checksums failed to match 255, 255, 254 != 255, 255, 254, 255, 255
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 255, 254
+Checksums failed to match 254, 255, 255 != 254, 255, 255, 254, 255
+Checksums failed to match 68, 216, 191 != 68, 216, 191, 255, 243
+Checksums failed to match 254, 255, 127 != 254, 255, 127, 255, 255
+Function code 95 not supported.
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 254, 255
+Checksums failed to match 255, 255, 190 != 255, 255, 190, 255, 191
+Checksums failed to match 255, 255, 254 != 255, 255, 254, 255, 254
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 254, 254
+Checksums failed to match 255, 255, 127 != 255, 255, 127, 255, 255
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 255, 255
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 255, 254
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 255, 255
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 255, 255
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 254, 255
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 255, 255
+Checksums failed to match 254, 255, 255 != 254, 255, 255, 255, 255
+Array networkBytes must contain an even number of bytes.
+Checksums failed to match 255, 255, 254 != 255, 255, 254, 255, 223
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 254, 255
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 255, 255
+Function code 39 not supported.
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 255, 255
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 255, 255
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 2, 3
+Array networkBytes must contain an even number of bytes.
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 255, 255
+Checksums failed to match 255, 255, 191 != 255, 255, 191, 255, 255
+Checksums failed to match 255, 191, 255 != 255, 191, 255, 255, 255
+Checksums failed to match 63, 255, 254 != 63, 255, 254, 255, 254
+Checksums failed to match 255, 254, 255 != 255, 254, 255, 255, 255
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 255, 255
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 254, 255
+Checksums failed to match 255, 252, 255 != 255, 252, 255, 255, 255
+Checksums failed to match 255, 255, 254 != 255, 255, 254, 255, 255
+Checksums failed to match 255, 254, 255 != 255, 254, 255, 255, 255
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 255, 255
+Checksums failed to match 254, 255, 255 != 254, 255, 255, 127, 255
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 255, 255
+Checksums failed to match 191, 223, 191 != 191, 223, 191, 255, 254
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 255, 255
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 255, 255
+Checksums failed to match 254, 255, 127 != 254, 255, 127, 255, 255
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 255, 255
+Function code 63 not supported.
+Checksums failed to match 255, 255, 254 != 255, 255, 254, 255, 255
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 255, 255
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 255, 255
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 255, 255
+Checksums failed to match 255, 255, 3 != 255, 255, 3, 3, 16
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 255, 255
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 255, 255
+Checksums failed to match 255, 255, 254 != 255, 255, 254, 255, 254
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 254, 255
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 251, 251
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 255, 255
+Checksums failed to match 255, 255, 254 != 255, 255, 254, 255, 255
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 254, 255
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 255, 254
+Checksums failed to match 255, 254, 255 != 255, 254, 255, 255, 254
+Array networkBytes must contain an even number of bytes.
+Checksums failed to match 254, 255, 255 != 254, 255, 255, 255, 255
+Checksums failed to match 255, 254, 255 != 255, 254, 255, 254, 255
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 255, 254
+Checksums failed to match 255, 253, 254 != 255, 253, 254, 255, 255
+Checksums failed to match 255, 254, 255 != 255, 254, 255, 254, 254
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 254, 255
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 255, 255
+Checksums failed to match 255, 254, 255 != 255, 254, 255, 255, 255
+Checksums failed to match 254, 255, 255 != 254, 255, 255, 255, 255
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 255, 255
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 255, 254
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 255, 255
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 255, 255
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 255, 255
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 255, 255
+Checksums failed to match 255, 255, 254 != 255, 255, 254, 255, 255
+Checksums failed to match 254, 255, 255 != 254, 255, 255, 255, 255
+Checksums failed to match 255, 191, 127 != 255, 191, 127, 255, 127
+Checksums failed to match 255, 254, 255 != 255, 254, 255, 255, 255
+Checksums failed to match 255, 254, 255 != 255, 254, 255, 255, 255
+Array networkBytes must contain an even number of bytes.
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 255, 255
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 255, 255
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 255, 255
+Checksums failed to match 255, 254, 127 != 255, 254, 127, 255, 255
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 255, 255
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 255, 255
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 255, 255
+Checksums failed to match 254, 255, 254 != 254, 255, 254, 255, 255
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 255, 255
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 247, 255
+Checksums failed to match 255, 255, 191 != 255, 255, 191, 255, 255
+Checksums failed to match 247, 255, 191 != 247, 255, 191, 255, 255
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 255, 255
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 255, 254
+Checksums failed to match 255, 254, 255 != 255, 254, 255, 255, 254
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 255, 255
+Checksums failed to match 255, 253, 255 != 255, 253, 255, 255, 255
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 255, 247
+Checksums failed to match 255, 255, 2 != 255, 255, 2, 3, 16
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 255, 255
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 254, 255
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 255, 255
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 254, 255
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 254, 255
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 255, 255
+Checksums failed to match 255, 255, 191 != 255, 255, 191, 255, 255
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 255, 255
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 255, 254
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 255, 255
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 255, 254
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 255, 255
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 255, 255
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 255, 255
+Checksums failed to match 127, 255, 127 != 127, 255, 127, 127, 255
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 255, 255
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 255, 255
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 255, 255
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 255, 255
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 255, 255
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 255, 255
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 255, 255
+Checksums failed to match 254, 255, 255 != 254, 255, 255, 254, 255
+Checksums failed to match 255, 255, 1 != 255, 255, 1, 3, 16
+Checksums failed to match 255, 255, 254 != 255, 255, 254, 255, 255
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 255, 255
+Checksums failed to match 255, 254, 255 != 255, 254, 255, 255, 255
+Checksums failed to match 247, 255, 255 != 247, 255, 255, 255, 255
+Checksums failed to match 255, 191, 255 != 255, 191, 255, 255, 255
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 254, 255
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 255, 254
+Checksums failed to match 255, 254, 255 != 255, 254, 255, 255, 255
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 255, 255
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 255, 255
+Checksums failed to match 255, 255, 254 != 255, 255, 254, 255, 255
+Checksums failed to match 254, 255, 255 != 254, 255, 255, 255, 255
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 255, 255
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 255, 255
+Checksums failed to match 255, 255, 254 != 255, 255, 254, 255, 255
+Checksums failed to match 254, 255, 255 != 254, 255, 255, 255, 255
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 255, 255
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 255, 255
+Checksums failed to match 255, 254, 255 != 255, 254, 255, 254, 255
+Checksums failed to match 249, 255, 255 != 249, 255, 255, 255, 95
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 255, 255
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 255, 255
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 255, 255
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 255, 255
+Checksums failed to match 254, 255, 255 != 254, 255, 255, 255, 254
+Checksums failed to match 254, 255, 255 != 254, 255, 255, 255, 254
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 254, 254
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 255, 255
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 255, 255
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 185, 255
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 255, 255
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 255, 255
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 255, 254
+Checksums failed to match 254, 255, 255 != 254, 255, 255, 255, 255
+Checksums failed to match 239, 255, 127 != 239, 255, 127, 254, 254
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 254, 255
+Checksums failed to match 254, 255, 255 != 254, 255, 255, 254, 255
+Checksums failed to match 254, 255, 255 != 254, 255, 255, 255, 255
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 255, 255
+Checksums failed to match 254, 255, 255 != 254, 255, 255, 255, 255
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 255, 254
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 255, 230
+Function code 127 not supported.
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 255, 254
+Checksums failed to match 239, 255, 255 != 239, 255, 255, 255, 255
+Checksums failed to match 255, 255, 254 != 255, 255, 254, 189, 253
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 255, 255
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 255, 255
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 255, 255
+Array networkBytes must contain an even number of bytes.
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 255, 254
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 255, 255
+Checksums failed to match 255, 255, 254 != 255, 255, 254, 254, 255
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 255, 251
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 255, 255
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 254, 255
+Checksums failed to match 252, 255, 255 != 252, 255, 255, 255, 254
+Checksums failed to match 254, 255, 255 != 254, 255, 255, 255, 255
+Checksums failed to match 255, 255, 239 != 255, 255, 239, 255, 255
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 255, 254
+Checksums failed to match 255, 255, 253 != 255, 255, 253, 255, 255
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 255, 255
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 255, 255
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 255, 255
+Checksums failed to match 254, 254, 255 != 254, 254, 255, 255, 255
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 255, 254
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 255, 255
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 255, 254
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 255, 255
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 255, 255
+Checksums failed to match 255, 252, 255 != 255, 252, 255, 255, 255
+Checksums failed to match 255, 255, 191 != 255, 255, 191, 255, 255
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 255, 255
+Checksums failed to match 254, 254, 255 != 254, 254, 255, 255, 255
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 255, 255
+Checksums failed to match 254, 255, 255 != 254, 255, 255, 255, 255
+Checksums failed to match 255, 254, 255 != 255, 254, 255, 255, 255
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 255, 255
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 255, 255
+2026-05-25 22:02:01.9229|TRACE|CleanerControlApp.Vision.LoginWindow|開始進行登入流程
+2026-05-25 22:02:01.9335|INFO|CleanerControlApp.Vision.LoginWindow|使用者 'admin' 登入成功，角色：Administrator
+info: CleanerControlApp.Vision.LoginWindow[0]
+      使用者 'admin' 登入成功，角色：Administrator
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 255, 255
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 255, 255
+2026-05-25 22:03:29.4994|TRACE|CleanerControlApp.Vision.LoginWindow|開始進行登入流程
+2026-05-25 22:03:29.5027|INFO|CleanerControlApp.Vision.LoginWindow|使用者 'supervisor' 登入成功，角色：Developer
+info: CleanerControlApp.Vision.LoginWindow[0]
+      使用者 'supervisor' 登入成功，角色：Developer
+Array networkBytes must contain an even number of bytes.
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 255, 255
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 255, 255
+Array networkBytes must contain an even number of bytes.
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 255, 255
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 255, 255
+Checksums failed to match 255, 255, 255 != 255, 255, 255, 255, 255
+Checksums failed to match 254, 255, 255 != 254, 255, 255, 255, 255
+Array networkBytes must contain an even number of bytes.
+Maximum amount of data 127 registers. (Parameter 'NumberOfPoints')
+
 
 # 待確認工作流程（請先確認，再執行下一步）
 

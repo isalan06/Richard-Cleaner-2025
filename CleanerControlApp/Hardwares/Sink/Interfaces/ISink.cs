@@ -114,5 +114,7 @@ namespace CleanerControlApp.Hardwares.Sink.Interfaces
 
         string MessageForOperation { get; }
 
+        void ModuleClose();
+
     }
 }
