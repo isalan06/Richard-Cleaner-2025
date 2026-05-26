@@ -49,20 +49,20 @@
  <ColumnDefinition Width="180" />
  </Grid.ColumnDefinitions>
 
-                        <TextBlock x:Name="TB_SinkModulePass_Label" Text="沖水槽模組跳過設定:" Grid.Column="0" VerticalAlignment="Center" Height="20" FontWeight="DemiBold"/>
- <TextBox x:Name="Txt_SinkModulePass" Grid.Row="0" Grid.Column="1" Margin="4,4,0,4" />
+ <TextBlock x:Name="TB_SinkModulePass_Label" Text="沖水槽模組跳過設定:" Grid.Column="0" VerticalAlignment="Center" Height="20" FontWeight="DemiBold"/>
+ <CheckBox x:Name="Txt_SinkModulePass" Grid.Row="0" Grid.Column="1" Margin="4,4,0,4" VerticalAlignment="Center" Content="啟用" />
 
-                        <TextBlock x:Name="TB_SoakingModulePass_Label" Text="浸泡槽模組跳過設定:" Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" Height="20" FontWeight="DemiBold"/>
- <TextBox x:Name="Txt_SoakingTankModulePass" Grid.Row="1" Grid.Column="1" Margin="4,4,0,4" />
+ <TextBlock x:Name="TB_SoakingModulePass_Label" Text="浸泡槽模組跳過設定:" Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" Height="20" FontWeight="DemiBold"/>
+ <CheckBox x:Name="Txt_SoakingTankModulePass" Grid.Row="1" Grid.Column="1" Margin="4,4,0,4" VerticalAlignment="Center" Content="啟用" />
 
-                        <TextBlock x:Name="TB_Drying1ModulePass_Label" Text="烘乾槽#1模組跳過設定:" Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" Height="20" FontWeight="DemiBold"/>
- <TextBox x:Name="Txt_DryingTank1ModulePass" Grid.Row="2" Grid.Column="1" Margin="4,4,0,4" />
+ <TextBlock x:Name="TB_Drying1ModulePass_Label" Text="烘乾槽#1模組跳過設定:" Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" Height="20" FontWeight="DemiBold"/>
+ <CheckBox x:Name="Txt_DryingTank1ModulePass" Grid.Row="2" Grid.Column="1" Margin="4,4,0,4" VerticalAlignment="Center" Content="啟用" />
 
-                        <TextBlock x:Name="TB_Drying2ModulePass_Label" Text="烘乾槽#2模組跳過設定:" Grid.Row="3" Grid.Column="0" VerticalAlignment="Center" Height="20" FontWeight="DemiBold"/>
- <TextBox x:Name="Txt_DryingTank2ModulePass" Grid.Row="3" Grid.Column="1" Margin="4,4,0,4" />
+ <TextBlock x:Name="TB_Drying2ModulePass_Label" Text="烘乾槽#2模組跳過設定:" Grid.Row="3" Grid.Column="0" VerticalAlignment="Center" Height="20" FontWeight="DemiBold"/>
+ <CheckBox x:Name="Txt_DryingTank2ModulePass" Grid.Row="3" Grid.Column="1" Margin="4,4,0,4" VerticalAlignment="Center" Content="啟用" />
 
  <TextBlock x:Name="TB_WriteMotionParam_Label" Text="初始寫入馬達參數到PLC:" Grid.Row="4" Grid.Column="0" VerticalAlignment="Center" Height="20" />
- <TextBox x:Name="Txt_WriteMotionParameterAfterInitialization" Grid.Row="4" Grid.Column="1" Margin="4,4,0,4" />
+ <CheckBox x:Name="Txt_WriteMotionParameterAfterInitialization" Grid.Row="4" Grid.Column="1" Margin="4,4,0,4" VerticalAlignment="Center" Content="啟用" />
 
  </Grid>
  </StackPanel>

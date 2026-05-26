@@ -80,11 +80,15 @@ namespace CleanerControlApp.Vision.Template
             if (btn == null) return;
             if (isPass)
             {
-                btn.Background = new SolidColorBrush(Color.FromRgb(0xD9,0xF0,0xFF)); // light blue
+                // ModulePass == true => Red, Disable
+                btn.Background = Brushes.Red;
+                btn.Content = "Disable";
             }
             else
             {
-                btn.ClearValue(Button.BackgroundProperty);
+                // ModulePass == false => Lime, Enable
+                btn.Background = Brushes.Lime;
+                btn.Content = "Enable";
             }
         }
 

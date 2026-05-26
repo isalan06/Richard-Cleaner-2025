@@ -337,7 +337,7 @@ namespace CleanerControlApp.Hardwares.SoakingTank.Services
 
             if (_ultrasonicDevice != null)
             {
-                if (Sensor_Liquid_H)
+                if (Sensor_Liquid_H || !ultrasonic)
                 {
                     if (ultrasonic) SetCurrent(_moduleSettings.SoakingTank != null ? _moduleSettings.SoakingTank.UltrasonicSetCurrent : 1f);
                     Command_CleanerUltrasonicOpen = ultrasonic;
@@ -411,7 +411,18 @@ namespace CleanerControlApp.Hardwares.SoakingTank.Services
         public int ElpasedPressureTime_Seconds => (int)(_elapsedTime != null ? _elapsedTime.Value.TotalSeconds : 0);
         public int RemainingPressureTime_Seconds => (_moduleSettings.SoakingTank != null) ? _moduleSettings.SoakingTank.ActTime_Second - ElpasedPressureTime_Seconds : 0;
 
-        public bool ModulePass { get; set; }
+        public bool ModulePass
+        {
+            get => _moduleSettings.System != null && _moduleSettings.System.SoakingTankModulePass != 0;
+            set
+            { 
+                if(_moduleSettings.System != null)
+                {
+                    _moduleSettings.System.SoakingTankModulePass = value ? 1 : 0;
+                    //ConfigLoader.SetModuleSettings(_moduleSettings);
+                }
+            }
+        }
         public bool HasWarning => _Cover_Open_Timeout || _Cover_Close_Timeout || _motorAlarmHomeTimeout || _motorAlarmMoveTimeout;
         public bool HasAlarm => _motorAlarm || _motorAlarmLimitN || _motorAlarmLimitP;
         public bool IsNormalStatus => !HasWarning && !HasAlarm;

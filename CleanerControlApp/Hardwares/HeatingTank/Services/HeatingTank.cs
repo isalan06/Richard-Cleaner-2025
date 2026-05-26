@@ -269,7 +269,7 @@ namespace CleanerControlApp.Hardwares.HeatingTank.Services
             bool result = false;
 
             _messageForOperation = string.Empty;
-            if (_moduleSettings.HeatingTank != null && Sensor_Liquid_L)
+            if (_moduleSettings.HeatingTank != null && (Sensor_Liquid_L || !heating))
             {
                 SetSV(heating ? _moduleSettings.HeatingTank.SV_High : _moduleSettings.HeatingTank.SV_Low);
                 _heating = heating;
@@ -302,7 +302,7 @@ namespace CleanerControlApp.Hardwares.HeatingTank.Services
             bool result = false;
             _messageForOperation = string.Empty;
 
-            if (_plcService != null && !_tankHHAlarm && !_private_waste_HAlarm)
+            if (_plcService != null && ((!_tankHHAlarm && !_private_waste_HAlarm) || !water))
             {
                 Command_WaterIn = water;
                 result = true;
@@ -335,7 +335,7 @@ namespace CleanerControlApp.Hardwares.HeatingTank.Services
             bool result = false;
             _messageForOperation = string.Empty;
 
-            if (_plcService != null && !_tankHHAlarm && (!_tankLLAlarm || !_auto) && !_private_waste_HAlarm)
+            if (_plcService != null && (!_tankHHAlarm && ((!_tankLLAlarm || !_auto) && !_private_waste_HAlarm) || !water))
             {
                 Command_WaterOut = water;
                 result = true;

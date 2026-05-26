@@ -54,9 +54,17 @@ namespace CleanerControlApp.Vision.SettingViews
  {
  if (LstRecipes.SelectedItem is string name)
  {
+ // Apply the recipe to ModuleSettings and persist (same behavior as SetSystemView)
+ try
+ {
+ if (ApplyAndSaveRecipe(name))
+ {
  SelectedRecipe = name;
  DialogResult = true;
  Close();
+ }
+ }
+ catch { }
  }
  }
 
@@ -64,13 +72,68 @@ namespace CleanerControlApp.Vision.SettingViews
  {
  if (LstRecipes.SelectedItem is string name)
  {
+ try
+ {
+ if (ApplyAndSaveRecipe(name))
+ {
  SelectedRecipe = name;
  DialogResult = true;
  Close();
  }
+ }
+ catch { }
+ }
  else
  {
  MessageBox.Show("請先選擇一個配方", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
+ }
+ }
+
+ private bool ApplyAndSaveRecipe(string name)
+ {
+ try
+ {
+ ModuleSettings? moduleSettings = null;
+ // Prefer DI instance if available
+ try
+ {
+ if (App.AppHost != null)
+ {
+ moduleSettings = App.AppHost.Services.GetService(typeof(ModuleSettings)) as ModuleSettings;
+ }
+ }
+ catch { }
+
+ if (moduleSettings == null)
+ {
+ try { moduleSettings = ConfigLoader.GetModuleSettings(); } catch { }
+ }
+
+ if (moduleSettings == null)
+ {
+ MessageBox.Show("無法取得模組設定以載入配方", "錯誤", MessageBoxButton.OK, MessageBoxImage.Error);
+ return false;
+ }
+
+ var ok = ConfigLoader.LoadRecipeToModuleSettings(moduleSettings, name);
+ if (ok)
+ {
+ // Persist the selection and recipe file
+ ConfigLoader.SetModuleSettingsAndSave(moduleSettings);
+
+ // Do not show extra MessageBox here; caller (UI) will update via ModuleSettingsUpdated event
+ return true;
+ }
+ else
+ {
+ MessageBox.Show($"載入配方失敗: {name}", "錯誤", MessageBoxButton.OK, MessageBoxImage.Error);
+ return false;
+ }
+ }
+ catch (Exception ex)
+ {
+ MessageBox.Show($"載入配方失敗: {ex.Message}", "錯誤", MessageBoxButton.OK, MessageBoxImage.Error);
+ return false;
  }
  }
 

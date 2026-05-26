@@ -288,11 +288,13 @@ namespace CleanerControlApp.Hardwares.Sink.Services
                     _messageForOperation = "無法啟動沖水：水壓系統異常。請先檢查水壓系統狀態並解除異常後再嘗試。";
                     OperateLog.Log("沖水槽 無法啟動沖水", "沖水槽 無法啟動沖水 - 水壓系統異常");
                 }
-
-                SetSV(pressure ? _moduleSettings.Sink.SV_High : _moduleSettings.Sink.SV_Low);
-                _deltaMS300?.SetOutput(pressure ? 1 : 0); // set bit for pressure command; 0: stop; 1:forward; 2:reverse(看現場接線決定)
-                _pressure = pressure;
-                result = true;
+                else
+                {
+                    SetSV(pressure ? _moduleSettings.Sink.SV_High : _moduleSettings.Sink.SV_Low);
+                    _deltaMS300?.SetOutput(pressure ? 1 : 0); // set bit for pressure command; 0: stop; 1:forward; 2:reverse(看現場接線決定)
+                    _pressure = pressure;
+                    result = true;
+                }
             }
 
             return result;
@@ -369,7 +371,18 @@ namespace CleanerControlApp.Hardwares.Sink.Services
         public int ElpasedPressureTime_Seconds => (int)(_elapsedTime != null ? _elapsedTime.Value.TotalSeconds : 0);
         public int RemainingPressureTime_Seconds => (_moduleSettings.Sink != null) ? _moduleSettings.Sink.ActTime_Second - ElpasedPressureTime_Seconds : 0;
 
-        public bool ModulePass { get; set; }
+        public bool ModulePass
+        {
+            get => _moduleSettings.System != null && _moduleSettings.System.SinkModulePass != 0;
+            set
+            { 
+                if(_moduleSettings.System != null)
+                {
+                    _moduleSettings.System.SinkModulePass = value ? 1 : 0;
+                    //ConfigLoader.SetModuleSettings(_moduleSettings);
+                }
+            }
+        }
         public bool HasWarning => _PV_Low_Timeout || _PV_High_Timeout || _Cover_Open_Timeout || _Cover_Close_Timeout || _motorAlarmHomeTimeout || _motorAlarmMoveTimeout || _invErrorAlarm;
         public bool HasAlarm => _motorAlarm || _motorAlarmLimitN || _motorAlarmLimitP;
         public bool IsNormalStatus => !HasWarning && !HasAlarm;

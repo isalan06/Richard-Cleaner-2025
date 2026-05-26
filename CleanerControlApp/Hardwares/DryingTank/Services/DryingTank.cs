@@ -455,7 +455,18 @@ namespace CleanerControlApp.Hardwares.DryingTank.Services
         public int ElpasedHeatingTime_Seconds => (int)(_elapsedTime != null ? _elapsedTime.Value.TotalSeconds : 0);
         public int RemainingHeatingTime_Seconds => (_moduleSettings.DryingTanks != null) ? _moduleSettings.DryingTanks[_moduleIndex].ActTime_Second - ElpasedHeatingTime_Seconds : 0;
 
-        public bool ModulePass { get; set; }
+        public bool ModulePass
+        {
+            get => _moduleSettings.System != null && (_moduleIndex == 0 ? _moduleSettings.System.DryingTank1ModulePass : _moduleSettings.System.DryingTank2ModulePass) != 0;
+            set
+            {
+                if (_moduleSettings.System != null)
+                { 
+                    if(_moduleIndex == 0) _moduleSettings.System.DryingTank1ModulePass = value ? 1 : 0;
+                    else _moduleSettings.System.DryingTank2ModulePass = value ? 1 : 0;
+                }
+            }
+        }
         public bool HasWarning => _PV_Low_Timeout || _PV_High_Timeout || _Cover_Open_Timeout || _Cover_Close_Timeout;
         public bool HasAlarm => false; // 根據需求定義警報條件，可能包括超時或其他異常狀態
         public bool IsNormalStatus => !HasWarning && !HasAlarm;

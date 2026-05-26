@@ -52,6 +52,29 @@ namespace CleanerControlApp.Vision.SettingViews
                 }
             }
             catch { }
+
+            // subscribe to module settings updates so UI refreshes when recipe applied elsewhere
+            try
+            {
+                ConfigLoader.ModuleSettingsUpdated += OnModuleSettingsUpdated;
+            }
+            catch { }
+        }
+
+        private void OnModuleSettingsUpdated(ModuleSettings ms)
+        {
+            try
+            {
+                Dispatcher.Invoke(() =>
+                {
+                    if (ms != null)
+                    {
+                        _moduleSettings = ms;
+                        LoadToUI();
+                    }
+                });
+            }
+            catch { }
         }
 
         private void Lst_RecipeNames_KeyDown(object? sender, KeyEventArgs e)
@@ -108,6 +131,7 @@ namespace CleanerControlApp.Vision.SettingViews
         }
 
         private TextBox? GetTextBox(string name) => this.FindName(name) as TextBox;
+        private CheckBox? GetCheckBox(string name) => this.FindName(name) as CheckBox;
 
         private void LoadToUI()
         {
@@ -116,17 +140,18 @@ namespace CleanerControlApp.Vision.SettingViews
 
             var s = _moduleSettings.MS_System;
 
-            var tbSink = GetTextBox("Txt_SinkModulePass");
-            var tbSoak = GetTextBox("Txt_SoakingTankModulePass");
-            var tbDry1 = GetTextBox("Txt_DryingTank1ModulePass");
-            var tbDry2 = GetTextBox("Txt_DryingTank2ModulePass");
-            var tbWrite = GetTextBox("Txt_WriteMotionParameterAfterInitialization");
+            // previous TextBoxes replaced by CheckBoxes, treat non-zero as Checked
+            var cbSink = GetCheckBox("Txt_SinkModulePass");
+            var cbSoak = GetCheckBox("Txt_SoakingTankModulePass");
+            var cbDry1 = GetCheckBox("Txt_DryingTank1ModulePass");
+            var cbDry2 = GetCheckBox("Txt_DryingTank2ModulePass");
+            var cbWrite = GetCheckBox("Txt_WriteMotionParameterAfterInitialization");
 
-            if (tbSink != null) tbSink.Text = s.SinkModulePass.ToString(CultureInfo.InvariantCulture);
-            if (tbSoak != null) tbSoak.Text = s.SoakingTankModulePass.ToString(CultureInfo.InvariantCulture);
-            if (tbDry1 != null) tbDry1.Text = s.DryingTank1ModulePass.ToString(CultureInfo.InvariantCulture);
-            if (tbDry2 != null) tbDry2.Text = s.DryingTank2ModulePass.ToString(CultureInfo.InvariantCulture);
-            if (tbWrite != null) tbWrite.Text = s.WriteMotionParameterAfterInitialization.ToString(CultureInfo.InvariantCulture);
+            if (cbSink != null) cbSink.IsChecked = s.SinkModulePass !=0;
+            if (cbSoak != null) cbSoak.IsChecked = s.SoakingTankModulePass !=0;
+            if (cbDry1 != null) cbDry1.IsChecked = s.DryingTank1ModulePass !=0;
+            if (cbDry2 != null) cbDry2.IsChecked = s.DryingTank2ModulePass !=0;
+            if (cbWrite != null) cbWrite.IsChecked = s.WriteMotionParameterAfterInitialization !=0;
 
             // Update current recipe name display
             try
@@ -154,7 +179,7 @@ namespace CleanerControlApp.Vision.SettingViews
             try { ConfigLoader.Load(); } catch { }
             if (_moduleSettings == null)
             {
-                try { _moduleSettings = ConfigLoader.GetModuleSettings(); } catch { }
+                try { _module_settings_assign_from_config(); } catch { }
             }
 
             LoadToUI();
@@ -162,6 +187,11 @@ namespace CleanerControlApp.Vision.SettingViews
 
             // reload recipes in case external changes occurred
             LoadRecipeList();
+        }
+
+        private void _module_settings_assign_from_config()
+        {
+            try { _moduleSettings = ConfigLoader.GetModuleSettings(); } catch { }
         }
 
         private void BtnWrite_Click(object sender, RoutedEventArgs e)
@@ -184,27 +214,22 @@ namespace CleanerControlApp.Vision.SettingViews
                 }
             }
 
-            var tbSink = GetTextBox("Txt_SinkModulePass");
-            var tbSoak = GetTextBox("Txt_SoakingTankModulePass");
-            var tbDry1 = GetTextBox("Txt_DryingTank1ModulePass");
-            var tbDry2 = GetTextBox("Txt_DryingTank2ModulePass");
-            var tbWrite = GetTextBox("Txt_WriteMotionParameterAfterInitialization");
+            var cbSink = GetCheckBox("Txt_SinkModulePass");
+            var cbSoak = GetCheckBox("Txt_SoakingTankModulePass");
+            var cbDry1 = GetCheckBox("Txt_DryingTank1ModulePass");
+            var cbDry2 = GetCheckBox("Txt_DryingTank2ModulePass");
+            var cbWrite = GetCheckBox("Txt_WriteMotionParameterAfterInitialization");
 
             var errors = new StringBuilder();
 
             int sink =0, soak =0, d1 =0, d2 =0, write =0;
 
-            bool pSink = tbSink != null && int.TryParse(tbSink.Text, NumberStyles.Integer, CultureInfo.InvariantCulture, out sink);
-            bool pSoak = tbSoak != null && int.TryParse(tbSoak.Text, NumberStyles.Integer, CultureInfo.InvariantCulture, out soak);
-            bool pD1 = tbDry1 != null && int.TryParse(tbDry1.Text, NumberStyles.Integer, CultureInfo.InvariantCulture, out d1);
-            bool pD2 = tbDry2 != null && int.TryParse(tbDry2.Text, NumberStyles.Integer, CultureInfo.InvariantCulture, out d2);
-            bool pWrite = tbWrite != null && int.TryParse(tbWrite.Text, NumberStyles.Integer, CultureInfo.InvariantCulture, out write);
-
-            if (!pSink) errors.AppendLine("Sink 值格式錯誤");
-            if (!pSoak) errors.AppendLine("浸泡槽 值格式錯誤");
-            if (!pD1) errors.AppendLine("烘乾1 值格式錯誤");
-            if (!pD2) errors.AppendLine("烘乾2 值格式錯誤");
-            if (!pWrite) errors.AppendLine("初始寫入馬達參數 值格式錯誤");
+            // Convert checked state to int
+            sink = (cbSink?.IsChecked == true) ?1 :0;
+            soak = (cbSoak?.IsChecked == true) ?1 :0;
+            d1 = (cbDry1?.IsChecked == true) ?1 :0;
+            d2 = (cbDry2?.IsChecked == true) ?1 :0;
+            write = (cbWrite?.IsChecked == true) ?1 :0;
 
             if (errors.Length >0)
             {
@@ -212,7 +237,7 @@ namespace CleanerControlApp.Vision.SettingViews
                 return;
             }
 
-            if (_moduleSettings.MS_System == null) _moduleSettings.MS_System = new MS_System();
+            if (_moduleSettings.MS_System == null) _module_settings_ensure_system();
 
             _moduleSettings.MS_System.SinkModulePass = sink;
             _moduleSettings.MS_System.SoakingTankModulePass = soak;
@@ -224,8 +249,6 @@ namespace CleanerControlApp.Vision.SettingViews
             {
                 // Persist ModuleSettings (and linked recipe file if RecipeName set)
                 ConfigLoader.SetModuleSettingsAndSave(_moduleSettings);
-
-                // Do NOT update DI ModuleSettings instance here — other views should refresh via their own Read action
 
                 // Update recipe name display in case it changed
                 try
@@ -243,6 +266,11 @@ namespace CleanerControlApp.Vision.SettingViews
             {
                 MessageBox.Show($"寫入失敗: {ex.Message}", "錯誤", MessageBoxButton.OK, MessageBoxImage.Error);
             }
+        }
+
+        private void _module_settings_ensure_system()
+        {
+            if (_moduleSettings.MS_System == null) _moduleSettings.MS_System = new MS_System();
         }
 
         private void BtnAddRecipe_Click(object sender, RoutedEventArgs e)
@@ -389,16 +417,14 @@ namespace CleanerControlApp.Vision.SettingViews
             {
                 if (Lst_RecipeNames.SelectedItem is string name)
                 {
-                    if (_moduleSettings == null) _moduleSettings = ConfigLoader.GetModuleSettings();
+                    if (_moduleSettings == null) _module_settings_assign_from_config();
                     if (_moduleSettings != null)
                     {
                         var ok = ConfigLoader.LoadRecipeToModuleSettings(_moduleSettings, name);
                         if (ok)
                         {
                             // Persist the selection and recipe file
-                            ConfigLoader.SetModuleSettingsAndSave(_moduleSettings);
-
-                            // Do NOT update DI ModuleSettings instance here — other views should refresh via their own Read action
+                            ConfigLoader.SetModuleSettingsAndSave(_module_settings_get_or_new());
 
                             // Refresh UI to reflect loaded recipe parameters (only for this view)
                             try { LoadToUI(); } catch { }
@@ -416,6 +442,12 @@ namespace CleanerControlApp.Vision.SettingViews
                 }
             }
             catch { }
+        }
+
+        private ModuleSettings _module_settings_get_or_new()
+        {
+            if (_moduleSettings == null) _moduleSettings = new ModuleSettings();
+            return _moduleSettings;
         }
 
         private void Lst_RecipeNames_SelectionChanged(object sender, SelectionChangedEventArgs e)

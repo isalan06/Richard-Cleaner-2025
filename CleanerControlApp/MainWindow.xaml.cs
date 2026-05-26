@@ -364,7 +364,17 @@ namespace CleanerControlApp
 
         private void CloseButton_Click(object sender, RoutedEventArgs e)
         {
-            //Application.Current.Shutdown();
+            try
+            {
+                var dlg = new CleanerControlApp.Vision.ConfirmCloseWindow() { Owner = this };
+                bool? res = dlg.ShowDialog();
+                if (res == true)
+                {
+                    if(_hardwareManager != null)
+                        _ = _hardwareManager.ModuleClose();
+                }
+            }
+            catch { }
         }
 
         private void BtnChangeRecipe_Click(object sender, RoutedEventArgs e)
@@ -372,34 +382,9 @@ namespace CleanerControlApp
             try
             {
                 var win = new RecipePickerWindow() { Owner = this };
-                var ok = win.ShowDialog();
-                if (ok == true && !string.IsNullOrWhiteSpace(win.SelectedRecipe))
-                {
-                    var name = win.SelectedRecipe;
-                    // load recipe to module settings and persist
-                    try
-                    {
-                        ModuleSettings ms = null;
-                        try { ms = _services.GetService(typeof(ModuleSettings)) as ModuleSettings; } catch { }
-                        if (ms == null) { try { ConfigLoader.Load(); ms = ConfigLoader.GetModuleSettings(); } catch { } }
-                        if (ms == null) ms = new ModuleSettings();
-
-                        var okLoad = ConfigLoader.LoadRecipeToModuleSettings(ms, name);
-                        if (okLoad)
-                        {
-                            ConfigLoader.SetModuleSettingsAndSave(ms);
-                            MessageBox.Show($"已套用配方: {name}", "資訊", MessageBoxButton.OK, MessageBoxImage.Information);
-                        }
-                        else
-                        {
-                            MessageBox.Show($"載入配方失敗: {name}", "錯誤", MessageBoxButton.OK, MessageBoxImage.Error);
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show($"套用配方時發生錯誤: {ex.Message}", "錯誤", MessageBoxButton.OK, MessageBoxImage.Error);
-                    }
-                }
+                // The RecipePickerWindow now applies and saves the selected recipe itself
+                // and raises ConfigLoader.ModuleSettingsUpdated. No additional action or dialogs needed here.
+                _ = win.ShowDialog();
             }
             catch { }
         }

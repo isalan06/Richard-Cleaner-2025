@@ -25,6 +25,7 @@ using System.Windows.Media.Animation;
 using System.Numerics;
 using CleanerControlApp.Utilities.Log;
 using NLog.LayoutRenderers;
+using System.Windows;
 
 namespace CleanerControlApp.Hardwares
 {
@@ -1650,6 +1651,44 @@ namespace CleanerControlApp.Hardwares
             }
 
             return result;
+        }
+
+        public async Task ModuleClose()
+        {
+            try
+            {
+                if (_sink != null) _sink.ModuleClose();
+                if (_soakingTank != null) _soakingTank.ModuleClose();
+                if (_dryingTanks != null)
+                {
+                    foreach (var tank in _dryingTanks)
+                    {
+                        tank.ModuleClose();
+                    }
+                }
+                if (_heatingTank != null) _heatingTank.ModuleClose();
+                if (_shuttle != null) _shuttle.ModuleClose();
+
+                // wait3 seconds before shutting down
+                await Task.Delay(TimeSpan.FromSeconds(2)).ConfigureAwait(false);
+
+                try
+                {
+                    // Ensure shutdown runs on UI thread
+                    if (Application.Current != null)
+                    {
+                        Application.Current.Dispatcher.Invoke(() =>
+                        {
+                            try { Application.Current.Shutdown(); } catch { }
+                        });
+                    }
+                }
+                catch { }
+            }
+            catch (Exception ex)
+            {
+                try { _logger?.LogError(ex, "Error during ModuleClose"); } catch { }
+            }
         }
 
         #endregion

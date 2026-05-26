@@ -7,7 +7,7 @@
         mc:Ignorable="d"
         Title="清洗機" Height="1080" Width="1920"
         WindowStartupLocation="Manual" Left="0" Top="0"
-        WindowState="Maximized"
+        WindowState="Maximized" WindowStyle="None" ResizeMode="NoResize"
         Loaded="Window_Loaded">
     <Grid>
         <Grid.RowDefinitions>

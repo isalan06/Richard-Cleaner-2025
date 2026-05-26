@@ -15,10 +15,10 @@
 
             <!-- Pass buttons for modules -->
             <StackPanel Orientation="Vertical" Canvas.Right="10" Canvas.Top="10" HorizontalAlignment="Right"/>
-            <Button x:Name="Btn_Sink_Pass" FontSize="20" Content="Pass" Width="80" Height="28" Click="Btn_Sink_Pass_Click" HorizontalAlignment="Left" Canvas.Left="855" Canvas.Top="73" VerticalAlignment="Center" />
-            <Button x:Name="Btn_Dry2_Pass" FontSize="20" Content="Pass" Width="80" Height="28" Click="Btn_Dry2_Pass_Click" HorizontalAlignment="Left" Canvas.Left="269" Canvas.Top="73" VerticalAlignment="Center" />
-            <Button x:Name="Btn_Dry1_Pass" FontSize="20" Content="Pass" Width="80" Height="28" Click="Btn_Dry1_Pass_Click" HorizontalAlignment="Left" Canvas.Left="459" Canvas.Top="73" VerticalAlignment="Center" />
-            <Button x:Name="Btn_Soaking_Pass" FontSize="20" Content="Pass" Width="80" Height="28" Click="Btn_Soaking_Pass_Click" HorizontalAlignment="Left" Canvas.Left="664" Canvas.Top="73" VerticalAlignment="Top" />
+            <Button x:Name="Btn_Sink_Pass" FontSize="20" Content="Enable" Width="100" Height="40" Click="Btn_Sink_Pass_Click" HorizontalAlignment="Left" Canvas.Left="849" Canvas.Top="73" VerticalAlignment="Center" Background="Lime"/>
+            <Button x:Name="Btn_Dry2_Pass" FontSize="20" Content="Enable" Width="100" Height="40" Click="Btn_Dry2_Pass_Click" HorizontalAlignment="Left" Canvas.Left="259" Canvas.Top="73" VerticalAlignment="Center" Background="Lime"/>
+            <Button x:Name="Btn_Dry1_Pass" FontSize="20" Content="Enable" Width="100" Height="40" Click="Btn_Dry1_Pass_Click" HorizontalAlignment="Left" Canvas.Left="453" Canvas.Top="73" VerticalAlignment="Center" Background="Lime"/>
+            <Button x:Name="Btn_Soaking_Pass" FontSize="20" Content="Enable" Width="100" Height="40" Click="Btn_Soaking_Pass_Click" HorizontalAlignment="Left" Canvas.Left="652" Canvas.Top="73" VerticalAlignment="Center" Background="Lime"/>
 
         </Canvas>
     </Grid>
