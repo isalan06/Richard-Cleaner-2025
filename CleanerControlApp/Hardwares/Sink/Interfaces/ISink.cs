@@ -33,6 +33,7 @@ namespace CleanerControlApp.Hardwares.Sink.Interfaces
         bool Pressure { get; }
         bool Cassette { get; }
         bool Initialized { get; }
+        bool Initializing { get; }
         bool Idle { get; }
 
         bool HighPressure { get; }

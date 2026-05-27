@@ -63,6 +63,8 @@ namespace CleanerControlApp.Hardwares
         // suppress alarm evaluation for initial period after Start to avoid false positives
         private DateTime? _alarmCheckStartTime = DateTime.UtcNow;
 
+        public string MessageForOperation { get; set; } = string.Empty;
+
         #endregion
 
         #region constructor
@@ -856,6 +858,7 @@ namespace CleanerControlApp.Hardwares
         public bool Initialize(bool force = false)
         {
             bool result = false;
+            MessageForOperation = string.Empty;
 
             if ((!HasSystemAlarm && !HasAutoStatus && _initializing) || force)
             {
@@ -873,6 +876,11 @@ namespace CleanerControlApp.Hardwares
                 try { _initializingStartTime = DateTime.UtcNow; } catch { _initializingStartTime = null; }
 
                 result = true;
+            }
+            else
+            { 
+                MessageForOperation = "無法開始初始化，請確認設備狀態正常且沒有模組處於自動狀態，或設備正在初始化中。";
+                OperateLog.Log("無法開始初始化", MessageForOperation);
             }
 
 

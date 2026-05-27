@@ -84,7 +84,7 @@
         <!-- Right: two stacked boxes -->
         <Grid Grid.Column="1" Margin="16,16,16,16">
             <Grid.RowDefinitions>
-                <RowDefinition Height="280" />
+                <RowDefinition Height="320" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
 

@@ -75,6 +75,13 @@
                                 <DataTrigger Binding="{Binding InitializedStatus, ElementName=RootControl}" Value="True">
                                     <Setter Property="Background" Value="Lime"/>
                                 </DataTrigger>
+                                <MultiDataTrigger>
+                                    <MultiDataTrigger.Conditions>
+                                        <Condition Binding="{Binding InitializedStatus, ElementName=RootControl}" Value="False" />
+                                        <Condition Binding="{Binding InitializingStatus, ElementName=RootControl}" Value="True" />
+                                    </MultiDataTrigger.Conditions>
+                                    <Setter Property="Background" Value="Yellow" />
+                                </MultiDataTrigger>
                             </Style.Triggers>
                         </Style>
                     </Border.Style>

@@ -260,6 +260,7 @@ namespace CleanerControlApp.Hardwares.HeatingTank.Services
         public bool Pausing => _pausing;
         public bool Heating => _heating;
         public bool Initialized => _initialized;
+        public bool Initializing => _initialized;
         public bool Idle => _initialized && IsNormalStatus;
 
         public bool HighTemperature => (PV > PV_Check_High) || _sim_pv;

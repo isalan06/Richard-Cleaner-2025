@@ -243,6 +243,7 @@ namespace CleanerControlApp.Hardwares.SoakingTank.Services
         public bool UltrasonicSign => _ultrasonic;
         public bool Cassette => _cassette;
         public bool Initialized => _initialized && (_sim_pass_motor || MotorHome);
+        public bool Initializing => _initialized && !MotorHome && !_sim_pass_motor;
         public bool Idle => Sensor_CoverOpen && !_ultrasonic && !_cassette && _initialized && IsNormalStatus && (_sim_pass_motor || (MotorServoOn && MotorIdle && MotorHome));
 
         public bool AirOP(bool air)

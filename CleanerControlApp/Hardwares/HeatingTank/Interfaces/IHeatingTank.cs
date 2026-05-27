@@ -32,6 +32,7 @@ namespace CleanerControlApp.Hardwares.HeatingTank.Interfaces
         bool Pausing { get; }
         bool Heating { get; }
         bool Initialized { get; }
+        bool Initializing { get; }
         bool Idle { get; }
 
         bool HighTemperature { get; }

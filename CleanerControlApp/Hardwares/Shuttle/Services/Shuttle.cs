@@ -47,6 +47,7 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
         private bool _moving = false;
         private bool _cassette = false;
         private bool _initialized = false;
+        private bool _initializing = false;
         private bool _autoStopFlag = false;
 
         private bool _sim_pass_motor = false;
@@ -257,6 +258,7 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
         public bool Moving => _moving || _pickTrigger || _placeTrigger || _checkCassetteTrigger;
         public bool Cassette => _cassette;
         public bool Initialized => _initialized && (_sim_pass_motor || MotorHome);
+        public bool Initializing => _initializing;
         public bool Idle => !_moving && !_cassette && _initialized && IsNormalStatus && (_sim_pass_motor || (MotorServoOn && MotorIdle && MotorHome));
 
         public bool ClamperCloseOP(bool close)
@@ -788,6 +790,7 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
         }
         private async void Initialize()
         {
+            _initializing = true;
             if (_motorXAxis != null) _motorXAxis.ServoOn(true);
             if (_motorZAxis != null) _motorZAxis.ServoOn(true);
 
@@ -811,8 +814,12 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
 
             await Home();
 
-            if(!MotorAlarm && MotorHome)
+            if (!MotorAlarm && MotorHome)
+            {
                 _initialized = true;
+            }
+
+            _initializing = false;
         }
 
         private async Task Home()
@@ -861,6 +868,7 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
 
             _auto = false;
             _initialized = false;
+            _initializing = false;
 
             _moving = false;
 

@@ -36,6 +36,7 @@ namespace CleanerControlApp.Hardwares.SoakingTank.Interfaces
         bool UltrasonicSign { get; }
         bool Cassette { get; }
         bool Initialized { get; }
+        bool Initializing { get; }
         bool Idle { get; }
 
 

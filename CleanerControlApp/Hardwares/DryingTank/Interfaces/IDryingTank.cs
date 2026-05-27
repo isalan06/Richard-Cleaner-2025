@@ -33,6 +33,7 @@ namespace CleanerControlApp.Hardwares.DryingTank.Interfaces
         bool Heating { get; }
         bool Cassette { get; }
         bool Initialized { get; }
+        bool Initializing { get; }
         bool Idle { get; }
 
         bool HighTemperature { get; }

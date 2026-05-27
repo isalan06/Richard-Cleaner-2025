@@ -7,6 +7,13 @@
  mc:Ignorable="d" 
  d:DesignHeight="450" d:DesignWidth="1150" x:Name="RootControl">
  <Grid Background="Transparent" Margin="10,0,10,0">
+ <Grid.RowDefinitions>
+ <RowDefinition Height="*" />
+ <RowDefinition Height="Auto" />
+ </Grid.RowDefinitions>
+
+ <!-- Original system line controls placed in first row -->
+ <Grid Grid.Row="0">
  <Grid.ColumnDefinitions>
  <ColumnDefinition Width="*" />
  <ColumnDefinition Width="*" />
@@ -22,5 +29,50 @@
  <local:Template_System_SoakingTank x:Name="SystemSoakingControl" Grid.Column="3" HorizontalAlignment="Center" VerticalAlignment="Center" />
  <local:Template_System_Sink x:Name="SystemSinkControl" Grid.Column="4" HorizontalAlignment="Center" VerticalAlignment="Center" />
  <local:Template_Loader x:Name="LoaderControl" Grid.Column="5" HorizontalAlignment="Center" VerticalAlignment="Center" />
+ </Grid>
+
+ <!-- Bottom area with two rows of informational text -->
+ <Border Grid.Row="1" Margin="0,8,0,0" Background="Transparent">
+ <Grid>
+ <Grid.RowDefinitions>
+ <RowDefinition Height="Auto" />
+ <RowDefinition Height="Auto" />
+ </Grid.RowDefinitions>
+
+ <!-- First info row: shuttle status label + status boxes arranged horizontally -->
+ <StackPanel Grid.Row="0" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="4,2,4,2">
+ <TextBlock Text="移載組狀態: " FontSize="20" Foreground="#333333" VerticalAlignment="Center" />
+ <!-- Status boxes: use small margins for spacing (~4) -->
+ <Border BorderBrush="Black" BorderThickness="1" CornerRadius="3" Padding="4" Height="24" Margin="4,0,0,0" VerticalAlignment="Center" Background="#FFFFFF">
+ <TextBlock Text="自動" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black"/>
+ </Border>
+ <Border BorderBrush="Black" BorderThickness="1" CornerRadius="3" Padding="4" Height="24" Margin="4,0,0,0" VerticalAlignment="Center" Background="#FFFFFF">
+ <TextBlock Text="暫停" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black"/>
+ </Border>
+ <Border BorderBrush="Black" BorderThickness="1" CornerRadius="3" Padding="4" Height="24" Margin="4,0,0,0" VerticalAlignment="Center" Background="#FFFFFF">
+ <TextBlock Text="卡匣" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black"/>
+ </Border>
+ <Border BorderBrush="Black" BorderThickness="1" CornerRadius="3" Padding="4" Height="24" Margin="4,0,0,0" VerticalAlignment="Center" Background="#FFFFFF">
+ <TextBlock Text="閒置" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black"/>
+ </Border>
+ <Border BorderBrush="Black" BorderThickness="1" CornerRadius="3" Padding="4" Height="24" Margin="4,0,0,0" VerticalAlignment="Center" Background="#FFFFFF">
+ <TextBlock Text="初始" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black"/>
+ </Border>
+ <Border BorderBrush="Black" BorderThickness="1" CornerRadius="3" Padding="4" Height="24" Margin="4,0,0,0" VerticalAlignment="Center" Background="#FFFFFF">
+ <TextBlock Text="警告" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black"/>
+ </Border>
+ <Border BorderBrush="Black" BorderThickness="1" CornerRadius="3" Padding="4" Height="24" Margin="4,0,0,0" VerticalAlignment="Center" Background="#FFFFFF">
+ <TextBlock Text="錯誤" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black"/>
+ </Border>
+ </StackPanel>
+
+ <!-- Second info row: heating tank status label (placeholder for future status items) -->
+ <StackPanel Grid.Row="1" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="4,2,4,2">
+ <TextBlock Text="加熱槽狀態: " FontSize="20" Foreground="#333333" VerticalAlignment="Center" />
+ <!-- Add status indicators for heating tank here, spaced by Margin="4,0,0,0" -->
+ </StackPanel>
+
+ </Grid>
+ </Border>
  </Grid>
 </UserControl>

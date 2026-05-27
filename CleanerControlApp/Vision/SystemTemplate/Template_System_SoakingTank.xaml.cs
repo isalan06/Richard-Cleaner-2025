@@ -34,6 +34,7 @@ namespace CleanerControlApp.Vision.SystemTemplate
         private bool _cassetteStatus;
         private bool _idleStatus;
         private bool _initializedStatus;
+        private bool _initializingStatus;
         private bool _warningStatus;
         private bool _alarmStatus;
 
@@ -132,6 +133,20 @@ namespace CleanerControlApp.Vision.SystemTemplate
             }
         }
 
+        // New property to indicate initialization in progress
+        public bool InitializingStatus
+        {
+            get => _initializingStatus;
+            private set
+            {
+                if (_initializingStatus != value)
+                {
+                    _initializingStatus = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
         public bool WarningStatus
         {
             get => _warningStatus;
@@ -206,6 +221,7 @@ namespace CleanerControlApp.Vision.SystemTemplate
                     CassetteStatus = _component.Cassette;
                     IdleStatus = _component.Idle;
                     InitializedStatus = _component.Initialized;
+                    InitializingStatus = _component.Initializing;
                     WarningStatus = _component.HasWarning;
                     AlarmStatus = _component.HasAlarm;
 
@@ -228,6 +244,7 @@ namespace CleanerControlApp.Vision.SystemTemplate
                     CassetteStatus = false;
                     IdleStatus = false;
                     InitializedStatus = false;
+                    InitializingStatus = false;
                     WarningStatus = false;
                     AlarmStatus = false;
 

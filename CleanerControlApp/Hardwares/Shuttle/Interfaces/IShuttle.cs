@@ -41,6 +41,7 @@ namespace CleanerControlApp.Hardwares.Shuttle.Interfaces
         bool Moving { get; }
         bool Cassette { get; }
         bool Initialized { get; }
+        bool Initializing { get; }
         bool Idle { get; }
 
         bool ClamperCloseOP(bool close);

@@ -269,6 +269,7 @@ namespace CleanerControlApp.Hardwares.Sink.Services
         public bool Pressure => _pressure;
         public bool Cassette => _cassette;
         public bool Initialized => _initialized && (_sim_pass_motor || MotorHome);
+        public bool Initializing => _initialized && !MotorHome && !_sim_pass_motor;
         public bool Idle => Sensor_CoverOpen && !_pressure && !_cassette && _initialized && IsNormalStatus && (_sim_pass_motor || (MotorServoOn && MotorIdle && MotorHome));
 
         public bool HomeIdle => Sensor_CoverOpen && !_pressure && !_cassette  && IsNormalStatus;
