@@ -87,6 +87,12 @@ namespace CleanerControlApp.Hardwares.Sink.Services
         private string _messageForOperation = "";
         private DateTime? _alarmCheckStartTime = DateTime.UtcNow;
 
+        private DateTime? _shakingCheckStartTime_P3 = DateTime.UtcNow;
+        private DateTime? _shakingCheckStartTime_P2 = DateTime.UtcNow;
+
+        private bool _homeRequest = false;
+        private bool _homeRequestDone = false;
+
         #endregion
 
         #region constructor
@@ -593,6 +599,7 @@ namespace CleanerControlApp.Hardwares.Sink.Services
         public bool InPos1 => ((_plcService != null) && (Posiition == (_moduleSettings.Sink != null ? _moduleSettings.Sink.MotorPosition_01 : 0))) || _sim_pass_motor;
         public bool InPos2 => ((_plcService != null) && (Posiition == (_moduleSettings.Sink != null ? _moduleSettings.Sink.MotorPosition_02 : 0))) || _sim_pass_motor;
         public bool InPos3 => ((_plcService != null) && (Posiition == (_moduleSettings.Sink != null ? _moduleSettings.Sink.MotorPosition_03 : 0))) || _sim_pass_motor;
+        public bool InPos0 => ((_plcService != null) && (Posiition == 0)) || _sim_pass_motor;
 
         public void Teach(int position)
         {
@@ -867,11 +874,11 @@ namespace CleanerControlApp.Hardwares.Sink.Services
         {
             if (_manualShaking)
             {
-                if (!InPos3 && MotorIdle && !_motor_commanding)
+                if (CommonFunction.MoveEndDelayPassed(ref _shakingCheckStartTime_P2, !InPos3 && MotorIdle && !_motor_commanding, _moduleSettings.Sink != null ? _moduleSettings.Sink.ShakingDelayTime_ms : 50))
                 {
                     MoveToPosition(2, 0);
                 }
-                else if (InPos3 && MotorIdle && !_motor_commanding)
+                else if (CommonFunction.MoveEndDelayPassed(ref _shakingCheckStartTime_P3, InPos3 && MotorIdle && !_motor_commanding, _moduleSettings.Sink != null ? _moduleSettings.Sink.ShakingDelayTime_ms : 50))
                 {
                     MoveToPosition(1, 0);
                 }
@@ -962,10 +969,12 @@ namespace CleanerControlApp.Hardwares.Sink.Services
                         MoveToPosition(0, 0);
                     }
 
-                    //卡匣放入後蓋子關閉
+                    //卡匣放入且下降到下位後蓋子關閉
                     if (_cassette && !Command_CleanerCoverClose)
                     {
-                        if(!InPos3 && !_motor_commanding && !_pausing)
+                        _homeRequest = false;
+                        _homeRequestDone = false;
+                        if (!InPos3 && !_motor_commanding && !_pausing)
                             MoveToPosition(2, 0);
 
                         if (InPos3)
@@ -975,7 +984,7 @@ namespace CleanerControlApp.Hardwares.Sink.Services
 
 
                     // 有卡匣且蓋子關閉後開始加熱
-                    if (_cassette && Sensor_CoverClose)
+                    if (_cassette && Sensor_CoverClose && !_homeRequest)
                     {
                         if (!Pressure && !_pausing) // 開始沖水
                         {
@@ -993,7 +1002,7 @@ namespace CleanerControlApp.Hardwares.Sink.Services
                     }
 
                     // 沖水時間計算
-                    if (Pressure && !_pausing && Sensor_CoverClose)
+                    if (Pressure && !_pausing && Sensor_CoverClose && !_homeRequest)
                     {
                         // start timer when condition becomes true
                         if (_heatingStartTime == null)
@@ -1003,11 +1012,11 @@ namespace CleanerControlApp.Hardwares.Sink.Services
                         else
                         {
                             // 馬達往復搖擺流程
-                            if(!InPos3 && MotorIdle && !_motor_commanding && !_pausing)
+                            if (CommonFunction.MoveEndDelayPassed(ref _shakingCheckStartTime_P2, !InPos3 && MotorIdle && !_motor_commanding && !_pausing, _moduleSettings.Sink != null ? _moduleSettings.Sink.ShakingDelayTime_ms : 50))
                             {
                                 MoveToPosition(2, 0);
                             }
-                            else if(InPos3 && MotorIdle && !_motor_commanding && !_pausing)
+                            else if (CommonFunction.MoveEndDelayPassed(ref _shakingCheckStartTime_P3, InPos3 && MotorIdle && !_motor_commanding && !_pausing, _moduleSettings.Sink != null ? _moduleSettings.Sink.ShakingDelayTime_ms : 50))
                             {
                                 MoveToPosition(1, 0);
                             }
@@ -1019,12 +1028,14 @@ namespace CleanerControlApp.Hardwares.Sink.Services
                             if (_elapsedTime >= TimeSpan.FromSeconds((double)(_moduleSettings.Sink != null ? _moduleSettings.Sink.ActTime_Second : 60.0)))
                             {
                                 PressureOP(false);
-                                _actFinished = true;
-                                MotorStop();
+                                //_actFinished = true;
+                                _homeRequest = true; // signal to move to home position and open cover for cassette pick up
+                                //MotorStop();
+                                _heatingStartTime = null;
                             }
                         }
                     }
-                    else
+                    else if(!_homeRequest) // 沒有滿足沖水條件時，重置計時器
                     {
                         // reset timer when condition no longer holds
                         _heatingStartTime = null;
@@ -1032,12 +1043,28 @@ namespace CleanerControlApp.Hardwares.Sink.Services
                             MotorStop();
                     }
 
+                    // 沖水完成後回原點，避免點位可能偏移
+                    if (_homeRequest && !_motor_commanding && MotorIdle && InPos3)
+                    {
+                        if (!_homeRequestDone)
+                        {
+                            _homeRequestDone = true;
+                            Home();
+                        }
+                        else if(MotorHome && InPos0)
+                        {
+                            _actFinished = true;
+                            _homeRequest = false;
+                            _homeRequestDone = false;
+                        }    
+                    }
+
 
                     // Clamper放置完成後確認並設定有卡匣
                     if (HS_ClamperPlaceFinished)
                     {
                         HS_ClamperPlaceFinished = false;
-                        MotorStop();
+                        //MotorStop();
                         _cassette = true;
                     }
                 }
@@ -1066,6 +1093,15 @@ namespace CleanerControlApp.Hardwares.Sink.Services
                             MoveToPosition(2, 0);
                             _motor_air_retry_count++;
                         }
+                    }
+
+                    // 風刀反覆吹氣結束後停止吹風且等待卡匣取出，當夾爪來取卡匣時再次啟動吹風協助吹乾
+                    if (_cassette && InPos1 && MotorIdle && !_motor_commanding && RetryAirFinished)
+                    {
+                        if (HS_ClamperMoving)
+                            AirOP(true);
+                        else
+                            AirOP(false);
                     }
 
                     // 卡匣取出後流程結束

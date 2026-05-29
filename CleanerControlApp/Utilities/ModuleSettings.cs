@@ -166,6 +166,7 @@ namespace CleanerControlApp.Utilities
         public int MotorVelocity_01 { get; set; }
         public int MotorVelocity_02 { get; set; }
         public int AirKnifeRetryCount { get; set; }
+        public int ShakingDelayTime_ms { get; set; }
 
     }
 
@@ -194,6 +195,7 @@ namespace CleanerControlApp.Utilities
         public int AirKnifeRetryCount { get; set; }
         public float UltrasonicSetCurrent { get; set; }
 
+        public int ShakingDelayTime_ms { get; set; }
     }
 
     public class MS_Shuttle
@@ -269,6 +271,8 @@ namespace CleanerControlApp.Utilities
         public int ActTime_Second { get; set; }
         public int AirKnifeRetryCount { get; set; }
 
+        public int ShakingDelayTime_ms { get; set; }
+
         public static SinkRecipe From(MS_Sink src)
         {
             if (src == null) throw new ArgumentNullException(nameof(src));
@@ -277,7 +281,8 @@ namespace CleanerControlApp.Utilities
                 SV_Low = src.SV_Low,
                 SV_High = src.SV_High,
                 ActTime_Second = src.ActTime_Second,
-                AirKnifeRetryCount = src.AirKnifeRetryCount
+                AirKnifeRetryCount = src.AirKnifeRetryCount,
+                ShakingDelayTime_ms = src.ShakingDelayTime_ms
             };
         }
 
@@ -288,6 +293,7 @@ namespace CleanerControlApp.Utilities
             target.SV_High = SV_High;
             target.ActTime_Second = ActTime_Second;
             target.AirKnifeRetryCount = AirKnifeRetryCount;
+            target.ShakingDelayTime_ms = ShakingDelayTime_ms;
         }
     }
 
@@ -329,6 +335,8 @@ namespace CleanerControlApp.Utilities
         public int AirKnifeRetryCount { get; set; }
         public float UltrasonicSetCurrent { get; set; }
 
+        public int ShakingDelayTime_ms { get; set; }
+
         public static SoakingTankRecipe From(MS_SoakingTank src)
         {
             if (src == null) throw new ArgumentNullException(nameof(src));
@@ -336,7 +344,8 @@ namespace CleanerControlApp.Utilities
             {
                 ActTime_Second = src.ActTime_Second,
                 AirKnifeRetryCount = src.AirKnifeRetryCount,
-                UltrasonicSetCurrent = src.UltrasonicSetCurrent
+                UltrasonicSetCurrent = src.UltrasonicSetCurrent,
+                ShakingDelayTime_ms = src.ShakingDelayTime_ms
             };
         }
 
@@ -346,6 +355,7 @@ namespace CleanerControlApp.Utilities
             target.ActTime_Second = ActTime_Second;
             target.AirKnifeRetryCount = AirKnifeRetryCount;
             target.UltrasonicSetCurrent = UltrasonicSetCurrent;
+            target.ShakingDelayTime_ms = ShakingDelayTime_ms;
         }
     }
 

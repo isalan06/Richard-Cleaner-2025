@@ -103,6 +103,7 @@ namespace CleanerControlApp.Hardwares.SoakingTank.Interfaces
         bool InPos1 { get; }
         bool InPos2 { get; }
         bool InPos3 { get; }
+        bool InPos0 { get; }
 
         void Teach(int position);
 

@@ -1678,7 +1678,7 @@ namespace CleanerControlApp.Hardwares
                 if (_shuttle != null) _shuttle.ModuleClose();
 
                 // wait3 seconds before shutting down
-                await Task.Delay(TimeSpan.FromSeconds(2)).ConfigureAwait(false);
+                await Task.Delay(TimeSpan.FromSeconds(1)).ConfigureAwait(false);
 
                 try
                 {

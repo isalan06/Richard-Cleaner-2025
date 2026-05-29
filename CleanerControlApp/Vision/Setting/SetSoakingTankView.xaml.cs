@@ -121,6 +121,7 @@ namespace CleanerControlApp.Vision.SettingViews
             var tbMVel2 = GetTextBox("Txt_MotorVel2");
             var tbAirRetry = GetTextBox("Txt_AirKnifeRetryCount");
             var tbUltrasonic = GetTextBox("Txt_UltrasonicSetCurrent");
+            var tbShaking = GetTextBox("Txt_ShakingDelayTime");
 
             if (tbTime != null) tbTime.Text = m.ActTime_Second.ToString(CultureInfo.InvariantCulture);
 
@@ -133,6 +134,7 @@ namespace CleanerControlApp.Vision.SettingViews
             if (tbAirRetry != null) tbAirRetry.Text = m.AirKnifeRetryCount.ToString(CultureInfo.InvariantCulture);
 
             if (tbUltrasonic != null) tbUltrasonic.Text = m.UltrasonicSetCurrent.ToString(CultureInfo.InvariantCulture);
+            if (tbShaking != null) tbShaking.Text = m.ShakingDelayTime_ms.ToString(CultureInfo.InvariantCulture);
         }
 
         private void BtnRead_Click(object sender, RoutedEventArgs e)
@@ -160,7 +162,7 @@ namespace CleanerControlApp.Vision.SettingViews
             }
 
             LoadToUI();
-            MessageBox.Show("讀取完成", "資訊", MessageBoxButton.OK, MessageBoxImage.Information);
+            MessageBox.Show("讀取完成", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
         private void BtnWrite_Click(object sender, RoutedEventArgs e)
@@ -206,6 +208,7 @@ namespace CleanerControlApp.Vision.SettingViews
             var tbMVel2 = GetTextBox("Txt_MotorVel2");
             var tbAirRetry = GetTextBox("Txt_AirKnifeRetryCount");
             var tbUltrasonic = GetTextBox("Txt_UltrasonicSetCurrent");
+            var tbShaking = GetTextBox("Txt_ShakingDelayTime");
 
             var errors = new StringBuilder();
 
@@ -215,6 +218,7 @@ namespace CleanerControlApp.Vision.SettingViews
             // inputs
             int input_time =0;
             int input_airRetry =0;
+            int input_shaking =0;
             float input_mpos1 =0, input_mpos2 =0, input_mpos3 =0, input_mvel1 =0, input_mvel2 =0;
             float input_ultrasonic =0f;
 
@@ -226,19 +230,25 @@ namespace CleanerControlApp.Vision.SettingViews
             bool parsed_mvel2 = tbMVel2 != null && float.TryParse(tbMVel2.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out input_mvel2);
             bool parsed_airRetry = tbAirRetry != null && int.TryParse(tbAirRetry.Text, NumberStyles.Integer, CultureInfo.InvariantCulture, out input_airRetry);
             bool parsed_ultrasonic = tbUltrasonic != null && float.TryParse(tbUltrasonic.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out input_ultrasonic);
+            bool parsed_shaking = tbShaking != null && int.TryParse(tbShaking.Text, NumberStyles.Integer, CultureInfo.InvariantCulture, out input_shaking);
 
-            if (!parsed_time) errors.AppendLine("錯誤: 浸泡時間輸入錯誤");
-            if (!parsed_mpos1) errors.AppendLine("錯誤: 馬達位置 #1 輸入錯誤");
-            if (!parsed_mpos2) errors.AppendLine("錯誤: 馬達位置 #2 輸入錯誤");
-            if (!parsed_mpos3) errors.AppendLine("錯誤: 馬達位置 #3 輸入錯誤");
-            if (!parsed_mvel1) errors.AppendLine("錯誤: 馬達速度 #1 輸入錯誤");
-            if (!parsed_mvel2) errors.AppendLine("錯誤: 馬達速度 #2 輸入錯誤");
-            if (!parsed_airRetry) errors.AppendLine("錯誤:風刀往復次數輸入錯誤");
-            if (!parsed_ultrasonic) errors.AppendLine("錯誤: 超音波設定電流輸入錯誤");
+            if (!parsed_time) errors.AppendLine("浸泡槽: 浸泡時間格式錯誤");
+            if (!parsed_mpos1) errors.AppendLine("浸泡槽: 馬達位置 #1 格式錯誤");
+            if (!parsed_mpos2) errors.AppendLine("浸泡槽: 馬達位置 #2 格式錯誤");
+            if (!parsed_mpos3) errors.AppendLine("浸泡槽: 馬達位置 #3 格式錯誤");
+            if (!parsed_mvel1) errors.AppendLine("浸泡槽: 馬達速度 #1 格式錯誤");
+            if (!parsed_mvel2) errors.AppendLine("浸泡槽: 馬達速度 #2 格式錯誤");
+            if (!parsed_airRetry) errors.AppendLine("浸泡槽:風刀往復次數格式錯誤");
+            if (!parsed_ultrasonic) errors.AppendLine("浸泡槽: 超音波設定電流格式錯誤");
+            if (!parsed_shaking) errors.AppendLine("浸泡槽: 搖擺動作延遲時間格式不正確");
 
             if (parsed_airRetry)
             {
-                if (input_airRetry <0) errors.AppendLine("錯誤:風刀往復次數不能為負數");
+                if (input_airRetry <0) errors.AppendLine("浸泡槽:風刀往復次數不能為負數");
+            }
+            if (parsed_shaking)
+            {
+                if (input_shaking <0) errors.AppendLine("浸泡槽:搖擺動作延遲時間不能為負數");
             }
 
             // determine ultrasonic max limit via reflection to avoid direct dependency
@@ -261,8 +271,8 @@ namespace CleanerControlApp.Vision.SettingViews
 
             if (parsed_ultrasonic)
             {
-                if (input_ultrasonic <0f) errors.AppendLine("錯誤: 超音波設定電流不能為負值");
-                else if (input_ultrasonic > ultrasonicMax) errors.AppendLine($"錯誤: 超音波設定電流({input_ultrasonic}) 超過上限 ({ultrasonicMax})");
+                if (input_ultrasonic <0f) errors.AppendLine("浸泡槽: 超音波設定電流不能為負數");
+                else if (input_ultrasonic > ultrasonicMax) errors.AppendLine($"浸泡槽: 超音波設定電流({input_ultrasonic}) 大於上限 ({ultrasonicMax})");
             }
 
             int conv_mpos1 = parsed_mpos1 ? (int)Math.Round(input_mpos1 / motorTransfer) :0;
@@ -288,6 +298,7 @@ namespace CleanerControlApp.Vision.SettingViews
             _moduleSettings.SoakingTank.MotorVelocity_02 = conv_mvel2;
 
             _moduleSettings.SoakingTank.AirKnifeRetryCount = parsed_airRetry ? input_airRetry : _moduleSettings.SoakingTank.AirKnifeRetryCount;
+            _moduleSettings.SoakingTank.ShakingDelayTime_ms = parsed_shaking ? input_shaking : _moduleSettings.SoakingTank.ShakingDelayTime_ms;
 
             // assign ultrasonic value
             if (parsed_ultrasonic)
@@ -312,7 +323,7 @@ namespace CleanerControlApp.Vision.SettingViews
                     catch { }
                 }
 
-                MessageBox.Show("寫入完成", "資訊", MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show("寫入完成", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
             }
             catch (Exception ex)
             {

@@ -45,6 +45,7 @@
  <RowDefinition Height="Auto" />
  <RowDefinition Height="Auto" />
  <RowDefinition Height="Auto" />
+ <RowDefinition Height="Auto" />
  </Grid.RowDefinitions>
  <Grid.ColumnDefinitions>
  <ColumnDefinition Width="165" />
@@ -76,7 +77,7 @@
  <TextBox x:Name="Txt_MotorVel2" Grid.Row="7" Grid.Column="1" Margin="4,4,0,4" />
 
  <!-- NumericUpDown-like control for AirKnifeRetryCount -->
-                        <TextBlock Text="風刀往復次數:" Grid.Row="8" Grid.Column="0" VerticalAlignment="Center" FontWeight="DemiBold"/>
+ <TextBlock Text="風刀往復次數:" Grid.Row="8" Grid.Column="0" VerticalAlignment="Center" FontWeight="DemiBold"/>
  <Grid Grid.Row="8" Grid.Column="1" Margin="4,4,0,4">
  <Grid.ColumnDefinitions>
  <ColumnDefinition Width="Auto" />
@@ -88,6 +89,10 @@
  <TextBox x:Name="Txt_AirKnifeRetryCount" Grid.Column="1" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Margin="4,0" />
  <Button x:Name="Btn_AirInc" Grid.Column="2" Content="+" Width="22" Height="22" Click="Btn_AirInc_Click" />
  </Grid>
+
+ <!-- New row: Shaking delay time -->
+ <TextBlock Text="搖擺動作延遲時間(ms):" Grid.Row="9" Grid.Column="0" VerticalAlignment="Center" FontWeight="DemiBold"/>
+ <TextBox x:Name="Txt_ShakingDelayTime" Grid.Row="9" Grid.Column="1" Margin="4,4,0,4" />
 
  </Grid>
  </StackPanel>

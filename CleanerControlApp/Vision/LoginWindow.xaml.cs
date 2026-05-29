@@ -74,5 +74,30 @@ namespace CleanerControlApp.Vision
                 ErrorText.Text = "帳號或密碼錯誤，請重新輸入。";
             }
         }
+
+        private async void CloseButton_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                var dlg = new CleanerControlApp.Vision.ConfirmCloseWindow() { Owner = this };
+                bool? res = dlg.ShowDialog();
+                if (res != true)
+                    return;
+
+                // close the login dialog
+                this.DialogResult = false;
+            }
+            catch { }
+
+            try
+            {
+                if (_hardwareManager != null)
+                {
+                    // perform module shutdown asynchronously
+                    await _hardwareManager.ModuleClose();
+                }
+            }
+            catch { }
+        }
     }
 }

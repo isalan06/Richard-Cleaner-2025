@@ -110,6 +110,7 @@ namespace CleanerControlApp.Vision.SettingViews
             var tbMVel1 = GetTextBox("Txt_MotorVel1");
             var tbMVel2 = GetTextBox("Txt_MotorVel2");
             var tbAirRetry = GetTextBox("Txt_AirKnifeRetryCount");
+            var tbShaking = GetTextBox("Txt_ShakingDelayTime");
 
             if (tbLow != null) tbLow.Text = displaySVLow.ToString(CultureInfo.InvariantCulture);
             if (tbHigh != null) tbHigh.Text = displaySVHigh.ToString(CultureInfo.InvariantCulture);
@@ -122,6 +123,7 @@ namespace CleanerControlApp.Vision.SettingViews
             if (tbMVel2 != null) tbMVel2.Text = (m.MotorVelocity_02 * motorTransfer).ToString(CultureInfo.InvariantCulture);
 
             if (tbAirRetry != null) tbAirRetry.Text = m.AirKnifeRetryCount.ToString(CultureInfo.InvariantCulture);
+            if (tbShaking != null) tbShaking.Text = m.ShakingDelayTime_ms.ToString(CultureInfo.InvariantCulture);
         }
 
         private void BtnRead_Click(object sender, RoutedEventArgs e)
@@ -198,6 +200,7 @@ namespace CleanerControlApp.Vision.SettingViews
             var tbMVel1 = GetTextBox("Txt_MotorVel1");
             var tbMVel2 = GetTextBox("Txt_MotorVel2");
             var tbAirRetry = GetTextBox("Txt_AirKnifeRetryCount");
+            var tbShaking = GetTextBox("Txt_ShakingDelayTime");
 
             var errors = new StringBuilder();
 
@@ -209,6 +212,7 @@ namespace CleanerControlApp.Vision.SettingViews
             float input_low =0, input_high =0, input_mpos1 =0, input_mpos2 =0, input_mpos3 =0, input_mvel1 =0, input_mvel2 =0;
             int input_time =0;
             int input_airRetry =0;
+            int input_shaking =0;
 
             bool parsed_low = tbLow != null && float.TryParse(tbLow.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out input_low);
             bool parsed_high = tbHigh != null && float.TryParse(tbHigh.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out input_high);
@@ -220,6 +224,7 @@ namespace CleanerControlApp.Vision.SettingViews
             bool parsed_mvel1 = tbMVel1 != null && float.TryParse(tbMVel1.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out input_mvel1);
             bool parsed_mvel2 = tbMVel2 != null && float.TryParse(tbMVel2.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out input_mvel2);
             bool parsed_airRetry = tbAirRetry != null && int.TryParse(tbAirRetry.Text, NumberStyles.Integer, CultureInfo.InvariantCulture, out input_airRetry);
+            bool parsed_shaking = tbShaking != null && int.TryParse(tbShaking.Text, NumberStyles.Integer, CultureInfo.InvariantCulture, out input_shaking);
 
             if (!parsed_low) errors.AppendLine("沖水槽:低設定值格式錯誤");
             if (!parsed_high) errors.AppendLine("沖水槽:高設定值格式錯誤");
@@ -230,6 +235,7 @@ namespace CleanerControlApp.Vision.SettingViews
             if (!parsed_mvel1) errors.AppendLine("沖水槽:馬達速度 #1 格式錯誤");
             if (!parsed_mvel2) errors.AppendLine("沖水槽:馬達速度 #2 格式錯誤");
             if (!parsed_airRetry) errors.AppendLine("沖水槽:風刀往復次數格式錯誤");
+            if (!parsed_shaking) errors.AppendLine("沖水槽:搖擺動作延遲時間格式不正確");
 
             int conv_low = parsed_low ? (int)Math.Round(Sink.ConvertPV_MToPVValue(input_low) / transfer) :0;
             int conv_high = parsed_high ? (int)Math.Round(Sink.ConvertPV_MToPVValue(input_high) / transfer) :0;
@@ -266,6 +272,11 @@ namespace CleanerControlApp.Vision.SettingViews
             {
                 if (input_airRetry <0) errors.AppendLine("沖水槽:風刀往復次數不能為負數");
             }
+            // validate shaking delay is non-negative
+            if (parsed_shaking)
+            {
+                if (input_shaking <0) errors.AppendLine("沖水槽:搖擺動作延遲時間不能為負數");
+            }
 
             // motor positions/vel converted to int by rounding after dividing by motorTransfer
             int conv_mpos1 = parsed_mpos1 ? (int)Math.Round(input_mpos1 / motorTransfer) :0;
@@ -294,6 +305,7 @@ namespace CleanerControlApp.Vision.SettingViews
 
             // assign air retry count
             _moduleSettings.Sink.AirKnifeRetryCount = parsed_airRetry ? input_airRetry : _moduleSettings.Sink.AirKnifeRetryCount;
+            _moduleSettings.Sink.ShakingDelayTime_ms = parsed_shaking ? input_shaking : _moduleSettings.Sink.ShakingDelayTime_ms;
 
             try
             {

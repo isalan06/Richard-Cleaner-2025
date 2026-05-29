@@ -71,6 +71,12 @@ namespace CleanerControlApp.Hardwares.SoakingTank.Services
         private string _messageForOperation = string.Empty;
         private DateTime? _alarmCheckStartTime = DateTime.UtcNow;
 
+        private DateTime? _shakingCheckStartTime_P3 = DateTime.UtcNow;
+        private DateTime? _shakingCheckStartTime_P2 = DateTime.UtcNow;
+
+        private bool _homeRequest = false;
+        private bool _homeRequestDone = false;
+
         #endregion
 
         #region constructor
@@ -628,7 +634,7 @@ namespace CleanerControlApp.Hardwares.SoakingTank.Services
         public bool InPos1 => ((_plcService != null) && (Posiition == (_moduleSettings.SoakingTank != null ? _moduleSettings.SoakingTank.MotorPosition_01 : 0))) || _sim_pass_motor;
         public bool InPos2 => ((_plcService != null) && (Posiition == (_moduleSettings.SoakingTank != null ? _moduleSettings.SoakingTank.MotorPosition_02 : 0))) || _sim_pass_motor;
         public bool InPos3 => ((_plcService != null) && (Posiition == (_moduleSettings.SoakingTank != null ? _moduleSettings.SoakingTank.MotorPosition_03 : 0))) || _sim_pass_motor;
-
+        public bool InPos0 => ((_plcService != null) && (Posiition == 0)) || _sim_pass_motor;
         public void Teach(int position)
         {
             if (_plcService != null && _moduleSettings.SoakingTank != null)
@@ -882,7 +888,7 @@ namespace CleanerControlApp.Hardwares.SoakingTank.Services
                 if (Ultrasonic) UltrasonicOP(false);
             }
 
-            await AutoProcedure(); 
+            AutoProcedure(); 
             ManualShakingFunction();
 
             await Task.Yield();
@@ -892,11 +898,11 @@ namespace CleanerControlApp.Hardwares.SoakingTank.Services
         {
             if (_manualShaking)
             {
-                if (!InPos3 && MotorIdle && !_motor_commanding)
+                if (CommonFunction.MoveEndDelayPassed(ref _shakingCheckStartTime_P2, !InPos3 && MotorIdle && !_motor_commanding, _moduleSettings.SoakingTank != null ? _moduleSettings.SoakingTank.ShakingDelayTime_ms : 50))
                 {
                     MoveToPosition(2, 0);
                 }
-                else if (InPos3 && MotorIdle && !_motor_commanding)
+                else if (CommonFunction.MoveEndDelayPassed(ref _shakingCheckStartTime_P3, InPos3 && MotorIdle && !_motor_commanding, _moduleSettings.SoakingTank != null ? _moduleSettings.SoakingTank.ShakingDelayTime_ms : 50))
                 {
                     MoveToPosition(1, 0);
                 }
@@ -962,7 +968,7 @@ namespace CleanerControlApp.Hardwares.SoakingTank.Services
             _elapsedTime = new TimeSpan();
         }
 
-        private async Task AutoProcedure()
+        private void AutoProcedure()
         {
             if (_private_waste_HAlarm || HS_WaterSystemError)
             {
@@ -1008,6 +1014,8 @@ namespace CleanerControlApp.Hardwares.SoakingTank.Services
                     //卡匣放入後蓋子關閉
                     if (_cassette && !Command_CleanerCoverClose)
                     {
+                        _homeRequest = false;
+                        _homeRequestDone = false;
                         if (!InPos3 && !_motor_commanding && !_pausing)
                             MoveToPosition(2, 0);
 
@@ -1027,7 +1035,6 @@ namespace CleanerControlApp.Hardwares.SoakingTank.Services
                     {
                         if (HS_RequestWater)
                         {
-                            await Task.Delay(TimeSpan.FromSeconds(1)).ConfigureAwait(false); // delay to ensure water level sensor updates
                             WaterInOP(false);
                         }
 
@@ -1036,9 +1043,9 @@ namespace CleanerControlApp.Hardwares.SoakingTank.Services
                     }
 
                     // 有卡匣及滿水位且蓋子關閉後開始
-                    if (_cassette && Sensor_CoverClose)
+                    if (_cassette && Sensor_CoverClose && !_homeRequest)
                     {
-                        if (!Ultrasonic && !_pausing && Sensor_Liquid_H) // 開始沖水
+                        if (!Ultrasonic && !_pausing && Sensor_Liquid_H) // 開始超音波震盪
                         {
                             UltrasonicOP(true);
                         }
@@ -1047,7 +1054,7 @@ namespace CleanerControlApp.Hardwares.SoakingTank.Services
                     }
 
                     // 沖水時間計算
-                    if (Ultrasonic && !_pausing && Sensor_CoverClose)
+                    if (Ultrasonic && !_pausing && Sensor_CoverClose && !_homeRequest)
                     {
                         // start timer when condition becomes true
                         if (_heatingStartTime == null)
@@ -1057,13 +1064,13 @@ namespace CleanerControlApp.Hardwares.SoakingTank.Services
                         else
                         {
                             // 馬達往復搖擺流程
-                            if (InPos3 && MotorIdle && !_motor_commanding && !_pausing)
-                            {
-                                MoveToPosition(1, 0);
-                            }
-                            else if (InPos2 && MotorIdle && !_motor_commanding && !_pausing)
+                            if (CommonFunction.MoveEndDelayPassed(ref _shakingCheckStartTime_P2, !InPos3 && MotorIdle && !_motor_commanding && !_pausing, _moduleSettings.SoakingTank != null ? _moduleSettings.SoakingTank.ShakingDelayTime_ms : 50))
                             {
                                 MoveToPosition(2, 0);
+                            }
+                            else if (CommonFunction.MoveEndDelayPassed(ref _shakingCheckStartTime_P3, InPos3 && MotorIdle && !_motor_commanding && !_pausing, _moduleSettings.SoakingTank != null ? _moduleSettings.SoakingTank.ShakingDelayTime_ms : 50))
+                            {
+                                MoveToPosition(1, 0);
                             }
 
 
@@ -1073,17 +1080,35 @@ namespace CleanerControlApp.Hardwares.SoakingTank.Services
                             if (_elapsedTime >= TimeSpan.FromSeconds((double)(_moduleSettings.SoakingTank != null ? _moduleSettings.SoakingTank.ActTime_Second : 60.0)))
                             {
                                 UltrasonicOP(false);
-                                _actFinished = true;
-                                MotorStop();
+                                //_actFinished = true;
+                                _homeRequest = true;
+                                //MotorStop();
+                                _heatingStartTime = null;
                             }
                         }
                     }
-                    else
+                    else if (!_homeRequest) // 沒有滿足持續計時條件則重置
                     {
                         // reset timer when condition no longer holds
                         _heatingStartTime = null;
                         if(_pausing && !MotorIdle)
                             MotorStop();
+                    }
+
+                    // 沖水完成後回原點，避免點位可能偏移
+                    if (_homeRequest && !_motor_commanding && MotorIdle && InPos3)
+                    {
+                        if (!_homeRequestDone)
+                        {
+                            _homeRequestDone = true;
+                            Home();
+                        }
+                        else if (MotorHome && InPos0)
+                        {
+                            _actFinished = true;
+                            _homeRequest = false;
+                            _homeRequestDone = false;
+                        }
                     }
 
 
@@ -1122,6 +1147,15 @@ namespace CleanerControlApp.Hardwares.SoakingTank.Services
                             MoveToPosition(2, 0);
                             _motor_air_retry_count++;
                         }
+                    }
+
+                    // 風刀反覆吹氣結束後停止吹風且等待卡匣取出，當夾爪來取卡匣時再次啟動吹風協助吹乾
+                    if (_cassette && InPos1 && MotorIdle && !_motor_commanding && RetryAirFinished)
+                    {
+                        if (HS_ClamperMoving)
+                            AirOP(true);
+                        else
+                            AirOP(false);
                     }
 
                     // 卡匣取出後流程結束
