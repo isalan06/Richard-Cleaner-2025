@@ -107,6 +107,7 @@ namespace CleanerControlApp.Hardwares
                 AlarmManager.AttachFlagGetter("ALM007", () => _checkCassette_alarm);
                 AlarmManager.AttachFlagGetter("ALM008", () => _initializingTimeout_alarm);
                 AlarmManager.AttachFlagGetter("ALM009", () => _plc_System_alarm);
+                AlarmManager.AttachFlagGetter("ALM010", () => _unloaderCannotPlaceHint);
 
                 StartLoop();
 
@@ -378,6 +379,8 @@ namespace CleanerControlApp.Hardwares
             set { if (_plcOperator != null) _plcOperator.Command_LighterBuzzer = value; }
         }
 
+        public bool WaterSlotCanWork => _heatingTank != null && _heatingTank.HighTemperature;
+
         #endregion
 
         #region Task
@@ -525,6 +528,7 @@ namespace CleanerControlApp.Hardwares
             }
         }
 
+        private bool _unloaderCannotPlaceHint => !UnloaderCanPlace;
 
         public bool HasAlarm => _communication_alarm || _emo_alarm || _leakage_alarm || _wasteTankH_alarm || _checkCassette_alarm || _initializingTimeout_alarm;
         public bool HasWarning => _main_air_alarm || _door_alarm;
@@ -545,7 +549,7 @@ namespace CleanerControlApp.Hardwares
 
         public bool HasSystemAlarm => HasAlarm || HasShuttleAlarm || HasSinkAlarm || HasSoakingTankAlarm || HasDryingTank1Alarm || HasDryingTank2Alarm || HasHeatingTankAlarm || IsAlarm;
         public bool HasSystemWarning => HasWarning || HasShuttleWarning || HasSinkWarning || HasSoakingTankWarning || HasDryingTank1Warning || HasDryingTank2Warning || HasHeatingTankWarning || IsWarning;
-
+        public bool HasSystemHint => AlarmManager.GetActiveCount(AlarmType.Hint) > 0;
 
 
         private async Task AlarmReset()
@@ -707,7 +711,7 @@ namespace CleanerControlApp.Hardwares
                 return result;
             }
         }
-        public bool UnloaderCanPlace => UnloaderCassetteCount < 5;
+        public bool UnloaderCanPlace => UnloaderCassetteCount < 5 && UnloaderFirstEmptyPosition >= 10;
         public int UnloaderFirstEmptyPosition
         {
             get
@@ -779,6 +783,8 @@ namespace CleanerControlApp.Hardwares
                 catch { }
             }
         }
+
+        public bool WaterSlotPosIsHigh => _sink != null && _soakingTank != null && (_sink.InPos1 || _soakingTank.InPos1 || !_sink.MotorHome || !_soakingTank.MotorHome);
 
         #endregion
 
@@ -1036,12 +1042,12 @@ namespace CleanerControlApp.Hardwares
                     if (!_sink.ModulePass && _soakingTank.ModulePass && _sink.HS_ActFinished) { pickPosition = 6; placePosition = 8; return true; }
                     if (_sink.ModulePass && _soakingTank.ModulePass && LoaderCanPick) { pickPosition = LoaderFirstCassettePosition; placePosition = 8; return true; }
                 }
-                if (_soakingTank.HS_InputPermit && !_soakingTank.ModulePass)
+                if (_soakingTank.HS_InputPermit && !_soakingTank.ModulePass && WaterSlotCanWork)
                 { 
                     if(!_sink.ModulePass && _sink.HS_ActFinished) { pickPosition = 6; placePosition = 7; return true; }
                     if(_sink.ModulePass && LoaderCanPick) { pickPosition = LoaderFirstCassettePosition; placePosition = 7; return true; }
                 }
-                if(_sink.HS_InputPermit && !_sink.ModulePass)
+                if(_sink.HS_InputPermit && !_sink.ModulePass && WaterSlotCanWork)
                 {
                     if (LoaderCanPick) { pickPosition = LoaderFirstCassettePosition; placePosition = 6; return true; }
                 }
@@ -1687,12 +1693,41 @@ namespace CleanerControlApp.Hardwares
                     {
                         Application.Current.Dispatcher.Invoke(() =>
                         {
-                            try { Application.Current.Shutdown(); } catch { }
+                            try
+                            {
+                                // If current user is Operator, request full machine shutdown instead of only closing the application
+                                if (UserManager.CurrentUserRole == UserRole.Operator)
+                                {
+                                    // Attempt to shut down the computer immediately. If it fails, fall back to application shutdown.
+                                    try
+                                    {
+                                        var psi = new ProcessStartInfo("shutdown", "/s /t0")
+                                        {
+                                            CreateNoWindow = true,
+                                            UseShellExecute = false
+                                        };
+                                        Process.Start(psi);
+                                    }
+                                    catch
+                                    {
+                                        // fallback to closing application if shutdown fails
+                                        try { Application.Current.Shutdown(); } catch { }
+                                    }
+                                }
+                                else
+                                {
+                                    try { Application.Current.Shutdown(); } catch { }
+                                }
+                            }
+                            catch
+                            {
+                                // ensure we at least close app if anything goes wrong inside dispatcher
+                                try { Application.Current.Shutdown(); } catch { }
+                            }
                         });
                     }
                 }
-                catch { }
-            }
+                catch { }            }
             catch (Exception ex)
             {
                 try { _logger?.LogError(ex, "Error during ModuleClose"); } catch { }
@@ -1705,14 +1740,35 @@ namespace CleanerControlApp.Hardwares
 
         private bool _buzzer_stop = false;
 
+        // Track hint-triggered buzzer: when a Hint appears, keep buzzer on for this period
+        private DateTime? _hintBuzzerEndTime = null;
+        private bool _previousHasSystemHint = false;
+
+
         public bool BuzzerStop => _buzzer_stop;
 
         public void CheckLightTower()
         {
             Tower_Red = HasSystemAlarm;
-            Tower_Yellow = HasSystemWarning;
+            Tower_Yellow = HasSystemWarning || HasSystemHint;
             Tower_Green = SystemAuto;
-            Tower_Buzzer = !_buzzer_stop && HasSystemAlarm;
+
+            // If a new hint appears, start (or extend) the hint buzzer period for10 seconds
+            var currentHasHint = HasSystemHint;
+            if (currentHasHint && !_previousHasSystemHint)
+            {
+                try
+                {
+                    _hintBuzzerEndTime = DateTime.UtcNow.AddSeconds(10);
+                }
+                catch { /* ignore */ }
+            }
+            _previousHasSystemHint = currentHasHint;
+
+            var hintBuzzerOn = _hintBuzzerEndTime.HasValue && DateTime.UtcNow <= _hintBuzzerEndTime.Value;
+
+            // Buzzer is on when there's a system alarm, or when a recent hint requested buzzer, and not manually stopped
+            Tower_Buzzer = !_buzzer_stop && (HasSystemAlarm || hintBuzzerOn);
         }
         public void Buzzer_Stop()
         {

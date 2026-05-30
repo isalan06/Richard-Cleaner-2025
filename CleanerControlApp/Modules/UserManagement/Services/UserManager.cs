@@ -14,7 +14,7 @@ namespace CleanerControlApp.Modules.UserManagement.Services
 
         // Static variables to hold current logged-in username and role
         public static string? CurrentUsername = null;
-        public static UserRole? CurrentUserRole = null;
+        public static UserRole? CurrentUserRole = UserRole.Operator;
 
         private string _developer_username = "supervisor";
         private string _developer_password = "9527";
@@ -38,7 +38,7 @@ namespace CleanerControlApp.Modules.UserManagement.Services
             {
                 // clear static values on failed login
                 CurrentUsername = null;
-                CurrentUserRole = null;
+                CurrentUserRole = UserRole.Operator;
                 return result;
             }
 

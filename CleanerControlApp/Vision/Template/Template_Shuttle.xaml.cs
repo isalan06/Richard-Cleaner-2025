@@ -18,6 +18,7 @@ using System.Windows.Threading;
 using CleanerControlApp.Hardwares.Shuttle.Models;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using CleanerControlApp.Hardwares;
 
 namespace CleanerControlApp.Vision.Template
 {
@@ -28,6 +29,7 @@ namespace CleanerControlApp.Vision.Template
     {
         private readonly IShuttle? _shuttle;
         private readonly DispatcherTimer _timer;
+        private readonly HardwareManager? _hwManager;
 
         // teach long-press timer
         private readonly DispatcherTimer _teachHoldTimer;
@@ -63,6 +65,15 @@ namespace CleanerControlApp.Vision.Template
             catch
             {
                 _shuttle = null;
+            }
+
+            try
+            {
+                _hwManager = App.AppHost?.Services.GetService<HardwareManager>();
+            }
+            catch
+            {
+                _hwManager = null;
             }
 
             // populate cmbXPositionSelect
@@ -426,6 +437,22 @@ namespace CleanerControlApp.Vision.Template
         {
             try
             {
+                // If water slot is high (water slot at cassette position or not homed), prompt user before moving
+                try
+                {
+                    var hw = _hwManager ?? App.AppHost?.Services.GetService<HardwareManager>();
+                    if (hw != null && hw.WaterSlotPosIsHigh)
+                    {
+                        bool confirm = CleanerControlApp.Vision.Shared.InfoAskPopup.Ask("水槽已在承載卡匣位置或尚未復歸，請確認是否進行移動?", Window.GetWindow(this));
+                        if (!confirm)
+                        {
+                            e.Handled = true;
+                            return;
+                        }
+                    }
+                }
+                catch { }
+
                 if (!CheckShuttleXMoveStatus())
                 {
                     e.Handled = true;

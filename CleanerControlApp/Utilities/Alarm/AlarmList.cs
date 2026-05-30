@@ -13,7 +13,8 @@ namespace CleanerControlApp.Utilities.Alarm
     public enum AlarmType
     {
         Warning,
-        Alarm
+        Alarm,
+        Hint
     }
 
     /// <summary>

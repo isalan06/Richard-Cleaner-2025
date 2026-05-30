@@ -121,6 +121,7 @@ namespace CleanerControlApp.Hardwares.HeatingTank.Services
             AlarmManager.AttachFlagGetter("ALM607", () => _invWarningAlarm);
             AlarmManager.AttachFlagGetter("ALM608", () => _tankLLAlarm);
             AlarmManager.AttachFlagGetter("ALM609", () => _tankHHAlarm);
+            AlarmManager.AttachFlagGetter("ALM610", () => _lowTemperatureHint);
 
             StartLoop();
 
@@ -939,8 +940,6 @@ namespace CleanerControlApp.Hardwares.HeatingTank.Services
 
         #region Alarm
 
-
-
         private bool _invErrorAlarm
         {
             get
@@ -987,6 +986,8 @@ namespace CleanerControlApp.Hardwares.HeatingTank.Services
                 return (_plcService != null) && !_plcService.WasteWaterPosH;
             }
         }
+
+        private bool _lowTemperatureHint => !HighTemperature;
 
         #endregion
     }

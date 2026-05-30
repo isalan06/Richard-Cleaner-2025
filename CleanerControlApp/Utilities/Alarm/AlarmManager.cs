@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using CleanerControlApp.Utilities.Log;
 using CleanerControlApp.Modules.UserManagement.Services;
+using System.Collections.ObjectModel;
 
 namespace CleanerControlApp.Utilities.Alarm
 {
@@ -443,6 +444,41 @@ namespace CleanerControlApp.Utilities.Alarm
             }
 
             RaiseAlarmsChanged();
+        }
+
+        /// <summary>
+        /// Returns counts of currently active alarms grouped by AlarmType (Alarm, Warning, Hint).
+        /// </summary>
+        public static IReadOnlyDictionary<AlarmType, int> GetActiveCounts()
+        {
+            lock (_lock)
+            {
+                var counts = new Dictionary<AlarmType, int>();
+                foreach (AlarmType t in Enum.GetValues(typeof(AlarmType)))
+                {
+                    counts[t] =0;
+                }
+
+                foreach (var e in _entries.Values)
+                {
+                    if (e.IsAlarm)
+                    {
+                        var t = e.Type;
+                        counts[t] = counts.TryGetValue(t, out var v) ? v +1 :1;
+                    }
+                }
+
+                return new ReadOnlyDictionary<AlarmType, int>(counts);
+            }
+        }
+
+        /// <summary>
+        /// Returns the active count for a single AlarmType.
+        /// </summary>
+        public static int GetActiveCount(AlarmType type)
+        {
+            var counts = GetActiveCounts();
+            return counts.TryGetValue(type, out var v) ? v :0;
         }
     }
 }
