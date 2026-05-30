@@ -47,6 +47,9 @@ namespace CleanerControlApp
 
         private Action<ModuleSettings>? _moduleSettingsUpdatedHandler;
 
+        // track flashing state for AutoIndicator when initializing
+        private bool _autoFlashState = false;
+
         /// <summary>
         /// 建構式，注入 Logger
         /// </summary>
@@ -166,10 +169,66 @@ namespace CleanerControlApp
         {
             if (_hardwareManager == null) return;
 
-            // Auto -> Lime when true
+            // Auto indicator: complex state -> set text + background, support flashing when initializing
             if (AutoIndicator != null)
             {
-                AutoIndicator.Background = _hardwareManager.SystemAuto ? Brushes.Lime : new SolidColorBrush(Color.FromRgb(0xB0,0xB0,0xB0));
+                // get inner textblock if present
+                TextBlock? tb = null;
+                try { tb = AutoIndicator.Child as TextBlock; } catch { }
+
+                // default
+                Brush bg = new SolidColorBrush(Color.FromRgb(0xB0,0xB0,0xB0));
+                string text = "初始化";
+                Brush fg = Brushes.Black;
+
+                if (_hardwareManager.SystemAuto)
+                {
+                    text = "自動";
+                    bg = Brushes.Lime;
+                }
+                else if (_hardwareManager.HasAutoStatus)
+                {
+                    text = "自動";
+                    bg = Brushes.Yellow;
+                }
+                else if (_hardwareManager.SystemIdle)
+                {
+                    text = "閒置";
+                    bg = Brushes.Yellow;
+                }
+                else if (_hardwareManager.SystemInitialized)
+                {
+                    text = "初始";
+                    bg = Brushes.Yellow;
+                }
+                else if (_hardwareManager.SystemInitializing)
+                {
+                    text = "初始化";
+                    // flashing: toggle between Yellow and gray on each tick
+                    _autoFlashState = !_autoFlashState;
+                    bg = _autoFlashState ? Brushes.Yellow : new SolidColorBrush(Color.FromRgb(0xB0,0xB0,0xB0));
+                }
+                else
+                {
+                    text = "初始化";
+                    bg = new SolidColorBrush(Color.FromRgb(0xB0,0xB0,0xB0));
+                }
+
+                try
+                {
+                    AutoIndicator.Background = bg;
+                    if (tb != null)
+                    {
+                        tb.Text = text;
+                        tb.Foreground = fg;
+                    }
+                    else
+                    {
+                        // if there's no inner textblock, consider replacing content
+                        AutoIndicator.Child = new TextBlock { Text = text, FontSize =20, HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center, Foreground = fg, FontWeight = FontWeights.Bold };
+                    }
+                }
+                catch { }
             }
 
             // Warning -> Yellow when true

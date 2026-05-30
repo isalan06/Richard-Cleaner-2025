@@ -749,6 +749,7 @@ namespace CleanerControlApp.Hardwares
         public bool DryingTank1Idle => _dryingTanks != null && _dryingTanks.Length > 0 && _dryingTanks[0].Idle;
         public bool DryingTank2Idle => _dryingTanks != null && _dryingTanks.Length > 1 && _dryingTanks[1].Idle;
         public bool HeatingTankIdle => _heatingTank != null && _heatingTank.Idle;
+        public bool SystemIdle => ShuttleIdle && SinkIdle && SoakingTankIdle && DryingTank1Idle && DryingTank2Idle && HeatingTankIdle;
 
         public bool ShuttleInitialized => _shuttle != null && _shuttle.Initialized;
         public bool SinkInitialized => _sink != null && _sink.Initialized;
@@ -758,6 +759,7 @@ namespace CleanerControlApp.Hardwares
         public bool HeatingTankInitialized => _heatingTank != null && _heatingTank.Initialized;
 
         public bool SystemInitialized => ShuttleInitialized && SinkInitialized && SoakingTankInitialized && DryingTank1Initialized && DryingTank2Initialized && HeatingTankInitialized && !_initializing;
+        public bool SystemInitializing => _initializing;
 
         public bool ShuttleAuto => _shuttle != null && _shuttle.Auto;
         public bool SinkAuto => _sink != null && _sink.Auto;
@@ -768,6 +770,8 @@ namespace CleanerControlApp.Hardwares
 
         public bool SystemAuto => ShuttleAuto && SinkAuto && SoakingTankAuto && DryingTank1Auto && DryingTank2Auto && HeatingTankAuto;
         public bool HasAutoStatus => ShuttleAuto || SinkAuto || SoakingTankAuto || DryingTank1Auto || DryingTank2Auto || HeatingTankAuto;
+
+
 
         // Expose PassClamperCheckCassette from shuttle for UI toggling
         public bool ShuttlePassClamperCheckCassette

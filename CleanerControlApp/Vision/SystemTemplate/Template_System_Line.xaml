@@ -6,73 +6,215 @@
  xmlns:local="clr-namespace:CleanerControlApp.Vision.SystemTemplate"
  mc:Ignorable="d" 
  d:DesignHeight="450" d:DesignWidth="1150" x:Name="RootControl">
- <Grid Background="Transparent" Margin="10,0,10,0">
- <Grid.RowDefinitions>
- <RowDefinition Height="*" />
- <RowDefinition Height="Auto" />
- </Grid.RowDefinitions>
+    <Grid Background="Transparent" Margin="10,0,10,0">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
 
- <!-- Original system line controls placed in first row -->
- <Grid Grid.Row="0">
- <Grid.ColumnDefinitions>
- <ColumnDefinition Width="*" />
- <ColumnDefinition Width="*" />
- <ColumnDefinition Width="*" />
- <ColumnDefinition Width="*" />
- <ColumnDefinition Width="*" />
- <ColumnDefinition Width="*" />
- </Grid.ColumnDefinitions>
+        <!-- Original system line controls placed in first row -->
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
 
- <local:Template_Unloader x:Name="UnloaderControl" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center" />
- <local:Template_System_DryingTank2 x:Name="DryingTank1Contro2" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" />
- <local:Template_System_DryingTank1 x:Name="DryingTank1Control" Grid.Column="2" HorizontalAlignment="Center" VerticalAlignment="Center" />
- <local:Template_System_SoakingTank x:Name="SystemSoakingControl" Grid.Column="3" HorizontalAlignment="Center" VerticalAlignment="Center" />
- <local:Template_System_Sink x:Name="SystemSinkControl" Grid.Column="4" HorizontalAlignment="Center" VerticalAlignment="Center" />
- <local:Template_Loader x:Name="LoaderControl" Grid.Column="5" HorizontalAlignment="Center" VerticalAlignment="Center" />
- </Grid>
+            <local:Template_Unloader x:Name="UnloaderControl" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center" />
+            <local:Template_System_DryingTank2 x:Name="DryingTank1Contro2" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" />
+            <local:Template_System_DryingTank1 x:Name="DryingTank1Control" Grid.Column="2" HorizontalAlignment="Center" VerticalAlignment="Center" />
+            <local:Template_System_SoakingTank x:Name="SystemSoakingControl" Grid.Column="3" HorizontalAlignment="Center" VerticalAlignment="Center" />
+            <local:Template_System_Sink x:Name="SystemSinkControl" Grid.Column="4" HorizontalAlignment="Center" VerticalAlignment="Center" />
+            <local:Template_Loader x:Name="LoaderControl" Grid.Column="5" HorizontalAlignment="Center" VerticalAlignment="Center" />
+        </Grid>
 
- <!-- Bottom area with two rows of informational text -->
- <Border Grid.Row="1" Margin="0,8,0,0" Background="Transparent">
- <Grid>
- <Grid.RowDefinitions>
- <RowDefinition Height="Auto" />
- <RowDefinition Height="Auto" />
- </Grid.RowDefinitions>
+        <!-- Bottom area with two rows of informational text -->
+        <Border Grid.Row="1" Margin="0,8,0,0" Background="Transparent">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
 
- <!-- First info row: shuttle status label + status boxes arranged horizontally -->
- <StackPanel Grid.Row="0" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="4,2,4,2">
- <TextBlock Text="移載組狀態: " FontSize="20" Foreground="#333333" VerticalAlignment="Center" />
- <!-- Status boxes: use small margins for spacing (~4) -->
- <Border BorderBrush="Black" BorderThickness="1" CornerRadius="3" Padding="4" Height="24" Margin="4,0,0,0" VerticalAlignment="Center" Background="#FFFFFF">
- <TextBlock Text="自動" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black"/>
- </Border>
- <Border BorderBrush="Black" BorderThickness="1" CornerRadius="3" Padding="4" Height="24" Margin="4,0,0,0" VerticalAlignment="Center" Background="#FFFFFF">
- <TextBlock Text="暫停" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black"/>
- </Border>
- <Border BorderBrush="Black" BorderThickness="1" CornerRadius="3" Padding="4" Height="24" Margin="4,0,0,0" VerticalAlignment="Center" Background="#FFFFFF">
- <TextBlock Text="卡匣" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black"/>
- </Border>
- <Border BorderBrush="Black" BorderThickness="1" CornerRadius="3" Padding="4" Height="24" Margin="4,0,0,0" VerticalAlignment="Center" Background="#FFFFFF">
- <TextBlock Text="閒置" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black"/>
- </Border>
- <Border BorderBrush="Black" BorderThickness="1" CornerRadius="3" Padding="4" Height="24" Margin="4,0,0,0" VerticalAlignment="Center" Background="#FFFFFF">
- <TextBlock Text="初始" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black"/>
- </Border>
- <Border BorderBrush="Black" BorderThickness="1" CornerRadius="3" Padding="4" Height="24" Margin="4,0,0,0" VerticalAlignment="Center" Background="#FFFFFF">
- <TextBlock Text="警告" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black"/>
- </Border>
- <Border BorderBrush="Black" BorderThickness="1" CornerRadius="3" Padding="4" Height="24" Margin="4,0,0,0" VerticalAlignment="Center" Background="#FFFFFF">
- <TextBlock Text="錯誤" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black"/>
- </Border>
- </StackPanel>
+                <!-- First info row: shuttle status label + status boxes arranged horizontally -->
+                <StackPanel Grid.Row="0" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="4,2,4,2">
+                    <TextBlock Text="移載組狀態: " FontSize="20" Foreground="#333333" VerticalAlignment="Center" />
+                    <!-- Status boxes: use small margins for spacing (~4) -->
+                    <Border BorderBrush="Black" BorderThickness="1" CornerRadius="3" Padding="4" Height="24" Margin="4,0,0,0" VerticalAlignment="Center">
+                        <Border.Style>
+                            <Style TargetType="Border">
+                                <Setter Property="Background" Value="#FFFFFF" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding ShuttleAuto, ElementName=RootControl}" Value="True">
+                                        <Setter Property="Background" Value="Lime" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Border.Style>
+                        <TextBlock Text="自動" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black"/>
+                    </Border>
+                    <Border BorderBrush="Black" BorderThickness="1" CornerRadius="3" Padding="4" Height="24" Margin="4,0,0,0" VerticalAlignment="Center">
+                        <Border.Style>
+                            <Style TargetType="Border">
+                                <Setter Property="Background" Value="#FFFFFF" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding ShuttlePausing, ElementName=RootControl}" Value="True">
+                                        <Setter Property="Background" Value="Lime" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Border.Style>
+                        <TextBlock Text="暫停" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black"/>
+                    </Border>
+                    <Border BorderBrush="Black" BorderThickness="1" CornerRadius="3" Padding="4" Height="24" Margin="4,0,0,0" VerticalAlignment="Center">
+                        <Border.Style>
+                            <Style TargetType="Border">
+                                <Setter Property="Background" Value="#FFFFFF" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding ShuttleCassette, ElementName=RootControl}" Value="True">
+                                        <Setter Property="Background" Value="Lime" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Border.Style>
+                        <TextBlock Text="卡匣" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black"/>
+                    </Border>
+                    <Border BorderBrush="Black" BorderThickness="1" CornerRadius="3" Padding="4" Height="24" Margin="4,0,0,0" VerticalAlignment="Center">
+                        <Border.Style>
+                            <Style TargetType="Border">
+                                <Setter Property="Background" Value="#FFFFFF" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding ShuttleIdle, ElementName=RootControl}" Value="True">
+                                        <Setter Property="Background" Value="Lime" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Border.Style>
+                        <TextBlock Text="閒置" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black"/>
+                    </Border>
+                    <Border BorderBrush="Black" BorderThickness="1" CornerRadius="3" Padding="4" Height="24" Margin="4,0,0,0" VerticalAlignment="Center">
+                        <Border.Style>
+                            <Style TargetType="Border">
+                                <Setter Property="Background" Value="#FFFFFF" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding ShuttleInitialized, ElementName=RootControl}" Value="True">
+                                        <Setter Property="Background" Value="Lime" />
+                                    </DataTrigger>
+                                    <MultiDataTrigger>
+                                        <MultiDataTrigger.Conditions>
+                                            <Condition Binding="{Binding ShuttleInitialized, ElementName=RootControl}" Value="False" />
+                                            <Condition Binding="{Binding ShuttleInitializing, ElementName=RootControl}" Value="True" />
+                                        </MultiDataTrigger.Conditions>
+                                        <Setter Property="Background" Value="Yellow" />
+                                    </MultiDataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Border.Style>
+                        <TextBlock Text="初始" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black"/>
+                    </Border>
+                    <Border BorderBrush="Black" BorderThickness="1" CornerRadius="3" Padding="4" Height="24" Margin="4,0,0,0" VerticalAlignment="Center">
+                        <Border.Style>
+                            <Style TargetType="Border">
+                                <Setter Property="Background" Value="#FFFFFF" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding ShuttleHasWarning, ElementName=RootControl}" Value="True">
+                                        <Setter Property="Background" Value="Yellow" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Border.Style>
+                        <TextBlock Text="警告" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black"/>
+                    </Border>
+                    <Border BorderBrush="Black" BorderThickness="1" CornerRadius="3" Padding="4" Height="24" Margin="4,0,0,0" VerticalAlignment="Center">
+                        <Border.Style>
+                            <Style TargetType="Border">
+                                <Setter Property="Background" Value="#FFFFFF" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding ShuttleHasAlarm, ElementName=RootControl}" Value="True">
+                                        <Setter Property="Background" Value="Red" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Border.Style>
+                        <TextBlock Text="錯誤" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black"/>
+                    </Border>
+                </StackPanel>
 
- <!-- Second info row: heating tank status label (placeholder for future status items) -->
- <StackPanel Grid.Row="1" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="4,2,4,2">
- <TextBlock Text="加熱槽狀態: " FontSize="20" Foreground="#333333" VerticalAlignment="Center" />
- <!-- Add status indicators for heating tank here, spaced by Margin="4,0,0,0" -->
- </StackPanel>
+                <!-- Second info row: heating tank status label (placeholder for future status items) -->
+                <StackPanel Grid.Row="1" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="4,2,4,2">
+                    <TextBlock Text="加熱槽狀態: " FontSize="20" Foreground="#333333" VerticalAlignment="Center" />
+                    <!-- Add status indicators for heating tank here, spaced by Margin="4,0,0,0" -->
+                    <Border BorderBrush="Black" BorderThickness="1" CornerRadius="3" Padding="4" Height="24" Margin="4,0,0,0" VerticalAlignment="Center">
+                        <Border.Style>
+                            <Style TargetType="Border">
+                                <Setter Property="Background" Value="#FFFFFF" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding HeatingTankAuto, ElementName=RootControl}" Value="True">
+                                        <Setter Property="Background" Value="Lime" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Border.Style>
+                        <TextBlock Text="自動" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black"/>
+                    </Border>
+                    <Border BorderBrush="Black" BorderThickness="1" CornerRadius="3" Padding="4" Height="24" Margin="4,0,0,0" VerticalAlignment="Center">
+                        <Border.Style>
+                            <Style TargetType="Border">
+                                <Setter Property="Background" Value="#FFFFFF" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding HeatingTankPausing, ElementName=RootControl}" Value="True">
+                                        <Setter Property="Background" Value="Lime" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Border.Style>
+                        <TextBlock Text="暫停" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black"/>
+                    </Border>
+                    <Border BorderBrush="Black" BorderThickness="1" CornerRadius="3" Padding="4" Height="24" Margin="4,0,0,0" VerticalAlignment="Center">
+                        <Border.Style>
+                            <Style TargetType="Border">
+                                <Setter Property="Background" Value="#FFFFFF" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding HeatingTankInitializedStatus, ElementName=RootControl}" Value="True">
+                                        <Setter Property="Background" Value="Lime" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Border.Style>
+                        <TextBlock Text="初始" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black"/>
+                    </Border>
+                    <Border BorderBrush="Black" BorderThickness="1" CornerRadius="3" Padding="4" Height="24" Margin="4,0,0,0" VerticalAlignment="Center">
+                        <Border.Style>
+                            <Style TargetType="Border">
+                                <Setter Property="Background" Value="#FFFFFF" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding HeatingTankHasWarning, ElementName=RootControl}" Value="True">
+                                        <Setter Property="Background" Value="Yellow" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Border.Style>
+                        <TextBlock Text="警告" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black"/>
+                    </Border>
+                    <Border BorderBrush="Black" BorderThickness="1" CornerRadius="3" Padding="4" Height="24" Margin="4,0,0,0" VerticalAlignment="Center">
+                        <Border.Style>
+                            <Style TargetType="Border">
+                                <Setter Property="Background" Value="#FFFFFF" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding HeatingTankHasAlarm, ElementName=RootControl}" Value="True">
+                                        <Setter Property="Background" Value="Red" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Border.Style>
+                        <TextBlock Text="錯誤" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black"/>
+                    </Border>
+                </StackPanel>
 
- </Grid>
- </Border>
- </Grid>
+            </Grid>
+        </Border>
+    </Grid>
 </UserControl>
