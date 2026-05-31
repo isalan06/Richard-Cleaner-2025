@@ -826,9 +826,14 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
         {
             if (_motorXAxis != null && _motorZAxis != null)
             { 
-                _motorZAxis.Home();
+                while(!_motorZAxis.MotorHoming && !_motorZAxis.ErrorHomeTimeout && !_motorZAxis.MotorAlarm && !_sim_pass_motor)
+                {
+                    _motorZAxis.Home();
+                    await Task.Delay(1000);
+                }
+                
 
-                await Task.Delay(1000);
+                //await Task.Delay(1000);
 
                 while (!_motorZAxis.MotorHome && !_motorZAxis.ErrorHomeTimeout && !_motorZAxis.MotorAlarm && !_sim_pass_motor)
                 { 
@@ -836,10 +841,15 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
                 }
 
                 if (!_motorZAxis.ErrorHomeTimeout && !_motorZAxis.MotorAlarm && !_motorZAxis.ErrorCommandTimeout)
-                { 
-                    _motorXAxis.Home();
+                {
+                    while (!_motorXAxis.MotorHoming && !_motorXAxis.ErrorHomeTimeout && !_motorXAxis.MotorAlarm && !_sim_pass_motor)
+                    {
+                        _motorXAxis.Home();
+                        await Task.Delay(1000);
 
-                    await Task.Delay(1000);
+                    }
+
+                    //await Task.Delay(1000);
 
                     while (!_motorXAxis.MotorHome && !_motorXAxis.ErrorHomeTimeout && !_motorXAxis.MotorAlarm && !_sim_pass_motor)
                     {

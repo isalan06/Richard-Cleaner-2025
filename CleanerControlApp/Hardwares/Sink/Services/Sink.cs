@@ -77,6 +77,7 @@ namespace CleanerControlApp.Hardwares.Sink.Services
         private int _motor_air_retry_count = 0;
         private bool _motor_air_up_flag = false;
         private bool RetryAirFinished => _moduleSettings.Sink != null && _moduleSettings.Sink.AirKnifeRetryCount <= _motor_air_retry_count;
+        private bool _retry_air_finished = false;
 
         private string _jogStatus = "";
         private string _homeStatus = "";
@@ -89,6 +90,8 @@ namespace CleanerControlApp.Hardwares.Sink.Services
 
         private DateTime? _shakingCheckStartTime_P3 = DateTime.UtcNow;
         private DateTime? _shakingCheckStartTime_P2 = DateTime.UtcNow;
+        private DateTime? _moveToP1StartTime = DateTime.UtcNow;
+        private DateTime? _moveToP3StartTime = DateTime.UtcNow;
 
         private bool _homeRequest = false;
         private bool _homeRequestDone = false;
@@ -373,7 +376,7 @@ namespace CleanerControlApp.Hardwares.Sink.Services
         public bool HS_ClamperPlaceFinished { get; set; }
         public bool HS_WaterSystemError { get; set; }
         public bool HS_InputPermit => Idle && !_pausing && !HS_ClamperMoving && _auto && InPos1;
-        public bool HS_ActFinished => _cassette && Sensor_CoverOpen && !HS_ClamperMoving && !Pressure && _actFinished && InPos1 && RetryAirFinished;
+        public bool HS_ActFinished => _cassette && Sensor_CoverOpen && !HS_ClamperMoving && !Pressure && _actFinished && InPos1 && RetryAirFinished && _retry_air_finished;
 
         public int ElpasedPressureTime_Seconds => (int)(_elapsedTime != null ? _elapsedTime.Value.TotalSeconds : 0);
         public int RemainingPressureTime_Seconds => (_moduleSettings.Sink != null) ? _moduleSettings.Sink.ActTime_Second - ElpasedPressureTime_Seconds : 0;
@@ -974,6 +977,7 @@ namespace CleanerControlApp.Hardwares.Sink.Services
                     {
                         _homeRequest = false;
                         _homeRequestDone = false;
+                        _retry_air_finished = false;
                         if (!InPos3 && !_motor_commanding && !_pausing)
                             MoveToPosition(2, 0);
 
@@ -1035,7 +1039,11 @@ namespace CleanerControlApp.Hardwares.Sink.Services
                             }
                         }
                     }
-                    else if(!_homeRequest) // 沒有滿足沖水條件時，重置計時器
+                    else if(_homeRequest && !_motor_commanding && MotorIdle && !InPos3 && !InPos0) // 沖水完成後馬達若不在下方位置則移動到下方位置
+                    {
+                        MoveToPosition(2, 0);
+                    }
+                    else if (!_homeRequest) // 沒有滿足沖水條件時，重置計時器
                     {
                         // reset timer when condition no longer holds
                         _heatingStartTime = null;
@@ -1044,7 +1052,7 @@ namespace CleanerControlApp.Hardwares.Sink.Services
                     }
 
                     // 沖水完成後回原點，避免點位可能偏移
-                    if (_homeRequest && !_motor_commanding && MotorIdle && InPos3)
+                    if (_homeRequest && !_motor_commanding && MotorIdle && (InPos3 || InPos0))
                     {
                         if (!_homeRequestDone)
                         {
@@ -1080,13 +1088,13 @@ namespace CleanerControlApp.Hardwares.Sink.Services
                     }
 
                     // 卡匣取出前確認蓋子打開且馬達在上方位置，若不在原點位置則移動到上方位置
-                    if (_cassette && Sensor_CoverOpen && !InPos1 && !_motor_commanding && MotorIdle)
+                    if (CommonFunction.MoveEndDelayPassed(ref _moveToP1StartTime, _cassette && Sensor_CoverOpen && !InPos1 && !_motor_commanding && MotorIdle, 500))
                     { 
                         MoveToPosition(0, 0);
                     }
 
                     // 風刀反覆吹氣流程
-                    if (_cassette && InPos1 && MotorIdle && !_motor_commanding)
+                    if (CommonFunction.MoveEndDelayPassed(ref _moveToP3StartTime, _cassette && InPos1 && MotorIdle && !_motor_commanding, 500))
                     {
                         if (!RetryAirFinished)
                         {
@@ -1098,6 +1106,8 @@ namespace CleanerControlApp.Hardwares.Sink.Services
                     // 風刀反覆吹氣結束後停止吹風且等待卡匣取出，當夾爪來取卡匣時再次啟動吹風協助吹乾
                     if (_cassette && InPos1 && MotorIdle && !_motor_commanding && RetryAirFinished)
                     {
+                        if(!_retry_air_finished)
+                            _retry_air_finished = true;
                         if (HS_ClamperMoving)
                             AirOP(true);
                         else

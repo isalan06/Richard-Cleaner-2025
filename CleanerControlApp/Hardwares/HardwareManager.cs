@@ -1135,9 +1135,14 @@ namespace CleanerControlApp.Hardwares
                         {
                             if (_auto_procedure_pick_executing = _shuttle.PickCassette(_auto_procedure_current_pick_position))
                             {
-                                SetMoving(_auto_procedure_current_pick_position, true);
+                                //SetMoving(_auto_procedure_current_pick_position, true);
                                 OperateLog.Log("自動流程取卡啟動", $"移載組 開始從 {GetPositionName(_auto_procedure_current_pick_position)} 取卡匣。");
                             }
+                        }
+
+                        if (_auto_procedure_pick_executing && !_auto_procedure_place_executing && !_shuttle.Cassette && !IsZInOriPos)
+                        {
+                            SetMoving(_auto_procedure_current_pick_position, true);
                         }
 
                         if (_auto_procedure_pick_executing && !_auto_procedure_place_executing && !_shuttle.Moving && _shuttle.Cassette && IsZInOriPos)

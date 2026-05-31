@@ -203,7 +203,7 @@ namespace CleanerControlApp.Modules.Motor.Services
                         {
                             try
                             {
-                                await Task.Delay(TimeSpan.FromSeconds(3)).ConfigureAwait(false);
+                                await Task.Delay(TimeSpan.FromSeconds(1)).ConfigureAwait(false);
                                 if (_plcService != null)
                                     _plcService.Command_Axis2Home = false;
                             }
@@ -222,7 +222,7 @@ namespace CleanerControlApp.Modules.Motor.Services
                         {
                             try
                             {
-                                await Task.Delay(TimeSpan.FromSeconds(3)).ConfigureAwait(false);
+                                await Task.Delay(TimeSpan.FromSeconds(1)).ConfigureAwait(false);
                                 if (_plcService != null)
                                     _plcService.Command_Axis1Home = false;
                             }
