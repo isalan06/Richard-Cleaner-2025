@@ -96,7 +96,12 @@
  <Run Text="{Binding CurrentPosition}" />
  </TextBlock>
 
- <!-- 編碼器位置：綁定到 AxisViewModel.EncoderPosition，確保對應軸的編碼器位置可見 -->
+                                <TextBlock Margin="4,4,4,0">
+ <Run Text="當前編碼器: " />
+ <Run Text="{Binding CurrentEncoder}" />
+                                </TextBlock>
+
+                                <!-- 編碼器位置：綁定到 AxisViewModel.EncoderPosition，確保對應軸的編碼器位置可見 -->
  <TextBlock Margin="4,2,4,0">
  <Run Text="編碼器位置: " />
  <Run Text="{Binding EncoderPosition}" />

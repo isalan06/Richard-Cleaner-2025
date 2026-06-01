@@ -1,8 +1,31 @@
 # 馬達
 匯川 Driver 1r = 10,000 pulse
-Shuttle X 1r = 40 mm
-Shuttel Z 1r = 10 mm
-Other Z 1r = 5 mm
+匯川 Encoder 18-bit => 1r = 2^18=262144 pulse
+換算 PLC當前脈波座標(Encoder)=(10000/262144)xEncoder
+Shuttle X 1r = 40 mm => 1 pulse = 0.004 mm
+Shuttel Z 1r = 10 mm => 1 pulse = 0.001 mm
+Other Z 1r = 5 mm => 1 pulse = 0.0005 mm
+
+速度換算 寫入 pulse/s => 匯川 速度是用 rpm=r/min=10000pulse/min = (10000/60) pulse/s = 166.67 pulse/s => rpm = pulse/s * 0.006
+
+## Control 變更
+Home/Jog保持用 pulse控制; Move用通訊控制
+參數設定
+H02.00 => 1 (原先:)
+H11.04 => 1 (原先:)
+H0C.09 => 1 (原先:)
+H17.00 => 28 (原先: )
+
+## Jog/Home步驟
+H05.00(0x5000)=0
+TBL
+
+## Move步驟
+Write Position to H11.12(0x110C, DWORD)
+Write Speed to H11.14(0x110E, WORD, RPM)
+H05.00(0x5000)=2
+H31.00(0x3100) Bit0 = 1 (Start)
+wait InPos Signal set H31.00(0x3100) Bit0 = 0 (Done)
 
 # Clamper
 X72: 自動: Clamper照一般流程開關

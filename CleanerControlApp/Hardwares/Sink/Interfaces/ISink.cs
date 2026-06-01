@@ -82,7 +82,7 @@ namespace CleanerControlApp.Hardwares.Sink.Interfaces
         bool MotorHoming { get; }
         bool MotorMoving { get; }
         bool MotorHome { get; }
-        int Posiition { get; }
+        int Position { get; }
         float Position_Value { get; }
 
         void ServoOn(bool servo);

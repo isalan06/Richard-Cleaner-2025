@@ -457,8 +457,10 @@ namespace CleanerControlApp.Hardwares.Sink.Services
         public bool MotorHoming => _plcService != null && _plcService.Axis3HomeProcedure;
         public bool MotorMoving => _plcService != null && _plcService.Axis3CommandProcedure;
         public bool MotorHome => _plcService != null && _plcService.Axis3HomeComplete;
-        public int Posiition => _plcService != null ? _plcService.Axis3Pos : 0;
-        public float Position_Value => (_plcService != null && _unitSettings.Sink != null) ? ((float)_plcService.Axis3Pos * _unitSettings.Sink.MotorUnitTransfer) : 1f;
+        //public int Posiition => _plcService != null ? _plcService.Axis3Pos : 0;
+        public int Position => _plcService != null ? _plcService.Axis3PosEncoder : 0;
+        //public float Position_Value => (_plcService != null && _unitSettings.Sink != null) ? ((float)_plcService.Axis3Pos * _unitSettings.Sink.MotorUnitTransfer) : 1f;
+        public float Position_Value => (_unitSettings.Sink != null) ? ((float)Position * _unitSettings.Sink.MotorUnitTransfer) : 1f;
 
         public void ServoOn(bool servo)
         {
@@ -599,21 +601,21 @@ namespace CleanerControlApp.Hardwares.Sink.Services
             }
         }
 
-        public bool InPos1 => ((_plcService != null) && (Posiition == (_moduleSettings.Sink != null ? _moduleSettings.Sink.MotorPosition_01 : 0))) || _sim_pass_motor;
-        public bool InPos2 => ((_plcService != null) && (Posiition == (_moduleSettings.Sink != null ? _moduleSettings.Sink.MotorPosition_02 : 0))) || _sim_pass_motor;
-        public bool InPos3 => ((_plcService != null) && (Posiition == (_moduleSettings.Sink != null ? _moduleSettings.Sink.MotorPosition_03 : 0))) || _sim_pass_motor;
-        public bool InPos0 => ((_plcService != null) && (Posiition == 0)) || _sim_pass_motor;
+        public bool InPos1 => ((_plcService != null) && (Position == (_moduleSettings.Sink != null ? _moduleSettings.Sink.MotorPosition_01 : 0))) || _sim_pass_motor;
+        public bool InPos2 => ((_plcService != null) && (Position == (_moduleSettings.Sink != null ? _moduleSettings.Sink.MotorPosition_02 : 0))) || _sim_pass_motor;
+        public bool InPos3 => ((_plcService != null) && (Position == (_moduleSettings.Sink != null ? _moduleSettings.Sink.MotorPosition_03 : 0))) || _sim_pass_motor;
+        public bool InPos0 => ((_plcService != null) && (Position == 0)) || _sim_pass_motor;
 
         public void Teach(int position)
         {
             if (_plcService != null && _moduleSettings.Sink != null)
             {
                 if (position == 0)
-                    _moduleSettings.Sink.MotorPosition_01 = Posiition;
+                    _moduleSettings.Sink.MotorPosition_01 = Position;
                 else if (position == 1)
-                    _moduleSettings.Sink.MotorPosition_02 = Posiition;
+                    _moduleSettings.Sink.MotorPosition_02 = Position;
                 else if (position == 2)
-                    _moduleSettings.Sink.MotorPosition_03 = Posiition;
+                    _moduleSettings.Sink.MotorPosition_03 = Position;
 
                 if(position >= 0 && position < 3)
                     ConfigLoader.SetModuleSettings(_moduleSettings);

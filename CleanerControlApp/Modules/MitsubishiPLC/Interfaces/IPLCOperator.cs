@@ -208,6 +208,11 @@ namespace CleanerControlApp.Modules.MitsubishiPLC.Interfaces
         public int Axis3Pos { get; }
         public int Axis4Pos { get; }
 
+        public int Axis1PosEncoder { get; }
+        public int Axis2PosEncoder { get; }
+        public int Axis3PosEncoder { get; }
+        public int Axis4PosEncoder { get; }
+
         public int Axis1EncoderPos { get; }
         public int Axis2EncoderPos { get; }
         public int Axis3EncoderPos { get; }

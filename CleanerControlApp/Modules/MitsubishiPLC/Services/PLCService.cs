@@ -726,6 +726,11 @@ namespace CleanerControlApp.Modules.MitsubishiPLC.Services
         public int Axis3Pos => _motionPos[2].IntValue;
         public int Axis4Pos => _motionPos[3].IntValue;
 
+        public int Axis1PosEncoder => 10000 * Axis1EncoderPos / 262144;
+        public int Axis2PosEncoder => 10000 * Axis2EncoderPos / 262144;
+        public int Axis3PosEncoder => 10000 * Axis3EncoderPos / 262144;
+        public int Axis4PosEncoder => 10000 * Axis4EncoderPos / 262144;
+
         public int Axis1EncoderPos => _motionPos[4].IntValue;
         public int Axis2EncoderPos => _motionPos[5].IntValue;
         public int Axis3EncoderPos => _motionPos[6].IntValue;

@@ -305,6 +305,14 @@ namespace CleanerControlApp.Vision.Developer
 			set => SetField(ref _currentPosition, value, nameof(CurrentPosition));
 		}
 
+		private int _currentEncoder;
+		public int CurrentEncoder
+		{ 
+			get => _currentEncoder;
+			set => SetField(ref _currentEncoder, value, nameof(CurrentEncoder));
+        }
+	
+
 		// new property exposed for encoder position so the UI can bind directly
 		private int _encoderPosition;
 		public int EncoderPosition
@@ -649,6 +657,7 @@ namespace CleanerControlApp.Vision.Developer
 			{
 				case 0:
 					CurrentPosition = _op.Axis1Pos;
+					CurrentEncoder = _op.Axis1PosEncoder;
 					EncoderPosition = _op.Axis1EncoderPos;
 					if (AlarmItems.Count >=5)
 					{
@@ -669,7 +678,8 @@ namespace CleanerControlApp.Vision.Developer
 					break;
 				case 1:
 					CurrentPosition = _op.Axis2Pos;
-					EncoderPosition = _op.Axis2EncoderPos;
+                    CurrentEncoder = _op.Axis2PosEncoder;
+                    EncoderPosition = _op.Axis2EncoderPos;
 					if (AlarmItems.Count >=5)
 					{
 						AlarmItems[0].IsOn = _op.Axis2ErrorAlarm;
@@ -689,7 +699,8 @@ namespace CleanerControlApp.Vision.Developer
 					break;
 				case 2:
 					CurrentPosition = _op.Axis3Pos;
-					EncoderPosition = _op.Axis3EncoderPos;
+                    CurrentEncoder = _op.Axis3PosEncoder;
+                    EncoderPosition = _op.Axis3EncoderPos;
 					if (AlarmItems.Count >=5)
 					{
 						AlarmItems[0].IsOn = _op.Axis3ErrorAlarm;
@@ -709,7 +720,8 @@ namespace CleanerControlApp.Vision.Developer
 					break;
 				case 3:
 					CurrentPosition = _op.Axis4Pos;
-					EncoderPosition = _op.Axis4EncoderPos;
+                    CurrentEncoder = _op.Axis4PosEncoder;
+                    EncoderPosition = _op.Axis4EncoderPos;
 					if (AlarmItems.Count >=5)
 					{
 						AlarmItems[0].IsOn = _op.Axis4ErrorAlarm;
@@ -924,6 +936,7 @@ namespace CleanerControlApp.Vision.Developer
 				else
 				{
 					axis.CurrentPosition =1234;
+					axis.CurrentEncoder = 1234;
 					axis.EncoderPosition =1234; // show default encoder value when PLC operator is not available
 					axis.AlarmItems[0].IsOn = false;
 					axis.AlarmItems[1].IsOn = false;
