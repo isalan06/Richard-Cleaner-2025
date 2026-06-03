@@ -601,10 +601,10 @@ namespace CleanerControlApp.Hardwares.Sink.Services
             }
         }
 
-        public bool InPos1 => ((_plcService != null) && (Position == (_moduleSettings.Sink != null ? _moduleSettings.Sink.MotorPosition_01 : 0))) || _sim_pass_motor;
-        public bool InPos2 => ((_plcService != null) && (Position == (_moduleSettings.Sink != null ? _moduleSettings.Sink.MotorPosition_02 : 0))) || _sim_pass_motor;
-        public bool InPos3 => ((_plcService != null) && (Position == (_moduleSettings.Sink != null ? _moduleSettings.Sink.MotorPosition_03 : 0))) || _sim_pass_motor;
-        public bool InPos0 => ((_plcService != null) && (Position == 0)) || _sim_pass_motor;
+        public bool InPos1 => (CommonFunction.CheckPositionInRange(Position, (_moduleSettings.Sink != null ? _moduleSettings.Sink.MotorPosition_01 : 0))) || _sim_pass_motor;
+        public bool InPos2 => (CommonFunction.CheckPositionInRange(Position, (_moduleSettings.Sink != null ? _moduleSettings.Sink.MotorPosition_02 : 0))) || _sim_pass_motor;
+        public bool InPos3 => (CommonFunction.CheckPositionInRange(Position, (_moduleSettings.Sink != null ? _moduleSettings.Sink.MotorPosition_03 : 0))) || _sim_pass_motor;
+        public bool InPos0 => (CommonFunction.CheckPositionInRange(Position, 0)) || _sim_pass_motor;
 
         public void Teach(int position)
         {

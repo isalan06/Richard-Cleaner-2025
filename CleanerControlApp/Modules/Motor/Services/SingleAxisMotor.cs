@@ -323,7 +323,7 @@ namespace CleanerControlApp.Modules.Motor.Services
                     });
                 }
                 catch { }
-
+                    
             }
         }
 
@@ -334,8 +334,12 @@ namespace CleanerControlApp.Modules.Motor.Services
 
             if (_plcService != null)
             {
-                result = (Position == (_moduleMotor.Positions != null ? _moduleMotor.Positions[position] : 0) || _sim_pass_motor);
-                if (position == 0 && !result && Position == 0) result = true; // after home, shuttle X,Z will be 0, it is not P1-Original Position, but it can continue to move
+                result = CommonFunction.CheckPositionInRange(Position, (_moduleMotor.Positions != null ? _moduleMotor.Positions[position] : 0)) || _sim_pass_motor;
+                // after home, shuttle X,Z will be 0, it is not P1-Original Position, but it can continue to move
+                if (position == 0 && !result)
+                {
+                    if (CommonFunction.CheckPositionInRange(Position, 0)) result = true;
+                }
 
             }
 

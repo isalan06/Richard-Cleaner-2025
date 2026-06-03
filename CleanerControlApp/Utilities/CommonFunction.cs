@@ -8,6 +8,8 @@ namespace CleanerControlApp.Utilities
 {
     public class CommonFunction
     {
+
+        public static int DefaultIntervalValue = 2;
         public static bool MoveEndDelayPassed(ref DateTime? startTimestamp, bool condition, int intervalTime)
         {
             try
@@ -32,6 +34,15 @@ namespace CleanerControlApp.Utilities
                 startTimestamp = null;
                 return condition;
             }
+        }
+
+        public static bool CheckPositionInRange(int currentPosition, int targetPosition, int intervalValue = -1)
+        {
+            if (intervalValue < 0)
+            {
+                intervalValue = DefaultIntervalValue;
+            }
+            return currentPosition >= (targetPosition - intervalValue) && currentPosition <= (targetPosition + intervalValue);
         }
     }
 }
