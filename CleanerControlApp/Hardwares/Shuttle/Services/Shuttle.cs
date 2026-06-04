@@ -385,8 +385,8 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
 
         public bool ZInIdlePosition => _motorZAxis != null && _motorZAxis.GetInPos(0);
 
-        public bool HasCassette => _cassette && Check_ClamperClose && Check_ClamperCassetteExist;
-        public bool IsEmpty => !_cassette && Check_ClamperOpen && !Check_ClamperCassetteExist;
+        public bool HasCassette => Check_ClamperClose && Check_ClamperCassetteExist;
+        public bool IsEmpty => Check_ClamperOpen && !Check_ClamperCassetteExist;
 
         // position 1~14 for pick/place position, 0 for original position
         public bool PickCassette(int position, bool dryRun = false, bool semiRun = false)
