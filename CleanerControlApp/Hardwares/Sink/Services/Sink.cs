@@ -457,8 +457,8 @@ namespace CleanerControlApp.Hardwares.Sink.Services
         public bool MotorHoming => _plcService != null && _plcService.Axis3HomeProcedure;
         public bool MotorMoving => _plcService != null && _plcService.Axis3CommandProcedure;
         public bool MotorHome => _plcService != null && _plcService.Axis3HomeComplete;
-        //public int Posiition => _plcService != null ? _plcService.Axis3Pos : 0;
-        public int Position => _plcService != null ? _plcService.Axis3PosEncoder : 0;
+        public int Position => _plcService != null ? _plcService.Axis3Pos : 0;
+        //public int Position => _plcService != null ? _plcService.Axis3PosEncoder : 0;
         //public float Position_Value => (_plcService != null && _unitSettings.Sink != null) ? ((float)_plcService.Axis3Pos * _unitSettings.Sink.MotorUnitTransfer) : 1f;
         public float Position_Value => (_unitSettings.Sink != null) ? ((float)Position * _unitSettings.Sink.MotorUnitTransfer) : 1f;
 

@@ -539,7 +539,7 @@ namespace CleanerControlApp.Hardwares.SoakingTank.Services
         }
         public void Home()
         {
-            if (_plcService != null && !MotorAlarm && MotorServoOn && Sensor_CoverOpen)
+            if (_plcService != null && !MotorAlarm && MotorServoOn && MotorIdle)
             {
                 try
                 {
@@ -1104,7 +1104,7 @@ namespace CleanerControlApp.Hardwares.SoakingTank.Services
                     }
 
                     // 沖水完成後回原點，避免點位可能偏移
-                    if (_homeRequest && !_motor_commanding && MotorIdle && (InPos3 || InPos0))
+                    if (_homeRequest && !_motor_commanding && MotorIdle && (InPos0 || InPos3))
                     {
                         if (!_homeRequestDone)
                         {
