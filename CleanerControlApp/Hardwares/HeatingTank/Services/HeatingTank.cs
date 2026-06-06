@@ -91,7 +91,10 @@ namespace CleanerControlApp.Hardwares.HeatingTank.Services
         // delay initial alarm evaluation to avoid false alarms when signals haven't returned yet
         private DateTime? _alarmCheckStartTime = DateTime.UtcNow;
 
- #endregion
+        private DateTime? _checkHeatingOnStartTime = null;
+        private DateTime? _checkHeatingOffStartTime = null;
+
+        #endregion
 
         #region constructor
 
@@ -699,8 +702,22 @@ namespace CleanerControlApp.Hardwares.HeatingTank.Services
             CheckTimeout();
 
             AutoProcedure();
+            CheckActOutputCorrectOrNot();
 
             await Task.Yield();
+        }
+
+        private void CheckActOutputCorrectOrNot()
+        {
+            int checkStatusDelay_ms = 3000; // delay to check if the output matches the expected status, to allow for hardware response time
+
+            bool isHeatingOnConditionError = _heating && (SV != (_moduleSettings.HeatingTank != null ? _moduleSettings.HeatingTank.SV_High : 0));
+            bool isHeatingOffConditionError = !_heating && (SV != (_moduleSettings.HeatingTank != null ? _moduleSettings.HeatingTank.SV_Low : 0));
+
+            if (CommonFunction.CheckStatusDelayPassed(ref _checkHeatingOnStartTime, isHeatingOnConditionError, checkStatusDelay_ms))
+                HeatingOP(true);
+            if (CommonFunction.CheckStatusDelayPassed(ref _checkHeatingOffStartTime, isHeatingOffConditionError, checkStatusDelay_ms))
+                HeatingOP(false);
         }
 
         #endregion

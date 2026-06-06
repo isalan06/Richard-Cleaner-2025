@@ -307,7 +307,7 @@ namespace CleanerControlApp.Modules.Motor.Services
                     {
                         try
                         {
-                            await Task.Delay(TimeSpan.FromSeconds(3)).ConfigureAwait(false);
+                            await Task.Delay(TimeSpan.FromSeconds(2)).ConfigureAwait(false);
                             if (_plcService != null)
                             {
                                 if(_moduleIndex == 1)

@@ -1,28 +1,32 @@
-# ���F
-�פt Driver 1r = 10,000 pulse
-�פt Encoder 18-bit => 1r = 2^18=262144 pulse
-���� PLC���e�ߪi�y��(Encoder)=(10000/262144)xEncoder
+﻿# Encoder-Command Deviation
+Encoder - Pulse Count = Deviation
+Pulse Command = Target Pulse - Deviation
+
+# Driver/Motor Calculate
+Driver 1r = 10,000 pulse
+Encoder 18-bit => 1r = 2^18=262144 pulse
+PLC-Encoder=(10000/262144) x MotorEncoder
 Shuttle X 1r = 40 mm => 1 pulse = 0.004 mm
 Shuttel Z 1r = 10 mm => 1 pulse = 0.001 mm
 Other Z 1r = 5 mm => 1 pulse = 0.0005 mm
 
-�t�״��� �g�J pulse/s => �פt �t�׬O�� rpm=r/min=10000pulse/min = (10000/60) pulse/s = 166.67 pulse/s => rpm = pulse/s * 0.006
+PLC pulse/s => Driver rpm=r/min=10000pulse/min = (10000/60) pulse/s = 166.67 pulse/s => rpm = pulse/s * 0.006
 
-## Control �ܧ�
-Home/Jog�O���� pulse����; Move�γq�T����
-�ѼƳ]�w
-H02.00 => 1 (���:1)
-H11.00 => 0 (���:0)
-H11.01 => 1 (���:0)
-H11.04 => 1 (���:0)
-H0C.09 => 1 (���:0)
-H17.00 => 28 (���: 0)
+## Control
+Home/Jog Mode;  pulse control; Move mode
+設定
+H02.00 => 1 (原本:1)
+H11.00 => 0 (原本:0)
+H11.01 => 1 (原本):0)
+H11.04 => 1 (原本:0)
+H0C.09 => 1 (原本:0)
+H17.00 => 28 (原本: 0)
 
-## Jog/Home�B�J
+## Jog/Home模式
 H05.00(0x5000)=0
 TBL
 
-## Move�B�J
+## Move模式
 Write Position to H11.12(0x110C, DWORD)
 Write Speed to H11.14(0x110E, WORD, RPM)
 H05.00(0x5000)=2

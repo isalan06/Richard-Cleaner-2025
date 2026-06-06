@@ -96,6 +96,9 @@ namespace CleanerControlApp.Hardwares.Sink.Services
         private bool _homeRequest = false;
         private bool _homeRequestDone = false;
 
+        private DateTime? _checkPressureOnStartTime = DateTime.UtcNow;
+        private DateTime? _checkPressureOffStartTime = DateTime.UtcNow;
+
         #endregion
 
         #region constructor
@@ -871,6 +874,7 @@ namespace CleanerControlApp.Hardwares.Sink.Services
 
             AutoProcedure();
             ManualShakingFunction();
+            CheckActOutputCorrectOrNot();
 
             await Task.Yield();
         }
@@ -889,6 +893,22 @@ namespace CleanerControlApp.Hardwares.Sink.Services
                 }
             }
         }
+
+        private void CheckActOutputCorrectOrNot()
+        {
+            int checkStatusDelay_ms = 3000; // delay to check if the output matches the expected status, to allow for hardware response time
+
+            bool isPressureOnConditionError = _pressure && (SV != (_moduleSettings.Sink != null ? _moduleSettings.Sink.SV_High : 0));
+            bool isPressureOffConditionError = !_pressure && (SV != (_moduleSettings.Sink != null ? _moduleSettings.Sink.SV_Low : 0));
+
+            // if the pressure status and SV do not match the expected condition for a certain duration, log a warning and try to correct it by re-sending the command
+            if (CommonFunction.CheckStatusDelayPassed(ref _checkPressureOnStartTime, isPressureOnConditionError, checkStatusDelay_ms))
+                PressureOP(true);
+            if(CommonFunction.CheckStatusDelayPassed(ref _checkPressureOffStartTime, isPressureOffConditionError, checkStatusDelay_ms))
+                PressureOP(false);
+        }
+
+
 
         #endregion
 

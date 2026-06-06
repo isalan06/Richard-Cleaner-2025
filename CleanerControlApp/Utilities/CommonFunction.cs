@@ -36,6 +36,38 @@ namespace CleanerControlApp.Utilities
             }
         }
 
+        public static bool CheckStatusDelayPassed(ref DateTime? startTimestamp, bool condition, int intervalTime_ms)
+        {
+            try
+            {
+                int ms = intervalTime_ms;
+                if (ms <= 0) return condition; // no delay configured
+
+                if (!condition)
+                {
+                    startTimestamp = null;
+                    return false;
+                }
+
+                if (startTimestamp == null)
+                    startTimestamp = DateTime.UtcNow;
+
+                if ((DateTime.UtcNow - startTimestamp.Value) >= TimeSpan.FromMilliseconds(ms))
+                {
+                    startTimestamp = null; // reset for next time
+                    return true;
+                }
+                else
+                    return false;
+            }
+            catch
+            {
+                // on error, behave as no delay
+                startTimestamp = null;
+                return condition;
+            }
+        }
+
         public static bool CheckPositionInRange(int currentPosition, int targetPosition, int intervalValue = -1)
         {
             if (intervalValue < 0)

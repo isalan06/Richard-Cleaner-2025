@@ -66,6 +66,10 @@ namespace CleanerControlApp.Vision.SystemTemplate
         public static readonly DependencyProperty HeatingTankHasAlarmProperty = DependencyProperty.Register(
         nameof(HeatingTankHasAlarm), typeof(bool), typeof(Template_System_Line), new PropertyMetadata(false));
 
+        // New: ShuttlePickPlaceMessage property (string)
+        public static readonly DependencyProperty ShuttlePickPlaceMessageProperty = DependencyProperty.Register(
+        nameof(ShuttlePickPlaceMessage), typeof(string), typeof(Template_System_Line), new PropertyMetadata(string.Empty));
+
         public bool ShuttleAuto
         {
             get => (bool)GetValue(ShuttleAutoProperty);
@@ -144,6 +148,13 @@ namespace CleanerControlApp.Vision.SystemTemplate
             set => SetValue(HeatingTankHasAlarmProperty, value);
         }
 
+        // New: ShuttlePickPlaceMessage property wrapper
+        public string ShuttlePickPlaceMessage
+        {
+            get => (string)GetValue(ShuttlePickPlaceMessageProperty);
+            set => SetValue(ShuttlePickPlaceMessageProperty, value);
+        }
+
         public Template_System_Line()
         {
             InitializeComponent();
@@ -197,6 +208,9 @@ namespace CleanerControlApp.Vision.SystemTemplate
                     ShuttleInitializing = _shuttle.Initializing;
                     ShuttleHasWarning = _shuttle.HasWarning;
                     ShuttleHasAlarm = _shuttle.HasAlarm;
+
+                    // update pick/place message
+                    try { ShuttlePickPlaceMessage = _shuttle.MessageForPickPlace ?? string.Empty; } catch { ShuttlePickPlaceMessage = string.Empty; }
                 }
                 else
                 {
@@ -208,6 +222,8 @@ namespace CleanerControlApp.Vision.SystemTemplate
                     ShuttleInitializing = false;
                     ShuttleHasWarning = false;
                     ShuttleHasAlarm = false;
+
+                    ShuttlePickPlaceMessage = string.Empty;
                 }
 
                 // Heating tank properties
