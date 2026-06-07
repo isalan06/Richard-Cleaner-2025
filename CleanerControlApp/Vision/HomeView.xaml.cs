@@ -39,6 +39,8 @@ namespace CleanerControlApp.Vision
         private DispatcherTimer? _initFlashTimer;
         private bool _initFlashState = false;
 
+        private Brush? _btnPauseOriginalBackground;
+
         private CancellationTokenSource? _initCts;
         private DateTime _initHoldStart;
 
@@ -79,6 +81,9 @@ namespace CleanerControlApp.Vision
 
             // capture stop buzzer original background
             _btnStopBuzzerOriginalBackground = BtnStopBuzzer.Background;
+
+            // capture pause original background
+            _btnPauseOriginalBackground = BtnPause.Background;
 
             // Wire button handlers
             BtnStopBuzzer.Click += BtnStopBuzzer_Click;
@@ -250,6 +255,9 @@ namespace CleanerControlApp.Vision
                     UpdateBuzzerButtonVisual(buzzerStopped);
                 }
 
+                bool paused = hw.IsPaused();
+                UpdatePauseButtonVisual(paused);
+
                 // Update Init button visuals based on hardware initializing/system initialized state
                 bool initializing = hw.Initializing;
                 bool systemInit = hw.SystemInitialized;
@@ -291,6 +299,26 @@ namespace CleanerControlApp.Vision
                 if (_btnStopBuzzerOriginalBackground != null)
                     BtnStopBuzzer.Background = _btnStopBuzzerOriginalBackground;
                 BtnStopBuzzer.Foreground = Brushes.Black;
+            }
+        }
+
+        private void UpdatePauseButtonVisual(bool paused)
+        {
+            if (!Dispatcher.CheckAccess())
+            {
+                Dispatcher.Invoke(() => UpdatePauseButtonVisual(paused));
+                return;
+            }
+            if (paused)
+            {
+                BtnPause.Background = Brushes.Yellow;
+                BtnPause.Foreground = Brushes.Black;
+            }
+            else
+            {
+                if (_btnPauseOriginalBackground != null)
+                    BtnPause.Background = _btnPauseOriginalBackground;
+                BtnPause.Foreground = Brushes.Black;
             }
         }
 
