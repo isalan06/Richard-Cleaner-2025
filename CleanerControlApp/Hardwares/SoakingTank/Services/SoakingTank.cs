@@ -60,7 +60,7 @@ namespace CleanerControlApp.Hardwares.SoakingTank.Services
         private bool _motor_commanding = false;
         private int _motor_air_retry_count = 0;
         private bool _motor_air_up_flag = false;
-        private bool RetryAirFinished => _moduleSettings.Sink != null && _moduleSettings.Sink.AirKnifeRetryCount <= _motor_air_retry_count;
+        private bool RetryAirFinished => _moduleSettings.SoakingTank != null && _moduleSettings.SoakingTank.AirKnifeRetryCount <= _motor_air_retry_count;
         private bool _retry_air_finished = false;
 
         private string _jogStatus = "";
@@ -1091,7 +1091,7 @@ namespace CleanerControlApp.Hardwares.SoakingTank.Services
                             }
                         }
                     }
-                    else if(_homeRequest && !_motor_commanding && MotorIdle && !InPos3 && !InPos0) // 沖水完成後馬達若不在下方位置則移動到下方位置
+                    else if(_homeRequest && !_motor_commanding && MotorIdle && !InPos3 && !InPos0 && !_homeRequestDone) // 沖水完成後馬達若不在下方位置則移動到下方位置
                     {
                         MoveToPosition(2, 0);
                     }

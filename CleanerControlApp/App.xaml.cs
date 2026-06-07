@@ -342,6 +342,7 @@ namespace CleanerControlApp
                             var unitSettings = sp.GetRequiredService<UnitSettings>();
                             var moduleSettings = sp.GetRequiredService<ModuleSettings>();
                             var deltaArr = sp.GetRequiredService<IDeltaMS300[]>();
+
                             var delta = (deltaArr != null && deltaArr.Length > HeatingTank.MS300_Index) ? deltaArr[HeatingTank.MS300_Index] : null!;
 
                             return new HeatingTank(logger, plc, tempControllers, unitSettings, moduleSettings, delta);

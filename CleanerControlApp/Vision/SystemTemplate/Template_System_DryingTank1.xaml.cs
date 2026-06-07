@@ -185,6 +185,21 @@ namespace CleanerControlApp.Vision.SystemTemplate
             }
         }
 
+        // PV display (formatted with no decimals)
+        private string _pvText = "--";
+        public string PVText
+        {
+            get => _pvText;
+            private set
+            {
+                if (_pvText != value)
+                {
+                    _pvText = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
         private void OnPropertyChanged([CallerMemberName] string? name = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
@@ -220,6 +235,16 @@ namespace CleanerControlApp.Vision.SystemTemplate
                         ElapsedAct = "00:00";
                         RemainingAct = "00:00";
                     }
+
+                    // PV value (formatted)
+                    try
+                    {
+                        PVText = _component.PV_Value.ToString("F0");
+                    }
+                    catch
+                    {
+                        PVText = "--";
+                    }
                 }
                 else
                 {
@@ -233,6 +258,7 @@ namespace CleanerControlApp.Vision.SystemTemplate
 
                     ElapsedAct = "00:00";
                     RemainingAct = "00:00";
+                    PVText = "--";
                 }
             }
             catch

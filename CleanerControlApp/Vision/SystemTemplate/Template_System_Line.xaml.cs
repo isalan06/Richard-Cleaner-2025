@@ -70,6 +70,10 @@ namespace CleanerControlApp.Vision.SystemTemplate
         public static readonly DependencyProperty ShuttlePickPlaceMessageProperty = DependencyProperty.Register(
         nameof(ShuttlePickPlaceMessage), typeof(string), typeof(Template_System_Line), new PropertyMetadata(string.Empty));
 
+        // Heating tank PV value (current temperature)
+        public static readonly DependencyProperty HeatingTankPVProperty = DependencyProperty.Register(
+            nameof(HeatingTankPV), typeof(double), typeof(Template_System_Line), new PropertyMetadata(0.0));
+
         public bool ShuttleAuto
         {
             get => (bool)GetValue(ShuttleAutoProperty);
@@ -155,6 +159,13 @@ namespace CleanerControlApp.Vision.SystemTemplate
             set => SetValue(ShuttlePickPlaceMessageProperty, value);
         }
 
+        // Expose heating tank PV as a dependency property for XAML binding
+        public double HeatingTankPV
+        {
+            get => (double)GetValue(HeatingTankPVProperty);
+            set => SetValue(HeatingTankPVProperty, value);
+        }
+
         public Template_System_Line()
         {
             InitializeComponent();
@@ -234,6 +245,8 @@ namespace CleanerControlApp.Vision.SystemTemplate
                     HeatingTankInitializedStatus = _heatingTank.Initialized;
                     HeatingTankHasWarning = _heatingTank.HasWarning;
                     HeatingTankHasAlarm = _heatingTank.HasAlarm;
+                    // update PV value (current temperature)
+                    try { HeatingTankPV = _heatingTank.PV_Value; } catch { HeatingTankPV = 0.0; }
                 }
                 else
                 {
@@ -242,6 +255,8 @@ namespace CleanerControlApp.Vision.SystemTemplate
                     HeatingTankInitializedStatus = false;
                     HeatingTankHasWarning = false;
                     HeatingTankHasAlarm = false;
+
+                    HeatingTankPV = 0.0;
                 }
             }
             catch

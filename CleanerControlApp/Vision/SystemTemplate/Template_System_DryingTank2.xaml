@@ -106,6 +106,8 @@
                     </Border.Style>
                     <TextBlock Text="錯誤" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black"/>
                 </Border>
+                <TextBlock Text="{Binding PVText, ElementName=RootControl}" FontSize="20" Foreground="Black" HorizontalAlignment="Center" Canvas.Left="102" Canvas.Top="148" VerticalAlignment="Top"/>
+                <TextBlock Text="°C" FontSize="20" Foreground="#333333" TextAlignment="Center" Height="25" Width="38" HorizontalAlignment="Center" Canvas.Left="102" Canvas.Top="173" VerticalAlignment="Top"/>
             </Canvas>
         </Canvas>
 

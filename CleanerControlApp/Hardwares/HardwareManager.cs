@@ -1181,7 +1181,7 @@ namespace CleanerControlApp.Hardwares
 
                 }
             }
-            else
+            else if(!ShuttleAuto)
             {
                 _auto_procedure_executing = false;
                 _auto_procedure_pick_executing = false;
@@ -1674,6 +1674,15 @@ namespace CleanerControlApp.Hardwares
             }
 
             return result;
+        }
+
+        public bool IsPaused()
+        {
+            if (_shuttle != null && _sink != null && _soakingTank != null && _dryingTanks != null && _dryingTanks.Length > 1 && _heatingTank != null)
+            {
+                return _shuttle.Pausing || _sink.Pausing || _soakingTank.Pausing || _dryingTanks[0].Pausing || _dryingTanks[1].Pausing || _heatingTank.Pausing;
+            }
+            return false;
         }
 
         public async Task ModuleClose()

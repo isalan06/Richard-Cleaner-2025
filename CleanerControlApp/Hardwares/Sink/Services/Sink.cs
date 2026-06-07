@@ -460,8 +460,8 @@ namespace CleanerControlApp.Hardwares.Sink.Services
         public bool MotorHoming => _plcService != null && _plcService.Axis3HomeProcedure;
         public bool MotorMoving => _plcService != null && _plcService.Axis3CommandProcedure;
         public bool MotorHome => _plcService != null && _plcService.Axis3HomeComplete;
-        public int Position => _plcService != null ? _plcService.Axis3Pos : 0;
-        //public int Position => _plcService != null ? _plcService.Axis3PosEncoder : 0;
+        //public int Position => _plcService != null ? _plcService.Axis3Pos : 0;
+        public int Position => _plcService != null ? _plcService.Axis3PosEncoder : 0;
         //public float Position_Value => (_plcService != null && _unitSettings.Sink != null) ? ((float)_plcService.Axis3Pos * _unitSettings.Sink.MotorUnitTransfer) : 1f;
         public float Position_Value => (_unitSettings.Sink != null) ? ((float)Position * _unitSettings.Sink.MotorUnitTransfer) : 1f;
 
@@ -607,7 +607,7 @@ namespace CleanerControlApp.Hardwares.Sink.Services
         public bool InPos1 => (CommonFunction.CheckPositionInRange(Position, (_moduleSettings.Sink != null ? _moduleSettings.Sink.MotorPosition_01 : 0))) || _sim_pass_motor;
         public bool InPos2 => (CommonFunction.CheckPositionInRange(Position, (_moduleSettings.Sink != null ? _moduleSettings.Sink.MotorPosition_02 : 0))) || _sim_pass_motor;
         public bool InPos3 => (CommonFunction.CheckPositionInRange(Position, (_moduleSettings.Sink != null ? _moduleSettings.Sink.MotorPosition_03 : 0))) || _sim_pass_motor;
-        public bool InPos0 => (CommonFunction.CheckPositionInRange(Position, 0)) || _sim_pass_motor;
+        public bool InPos0 => (CommonFunction.CheckPositionInRange(Position, 0, 15)) || _sim_pass_motor;
 
         public void Teach(int position)
         {
@@ -1061,7 +1061,7 @@ namespace CleanerControlApp.Hardwares.Sink.Services
                             }
                         }
                     }
-                    else if(_homeRequest && !_motor_commanding && MotorIdle && !InPos3 && !InPos0) // 沖水完成後馬達若不在下方位置則移動到下方位置
+                    else if(_homeRequest && !_motor_commanding && MotorIdle && !InPos3 && !InPos0 && !_homeRequestDone) // 沖水完成後馬達若不在下方位置則移動到下方位置
                     {
                         MoveToPosition(2, 0);
                     }

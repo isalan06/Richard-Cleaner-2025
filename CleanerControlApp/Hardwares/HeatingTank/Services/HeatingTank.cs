@@ -1,4 +1,5 @@
 ﻿using CleanerControlApp.Hardwares.HeatingTank.Interfaces;
+using CleanerControlApp.Hardwares.SoakingTank.Interfaces;
 using CleanerControlApp.Modules.DeltaMS300.Interfaces;
 using CleanerControlApp.Modules.DeltaMS300.Services;
 using CleanerControlApp.Modules.MitsubishiPLC.Interfaces;
@@ -94,6 +95,8 @@ namespace CleanerControlApp.Hardwares.HeatingTank.Services
         private DateTime? _checkHeatingOnStartTime = null;
         private DateTime? _checkHeatingOffStartTime = null;
 
+        private bool SoakingTank_H_Alarm => _plcService != null && !_plcService.TankWaterPosH;
+
         #endregion
 
         #region constructor
@@ -111,6 +114,7 @@ namespace CleanerControlApp.Hardwares.HeatingTank.Services
 
             _temperatureController = temperatureControllers?[TC_Index];
             _temperatureControllers = temperatureControllers;
+
 
             RefreshTimeoutValue();
 
@@ -785,15 +789,22 @@ namespace CleanerControlApp.Hardwares.HeatingTank.Services
 
                     if (Command_WaterOut && !IsHighFrequency) HighFrequencyOP();
 
-                    if (!Command_WaterOut && IsHighFrequency) LowFrequencyOP();
+                    if ((!Command_WaterOut || !HS_RequestWater) && IsHighFrequency) LowFrequencyOP();
 
                     if (!Heating && Sensor_Liquid_L) HeatingOP(true);
 
                     if (HS_RequestWater && !Command_WaterOut) WaterOutOP(true);
                     else if (!HS_RequestWater && Command_WaterOut) WaterOutOP(false);
                 }
-
                 
+
+            }
+
+
+            if (SoakingTank_H_Alarm)
+            { 
+                if(!IsLowFrequency) LowFrequencyOP();
+                if (Command_WaterOut) WaterOutOP(false);
             }
 
             if (_PV_High_Timeout && Heating) HeatingOP(false);

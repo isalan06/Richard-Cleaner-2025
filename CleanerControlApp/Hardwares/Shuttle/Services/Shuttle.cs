@@ -953,9 +953,9 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
             if (!_placeTrigger && _placeCase !=0) _placeCase =0;
             if (!_checkCassetteTrigger && _checkCassetteCase !=0) _checkCassetteCase =0;
 
-            if (_auto && !_dryRun && !_semiRun)
+            if (_auto && !_dryRun && !_semiRun && _motorXAxis != null)
             {
-                if (Idle && _autoStopFlag && !_pickTrigger && !_placeTrigger && !_moving)
+                if (Idle && _autoStopFlag && !_pickTrigger && !_placeTrigger && !_moving && _motorXAxis.GetInPos(0))
                 {
                     _autoStopFlag = false;
                     _auto = false;

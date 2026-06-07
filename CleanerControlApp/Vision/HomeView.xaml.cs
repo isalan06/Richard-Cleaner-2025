@@ -73,6 +73,10 @@ namespace CleanerControlApp.Vision
             _btnInitOriginalBackground = BtnInit.Background;
             _btnInitOriginalStyle = BtnInit.Style;
 
+            // Ensure mouse enter/leave lock the current background as a local value so style hover cannot change it
+            BtnInit.MouseEnter += BtnInit_MouseEnter;
+            BtnInit.MouseLeave += BtnInit_MouseLeave;
+
             // capture stop buzzer original background
             _btnStopBuzzerOriginalBackground = BtnStopBuzzer.Background;
 
@@ -306,7 +310,7 @@ namespace CleanerControlApp.Vision
             {
                 // lighter blue background to indicate system initialized (better contrast with black text)
                 StopInitFlashTimer();
-                BtnInit.Background = new SolidColorBrush(Color.FromRgb(0xB3, 0xD9, 0xFF)); // light blue
+                BtnInit.Background = Brushes.Lime; // lime when initialized
                 BtnInit.Foreground = Brushes.Black;
             }
             else if (initializing)
@@ -345,8 +349,8 @@ namespace CleanerControlApp.Vision
                     _initFlashState = !_initFlashState;
                     if (_initFlashState)
                     {
-                        // light blue flash
-                        BtnInit.Background = Brushes.LightBlue;
+                        // lime flash
+                        BtnInit.Background = Brushes.Lime;
                         BtnInit.Foreground = Brushes.Black;
                     }
                     else
@@ -377,6 +381,28 @@ namespace CleanerControlApp.Vision
             catch { }
             _initFlashTimer = null;
             _initFlashState = false;
+        }
+
+        private void BtnInit_MouseEnter(object? sender, MouseEventArgs e)
+        {
+            try
+            {
+                // set current effective background as a local value to take precedence over style triggers
+                var current = BtnInit.Background;
+                if (current != null)
+                    BtnInit.Background = current;
+            }
+            catch { }
+        }
+
+        private void BtnInit_MouseLeave(object? sender, MouseEventArgs e)
+        {
+            try
+            {
+                // No action: leave the local background in place so ongoing flashing or init-complete visuals are preserved.
+                // This prevents the global style's IsMouseOver trigger from changing the background when pointer leaves and re-enters rapidly.
+            }
+            catch { }
         }
 
         private async void BtnResetError_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
