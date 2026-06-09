@@ -5,13 +5,13 @@ using System.Windows.Threading;
 
 namespace CleanerControlApp.Vision.Shared
 {
- public static class StatusPopup
+ public static class InfoPopup
  {
  /// <summary>
- /// Show a modal status popup with auto-close countdown.
+ /// Show a modal info popup with auto-close countdown.
  /// owner may be null, in which case Application.Current.MainWindow is used if available.
  /// </summary>
- public static void Show(string status, Window? owner = null, int autoCloseSeconds =10)
+ public static void Show(string info, Window? owner = null, int autoCloseSeconds =10)
  {
  try
  {
@@ -24,15 +24,15 @@ namespace CleanerControlApp.Vision.Shared
  // If the provided owner belongs to a different dispatcher, drop it to avoid cross-thread access
  Window? safeOwner = null;
  try { if (owner != null && owner.Dispatcher == app.Dispatcher) safeOwner = owner; } catch { safeOwner = null; }
- Show(status, safeOwner, autoCloseSeconds);
+ Show(info, safeOwner, autoCloseSeconds);
  });
  return;
  }
- 
+
  var wOwner = owner ?? Application.Current?.MainWindow;
  var w = new Window()
  {
- Title = "無法操作原因",
+ Title = "資訊",
  Owner = wOwner,
  WindowStyle = WindowStyle.None,
  AllowsTransparency = true,
@@ -45,15 +45,16 @@ namespace CleanerControlApp.Vision.Shared
 
  var border = new Border()
  {
- Background = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(0xEE,0xFF,0xCC,0xCC)),
- BorderBrush = System.Windows.Media.Brushes.DarkRed,
+ // 淡綠色 (light green)
+ Background = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(0xEE,0xCC,0xFF,0xCC)),
+ BorderBrush = System.Windows.Media.Brushes.DarkGreen,
  BorderThickness = new Thickness(1),
  CornerRadius = new CornerRadius(6),
  Padding = new Thickness(10)
  };
 
  var panel = new StackPanel() { Orientation = Orientation.Vertical };
- var txt = new TextBlock() { Text = status, FontSize =14, TextWrapping = TextWrapping.Wrap, Foreground = System.Windows.Media.Brushes.Black, MaxWidth =300 };
+ var txt = new TextBlock() { Text = info, FontSize =14, TextWrapping = TextWrapping.Wrap, Foreground = System.Windows.Media.Brushes.Black, MaxWidth =300 };
  panel.Children.Add(txt);
 
  var countdown = new TextBlock() { Text = $"將在 {autoCloseSeconds} 秒後關閉", FontSize =14, Margin = new Thickness(0,8,0,0), Foreground = System.Windows.Media.Brushes.Black, HorizontalAlignment = HorizontalAlignment.Center };

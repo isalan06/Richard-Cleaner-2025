@@ -65,6 +65,10 @@ namespace CleanerControlApp.Hardwares
 
         public string MessageForOperation { get; set; } = string.Empty;
 
+        private static int HomeAfterProcedureCount = 10;
+        private static bool NeedHomeAfterProcedure => ProcedureCount++ >= HomeAfterProcedureCount;
+        private static int ProcedureCount = 0;
+
         #endregion
 
         #region constructor
@@ -493,6 +497,19 @@ namespace CleanerControlApp.Hardwares
             {
                 if (_alarmCheckStartTime != null && DateTime.UtcNow - _alarmCheckStartTime.Value < TimeSpan.FromSeconds(10))
                     return false;
+
+                // If current user is Developer, suppress door alarms for debugging/development
+                try
+                {
+                    if (UserManager.CurrentUserRole == UserRole.Developer)
+                        return false;
+                }
+                catch
+                {
+                    // ignore issues reading user role
+                }
+
+
                 return !FrontDoor1Sign || !FrontDoor2Sign || !FrontDoor3Sign || !FrontDoor4Sign || !SideDoor1Sign || !SideDoor2Sign;
             }
         }
@@ -1168,13 +1185,21 @@ namespace CleanerControlApp.Hardwares
                             }
                         }
 
-                        if (_auto_procedure_backtoP0_executing && _shuttle.ShuttleXMotor != null && _shuttle.ShuttleXMotor.GetInPos(0))
+                        if (_auto_procedure_backtoP0_executing && _shuttle.ShuttleXMotor != null && _shuttle.ShuttleXMotor.GetInPos(0) && _shuttle.ShuttleZMotor != null)
                         {
-                            _auto_procedure_executing = false;
-                            _auto_procedure_pick_executing = false;
-                            _auto_procedure_place_executing = false;
-                            _auto_procedure_backtoP0_executing = false;
-                            OperateLog.Log("自動流程完成", $"移載組 已完成從 {GetPositionName(_auto_procedure_current_pick_position)} 移動到 {GetPositionName(_auto_procedure_current_place_position)} 的流程，並回到原點。");
+                            if (NeedHomeAfterProcedure)
+                            {
+                                _shuttle.ShuttleZMotor.Home();
+                                ProcedureCount = 0;
+                            }
+                            else if(_shuttle.ShuttleZMotor.MotorIdle && _shuttle.ShuttleZMotor.MotorHome)
+                            {
+                                _auto_procedure_executing = false;
+                                _auto_procedure_pick_executing = false;
+                                _auto_procedure_place_executing = false;
+                                _auto_procedure_backtoP0_executing = false;
+                                OperateLog.Log("自動流程完成", $"移載組 已完成從 {GetPositionName(_auto_procedure_current_pick_position)} 移動到 {GetPositionName(_auto_procedure_current_place_position)} 的流程，並回到原點。");
+                            }
                         }
                     }
 
@@ -1361,7 +1386,7 @@ namespace CleanerControlApp.Hardwares
                                 }
                                 else
                                 {
-                                    _dryrun_procedure_status = $"Case 5: Failed to pick from Soaking Position: {_pickPosition}";
+                                    _dryrun_procedure_status = $"Case 9: Failed to pick from Soaking Position: {_pickPosition}";
                                     _dryrun_procedure_case = 99; // error case
                                 }
                             }
@@ -1745,7 +1770,8 @@ namespace CleanerControlApp.Hardwares
                         });
                     }
                 }
-                catch { }            }
+                catch { }
+            }
             catch (Exception ex)
             {
                 try { _logger?.LogError(ex, "Error during ModuleClose"); } catch { }
@@ -1891,7 +1917,10 @@ namespace CleanerControlApp.Hardwares
                 }
                 if (SystemAuto)
                 {
-                    sb.AppendLine(" - 系統目前處於自動模式：可按下 [暫停] 讓設備暫時停止或 長按 [停止] 強制停止。");
+                    if(IsPaused())
+                        sb.AppendLine(" - 系統目前處於暫停狀態：按下 [啟動] 讓設備繼續運作。");
+                    else
+                        sb.AppendLine(" - 系統目前處於自動模式：可按下 [暫停] 讓設備暫時停止或 長按 [停止] 強制停止。");
                 }
 
                 if (!Check_All_Modbus_Connected)

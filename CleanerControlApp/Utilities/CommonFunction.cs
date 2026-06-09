@@ -76,5 +76,23 @@ namespace CleanerControlApp.Utilities
             }
             return currentPosition >= (targetPosition - intervalValue) && currentPosition <= (targetPosition + intervalValue);
         }
+
+        public static bool CheckPositionBelow(int currentPosition, int targetPosition, int intervalValue = -1)
+        {
+            if (intervalValue < 0)
+            {
+                intervalValue = DefaultIntervalValue;
+            }
+            return currentPosition < (targetPosition + intervalValue);
+        }
+
+        public static bool CheckPositionAbove(int currentPosition, int targetPosition, int intervalValue = -1)
+        {
+            if (intervalValue < 0)
+            {
+                intervalValue = DefaultIntervalValue;
+            }
+            return currentPosition > (targetPosition - intervalValue);
+        }
     }
 }

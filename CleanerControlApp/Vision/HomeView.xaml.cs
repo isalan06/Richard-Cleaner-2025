@@ -22,7 +22,7 @@ namespace CleanerControlApp.Vision
     public partial class HomeView : UserControl
     {
         private CancellationTokenSource? _resetCts;
-        private const int HoldMilliseconds = 1000; //1 second (changed from 3000)
+        private const int HoldMilliseconds =1000; //1 second (changed from3000)
         private DispatcherTimer? _progressTimer;
         private DateTime _holdStart;
         private Brush? _btnResetOriginalBackground;
@@ -63,7 +63,7 @@ namespace CleanerControlApp.Vision
             catch (Exception ex)
             {
                 // Show detailed exception to aid debugging of XAML issues
-                MessageBox.Show($"HomeView InitializeComponent failed:\n{ex}", "XAML Load Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                try { CleanerControlApp.Vision.Shared.StatusPopup.Show($"HomeView InitializeComponent failed:\n{ex}", Window.GetWindow(this),10); } catch { }
                 throw;
             }
 
@@ -101,16 +101,16 @@ namespace CleanerControlApp.Vision
                             var hw = App.AppHost?.Services?.GetService<HardwareManager>();
                             if (hw == null)
                             {
-                                MessageBox.Show("HardwareManager not available.", "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
+                                try { CleanerControlApp.Vision.Shared.StatusPopup.Show("HardwareManager not available.", Window.GetWindow(this),5); } catch { }
                                 return;
                             }
                             bool stopped = hw.AutoStop();
                             if (!stopped)
-                                MessageBox.Show("系統無法停止，可能尚未初始化。", "警告", MessageBoxButton.OK, MessageBoxImage.Warning);
+                                try { CleanerControlApp.Vision.Shared.StatusPopup.Show("系統無法停止，可能尚未初始化。", Window.GetWindow(this),5); } catch { }
                         }
                         catch (Exception ex)
                         {
-                            MessageBox.Show($"處理失敗:\n{ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                            try { CleanerControlApp.Vision.Shared.StatusPopup.Show($"處理失敗:\n{ex.Message}", Window.GetWindow(this),8); } catch { }
                         }
                     };
 
@@ -132,18 +132,18 @@ namespace CleanerControlApp.Vision
                                         var hw = App.AppHost?.Services?.GetService<HardwareManager>();
                                         if (hw == null)
                                         {
-                                            MessageBox.Show("HardwareManager not available.", "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
+                                            try { CleanerControlApp.Vision.Shared.StatusPopup.Show("HardwareManager not available.", Window.GetWindow(this),5); } catch { }
                                             return;
                                         }
                                         bool forced = hw.AutoStop(true);
                                         if (forced)
-                                            MessageBox.Show("強制停止完成", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
+                                            try { CleanerControlApp.Vision.Shared.StatusPopup.Show("強制停止完成", Window.GetWindow(this),5); } catch { }
                                         else
-                                            MessageBox.Show("強制停止失敗", "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
+                                            try { CleanerControlApp.Vision.Shared.StatusPopup.Show("強制停止失敗", Window.GetWindow(this),5); } catch { }
                                     }
                                     catch (Exception ex)
                                     {
-                                        MessageBox.Show($"強制停止失敗:\n{ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                                        try { CleanerControlApp.Vision.Shared.StatusPopup.Show($"強制停止失敗:\n{ex.Message}", Window.GetWindow(this),8); } catch { }
                                     }
                                 });
                             }
@@ -290,7 +290,7 @@ namespace CleanerControlApp.Vision
             if (stopped)
             {
                 // dark background to indicate buzzer stopped
-                BtnStopBuzzer.Background = new SolidColorBrush(Color.FromRgb(0x33, 0x33, 0x33)); // dark gray
+                BtnStopBuzzer.Background = new SolidColorBrush(Color.FromRgb(0x33,0x33,0x33)); // dark gray
                 BtnStopBuzzer.Foreground = Brushes.White;
             }
             else
@@ -452,7 +452,7 @@ namespace CleanerControlApp.Vision
                     {
                         await Task.Delay(HoldMilliseconds, token).ConfigureAwait(false);
                         // if not cancelled, perform reset on UI thread
-                        Dispatcher.Invoke(async () => await PerformAlarmResetAsync());
+                        Dispatcher.Invoke(() => _ = PerformAlarmResetAsync());
                     }
                     catch (OperationCanceledException) { }
                 }, token).ConfigureAwait(false);
@@ -501,7 +501,7 @@ namespace CleanerControlApp.Vision
             // ensure rect is visible and zero width
             try
             {
-                ResetProgressRect.Width = 0;
+                ResetProgressRect.Width =0;
             }
             catch { }
         }
@@ -530,7 +530,7 @@ namespace CleanerControlApp.Vision
             // ensure rect is visible and zero width
             try
             {
-                InitProgressRect.Width = 0;
+                InitProgressRect.Width =0;
             }
             catch { }
         }
@@ -547,7 +547,7 @@ namespace CleanerControlApp.Vision
             // reset rect
             try
             {
-                ResetProgressRect.Width = 0;
+                ResetProgressRect.Width =0;
             }
             catch { }
 
@@ -640,7 +640,7 @@ namespace CleanerControlApp.Vision
                     double newWidth = full * progress;
                     var leftBorder = BtnResetError.BorderThickness.Left;
                     ResetProgressRect.Width = newWidth;
-                    ResetProgressRect.Margin = new Thickness(-leftBorder, 0, 0, 0);
+                    ResetProgressRect.Margin = new Thickness(-leftBorder,0,0,0);
                 }
 
                 // Update Init button progress only when init hold is active
@@ -655,7 +655,7 @@ namespace CleanerControlApp.Vision
                     double initNewWidth = initFull * initProgress;
                     var initLeftBorder = BtnInit.BorderThickness.Left;
                     InitProgressRect.Width = initNewWidth;
-                    InitProgressRect.Margin = new Thickness(-initLeftBorder, 0, 0, 0);
+                    InitProgressRect.Margin = new Thickness(-initLeftBorder,0,0,0);
 
                     try
                     {
@@ -691,15 +691,15 @@ namespace CleanerControlApp.Vision
                 var hw = App.AppHost?.Services?.GetService<HardwareManager>();
                 if (hw == null)
                 {
-                    MessageBox.Show("HardwareManager not available.", "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    try { Dispatcher.Invoke(() => CleanerControlApp.Vision.Shared.StatusPopup.Show("HardwareManager not available.", Window.GetWindow(this),5)); } catch { }
                     return;
                 }
                 await hw.AlarmResetAsync().ConfigureAwait(false);
-                MessageBox.Show("錯誤已重置", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
+                try { Dispatcher.Invoke(() => CleanerControlApp.Vision.Shared.StatusPopup.Show("錯誤已重置", Window.GetWindow(this),5)); } catch { }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"錯誤重置失敗:\n{ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                try { Dispatcher.Invoke(() => CleanerControlApp.Vision.Shared.StatusPopup.Show($"錯誤重置失敗:\n{ex.Message}", Window.GetWindow(this),8)); } catch { }
             }
         }
 
@@ -710,14 +710,14 @@ namespace CleanerControlApp.Vision
                 var hw = App.AppHost?.Services?.GetService<HardwareManager>();
                 if (hw == null)
                 {
-                    MessageBox.Show("HardwareManager not available.", "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    try { CleanerControlApp.Vision.Shared.StatusPopup.Show("HardwareManager not available.", Window.GetWindow(this),5); } catch { }
                     return;
                 }
                 hw.Buzzer_Stop();
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"停止蜂鳴器失敗:\n{ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                try { CleanerControlApp.Vision.Shared.StatusPopup.Show($"停止蜂鳴器失敗:\n{ex.Message}", Window.GetWindow(this),8); } catch { }
             }
         }
 
@@ -728,7 +728,7 @@ namespace CleanerControlApp.Vision
                 var hw = App.AppHost?.Services?.GetService<HardwareManager>();
                 if (hw == null)
                 {
-                    MessageBox.Show("HardwareManager not available.", "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    try { CleanerControlApp.Vision.Shared.StatusPopup.Show("HardwareManager not available.", Window.GetWindow(this),5); } catch { }
                     return;
                 }
 
@@ -736,12 +736,12 @@ namespace CleanerControlApp.Vision
                 if (!started)
                 {
                     // AutoStart returned false -> likely system not initialized
-                    MessageBox.Show("系統無法啟動，可能尚未初始化。", "警告", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    try { CleanerControlApp.Vision.Shared.StatusPopup.Show("系統無法啟動，可能尚未初始化。", Window.GetWindow(this),5); } catch { }
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"啟動失敗:\n{ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                try { CleanerControlApp.Vision.Shared.StatusPopup.Show($"啟動失敗:\n{ex.Message}", Window.GetWindow(this),8); } catch { }
             }
         }
 
@@ -752,19 +752,19 @@ namespace CleanerControlApp.Vision
                 var hw = App.AppHost?.Services?.GetService<HardwareManager>();
                 if (hw == null)
                 {
-                    MessageBox.Show("HardwareManager not available.", "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    try { CleanerControlApp.Vision.Shared.StatusPopup.Show("HardwareManager not available.", Window.GetWindow(this),5); } catch { }
                     return;
                 }
 
                 bool paused = hw.AutoPause();
                 if (!paused)
                 {
-                    MessageBox.Show("系統無法暫停，可能尚未初始化。", "警告", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    try { CleanerControlApp.Vision.Shared.StatusPopup.Show("系統無法暫停，可能尚未初始化。", Window.GetWindow(this),5); } catch { }
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"暫停失敗:\n{ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                try { CleanerControlApp.Vision.Shared.StatusPopup.Show($"暫停失敗:\n{ex.Message}", Window.GetWindow(this),8); } catch { }
             }
         }
 
@@ -849,7 +849,7 @@ namespace CleanerControlApp.Vision
 
             try
             {
-                InitProgressRect.Width = 0;
+                InitProgressRect.Width =0;
             }
             catch { }
 
@@ -872,7 +872,7 @@ namespace CleanerControlApp.Vision
                 var hw = App.AppHost?.Services?.GetService<HardwareManager>();
                 if (hw == null)
                 {
-                    MessageBox.Show("HardwareManager not available.", "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    try { CleanerControlApp.Vision.Shared.StatusPopup.Show("HardwareManager not available.", Window.GetWindow(this),5); } catch { }
                     return;
                 }
 
@@ -882,27 +882,27 @@ namespace CleanerControlApp.Vision
                 {
                     // developer: force initialize
                     hw.Initialize(true);
-                    MessageBox.Show("初始化 (Developer)", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
+                    try { CleanerControlApp.Vision.Shared.StatusPopup.Show("初始化 (Developer)", Window.GetWindow(this),5); } catch { }
                 }
                 else
                 {
                     // non-developer: perform check first
                     string status = string.Empty;
                     int result = hw.CheckCanInitialize(out status);
-                    if (result == 0)
+                    if (result ==0)
                     {
                         hw.Initialize(false);
-                        MessageBox.Show("初始化完成", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
+                        try { CleanerControlApp.Vision.Shared.StatusPopup.Show("初始化完成", Window.GetWindow(this),5); } catch { }
                     }
                     else
                     {
-                        MessageBox.Show(status, "Initialization Check", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        try { CleanerControlApp.Vision.Shared.StatusPopup.Show(status, Window.GetWindow(this),8); } catch { }
                     }
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"初始化失敗:\n{ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                try { CleanerControlApp.Vision.Shared.StatusPopup.Show($"初始化失敗:\n{ex.Message}", Window.GetWindow(this),8); } catch { }
             }
         }
 
@@ -911,7 +911,7 @@ namespace CleanerControlApp.Vision
             try
             {
                 var entries = OperateLog.GetEntriesForDate(DateTime.Now);
-                if (entries != null && entries.Count > 0)
+                if (entries != null && entries.Count >0)
                 {
                     var last = entries.OrderByDescending(x => x.Timestamp).FirstOrDefault();
                     if (last != null)
@@ -986,7 +986,7 @@ namespace CleanerControlApp.Vision
                 var hw = App.AppHost?.Services?.GetService<HardwareManager>();
                 if (hw == null)
                 {
-                    MessageBox.Show("HardwareManager not available.", "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    try { CleanerControlApp.Vision.Shared.StatusPopup.Show("HardwareManager not available.", Window.GetWindow(this),5); } catch { }
                     return;
                 }
 
@@ -1022,8 +1022,8 @@ namespace CleanerControlApp.Vision
                     // set owner and size relative to owner (1.5x)
                     win.Owner = owner;
 
-                    double w = owner.ActualWidth > 0 ? owner.ActualWidth * 1.5 : 600 * 1.5;
-                    double h = owner.ActualHeight > 0 ? owner.ActualHeight * 1.5 : 420 * 1.5;
+                    double w = owner.ActualWidth >0 ? owner.ActualWidth *1.5 :600 *1.5;
+                    double h = owner.ActualHeight >0 ? owner.ActualHeight *1.5 :420 *1.5;
 
                     // ensure it does not exceed available work area
                     w = Math.Min(w, SystemParameters.WorkArea.Width);
@@ -1035,15 +1035,15 @@ namespace CleanerControlApp.Vision
                 else
                 {
                     // fallback: scale default size
-                    win.Width = 600 * 1.5;
-                    win.Height = 420 * 1.5;
+                    win.Width =600 *1.5;
+                    win.Height =420 *1.5;
                 }
 
                 win.ShowDialog();
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"顯示Hint失敗:\n{ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                try { CleanerControlApp.Vision.Shared.StatusPopup.Show($"顯示Hint失敗:\n{ex.Message}", Window.GetWindow(this),8); } catch { }
             }
         }
     }

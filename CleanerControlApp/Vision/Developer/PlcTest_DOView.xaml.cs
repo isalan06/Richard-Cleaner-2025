@@ -104,133 +104,133 @@ namespace CleanerControlApp.Vision.Developer
             _refreshTimer = new DispatcherTimer(DispatcherPriority.Normal)
             {
                 Interval = System.TimeSpan.FromMilliseconds(200)
- };
+            };
 
             _refreshTimer.Tick += (s, e) =>
  {
- foreach (var g in Groups)
- {
- foreach (var it in g.Items)
- it.Refresh();
- }
+     foreach (var g in Groups)
+     {
+         foreach (var it in g.Items)
+             it.Refresh();
+     }
  };
             _refreshTimer.Start();
- }
+        }
 
- private void AddGroup(string header, (string addr, string desc)[] entries)
- {
- var g = new DOGroup { Header = header };
- foreach (var e in entries)
- {
- g.Items.Add(new DOItem(e.addr, e.desc, _plcService));
- }
- Groups.Add(g);
- }
+        private void AddGroup(string header, (string addr, string desc)[] entries)
+        {
+            var g = new DOGroup { Header = header };
+            foreach (var e in entries)
+            {
+                g.Items.Add(new DOItem(e.addr, e.desc, _plcService));
+            }
+            Groups.Add(g);
+        }
 
- private void OnSetButtonClick(object sender, RoutedEventArgs e)
- {
- if (sender is Button btn && btn.DataContext is DOItem item)
- {
- // toggle command bit for this item
- item.ToggleCommand();
- }
- }
- }
+        private void OnSetButtonClick(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.DataContext is DOItem item)
+            {
+                // toggle command bit for this item
+                item.ToggleCommand();
+            }
+        }
+    }
 
- public class DOGroup
- {
- public string? Header { get; set; }
- public ObservableCollection<DOItem> Items { get; } = new ObservableCollection<DOItem>();
- }
+    public class DOGroup
+    {
+        public string? Header { get; set; }
+        public ObservableCollection<DOItem> Items { get; } = new ObservableCollection<DOItem>();
+    }
 
- public class DOItem : INotifyPropertyChanged
- {
- private readonly IPLCService? _plc = null;
- private readonly int _wordIndex;
- private readonly int _bitIndex;
+    public class DOItem : INotifyPropertyChanged
+    {
+        private readonly IPLCService? _plc = null;
+        private readonly int _wordIndex;
+        private readonly int _bitIndex;
 
- public string Address { get; }
- public string Description { get; }
+        public string Address { get; }
+        public string Description { get; }
 
- public DOItem(string address, string description, IPLCService? plc)
- {
- Address = address;
- Description = description;
- _plc = plc;
+        public DOItem(string address, string description, IPLCService? plc)
+        {
+            Address = address;
+            Description = description;
+            _plc = plc;
 
- if (int.TryParse(address.TrimStart('Y', 'y'), out int num))
- {
- int tens = num /10;
- int units = num %10;
- _wordIndex = tens /2; // every two tens groups -> next word
- _bitIndex = units + (tens %2) *8; // odd tens -> high byte (bits8..15)
- }
- else
- {
- _wordIndex =0;
- _bitIndex =0;
- }
- }
+            if (int.TryParse(address.TrimStart('Y', 'y'), out int num))
+            {
+                int tens = num / 10;
+                int units = num % 10;
+                _wordIndex = tens / 2; // every two tens groups -> next word
+                _bitIndex = units + (tens % 2) * 8; // odd tens -> high byte (bits8..15)
+            }
+            else
+            {
+                _wordIndex = 0;
+                _bitIndex = 0;
+            }
+        }
 
- public bool IsOn
- {
- get
- {
- if (_plc == null) return false;
- var arr = _plc.DIO_Y;
- if (arr == null) return false;
- if (_wordIndex <0 || _wordIndex >= arr.Length) return false;
- if (_bitIndex <0 || _bitIndex >15) return false;
- return arr[_wordIndex].GetBit(_bitIndex);
- }
- }
+        public bool IsOn
+        {
+            get
+            {
+                if (_plc == null) return false;
+                var arr = _plc.DIO_Y;
+                if (arr == null) return false;
+                if (_wordIndex < 0 || _wordIndex >= arr.Length) return false;
+                if (_bitIndex < 0 || _bitIndex > 15) return false;
+                return arr[_wordIndex].GetBit(_bitIndex);
+            }
+        }
 
- // Command mapping: base command index5 + _wordIndex
- private int CommandWordIndex =>5 + _wordIndex;
+        // Command mapping: base command index5 + _wordIndex
+        private int CommandWordIndex => 5 + _wordIndex;
 
- public bool CommandIsOn
- {
- get
- {
- if (_plc == null) return false;
- var cmd = _plc.Command;
- if (cmd == null) return false;
- if (CommandWordIndex <0 || CommandWordIndex >= cmd.Length) return false;
- if (_bitIndex <0 || _bitIndex >15) return false;
- return cmd[CommandWordIndex].GetBit(_bitIndex);
- }
- }
+        public bool CommandIsOn
+        {
+            get
+            {
+                if (_plc == null) return false;
+                var cmd = _plc.Command;
+                if (cmd == null) return false;
+                if (CommandWordIndex < 0 || CommandWordIndex >= cmd.Length) return false;
+                if (_bitIndex < 0 || _bitIndex > 15) return false;
+                return cmd[CommandWordIndex].GetBit(_bitIndex);
+            }
+        }
 
- public void ToggleCommand()
- {
- if (_plc == null) return;
- var cmd = _plc.Command;
- if (cmd == null) return;
- if (CommandWordIndex <0 || CommandWordIndex >= cmd.Length) return;
- if (_bitIndex <0 || _bitIndex >15) return;
+        public void ToggleCommand()
+        {
+            if (_plc == null) return;
+            var cmd = _plc.Command;
+            if (cmd == null) return;
+            if (CommandWordIndex < 0 || CommandWordIndex >= cmd.Length) return;
+            if (_bitIndex < 0 || _bitIndex > 15) return;
 
- var union = cmd[CommandWordIndex];
- bool current = union.GetBit(_bitIndex);
- union.SetBit(_bitIndex, !current);
- // write back the modified struct
- cmd[CommandWordIndex] = union;
- // assign back to plc service
- _plc.Command = cmd;
+            var union = cmd[CommandWordIndex];
+            bool current = union.GetBit(_bitIndex);
+            union.SetBit(_bitIndex, !current);
+            // write back the modified struct
+            cmd[CommandWordIndex] = union;
+            // assign back to plc service
+            _plc.Command = cmd;
 
- // notify change
- OnPropertyChanged(nameof(CommandIsOn));
- }
+            // notify change
+            OnPropertyChanged(nameof(CommandIsOn));
+        }
 
- public void Refresh()
- {
- OnPropertyChanged(nameof(IsOn));
- OnPropertyChanged(nameof(CommandIsOn));
- }
+        public void Refresh()
+        {
+            OnPropertyChanged(nameof(IsOn));
+            OnPropertyChanged(nameof(CommandIsOn));
+        }
 
- public event PropertyChangedEventHandler? PropertyChanged;
- protected void OnPropertyChanged([CallerMemberName] string? propName = null)
- {
- PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propName));
- }
- }
+        public event PropertyChangedEventHandler? PropertyChanged;
+        protected void OnPropertyChanged([CallerMemberName] string? propName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propName));
+        }
+    }
 }

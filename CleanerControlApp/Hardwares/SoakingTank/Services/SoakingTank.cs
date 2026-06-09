@@ -254,10 +254,12 @@ namespace CleanerControlApp.Hardwares.SoakingTank.Services
         public bool Initialized => _initialized && (_sim_pass_motor || MotorHome);
         public bool Initializing => _initialized && !MotorHome && !_sim_pass_motor;
         public bool Idle => Sensor_CoverOpen && !_ultrasonic && !_cassette && _initialized && IsNormalStatus && (_sim_pass_motor || (MotorServoOn && MotorIdle && MotorHome));
+        public bool CanStopAuto => Sensor_CoverOpen && !_ultrasonic && _initialized && IsNormalStatus && (_sim_pass_motor || (MotorServoOn && MotorIdle && MotorHome && InPos1));
 
         public bool AirOP(bool air)
         {
             bool result = true;
+            _messageForOperation = string.Empty;
             if (_plcService != null)
             {
                 Command_CleanerAirOpen = air;
@@ -271,10 +273,14 @@ namespace CleanerControlApp.Hardwares.SoakingTank.Services
         {
             bool result = false;
 
-            if (_plcService != null)
+            if (!_auto)
             {
                 result = AirOP(air);
                 OperateLog.Log($"浸泡槽 手動氣閥 " + (air ? "開" : "關"), $"浸泡槽 手動氣閥 " + (air ? "開" : "關"));
+            }
+            else
+            { 
+                _messageForOperation = "無法操作氣閥，請先停止自動模式後再進行手動操作。";
             }
 
             return result;
@@ -306,10 +312,14 @@ namespace CleanerControlApp.Hardwares.SoakingTank.Services
         {
             bool result = false;
 
-            if (_plcService != null)
-            { 
+            if (!_auto)
+            {
                 result = WaterOutputOP(water);
                 OperateLog.Log($"浸泡槽 手動排水 " + (water ? "開" : "關"), $"浸泡槽 手動排水 " + (water ? "開" : "關"));
+            }
+            else
+            { 
+                _messageForOperation = "無法操作排水閥，請先停止自動模式後再進行手動操作。";
             }
 
             return result;
@@ -318,6 +328,7 @@ namespace CleanerControlApp.Hardwares.SoakingTank.Services
         public bool CoverClose(bool close)
         {
             bool result = true;
+            _messageForOperation = string.Empty;
             if (_plcService != null)
             {
                 Command_CleanerCoverClose = close;
@@ -331,10 +342,21 @@ namespace CleanerControlApp.Hardwares.SoakingTank.Services
         {
             bool result = false;
 
-            if (_plcService != null)
+            if (!_auto)
             {
-                result = CoverClose(close);
-                OperateLog.Log($"浸泡槽 手動蓋子 " + (close ? "關" : "開"), $"浸泡槽 手動蓋子 " + (close ? "關" : "開"));
+                if (!InSafePos && close)
+                {
+                    _messageForOperation = "為安全起見，無法關蓋：請先確認馬達位置在安全區域（位置2或位置3）再嘗試關蓋。";
+                }
+                else
+                {
+                    result = CoverClose(close);
+                    OperateLog.Log($"浸泡槽 手動蓋子 " + (close ? "關" : "開"), $"浸泡槽 手動蓋子 " + (close ? "關" : "開"));
+                }
+            }
+            else
+            {
+                _messageForOperation = "無法操作蓋子，請先停止自動模式後再進行手動操作。";
             }
 
             return result;
@@ -634,10 +656,12 @@ namespace CleanerControlApp.Hardwares.SoakingTank.Services
             }
         }
 
-        public bool InPos1 => (CommonFunction.CheckPositionInRange(Position, (_moduleSettings.SoakingTank != null ? _moduleSettings.SoakingTank.MotorPosition_01 : 0))) || _sim_pass_motor;
-        public bool InPos2 => (CommonFunction.CheckPositionInRange(Position, (_moduleSettings.SoakingTank != null ? _moduleSettings.SoakingTank.MotorPosition_02 : 0))) || _sim_pass_motor;
-        public bool InPos3 => (CommonFunction.CheckPositionInRange(Position, (_moduleSettings.SoakingTank != null ? _moduleSettings.SoakingTank.MotorPosition_03 : 0))) || _sim_pass_motor;
-        public bool InPos0 => (CommonFunction.CheckPositionInRange(Position, 0)) || _sim_pass_motor;
+        public bool InPos1 => ((CommonFunction.CheckPositionInRange(Position, (_moduleSettings.SoakingTank != null ? _moduleSettings.SoakingTank.MotorPosition_01 : 0))) && MotorHome) || _sim_pass_motor;
+        public bool InPos2 => ((CommonFunction.CheckPositionInRange(Position, (_moduleSettings.SoakingTank != null ? _moduleSettings.SoakingTank.MotorPosition_02 : 0))) && MotorHome) || _sim_pass_motor;
+        public bool InPos3 => ((CommonFunction.CheckPositionInRange(Position, (_moduleSettings.SoakingTank != null ? _moduleSettings.SoakingTank.MotorPosition_03 : 0))) && MotorHome) || _sim_pass_motor;
+        public bool InPos0 => ((CommonFunction.CheckPositionInRange(Position, 0)) && MotorHome) || _sim_pass_motor;
+        public bool InSafePos => ((CommonFunction.CheckPositionAbove(Position, (_moduleSettings.SoakingTank != null ? _moduleSettings.SoakingTank.MotorPosition_02 : 0))) && MotorHome) || _sim_pass_motor;
+
         public void Teach(int position)
         {
             if (_plcService != null && _moduleSettings.SoakingTank != null)
@@ -982,7 +1006,7 @@ namespace CleanerControlApp.Hardwares.SoakingTank.Services
 
             if (_auto)
             {
-                if (Idle && _autoStopFlag)
+                if (CanStopAuto && _autoStopFlag)
                 {
                     _autoStopFlag = false;
                     _auto = false;

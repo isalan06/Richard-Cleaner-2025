@@ -283,6 +283,7 @@ namespace CleanerControlApp.Hardwares.Sink.Services
         public bool Initialized => _initialized && (_sim_pass_motor || MotorHome);
         public bool Initializing => _initialized && !MotorHome && !_sim_pass_motor;
         public bool Idle => Sensor_CoverOpen && !_pressure && !_cassette && _initialized && IsNormalStatus && (_sim_pass_motor || (MotorServoOn && MotorIdle && MotorHome));
+        public bool CanStopAuto => Sensor_CoverOpen && !_pressure && _initialized && IsNormalStatus && (_sim_pass_motor || (MotorServoOn && MotorIdle && MotorHome && InPos1));
 
         public bool HomeIdle => Sensor_CoverOpen && !_pressure && !_cassette  && IsNormalStatus;
 
@@ -321,12 +322,17 @@ namespace CleanerControlApp.Hardwares.Sink.Services
                 result = PressureOP(pressure);
                 OperateLog.Log($"沖水槽 手動噴水 " + (pressure ? "開" : "關"), $"沖水槽 手動噴水 " + (pressure ? "開" : "關"));
             }
+            else
+            {
+                _messageForOperation = "目前系統在自動模式，無法手動控制沖水。若要手動控制請先停止自動模式。";
+            }
 
             return false;
         }
         public bool AirOP(bool air)
         {
             bool result = true;
+            _messageForOperation = string.Empty;
             if (_plcService != null)
             {
                 Command_CleanerAirOpen = air;
@@ -340,10 +346,14 @@ namespace CleanerControlApp.Hardwares.Sink.Services
         {
             bool result = false;
 
-            if (_plcService != null)
+            if (!_auto)
             {
                 result = AirOP(air);
                 OperateLog.Log($"沖水槽 手動氣閥 " + (air ? "開" : "關"), $"沖水槽 手動氣閥 " + (air ? "開" : "關"));
+            }
+            else
+            { 
+                _messageForOperation = "目前系統在自動模式，無法手動控制氣刀。若要手動控制請先停止自動模式。";
             }
 
             return result;
@@ -352,6 +362,7 @@ namespace CleanerControlApp.Hardwares.Sink.Services
         public bool CoverClose(bool close)
         {
             bool result = true;
+            _messageForOperation = string.Empty;
             if (_plcService != null)
             {
                 Command_CleanerCoverClose = close;
@@ -365,10 +376,21 @@ namespace CleanerControlApp.Hardwares.Sink.Services
         {
             bool result = false;
 
-            if (_plcService != null)
+            if (!_auto)
             {
-                result = CoverClose(close);
-                OperateLog.Log($"沖水槽 手動蓋子 " + (close ? "關" : "開"), $"沖水槽 手動蓋子 " + (close ? "關" : "開"));
+                if (!InSafePos && close)
+                {
+                    _messageForOperation = "為安全起見，無法關蓋：請先確認馬達位置在安全區域（位置2或位置3）再嘗試關蓋。";
+                }
+                else
+                {
+                    result = CoverClose(close);
+                    OperateLog.Log($"沖水槽 手動蓋子 " + (close ? "關" : "開"), $"沖水槽 手動蓋子 " + (close ? "關" : "開"));
+                }
+            }
+            else
+            {
+                _messageForOperation = "目前系統在自動模式，無法手動控制蓋子。若要手動控制請先停止自動模式。";
             }
 
             return result;
@@ -604,10 +626,11 @@ namespace CleanerControlApp.Hardwares.Sink.Services
             }
         }
 
-        public bool InPos1 => (CommonFunction.CheckPositionInRange(Position, (_moduleSettings.Sink != null ? _moduleSettings.Sink.MotorPosition_01 : 0))) || _sim_pass_motor;
-        public bool InPos2 => (CommonFunction.CheckPositionInRange(Position, (_moduleSettings.Sink != null ? _moduleSettings.Sink.MotorPosition_02 : 0))) || _sim_pass_motor;
-        public bool InPos3 => (CommonFunction.CheckPositionInRange(Position, (_moduleSettings.Sink != null ? _moduleSettings.Sink.MotorPosition_03 : 0))) || _sim_pass_motor;
-        public bool InPos0 => (CommonFunction.CheckPositionInRange(Position, 0, 15)) || _sim_pass_motor;
+        public bool InPos1 => ((CommonFunction.CheckPositionInRange(Position, (_moduleSettings.Sink != null ? _moduleSettings.Sink.MotorPosition_01 : 0))) && MotorHome) || _sim_pass_motor;
+        public bool InPos2 => ((CommonFunction.CheckPositionInRange(Position, (_moduleSettings.Sink != null ? _moduleSettings.Sink.MotorPosition_02 : 0))) && MotorHome)  || _sim_pass_motor;
+        public bool InPos3 => ((CommonFunction.CheckPositionInRange(Position, (_moduleSettings.Sink != null ? _moduleSettings.Sink.MotorPosition_03 : 0))) && MotorHome)  || _sim_pass_motor;
+        public bool InPos0 => ((CommonFunction.CheckPositionInRange(Position, 0, 15)) && MotorHome) || _sim_pass_motor;
+        public bool InSafePos => ((CommonFunction.CheckPositionAbove(Position, (_moduleSettings.Sink != null ? _moduleSettings.Sink.MotorPosition_02 : 0))) && MotorHome) || _sim_pass_motor;
 
         public void Teach(int position)
         {
@@ -972,7 +995,7 @@ namespace CleanerControlApp.Hardwares.Sink.Services
         {
             if (_auto)
             {
-                if (Idle && _autoStopFlag)
+                if (CanStopAuto && _autoStopFlag)
                 {
                     _autoStopFlag = false;
                     _auto = false;

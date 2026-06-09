@@ -68,7 +68,7 @@
  <TextBlock x:Name="TB_MotorVel1_Label" Text="馬達速度 #1-升降(mm/s):" Grid.Row="4" Grid.Column="0" VerticalAlignment="Center" />
  <TextBox x:Name="Txt_MotorVel1" Grid.Row="4" Grid.Column="1" Margin="4,4,0,4" />
 
- <TextBlock x:Name="TB_MotorVel2_Label" Text="馬達速度 #2-搖擺(mm/s):" Grid.Row="5" Grid.Column="0" VerticalAlignment="Center" FontWeight="DemiBold"/>
+ <TextBlock x:Name="TB_MotorVel2_Label" Text="馬達速度 #2-搖擺(mm/s):" Grid.Row="5" Grid.Column="0" VerticalAlignment="Center"/>
  <TextBox x:Name="Txt_MotorVel2" Grid.Row="5" Grid.Column="1" Margin="4,4,0,4" />
 
  <!-- Ultrasonic Set Current -->

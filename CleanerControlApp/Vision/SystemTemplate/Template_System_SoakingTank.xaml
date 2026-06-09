@@ -34,7 +34,7 @@
                             <Setter Property="Background" Value="#FFFFFF"/>
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding PauseStatus, ElementName=RootControl}" Value="True">
-                                    <Setter Property="Background" Value="Lime"/>
+                                    <Setter Property="Background" Value="Yellow"/>
                                 </DataTrigger>
                             </Style.Triggers>
                         </Style>

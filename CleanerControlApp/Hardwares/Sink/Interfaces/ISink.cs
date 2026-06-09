@@ -35,6 +35,7 @@ namespace CleanerControlApp.Hardwares.Sink.Interfaces
         bool Initialized { get; }
         bool Initializing { get; }
         bool Idle { get; }
+        bool CanStopAuto { get; }
 
         bool HighPressure { get; }
         bool LowPressure { get; }
@@ -97,6 +98,7 @@ namespace CleanerControlApp.Hardwares.Sink.Interfaces
         bool InPos3 { get; }
 
         bool InPos0 { get; }
+        bool InSafePos { get; }
 
         void Teach(int position);
 

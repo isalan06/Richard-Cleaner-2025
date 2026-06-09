@@ -125,12 +125,19 @@ namespace CleanerControlApp.Vision.Template
                 // call teach on ISink with position0
                 try
                 {
-                    _sink?.Teach(0);
-                    MessageBox.Show("Teach (P1) executed.", "Teach", MessageBoxButton.OK, MessageBoxImage.Information);
+                    if (_sink != null && _sink.MotorHome)
+                    {
+                        _sink?.Teach(0);
+                        try { CleanerControlApp.Vision.Shared.InfoPopup.Show("Teach (P1) executed.", Window.GetWindow(this), 5); } catch { }
+                    }
+                    else
+                    {
+                        try { CleanerControlApp.Vision.Shared.StatusPopup.Show("Cannot teach P1: Motor not homed.", Window.GetWindow(this),5); } catch { }
+                    }
                 }
                 catch (Exception ex)
                 {
-                    try { MessageBox.Show($"Teach failed: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error); } catch { }
+                    try { CleanerControlApp.Vision.Shared.StatusPopup.Show($"Teach failed: {ex.Message}", Window.GetWindow(this),5); } catch { }
                 }
             }
             catch { }
@@ -149,12 +156,19 @@ namespace CleanerControlApp.Vision.Template
                 // call teach on ISink with position1
                 try
                 {
-                    _sink?.Teach(1);
-                    MessageBox.Show("Teach (P2) executed.", "Teach", MessageBoxButton.OK, MessageBoxImage.Information);
+                    if (_sink != null && _sink.MotorHome)
+                    {
+                        _sink?.Teach(1);
+                        try { CleanerControlApp.Vision.Shared.InfoPopup.Show("Teach (P2) executed.", Window.GetWindow(this), 5); } catch { }
+                    }
+                    else
+                    {
+                        try { CleanerControlApp.Vision.Shared.StatusPopup.Show("Cannot teach P2: Motor not homed.", Window.GetWindow(this),5); } catch { }
+                    }
                 }
                 catch (Exception ex)
                 {
-                    try { MessageBox.Show($"Teach failed: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error); } catch { }
+                    try { CleanerControlApp.Vision.Shared.StatusPopup.Show($"Teach failed: {ex.Message}", Window.GetWindow(this),5); } catch { }
                 }
             }
             catch { }
@@ -173,12 +187,19 @@ namespace CleanerControlApp.Vision.Template
                 // call teach on ISink with position2
                 try
                 {
-                    _sink?.Teach(2);
-                    MessageBox.Show("Teach (P3) executed.", "Teach", MessageBoxButton.OK, MessageBoxImage.Information);
+                    if(_sink != null && _sink.MotorHome)
+                    {
+                        _sink?.Teach(2);
+                        try { CleanerControlApp.Vision.Shared.InfoPopup.Show("Teach (P3) executed.", Window.GetWindow(this), 5); } catch { }
+                    }
+                    else
+                    {
+                        try { CleanerControlApp.Vision.Shared.StatusPopup.Show("Cannot teach P3: Motor not homed.", Window.GetWindow(this),5); } catch { }
+                    }
                 }
                 catch (Exception ex)
                 {
-                    try { MessageBox.Show($"Teach failed: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error); } catch { }
+                    try { CleanerControlApp.Vision.Shared.StatusPopup.Show($"Teach failed: {ex.Message}", Window.GetWindow(this),5); } catch { }
                 }
             }
             catch { }
@@ -439,6 +460,7 @@ namespace CleanerControlApp.Vision.Template
             try
             {
                 _sink?.ManualCoverClose(false);
+                CheckStatus();
             }
             catch
             {
@@ -451,6 +473,7 @@ namespace CleanerControlApp.Vision.Template
             try
             {
                 _sink?.ManualCoverClose(true);
+                CheckStatus();
             }
             catch
             {
@@ -463,11 +486,7 @@ namespace CleanerControlApp.Vision.Template
             try
             {
                 _sink?.ManualPressureOP(true);
-                var status = _sink?.MessageForOperation;
-                if (!string.IsNullOrEmpty(status))
-                {
-                    ShowStatusPopup(status);
-                }
+                CheckStatus();
 
             }
             catch
@@ -481,6 +500,7 @@ namespace CleanerControlApp.Vision.Template
             try
             {
                 _sink?.ManualPressureOP(false);
+                CheckStatus();
             }
             catch
             {
@@ -493,6 +513,7 @@ namespace CleanerControlApp.Vision.Template
             try
             {
                 _sink?.ManualAirOP(true);
+                CheckStatus();
             }
             catch
             {
@@ -505,6 +526,7 @@ namespace CleanerControlApp.Vision.Template
             try
             {
                 _sink?.ManualAirOP(false);
+                CheckStatus();
             }
             catch
             {
@@ -539,11 +561,7 @@ namespace CleanerControlApp.Vision.Template
                 {
                     try { 
                         _sink.ManualStartToShaking();
-                        var status = _sink.MessageForOperation;
-                        if (!string.IsNullOrEmpty(status))
-                        {
-                            ShowStatusPopup(status);
-                        }
+                        CheckStatus();
 
                     } catch { }
                 }
@@ -581,15 +599,7 @@ namespace CleanerControlApp.Vision.Template
                 int speed = GetSelectedSpeed();
                 _sink?.MoveToPosition(0, speed);
                 // after command, check operation message and show popup if any
-                try
-                {
-                    var msg = _sink?.MessageForOperation ?? string.Empty;
-                    if (!string.IsNullOrEmpty(msg))
-                    {
-                        CleanerControlApp.Vision.Shared.StatusPopup.Show(msg, Window.GetWindow(this),5);
-                    }
-                }
-                catch { }
+                CheckStatus();
             }
             catch { }
         }
@@ -606,15 +616,7 @@ namespace CleanerControlApp.Vision.Template
 
                 int speed = GetSelectedSpeed();
                 _sink?.MoveToPosition(1, speed);
-                try
-                {
-                    var msg = _sink?.MessageForOperation ?? string.Empty;
-                    if (!string.IsNullOrEmpty(msg))
-                    {
-                        CleanerControlApp.Vision.Shared.StatusPopup.Show(msg, Window.GetWindow(this),5);
-                    }
-                }
-                catch { }
+                CheckStatus();
             }
             catch { }
         }
@@ -631,15 +633,7 @@ namespace CleanerControlApp.Vision.Template
 
                 int speed = GetSelectedSpeed();
                 _sink?.MoveToPosition(2, speed);
-                try
-                {
-                    var msg = _sink?.MessageForOperation ?? string.Empty;
-                    if (!string.IsNullOrEmpty(msg))
-                    {
-                        CleanerControlApp.Vision.Shared.StatusPopup.Show(msg, Window.GetWindow(this),5);
-                    }
-                }
-                catch { }
+                CheckStatus();
             }
             catch { }
         }
@@ -682,6 +676,15 @@ namespace CleanerControlApp.Vision.Template
         private void ShowStatusPopup(string status)
         {
             try { CleanerControlApp.Vision.Shared.StatusPopup.Show(status, Window.GetWindow(this),5); } catch { }
+        }
+
+        private void CheckStatus()
+        {
+            var status = _sink?.MessageForOperation;
+            if (!string.IsNullOrEmpty(status))
+            {
+                ShowStatusPopup(status);
+            }
         }
     }
 }

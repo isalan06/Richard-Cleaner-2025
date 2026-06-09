@@ -38,7 +38,7 @@ namespace CleanerControlApp.Hardwares.SoakingTank.Interfaces
         bool Initialized { get; }
         bool Initializing { get; }
         bool Idle { get; }
-
+        bool CanStopAuto { get; }
 
         bool AirOP(bool air);
         bool ManualAirOP(bool air);
@@ -104,6 +104,7 @@ namespace CleanerControlApp.Hardwares.SoakingTank.Interfaces
         bool InPos2 { get; }
         bool InPos3 { get; }
         bool InPos0 { get; }
+        bool InSafePos { get; }
 
         void Teach(int position);
 

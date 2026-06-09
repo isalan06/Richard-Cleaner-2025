@@ -111,12 +111,19 @@ namespace CleanerControlApp.Vision.Template
 
                 try
                 {
-                    _soakingTank?.Teach(0);
-                    MessageBox.Show("Teach (P1) executed.", "Teach", MessageBoxButton.OK, MessageBoxImage.Information);
+                    if (_soakingTank != null && _soakingTank.MotorHome)
+                    {
+                        _soakingTank?.Teach(0);
+                        try { CleanerControlApp.Vision.Shared.InfoPopup.Show("Teach (P1) executed.", Window.GetWindow(this), 5); } catch { }
+                    }
+                    else
+                    {
+                        try { CleanerControlApp.Vision.Shared.StatusPopup.Show("Cannot teach P1: Motor not homed.", Window.GetWindow(this), 5); } catch { }
+                    }
                 }
                 catch (Exception ex)
                 {
-                    try { MessageBox.Show($"Teach failed: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error); } catch { }
+                    try { CleanerControlApp.Vision.Shared.StatusPopup.Show($"Teach failed: {ex.Message}", Window.GetWindow(this),5); } catch { }
                 }
             }
             catch { }
@@ -132,12 +139,19 @@ namespace CleanerControlApp.Vision.Template
 
                 try
                 {
-                    _soakingTank?.Teach(1);
-                    MessageBox.Show("Teach (P2) executed.", "Teach", MessageBoxButton.OK, MessageBoxImage.Information);
+                    if (_soakingTank != null && _soakingTank.MotorHome)
+                    {
+                        _soakingTank?.Teach(1);
+                        try { CleanerControlApp.Vision.Shared.InfoPopup.Show("Teach (P2) executed.", Window.GetWindow(this), 5); } catch { }
+                    }
+                    else
+                    {
+                        try { CleanerControlApp.Vision.Shared.StatusPopup.Show("Cannot teach P2: Motor not homed.", Window.GetWindow(this), 5); } catch { }
+                    }
                 }
                 catch (Exception ex)
                 {
-                    try { MessageBox.Show($"Teach failed: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error); } catch { }
+                    try { CleanerControlApp.Vision.Shared.StatusPopup.Show($"Teach failed: {ex.Message}", Window.GetWindow(this),5); } catch { }
                 }
             }
             catch { }
@@ -153,12 +167,19 @@ namespace CleanerControlApp.Vision.Template
 
                 try
                 {
-                    _soakingTank?.Teach(2);
-                    MessageBox.Show("Teach (P3) executed.", "Teach", MessageBoxButton.OK, MessageBoxImage.Information);
+                    if (_soakingTank != null && _soakingTank.MotorHome)
+                    {
+                        _soakingTank?.Teach(2);
+                        try { CleanerControlApp.Vision.Shared.InfoPopup.Show("Teach (P3) executed.", Window.GetWindow(this), 5); } catch { }
+                    }
+                    else
+                    {
+                        try { CleanerControlApp.Vision.Shared.StatusPopup.Show("Cannot teach P3: Motor not homed.", Window.GetWindow(this), 5); } catch { }
+                    }
                 }
                 catch (Exception ex)
                 {
-                    try { MessageBox.Show($"Teach failed: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error); } catch { }
+                    try { CleanerControlApp.Vision.Shared.StatusPopup.Show($"Teach failed: {ex.Message}", Window.GetWindow(this),5); } catch { }
                 }
             }
             catch { }
@@ -384,6 +405,7 @@ namespace CleanerControlApp.Vision.Template
 
                 int speed = GetSelectedSpeed();
                 _soakingTank?.MoveToPosition(0, speed);
+                CheckStatus();
             }
             catch { }
         }
@@ -400,6 +422,7 @@ namespace CleanerControlApp.Vision.Template
 
                 int speed = GetSelectedSpeed();
                 _soakingTank?.MoveToPosition(1, speed);
+                CheckStatus();
             }
             catch { }
         }
@@ -416,6 +439,7 @@ namespace CleanerControlApp.Vision.Template
 
                 int speed = GetSelectedSpeed();
                 _soakingTank?.MoveToPosition(2, speed);
+                CheckStatus();
             }
             catch { }
         }
@@ -434,11 +458,7 @@ namespace CleanerControlApp.Vision.Template
                 {
                     try { 
                         _soakingTank.ManualStartToShaking();
-                        var status = _soakingTank?.MessageForOperation;
-                        if (!string.IsNullOrEmpty(status))
-                        {
-                            ShowStatusPopup(status);
-                        }
+                        CheckStatus();
                     } catch { }
                 }
                 try { ManaulShaking = _soakingTank.ManaulShaking; } catch { }
@@ -464,48 +484,51 @@ namespace CleanerControlApp.Vision.Template
         private void OpenCover_Click(object sender, RoutedEventArgs e)
         {
             try { _soakingTank?.ManualCoverClose(false); } catch { }
+            CheckStatus();
         }
 
         private void CloseCover_Click(object sender, RoutedEventArgs e)
         {
             try { _soakingTank?.ManualCoverClose(true); } catch { }
+            CheckStatus();
         }
 
         private void OpenAir_Click(object sender, RoutedEventArgs e)
         {
             try { _soakingTank?.ManualAirOP(true); } catch { }
+            CheckStatus();
         }
 
         private void CloseAir_Click(object sender, RoutedEventArgs e)
         {
             try { _soakingTank?.ManualAirOP(false); } catch { }
+            CheckStatus();
         }
 
         private void OpenWaterIn_Click(object sender, RoutedEventArgs e)
         {
             try { _soakingTank?.ManualWaterInOP(true); } catch { }
+            CheckStatus();
         }
 
         private void CloseWaterIn_Click(object sender, RoutedEventArgs e)
         {
             try { _soakingTank?.ManualWaterInOP(false); } catch { }
+            CheckStatus();
         }
 
         private void OpenUltrasonic_Click(object sender, RoutedEventArgs e)
         {
             try { 
                 _soakingTank?.ManualUltrasonicOP(true);
-                var status = _soakingTank?.MessageForOperation;
-                if (!string.IsNullOrEmpty(status))
-                {
-                    ShowStatusPopup(status);
-                }
+                CheckStatus();
             } catch { }
         }
 
         private void CloseUltrasonic_Click(object sender, RoutedEventArgs e)
         {
             try { _soakingTank?.ManualUltrasonicOP(false); } catch { }
+            CheckStatus();
         }
 
         private void OpenWaterOut_Click(object sender, RoutedEventArgs e)
@@ -513,11 +536,7 @@ namespace CleanerControlApp.Vision.Template
             try
             {
                 _soakingTank?.ManualWaterOutputOP(true);
-                var status = _soakingTank?.MessageForOperation;
-                if (!string.IsNullOrEmpty(status))
-                {
-                    ShowStatusPopup(status);
-                }
+                CheckStatus();
             }
             catch { }
 
@@ -526,6 +545,7 @@ namespace CleanerControlApp.Vision.Template
         private void CloseWaterOut_Click(object sender, RoutedEventArgs e)
         {
             try { _soakingTank?.ManualWaterOutputOP(false); } catch { }
+            CheckStatus();
         }
 
         // Reset alarm button handler
@@ -565,6 +585,15 @@ namespace CleanerControlApp.Vision.Template
                 CleanerControlApp.Vision.Shared.StatusPopup.Show(status, Window.GetWindow(this),10);
             }
             catch { }
+        }
+
+        private void CheckStatus()
+        {
+            var status = _soakingTank?.MessageForOperation;
+            if (!string.IsNullOrEmpty(status))
+            {
+                ShowStatusPopup(status);
+            }
         }
     }
 }
