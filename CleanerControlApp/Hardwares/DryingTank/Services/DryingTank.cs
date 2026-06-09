@@ -79,6 +79,8 @@ namespace CleanerControlApp.Hardwares.DryingTank.Services
         private DateTime? _checkHeatingOnStartTime = null;
         private DateTime? _checkHeatingOffStartTime = null;
 
+        private string _messageForOperation = string.Empty;
+
         #endregion
 
         #region constructor
@@ -348,6 +350,7 @@ namespace CleanerControlApp.Hardwares.DryingTank.Services
         public bool Initialized => _initialized;
         public bool Initializing => _initialized;
         public bool Idle => Sensor_CoverOpen && !_heating && !_cassette && _initialized && IsNormalStatus;
+        public bool CanStopAuto => Sensor_CoverOpen && !_heating && _initialized && !HS_ShuttleAuto;
 
         public bool HighTemperature => (PV > PV_Check_High) || _sim_pv;
         public bool LowTemperature => PV < PV_Check_Low;
@@ -355,7 +358,7 @@ namespace CleanerControlApp.Hardwares.DryingTank.Services
         {
             bool result = false;
 
-
+            _messageForOperation = string.Empty;
             if (_moduleSettings.DryingTanks != null)
             {
                 SetSV(heating ? _moduleSettings.DryingTanks[_moduleIndex].SV_High : _moduleSettings.DryingTanks[_moduleIndex].SV_Low);
@@ -374,12 +377,17 @@ namespace CleanerControlApp.Hardwares.DryingTank.Services
                 result = HeatingOP(heating);
                 OperateLog.Log($"烘乾槽#{ModuleIndex + 1} 手動加熱 " + (heating ? "開" : "關"), $"烘乾槽#{ModuleIndex + 1} 手動加熱 " + (heating ? "開" : "關"));
             }
+            else
+            {
+                _messageForOperation = "無法操作加熱器，請先停止自動模式後再進行手動操作。";
+            }
 
             return false;
         }
         public bool AirOP(bool air)
         {
             bool result = true;
+            _messageForOperation = string.Empty;
             if (_plcService != null)
             {
                 Command_HeaterAirOpen = air;
@@ -393,10 +401,14 @@ namespace CleanerControlApp.Hardwares.DryingTank.Services
         {
             bool result = false;
 
-            if (_plcService != null)
+            if (!_auto)
             {
                 result = AirOP(air);
                 OperateLog.Log($"烘乾槽#{ModuleIndex + 1} 手動氣閥 " + (air ? "開" : "關"), $"烘乾槽#{ModuleIndex + 1} 手動氣閥 " + (air ? "開" : "關"));
+            }
+            else
+            {
+                _messageForOperation = "無法操作氣閥，請先停止自動模式後再進行手動操作。";
             }
 
             return result;
@@ -404,6 +416,7 @@ namespace CleanerControlApp.Hardwares.DryingTank.Services
         public bool BlowerOP(bool blow)
         {
             bool result = true;
+            _messageForOperation = string.Empty;
             if (_plcService != null)
             {
                 Command_HeaterBlower = blow;
@@ -417,10 +430,14 @@ namespace CleanerControlApp.Hardwares.DryingTank.Services
         {
             bool result = false;
 
-            if (_plcService != null)
+            if (!_auto)
             {
                 result = BlowerOP(blow);
                 OperateLog.Log($"烘乾槽#{ModuleIndex + 1} 手動風扇 " + (blow ? "開" : "關"), $"烘乾槽#{ModuleIndex + 1} 手動風扇 " + (blow ? "開" : "關"));
+            }
+            else
+            {
+                _messageForOperation = "無法操作風扇，請先停止自動模式後再進行手動操作。";
             }
 
             return result;
@@ -428,6 +445,7 @@ namespace CleanerControlApp.Hardwares.DryingTank.Services
         public bool CoverClose(bool close)
         {
             bool result = true;
+            _messageForOperation = string.Empty;
             if (_plcService != null)
             {
                 Command_HeaterCoverClose = close;
@@ -441,10 +459,14 @@ namespace CleanerControlApp.Hardwares.DryingTank.Services
         {
             bool result = false;
 
-            if (_plcService != null)
+            if (!_auto)
             {
                 result = CoverClose(close);
                 OperateLog.Log($"烘乾槽#{ModuleIndex + 1} 手動蓋子 " + (close ? "關" : "開"), $"烘乾槽#{ModuleIndex + 1} 手動蓋子 " + (close ? "關" : "開"));
+            }
+            else
+            {
+                _messageForOperation = "無法操作蓋子，請先停止自動模式後再進行手動操作。";
             }
 
             return result;
@@ -455,6 +477,7 @@ namespace CleanerControlApp.Hardwares.DryingTank.Services
         public bool HS_ClamperPlaceFinished { get; set; }
         public bool HS_InputPermit => Idle && !_pausing && !HS_ClamperMoving && _auto;
         public bool HS_ActFinished => _cassette && Sensor_CoverOpen && !HS_ClamperMoving && !Heating && _actFinished;
+        public bool HS_ShuttleAuto { get; set; }
 
         public int ElpasedHeatingTime_Seconds => (int)(_elapsedTime != null ? _elapsedTime.Value.TotalSeconds : 0);
         public int RemainingHeatingTime_Seconds => (_moduleSettings.DryingTanks != null) ? _moduleSettings.DryingTanks[_moduleIndex].ActTime_Second - ElpasedHeatingTime_Seconds : 0;
@@ -621,6 +644,8 @@ namespace CleanerControlApp.Hardwares.DryingTank.Services
             return sb.ToString();
         }
 
+        public string MessageForOperation => _messageForOperation;
+
         public void ModuleClose()
         {
             HeatingOP(false);
@@ -759,7 +784,7 @@ namespace CleanerControlApp.Hardwares.DryingTank.Services
 
             if (_auto)
             {
-                if (Idle && _autoStopFlag)
+                if (CanStopAuto && _autoStopFlag)
                 {
                     _autoStopFlag = false;
                     _auto = false;

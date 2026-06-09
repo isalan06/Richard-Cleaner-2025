@@ -30,6 +30,7 @@ namespace CleanerControlApp.Modules.Motor.Interfaces
         void MotorStop();
 
         bool GetInPos(int position);
+        bool InZeroPos { get; }
 
         void Teach(int position);
 

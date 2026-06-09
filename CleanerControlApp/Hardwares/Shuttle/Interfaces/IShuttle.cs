@@ -43,6 +43,7 @@ namespace CleanerControlApp.Hardwares.Shuttle.Interfaces
         bool Initialized { get; }
         bool Initializing { get; }
         bool Idle { get; }
+        bool CanStopAuto { get; }
 
         bool ClamperCloseOP(bool close);
         bool ManualClamperCloseOP(bool close);
@@ -97,6 +98,7 @@ namespace CleanerControlApp.Hardwares.Shuttle.Interfaces
         bool SemiPlaceCassette(int semiPosIndex);
 
         string MessageForPickPlace { get; }
+        string MessageForOperation { get; }
 
         bool PassClamperCheckCassette { get; set; }
 

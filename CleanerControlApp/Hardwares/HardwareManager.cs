@@ -26,6 +26,7 @@ using System.Numerics;
 using CleanerControlApp.Utilities.Log;
 using NLog.LayoutRenderers;
 using System.Windows;
+using System.Transactions;
 
 namespace CleanerControlApp.Hardwares
 {
@@ -68,6 +69,8 @@ namespace CleanerControlApp.Hardwares
         private static int HomeAfterProcedureCount = 10;
         private static bool NeedHomeAfterProcedure => ProcedureCount++ >= HomeAfterProcedureCount;
         private static int ProcedureCount = 0;
+
+        private bool _auto_stopping = false;
 
         #endregion
 
@@ -1134,7 +1137,7 @@ namespace CleanerControlApp.Hardwares
                 }
                 else
                 {
-                    if (CheckPickAndPlacePosition(out int pickPosition, out int placePosition) && !_auto_procedure_executing)
+                    if (CheckPickAndPlacePosition(out int pickPosition, out int placePosition) && !_auto_procedure_executing && !_auto_stopping)
                     {
                         
                         _auto_procedure_executing = true;
@@ -1192,7 +1195,7 @@ namespace CleanerControlApp.Hardwares
                                 _shuttle.ShuttleZMotor.Home();
                                 ProcedureCount = 0;
                             }
-                            else if(_shuttle.ShuttleZMotor.MotorIdle && _shuttle.ShuttleZMotor.MotorHome)
+                            else if(_shuttle.ShuttleZMotor.MotorIdle && _shuttle.ShuttleZMotor.MotorHome && _shuttle.ShuttleZMotor.InZeroPos)
                             {
                                 _auto_procedure_executing = false;
                                 _auto_procedure_pick_executing = false;
@@ -1213,6 +1216,17 @@ namespace CleanerControlApp.Hardwares
                 _auto_procedure_place_executing = false;
                 _auto_procedure_backtoP0_executing = false;
             }
+
+            if (_heatingTank != null && _sink != null && _soakingTank != null && _dryingTanks != null && _dryingTanks.Length >= 2)
+            {
+                _heatingTank.HS_AllWaterSlotNotAuto = !SinkAuto && !SoakingTankAuto;
+
+                _sink.HS_ShuttleAuto = ShuttleAuto;
+                _soakingTank.HS_ShuttleAuto = ShuttleAuto;
+                _dryingTanks[0].HS_ShuttleAuto = ShuttleAuto;
+                _dryingTanks[1].HS_ShuttleAuto = ShuttleAuto;
+            }
+
         }
 
         private void DryRunProcedure()
@@ -1629,6 +1643,7 @@ namespace CleanerControlApp.Hardwares
             {
                 if (_shuttle != null && _sink != null && _soakingTank != null && _dryingTanks != null && _dryingTanks.Length > 1 && _heatingTank != null)
                 {
+                    _auto_stopping = false;
                     _auto_procedure_trigger = true;
                     _shuttle.AutoStart();
                     _sink.AutoStart();
@@ -1652,6 +1667,7 @@ namespace CleanerControlApp.Hardwares
             {
                 if (_shuttle != null && _sink != null && _soakingTank != null && _dryingTanks != null && _dryingTanks.Length > 1 && _heatingTank != null)
                 {
+                    _auto_stopping = true;
                     if (force)
                     {
                         _shuttle.AlarmStop();

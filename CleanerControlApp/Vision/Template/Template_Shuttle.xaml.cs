@@ -414,6 +414,7 @@ namespace CleanerControlApp.Vision.Template
             try
             {
                 _shuttle?.ManualClamperOpenOP(true);
+                CheckStatus();
             }
             catch
             {
@@ -426,6 +427,7 @@ namespace CleanerControlApp.Vision.Template
             try
             {
                 _shuttle?.ManualClamperCloseOP(true);
+                CheckStatus();
             }
             catch
             {
@@ -462,6 +464,7 @@ namespace CleanerControlApp.Vision.Template
                 int pos = GetSelectedPositionX();
                 int speed = GetSelectedSpeedX();
                 _shuttle?.ShuttleXMotor?.MoveToPosition(pos, speed);
+                CheckStatus();
             }
             catch { }
         }
@@ -483,12 +486,21 @@ namespace CleanerControlApp.Vision.Template
                 int pos = GetSelectedPositionX();
                 try
                 {
-                    _shuttle?.ShuttleXMotor?.Teach(pos);
-                    MessageBox.Show($"Teach (P{pos +1}) executed.", "Teach", MessageBoxButton.OK, MessageBoxImage.Information);
+                    if (_shuttle?.ShuttleXMotor != null && _shuttle.ShuttleXMotor.MotorHome)
+                    {
+                        _shuttle?.ShuttleXMotor?.Teach(pos);
+                        try { CleanerControlApp.Vision.Shared.InfoPopup.Show($"Teach (P{pos + 1}) executed.", Window.GetWindow(this), 5); } catch { }
+                        //MessageBox.Show($"Teach (P{pos +1}) executed.", "Teach", MessageBoxButton.OK, MessageBoxImage.Information);
+                    }
+                    else
+                    {
+                        try { CleanerControlApp.Vision.Shared.StatusPopup.Show($"Cannot teach P{pos + 1}: Motor not homed.", Window.GetWindow(this), 5); } catch { }
+                    }
                 }
                 catch (Exception ex)
                 {
-                    try { MessageBox.Show($"Teach failed: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error); } catch { }
+                    try { CleanerControlApp.Vision.Shared.StatusPopup.Show($"Teach failed: {ex.Message}", Window.GetWindow(this), 5); } catch { }
+                    //try { MessageBox.Show($"Teach failed: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error); } catch { }
                 }
             }
             catch { }
@@ -559,6 +571,7 @@ namespace CleanerControlApp.Vision.Template
                 int pos = GetSelectedPositionZ();
                 int speed = GetSelectedSpeedZ();
                 _shuttle?.ShuttleZMotor?.MoveToPosition(pos, speed);
+                CheckStatus();
             }
             catch { }
         }
@@ -580,12 +593,21 @@ namespace CleanerControlApp.Vision.Template
                 int pos = GetSelectedPositionZ();
                 try
                 {
-                    _shuttle?.ShuttleZMotor?.Teach(pos);
-                    MessageBox.Show($"Teach Z (P{pos +1}) executed.", "Teach", MessageBoxButton.OK, MessageBoxImage.Information);
+                    if (_shuttle?.ShuttleZMotor != null && _shuttle.ShuttleZMotor.MotorHome)
+                    {
+                        _shuttle?.ShuttleZMotor?.Teach(pos);
+                        try { CleanerControlApp.Vision.Shared.InfoPopup.Show($"Teach Z (P{pos + 1}) executed.", Window.GetWindow(this), 5); } catch { }
+                        //MessageBox.Show($"Teach Z (P{pos + 1}) executed.", "Teach", MessageBoxButton.OK, MessageBoxImage.Information);
+                    }
+                    else
+                    {
+                        try { CleanerControlApp.Vision.Shared.StatusPopup.Show($"Cannot teach Z P{pos + 1}: Motor not homed.", Window.GetWindow(this), 5); } catch { }
+                    }
                 }
                 catch (Exception ex)
                 {
-                    try { MessageBox.Show($"Teach failed: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error); } catch { }
+                    try { CleanerControlApp.Vision.Shared.StatusPopup.Show($"Teach Z failed: {ex.Message}", Window.GetWindow(this), 5); } catch { }
+                    //try { MessageBox.Show($"Teach failed: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error); } catch { }
                 }
             }
             catch { }
@@ -675,6 +697,15 @@ namespace CleanerControlApp.Vision.Template
         private void ShowStatusPopup(string status)
         {
             try { CleanerControlApp.Vision.Shared.StatusPopup.Show(status, Window.GetWindow(this),10); } catch { }
+        }
+
+        private void CheckStatus()
+        {
+            var status = _shuttle?.MessageForOperation;
+            if (!string.IsNullOrEmpty(status))
+            {
+                ShowStatusPopup(status);
+            }
         }
     }
 }

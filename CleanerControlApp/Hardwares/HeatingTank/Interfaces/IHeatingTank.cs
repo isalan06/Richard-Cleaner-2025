@@ -34,6 +34,7 @@ namespace CleanerControlApp.Hardwares.HeatingTank.Interfaces
         bool Initialized { get; }
         bool Initializing { get; }
         bool Idle { get; }
+        bool CanStopAuto { get; }
 
         bool HighTemperature { get; }
         bool LowTemperature { get; }
@@ -45,6 +46,7 @@ namespace CleanerControlApp.Hardwares.HeatingTank.Interfaces
         bool ManualWaterOutOP(bool water);
 
         bool HS_RequestWater { get; set; }
+        bool HS_AllWaterSlotNotAuto { get; set; }
 
         bool HasWarning { get; }
         bool HasAlarm { get; }

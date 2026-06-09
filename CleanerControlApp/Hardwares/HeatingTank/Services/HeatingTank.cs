@@ -270,6 +270,7 @@ namespace CleanerControlApp.Hardwares.HeatingTank.Services
         public bool Initialized => _initialized;
         public bool Initializing => _initialized;
         public bool Idle => _initialized && IsNormalStatus;
+        public bool CanStopAuto => _initialized && HS_AllWaterSlotNotAuto;
 
         public bool HighTemperature => (PV > PV_Check_High) || _sim_pv;
         public bool LowTemperature => PV < PV_Check_Low;
@@ -302,6 +303,10 @@ namespace CleanerControlApp.Hardwares.HeatingTank.Services
             {
                 result = HeatingOP(heating);
                 OperateLog.Log($"加熱槽 手動加熱 " + (heating ? "開" : "關"), $"加熱槽 手動加熱 " + (heating ? "開" : "關"));
+            }
+            else
+            {
+                _messageForOperation = "無法手動切換加熱: 自動模式中";
             }
 
             return false;
@@ -336,6 +341,10 @@ namespace CleanerControlApp.Hardwares.HeatingTank.Services
                 result = WaterInOP(water);
                 OperateLog.Log($"加熱槽 手動加水 " + (water ? "開" : "關"), $"加熱槽 手動加水 " + (water ? "開" : "關"));
             }
+            else
+            {
+                _messageForOperation = "無法手動切換進水: 自動模式中";
+            }
 
             return result;
         }
@@ -365,17 +374,21 @@ namespace CleanerControlApp.Hardwares.HeatingTank.Services
         {
             bool result = false;
 
-            if (!_auto)
+            if (!_auto || !water)
             {
                 result = WaterOutOP(water);
                 OperateLog.Log($"加熱槽 手動出水 " + (water ? "開" : "關"), $"加熱槽 手動出水 " + (water ? "開" : "關"));
+            }
+            else
+            { 
+                _messageForOperation = "無法手動切換出水: 自動模式中且要求開啟出水";
             }
 
             return result;
         }
 
         public bool HS_RequestWater { get; set; }
-
+        public bool HS_AllWaterSlotNotAuto { get; set; }
         public bool ModulePass { get; set; }
         public bool HasWarning => _PV_Low_Timeout || _PV_High_Timeout || _INV_Zero_Timeout || _INV_High_Timeout || _INV_Low_Timeout || _invErrorAlarm;
         public bool HasAlarm => _tankHHAlarm || _tankLLAlarm;
@@ -811,7 +824,7 @@ namespace CleanerControlApp.Hardwares.HeatingTank.Services
 
             if (_auto)
             {
-                if (Idle && _autoStopFlag)
+                if (CanStopAuto && _autoStopFlag)
                 {
                     _autoStopFlag = false;
                     _auto = false;

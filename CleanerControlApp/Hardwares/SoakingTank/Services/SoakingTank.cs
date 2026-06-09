@@ -254,7 +254,7 @@ namespace CleanerControlApp.Hardwares.SoakingTank.Services
         public bool Initialized => _initialized && (_sim_pass_motor || MotorHome);
         public bool Initializing => _initialized && !MotorHome && !_sim_pass_motor;
         public bool Idle => Sensor_CoverOpen && !_ultrasonic && !_cassette && _initialized && IsNormalStatus && (_sim_pass_motor || (MotorServoOn && MotorIdle && MotorHome));
-        public bool CanStopAuto => Sensor_CoverOpen && !_ultrasonic && _initialized && IsNormalStatus && (_sim_pass_motor || (MotorServoOn && MotorIdle && MotorHome && InPos1));
+        public bool CanStopAuto => !HS_ShuttleAuto && Sensor_CoverOpen && !_ultrasonic && _initialized && (_sim_pass_motor || (MotorServoOn && MotorIdle && MotorHome && InPos1));
 
         public bool AirOP(bool air)
         {
@@ -389,10 +389,14 @@ namespace CleanerControlApp.Hardwares.SoakingTank.Services
         {
             bool result = false;
 
-            if(_ultrasonicDevice != null)
+            if(!_auto)
             {
                 result = UltrasonicOP(ultrasonic);
                 OperateLog.Log($"浸泡槽 手動超音波 " + (ultrasonic ? "開" : "關"), $"浸泡槽 手動超音波 " + (ultrasonic ? "開" : "關"));
+            }
+            else
+            {
+                _messageForOperation = "無法操作超音波，請先停止自動模式後再進行手動操作。";
             }
 
             return result;
@@ -406,7 +410,7 @@ namespace CleanerControlApp.Hardwares.SoakingTank.Services
 
             if (_heatingTank != null)
             {
-                _heatingTank.ManualWaterOutOP(water); // 同步控制加熱槽排水以確保水路流動
+                _heatingTank.WaterOutOP(water); // 同步控制加熱槽排水以確保水路流動
                 if(_heatingTank.MessageForOperation != string.Empty)
                 {
                     _messageForOperation = "無法操作注水，因加熱槽: " + _heatingTank.MessageForOperation;
@@ -424,10 +428,14 @@ namespace CleanerControlApp.Hardwares.SoakingTank.Services
         {
             bool result = false;
 
-            if (_heatingTank != null)
+            if (!_auto || !water)
             {
                 result = WaterInOP(water);
                 OperateLog.Log($"浸泡槽 手動注水 " + (water ? "開" : "關"), $"浸泡槽 手動注水 " + (water ? "開" : "關"));
+            }
+            else
+            {
+                _messageForOperation = "無法操作注水，請先停止自動模式後再進行手動操作。";
             }
 
             return result;
@@ -439,6 +447,7 @@ namespace CleanerControlApp.Hardwares.SoakingTank.Services
         public bool HS_InputPermit => Idle && !_pausing && !HS_ClamperMoving && _auto && InPos1;
         public bool HS_ActFinished => _cassette && Sensor_CoverOpen && !HS_ClamperMoving && !Ultrasonic && _actFinished && InPos1 && RetryAirFinished && _retry_air_finished;
         public bool HS_RequestWater => _heatingTank != null && _heatingTank.HS_RequestWater;
+        public bool HS_ShuttleAuto { get; set; }
 
         public int ElpasedPressureTime_Seconds => (int)(_elapsedTime != null ? _elapsedTime.Value.TotalSeconds : 0);
         public int RemainingPressureTime_Seconds => (_moduleSettings.SoakingTank != null) ? _moduleSettings.SoakingTank.ActTime_Second - ElpasedPressureTime_Seconds : 0;

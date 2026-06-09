@@ -101,12 +101,25 @@ namespace CleanerControlApp.Vision.Manual
                 if (idx < 0) return;
                 try
                 {
-                    _shuttle?.TeachSemiPosition(idx);
-                    MessageBox.Show($"Teach (P{idx + 1}) executed.", "Teach", MessageBoxButton.OK, MessageBoxImage.Information);
+                    if (_shuttle?.ShuttleXMotor != null && _shuttle?.ShuttleZMotor != null && _shuttle.ShuttleXMotor.MotorHome && _shuttle.ShuttleZMotor.MotorHome)
+                    {
+                        _shuttle?.TeachSemiPosition(idx);
+                        try { CleanerControlApp.Vision.Shared.InfoPopup.Show($"Teach (P{idx + 1}) executed.", Window.GetWindow(this), 5); } catch { }
+                        //MessageBox.Show($"Teach (P{idx + 1}) executed.", "Teach", MessageBoxButton.OK, MessageBoxImage.Information);
+                    }
+                    else
+                    {
+                        try
+                        {
+                            CleanerControlApp.Vision.Shared.StatusPopup.Show($"Cannot teach (P{idx + 1}) Motor not homed.", Window.GetWindow(this), 5);
+                        }
+                        catch { }
+                    }
                 }
                 catch (Exception ex)
                 {
-                    try { MessageBox.Show($"Teach failed: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error); } catch { }
+                    try { CleanerControlApp.Vision.Shared.StatusPopup.Show($"Teach failed: {ex.Message}", Window.GetWindow(this), 5); } catch { }
+                    //try { MessageBox.Show($"Teach failed: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error); } catch { }
                 }
             }
             catch { }

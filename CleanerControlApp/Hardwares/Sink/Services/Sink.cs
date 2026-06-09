@@ -283,7 +283,7 @@ namespace CleanerControlApp.Hardwares.Sink.Services
         public bool Initialized => _initialized && (_sim_pass_motor || MotorHome);
         public bool Initializing => _initialized && !MotorHome && !_sim_pass_motor;
         public bool Idle => Sensor_CoverOpen && !_pressure && !_cassette && _initialized && IsNormalStatus && (_sim_pass_motor || (MotorServoOn && MotorIdle && MotorHome));
-        public bool CanStopAuto => Sensor_CoverOpen && !_pressure && _initialized && IsNormalStatus && (_sim_pass_motor || (MotorServoOn && MotorIdle && MotorHome && InPos1));
+        public bool CanStopAuto => !HS_ShuttleAuto && Sensor_CoverOpen && !_pressure && _initialized && (_sim_pass_motor || (MotorServoOn && MotorIdle && MotorHome && InPos1));
 
         public bool HomeIdle => Sensor_CoverOpen && !_pressure && !_cassette  && IsNormalStatus;
 
@@ -402,6 +402,7 @@ namespace CleanerControlApp.Hardwares.Sink.Services
         public bool HS_WaterSystemError { get; set; }
         public bool HS_InputPermit => Idle && !_pausing && !HS_ClamperMoving && _auto && InPos1;
         public bool HS_ActFinished => _cassette && Sensor_CoverOpen && !HS_ClamperMoving && !Pressure && _actFinished && InPos1 && RetryAirFinished && _retry_air_finished;
+        public bool HS_ShuttleAuto { get; set; }
 
         public int ElpasedPressureTime_Seconds => (int)(_elapsedTime != null ? _elapsedTime.Value.TotalSeconds : 0);
         public int RemainingPressureTime_Seconds => (_moduleSettings.Sink != null) ? _moduleSettings.Sink.ActTime_Second - ElpasedPressureTime_Seconds : 0;

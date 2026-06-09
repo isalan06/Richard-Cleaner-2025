@@ -35,6 +35,7 @@ namespace CleanerControlApp.Hardwares.DryingTank.Interfaces
         bool Initialized { get; }
         bool Initializing { get; }
         bool Idle { get; }
+        bool CanStopAuto { get; }
 
         bool HighTemperature { get; }
         bool LowTemperature { get; }
@@ -52,6 +53,7 @@ namespace CleanerControlApp.Hardwares.DryingTank.Interfaces
         bool HS_ClamperPlaceFinished { get; set; }
         bool HS_InputPermit { get; }
         bool HS_ActFinished { get; }
+        bool HS_ShuttleAuto { get; set; }
 
         int ElpasedHeatingTime_Seconds { get; }
         int RemainingHeatingTime_Seconds { get; }
@@ -71,6 +73,8 @@ namespace CleanerControlApp.Hardwares.DryingTank.Interfaces
         void SimHiTemperature(bool pv);
 
         string Hint();
+
+        string MessageForOperation { get; }
 
         void ModuleClose();
     }

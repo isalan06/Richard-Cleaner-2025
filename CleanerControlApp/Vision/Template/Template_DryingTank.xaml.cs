@@ -47,7 +47,10 @@ namespace CleanerControlApp.Vision.Template
             try
             {
                 if (_dryingTanks != null && _dryingTanks.Length > 0)
+                {
                     _dryingTanks[0].ManualCoverClose(false);
+                    CheckStatus(0);
+                }
             }
             catch (Exception ex)
             {
@@ -60,7 +63,10 @@ namespace CleanerControlApp.Vision.Template
             try
             {
                 if (_dryingTanks != null && _dryingTanks.Length > 0)
+                {
                     _dryingTanks[0].ManualCoverClose(true);
+                    CheckStatus(0);
+                }
             }
             catch (Exception ex)
             {
@@ -75,6 +81,7 @@ namespace CleanerControlApp.Vision.Template
                 if (_dryingTanks != null && _dryingTanks.Length > 1)
                 {
                     _dryingTanks[1].ManualCoverClose(false);
+                    CheckStatus(1);
                 }
             }
             catch (Exception ex)
@@ -90,6 +97,7 @@ namespace CleanerControlApp.Vision.Template
                 if (_dryingTanks != null && _dryingTanks.Length > 1)
                 {
                     _dryingTanks[1].ManualCoverClose(true);
+                    CheckStatus(1);
                 }
             }
             catch (Exception ex)
@@ -103,7 +111,10 @@ namespace CleanerControlApp.Vision.Template
             try
             {
                 if (_dryingTanks != null && _dryingTanks.Length > 0)
+                {
                     _dryingTanks[0].ManualHeatingOP(true);
+                    CheckStatus(0);
+                }
             }
             catch (Exception ex)
             {
@@ -116,7 +127,10 @@ namespace CleanerControlApp.Vision.Template
             try
             {
                 if (_dryingTanks != null && _dryingTanks.Length > 0)
+                {
                     _dryingTanks[0].ManualHeatingOP(false);
+                    CheckStatus(0);
+                }
             }
             catch (Exception ex)
             {
@@ -129,7 +143,10 @@ namespace CleanerControlApp.Vision.Template
             try
             {
                 if (_dryingTanks != null && _dryingTanks.Length > 1)
+                {
                     _dryingTanks[1].ManualHeatingOP(true);
+                    CheckStatus(1);
+                }
             }
             catch (Exception ex)
             {
@@ -142,7 +159,10 @@ namespace CleanerControlApp.Vision.Template
             try
             {
                 if (_dryingTanks != null && _dryingTanks.Length > 1)
+                {
                     _dryingTanks[1].ManualHeatingOP(false);
+                    CheckStatus(1);
+                }
             }
             catch (Exception ex)
             {
@@ -155,7 +175,10 @@ namespace CleanerControlApp.Vision.Template
             try
             {
                 if (_dryingTanks != null && _dryingTanks.Length > 0)
+                {
                     _dryingTanks[0].ManualBlowerOP(true);
+                    CheckStatus(0);
+                }
             }
             catch (Exception ex)
             {
@@ -168,7 +191,10 @@ namespace CleanerControlApp.Vision.Template
             try
             {
                 if (_dryingTanks != null && _dryingTanks.Length > 0)
+                {
                     _dryingTanks[0].ManualBlowerOP(false);
+                    CheckStatus(0);
+                }
             }
             catch (Exception ex)
             {
@@ -181,7 +207,10 @@ namespace CleanerControlApp.Vision.Template
             try
             {
                 if (_dryingTanks != null && _dryingTanks.Length > 1)
+                {
                     _dryingTanks[1].ManualBlowerOP(true);
+                    CheckStatus(1);
+                }
             }
             catch (Exception ex)
             {
@@ -194,7 +223,10 @@ namespace CleanerControlApp.Vision.Template
             try
             {
                 if (_dryingTanks != null && _dryingTanks.Length > 1)
+                {
                     _dryingTanks[1].ManualBlowerOP(false);
+                    CheckStatus(1);
+                }
             }
             catch (Exception ex)
             {
@@ -207,7 +239,10 @@ namespace CleanerControlApp.Vision.Template
             try
             {
                 if (_dryingTanks != null && _dryingTanks.Length > 0)
+                {
                     _dryingTanks[0].ManualAirOP(true);
+                    CheckStatus(0);
+                }
             }
             catch (Exception ex)
             {
@@ -220,7 +255,10 @@ namespace CleanerControlApp.Vision.Template
             try
             {
                 if (_dryingTanks != null && _dryingTanks.Length > 0)
+                {
                     _dryingTanks[0].ManualAirOP(false);
+                    CheckStatus(0);
+                }
             }
             catch (Exception ex)
             {
@@ -233,7 +271,10 @@ namespace CleanerControlApp.Vision.Template
             try
             {
                 if (_dryingTanks != null && _dryingTanks.Length > 1)
+                {
                     _dryingTanks[1].ManualAirOP(true);
+                    CheckStatus(1);
+                }
             }
             catch (Exception ex)
             {
@@ -246,7 +287,10 @@ namespace CleanerControlApp.Vision.Template
             try
             {
                 if (_dryingTanks != null && _dryingTanks.Length > 1)
+                {
                     _dryingTanks[1].ManualAirOP(false);
+                    CheckStatus(1);
+                }
             }
             catch (Exception ex)
             {
@@ -1157,5 +1201,22 @@ namespace CleanerControlApp.Vision.Template
 
         public event PropertyChangedEventHandler? PropertyChanged;
         protected void OnPropertyChanged(string? propName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propName));
+
+        private void ShowStatusPopup(string status)
+        {
+            try { CleanerControlApp.Vision.Shared.StatusPopup.Show(status, Window.GetWindow(this), 5); } catch { }
+        }
+
+        private void CheckStatus(int index)
+        {
+            if (index == 0 || index == 1)
+            {
+                var status = _dryingTanks?[index].MessageForOperation;
+                if (!string.IsNullOrEmpty(status))
+                {
+                    ShowStatusPopup(status);
+                }
+            }
+        }
     }
 }

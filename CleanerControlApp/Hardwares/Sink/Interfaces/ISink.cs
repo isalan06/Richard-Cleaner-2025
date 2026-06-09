@@ -53,7 +53,7 @@ namespace CleanerControlApp.Hardwares.Sink.Interfaces
         bool HS_WaterSystemError { get; set; }
         bool HS_InputPermit { get; }
         bool HS_ActFinished { get; }
-        
+        bool HS_ShuttleAuto { get; set; }
 
         int ElpasedPressureTime_Seconds { get; }
         int RemainingPressureTime_Seconds { get; }

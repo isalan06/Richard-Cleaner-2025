@@ -305,11 +305,7 @@ namespace CleanerControlApp.Vision.Template
             try
             {
                 _heatingTank?.ManualWaterInOP(true);
-                var status = _heatingTank?.MessageForOperation;
-                if (!string.IsNullOrEmpty(status))
-                {
-                    ShowStatusPopup(status);
-                }
+                CheckStatus();
             }
             catch { }
         }
@@ -319,6 +315,7 @@ namespace CleanerControlApp.Vision.Template
             try
             {
                 _heatingTank?.ManualWaterInOP(false);
+                CheckStatus();
             }
             catch { }
         }
@@ -329,11 +326,7 @@ namespace CleanerControlApp.Vision.Template
             try
             {
                 _heatingTank?.ManualWaterOutOP(true);
-                var status = _heatingTank?.MessageForOperation;
-                if (!string.IsNullOrEmpty(status))
-                {
-                    ShowStatusPopup(status);
-                }
+                CheckStatus();
             }
             catch { }
         }
@@ -343,6 +336,7 @@ namespace CleanerControlApp.Vision.Template
             try
             {
                 _heatingTank?.ManualWaterOutOP(false);
+                CheckStatus();
             }
             catch { }
         }
@@ -353,11 +347,7 @@ namespace CleanerControlApp.Vision.Template
             try
             {
                 _heatingTank?.ManualHeatingOP(true);
-                var status = _heatingTank?.MessageForOperation;
-                if (!string.IsNullOrEmpty(status))
-                {
-                    ShowStatusPopup(status);
-                }
+                CheckStatus();
             }
             catch { }
         }
@@ -367,6 +357,7 @@ namespace CleanerControlApp.Vision.Template
             try
             {
                 _heatingTank?.ManualHeatingOP(false);
+                CheckStatus();
             }
             catch { }
         }
@@ -391,6 +382,15 @@ namespace CleanerControlApp.Vision.Template
                 CleanerControlApp.Vision.Shared.StatusPopup.Show(status, Window.GetWindow(this), 10);
             }
             catch { }
+        }
+
+        private void CheckStatus()
+        {
+            var status = _heatingTank?.MessageForOperation;
+            if (!string.IsNullOrEmpty(status))
+            {
+                ShowStatusPopup(status);
+            }
         }
     }
 }

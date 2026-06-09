@@ -94,6 +94,7 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
         private DateTime? _clampEndDelayStart;
 
         private string _messageForPickPlace = string.Empty;
+        private string _messageForOperation = string.Empty;
         private bool _passClamperCheckCassette = false;
         private DateTime? _alarmCheckStartTime = DateTime.UtcNow;
 
@@ -260,12 +261,14 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
         public bool Initialized => _initialized && (_sim_pass_motor || MotorHome);
         public bool Initializing => _initializing;
         public bool Idle => !_moving && !_cassette && _initialized && IsNormalStatus && (_sim_pass_motor || (MotorServoOn && MotorIdle && MotorHome));
+        public bool CanStopAuto => _motorXAxis != null && !_cassette && _initialized && !_pickTrigger && !_placeTrigger && (_sim_pass_motor || (MotorServoOn && MotorIdle && MotorHome && !_moving && _motorXAxis.GetInPos(0)));
 
         public bool ClamperCloseOP(bool close)
         {
             bool result = false;
 
-            if(_plcService != null)
+            _messageForOperation = string.Empty;
+            if (_plcService != null)
             {
                 Command_ClamperClose = close;
                 if (close && Command_ClamperOpen) Command_ClamperOpen = false;
@@ -278,10 +281,14 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
         {
             bool result = false;
 
-            if(_plcService != null)
+            if(!_auto)
             {
                 result = ClamperCloseOP(close);
                 OperateLog.Log("手動 關閉夾爪 " + (close ? "ON" : "OFF"), result ? "Success" : "Failed");
+            }
+            else
+            {
+                _messageForOperation = "目前為自動模式，無法手動操作夾爪。請先暫停自動流程再進行手動操作。";
             }
 
             return result;
@@ -289,7 +296,8 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
         public bool ClamperOpenOP(bool open)
         {
             bool result = false;
-            if(_plcService != null)
+            _messageForOperation = string.Empty;
+            if (_plcService != null)
             {
                 Command_ClamperOpen = open;
                 if (open && Command_ClamperClose) Command_ClamperClose = false;
@@ -300,10 +308,14 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
         public bool ManualClamperOpenOP(bool open)
         {
             bool result = false;
-            if(_plcService != null)
+            if(!_auto)
             {
                 result = ClamperOpenOP(open);
                 OperateLog.Log("手動 開啟夾爪 " + (open ? "ON" : "OFF"), result ? "Success" : "Failed");
+            }
+            else
+            {
+                _messageForOperation = "目前為自動模式，無法手動操作夾爪。請先暫停自動流程再進行手動操作。";
             }
             return result;
         }
@@ -636,6 +648,7 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
         }
 
         public string MessageForPickPlace => _messageForPickPlace;
+        public string MessageForOperation => _messageForOperation; 
 
         public bool PassClamperCheckCassette
         {
@@ -955,7 +968,7 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
 
             if (_auto && !_dryRun && !_semiRun && _motorXAxis != null)
             {
-                if (Idle && _autoStopFlag && !_pickTrigger && !_placeTrigger && !_moving && _motorXAxis.GetInPos(0))
+                if (CanStopAuto && _autoStopFlag)
                 {
                     _autoStopFlag = false;
                     _auto = false;
