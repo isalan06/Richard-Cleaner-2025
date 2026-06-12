@@ -892,7 +892,7 @@ namespace CleanerControlApp.Vision
                     if (result ==0)
                     {
                         hw.Initialize(false);
-                        try { CleanerControlApp.Vision.Shared.StatusPopup.Show("初始化完成", Window.GetWindow(this),5); } catch { }
+                        try { CleanerControlApp.Vision.Shared.StatusPopup.Show("初始化", Window.GetWindow(this),5); } catch { }
                     }
                     else
                     {

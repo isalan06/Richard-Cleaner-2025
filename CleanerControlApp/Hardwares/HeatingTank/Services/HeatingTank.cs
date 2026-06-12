@@ -777,6 +777,7 @@ namespace CleanerControlApp.Hardwares.HeatingTank.Services
 
         private void AutoProcedure()
         {
+
             // Water System Error handling: if Waste Water High Alarm is on, stop water in and out regardless of other conditions; if Liquid HH alarm is on, stop water in and allow water out; if Liquid LL alarm is on, stop water out and allow water in
             if (_private_waste_HAlarm || _tankHHAlarm || _tankLLAlarm)
             {
@@ -813,12 +814,13 @@ namespace CleanerControlApp.Hardwares.HeatingTank.Services
 
             }
 
-
+            // 新增 Timer delay
+            /*
             if (SoakingTank_H_Alarm)
             { 
                 if(!IsLowFrequency) LowFrequencyOP();
                 if (Command_WaterOut) WaterOutOP(false);
-            }
+            } */
 
             if (_PV_High_Timeout && Heating) HeatingOP(false);
 

@@ -66,7 +66,7 @@ namespace CleanerControlApp.Hardwares
 
         public string MessageForOperation { get; set; } = string.Empty;
 
-        private static int HomeAfterProcedureCount = 10;
+        private static int HomeAfterProcedureCount = 2;
         private static bool NeedHomeAfterProcedure => ProcedureCount++ >= HomeAfterProcedureCount;
         private static int ProcedureCount = 0;
 
@@ -890,7 +890,7 @@ namespace CleanerControlApp.Hardwares
             bool result = false;
             MessageForOperation = string.Empty;
 
-            if ((!HasSystemAlarm && !HasAutoStatus && _initializing) || force)
+            if ((!HasSystemAlarm && !HasAutoStatus && !_initializing) || force)
             {
                 if (force)
                 {
@@ -1741,6 +1741,11 @@ namespace CleanerControlApp.Hardwares
                 }
                 if (_heatingTank != null) _heatingTank.ModuleClose();
                 if (_shuttle != null) _shuttle.ModuleClose();
+
+                Tower_Buzzer = false;
+                Tower_Green = false;
+                Tower_Red = false;
+                Tower_Yellow = false;
 
                 // wait3 seconds before shutting down
                 await Task.Delay(TimeSpan.FromSeconds(1)).ConfigureAwait(false);
