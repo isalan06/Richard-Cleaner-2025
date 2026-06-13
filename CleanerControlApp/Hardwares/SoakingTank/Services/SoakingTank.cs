@@ -254,7 +254,7 @@ namespace CleanerControlApp.Hardwares.SoakingTank.Services
         public bool Initialized => _initialized && (_sim_pass_motor || MotorHome);
         public bool Initializing => _initialized && !MotorHome && !_sim_pass_motor;
         public bool Idle => Sensor_CoverOpen && !_ultrasonic && !_cassette && _initialized && IsNormalStatus && (_sim_pass_motor || (MotorServoOn && MotorIdle && MotorHome));
-        public bool CanStopAuto => !HS_ShuttleAuto && Sensor_CoverOpen && !_ultrasonic && _initialized && (_sim_pass_motor || (MotorServoOn && MotorIdle && MotorHome && InPos1));
+        public bool CanStopAuto => !HS_ShuttleAuto && Sensor_CoverOpen && HS_ActFinished && HS_InputPermit && !_ultrasonic && _initialized && (_sim_pass_motor || (MotorServoOn && MotorIdle && MotorHome && InPos1));
 
         public bool AirOP(bool air)
         {

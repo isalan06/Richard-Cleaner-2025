@@ -781,6 +781,8 @@ namespace CleanerControlApp.Hardwares
         public bool SystemInitialized => ShuttleInitialized && SinkInitialized && SoakingTankInitialized && DryingTank1Initialized && DryingTank2Initialized && HeatingTankInitialized && !_initializing;
         public bool SystemInitializing => _initializing;
 
+        public bool SystemCanInitialize => !SystemInitializing && !HasAutoStatus && !HasSystemAlarm;
+
         public bool ShuttleAuto => _shuttle != null && _shuttle.Auto;
         public bool SinkAuto => _sink != null && _sink.Auto;
         public bool SoakingTankAuto => _soakingTank != null && _soakingTank.Auto;
@@ -790,6 +792,15 @@ namespace CleanerControlApp.Hardwares
 
         public bool SystemAuto => ShuttleAuto && SinkAuto && SoakingTankAuto && DryingTank1Auto && DryingTank2Auto && HeatingTankAuto;
         public bool HasAutoStatus => ShuttleAuto || SinkAuto || SoakingTankAuto || DryingTank1Auto || DryingTank2Auto || HeatingTankAuto;
+
+        public bool IsAutoStoppingTrigger => _auto_stopping;
+
+        public bool ShuttlePausing => _shuttle != null && _shuttle.Pausing;
+        public bool SinkPausing => _sink != null && _sink.Pausing;
+        public bool SoakingTankPausing => _soakingTank != null && _soakingTank.Pausing;
+        public bool DryingTank1Pausing => _dryingTanks != null && _dryingTanks.Length > 0 && _dryingTanks[0].Pausing;
+        public bool DryingTank2Pausing => _dryingTanks != null && _dryingTanks.Length > 1 && _dryingTanks[1].Pausing;
+        public bool SystemPausing => ShuttlePausing || SinkPausing || SoakingTankPausing || DryingTank1Pausing || DryingTank2Pausing;
 
 
 
@@ -1227,6 +1238,7 @@ namespace CleanerControlApp.Hardwares
                 _dryingTanks[1].HS_ShuttleAuto = ShuttleAuto;
             }
 
+            if (_auto_stopping && !HasAutoStatus) _auto_stopping = false;
         }
 
         private void DryRunProcedure()
@@ -1717,15 +1729,6 @@ namespace CleanerControlApp.Hardwares
             return result;
         }
 
-        public bool IsPaused()
-        {
-            if (_shuttle != null && _sink != null && _soakingTank != null && _dryingTanks != null && _dryingTanks.Length > 1 && _heatingTank != null)
-            {
-                return _shuttle.Pausing || _sink.Pausing || _soakingTank.Pausing || _dryingTanks[0].Pausing || _dryingTanks[1].Pausing || _heatingTank.Pausing;
-            }
-            return false;
-        }
-
         public async Task ModuleClose()
         {
             try
@@ -1929,7 +1932,10 @@ namespace CleanerControlApp.Hardwares
                 }
                 else if (HasAutoStatus)
                 {
-                    sb.AppendLine(" - 目前有模組處於自動模式。若要重新初始化，請先按下 [停止] 停止自動。");
+                    if (IsAutoStoppingTrigger)
+                        sb.AppendLine(" - 目前已下達停止命令，請等待每個模組完成程序回到閒置狀態，若要繼續自動程序，按下[啟動] 讓設備繼續運作。");
+                    else
+                        sb.AppendLine(" - 目前有模組處於自動模式。若要重新初始化，請先按下 [停止] 停止自動。");
                 }
 
                 if (SystemInitialized && !SystemAuto && !HasSystemAlarm)
@@ -1938,7 +1944,7 @@ namespace CleanerControlApp.Hardwares
                 }
                 if (SystemAuto)
                 {
-                    if(IsPaused())
+                    if(SystemPausing)
                         sb.AppendLine(" - 系統目前處於暫停狀態：按下 [啟動] 讓設備繼續運作。");
                     else
                         sb.AppendLine(" - 系統目前處於自動模式：可按下 [暫停] 讓設備暫時停止或 長按 [停止] 強制停止。");

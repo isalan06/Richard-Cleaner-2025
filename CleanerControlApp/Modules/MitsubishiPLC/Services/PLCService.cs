@@ -15,6 +15,11 @@ namespace CleanerControlApp.Modules.MitsubishiPLC.Services
 {
     public class PLCService : IPLCService, IDisposable, IPLCOperator
     {
+        #region Static Variable
+
+        public static bool IsReadComplete { get; private set; }
+
+        #endregion
 
         #region attribute
 
@@ -273,6 +278,7 @@ namespace CleanerControlApp.Modules.MitsubishiPLC.Services
                         if(!_writeplcparameter_done)
                         {
                             _writeplcparameter_done = true;
+                            IsReadComplete = true;
                             await writeParameter();
                         }
                     }

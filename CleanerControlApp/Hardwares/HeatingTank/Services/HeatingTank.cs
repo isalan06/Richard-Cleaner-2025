@@ -95,7 +95,7 @@ namespace CleanerControlApp.Hardwares.HeatingTank.Services
         private DateTime? _checkHeatingOnStartTime = null;
         private DateTime? _checkHeatingOffStartTime = null;
 
-        private bool SoakingTank_H_Alarm => _plcService != null && !_plcService.TankWaterPosH;
+        private bool SoakingTank_H_Alarm => _plcService != null && !_plcService.TankWaterPosH && PLCService.IsReadComplete;
 
         #endregion
 
@@ -814,13 +814,11 @@ namespace CleanerControlApp.Hardwares.HeatingTank.Services
 
             }
 
-            // 新增 Timer delay
-            /*
             if (SoakingTank_H_Alarm)
             { 
                 if(!IsLowFrequency) LowFrequencyOP();
                 if (Command_WaterOut) WaterOutOP(false);
-            } */
+            } 
 
             if (_PV_High_Timeout && Heating) HeatingOP(false);
 

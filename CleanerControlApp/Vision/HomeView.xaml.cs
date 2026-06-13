@@ -40,6 +40,10 @@ namespace CleanerControlApp.Vision
         private bool _initFlashState = false;
 
         private Brush? _btnPauseOriginalBackground;
+        // Stop button flash support
+        private Brush? _btnStopOriginalBackground;
+        private DispatcherTimer? _stopFlashTimer;
+        private bool _stopFlashState = false;
 
         private CancellationTokenSource? _initCts;
         private DateTime _initHoldStart;
@@ -84,6 +88,8 @@ namespace CleanerControlApp.Vision
 
             // capture pause original background
             _btnPauseOriginalBackground = BtnPause.Background;
+            // capture stop original background
+            _btnStopOriginalBackground = BtnStop.Background;
 
             // Wire button handlers
             BtnStopBuzzer.Click += BtnStopBuzzer_Click;
@@ -194,6 +200,9 @@ namespace CleanerControlApp.Vision
 
             // Ensure cleanup on unload
             this.Unloaded += HomeView_Unloaded;
+            // Refresh UI when control is first loaded or becomes visible to avoid showing stale data
+            this.Loaded += HomeView_Loaded;
+            this.IsVisibleChanged += HomeView_IsVisibleChanged;
 
             // Wire hint button
             BtnHint.Click += BtnHint_Click;
@@ -255,7 +264,7 @@ namespace CleanerControlApp.Vision
                     UpdateBuzzerButtonVisual(buzzerStopped);
                 }
 
-                bool paused = hw.IsPaused();
+                bool paused = hw.SystemPausing;
                 UpdatePauseButtonVisual(paused);
 
                 // Update Init button visuals based on hardware initializing/system initialized state
@@ -273,6 +282,16 @@ namespace CleanerControlApp.Vision
                     {
                         tbSystemHint.Text = hw.Next();
                     }
+                }
+                catch { }
+
+                // If auto-stop trigger is active, flash Stop button yellow
+                try
+                {
+                    if (hw.IsAutoStoppingTrigger)
+                        StartStopFlashTimer();
+                    else
+                        StopStopFlashTimer();
                 }
                 catch { }
             }
@@ -409,6 +428,61 @@ namespace CleanerControlApp.Vision
             catch { }
             _initFlashTimer = null;
             _initFlashState = false;
+        }
+
+        // Added: Start/Stop flash timer for Stop button to fix missing method CS0103
+        private void StartStopFlashTimer()
+        {
+            if (_stopFlashTimer != null) return;
+
+            // ensure original background captured
+            if (_btnStopOriginalBackground == null)
+                _btnStopOriginalBackground = BtnStop.Background;
+
+            _stopFlashTimer = new DispatcherTimer(DispatcherPriority.Background) { Interval = TimeSpan.FromMilliseconds(400) };
+            _stopFlashTimer.Tick += (s, e) =>
+            {
+                try
+                {
+                    _stopFlashState = !_stopFlashState;
+                    if (_stopFlashState)
+                    {
+                        BtnStop.Background = Brushes.Yellow;
+                        BtnStop.Foreground = Brushes.Black;
+                    }
+                    else
+                    {
+                        if (_btnStopOriginalBackground != null)
+                            BtnStop.Background = _btnStopOriginalBackground;
+                        BtnStop.Foreground = Brushes.Black;
+                    }
+                }
+                catch { }
+            };
+
+            // set initial flash state and apply immediately
+            _stopFlashState = true;
+            BtnStop.Background = Brushes.Yellow;
+            BtnStop.Foreground = Brushes.Black;
+            _stopFlashTimer.Start();
+        }
+
+        private void StopStopFlashTimer()
+        {
+            if (_stopFlashTimer == null) return;
+            try
+            {
+                _stopFlashTimer.Stop();
+                // no need to remove anonymous handler; allow GC to collect
+            }
+            catch { }
+            _stopFlashTimer = null;
+            _stopFlashState = false;
+
+            // restore original background
+            if (_btnStopOriginalBackground != null)
+                BtnStop.Background = _btnStopOriginalBackground;
+            BtnStop.Foreground = Brushes.Black;
         }
 
         private void BtnInit_MouseEnter(object? sender, MouseEventArgs e)
@@ -882,7 +956,7 @@ namespace CleanerControlApp.Vision
                 {
                     // developer: force initialize
                     hw.Initialize(true);
-                    try { CleanerControlApp.Vision.Shared.StatusPopup.Show("初始化 (Developer)", Window.GetWindow(this),5); } catch { }
+                    try { CleanerControlApp.Vision.Shared.InfoPopup.Show("初始化 (Developer)", Window.GetWindow(this),5); } catch { }
                 }
                 else
                 {
@@ -892,7 +966,7 @@ namespace CleanerControlApp.Vision
                     if (result ==0)
                     {
                         hw.Initialize(false);
-                        try { CleanerControlApp.Vision.Shared.StatusPopup.Show("初始化", Window.GetWindow(this),5); } catch { }
+                        try { CleanerControlApp.Vision.Shared.InfoPopup.Show("初始化", Window.GetWindow(this),5); } catch { }
                     }
                     else
                     {
@@ -975,6 +1049,57 @@ namespace CleanerControlApp.Vision
                 StopHardwareStatusTimer();
                 StopOperateLogTimer();
                 this.Unloaded -= HomeView_Unloaded;
+                this.Loaded -= HomeView_Loaded;
+                this.IsVisibleChanged -= HomeView_IsVisibleChanged;
+            }
+            catch { }
+        }
+
+        private void HomeView_Loaded(object? sender, RoutedEventArgs e)
+        {
+            try
+            {
+                // Refresh immediately when control is loaded
+                RefreshUI();
+            }
+            catch { }
+        }
+
+        private void HomeView_IsVisibleChanged(object? sender, DependencyPropertyChangedEventArgs e)
+        {
+            try
+            {
+                // when becoming visible, refresh UI so user doesn't see stale data
+                if (this.IsVisible)
+                {
+                    RefreshUI();
+                }
+            }
+            catch { }
+        }
+
+        // Centralized refresh that updates alarms, latest log and hardware visual state immediately
+        private void RefreshUI()
+        {
+            // Ensure UI thread
+            if (!Dispatcher.CheckAccess())
+            {
+                Dispatcher.Invoke(() => RefreshUI());
+                return;
+            }
+
+            try
+            {
+                // Populate alarms and latest log right away
+                PopulateCurrentAlarms();
+                LoadLatestOperateLog();
+
+                // Update hardware-driven visuals by invoking the same logic as the hardware timer tick
+                try
+                {
+                    HwStatusTimer_Tick(this, EventArgs.Empty);
+                }
+                catch { }
             }
             catch { }
         }
