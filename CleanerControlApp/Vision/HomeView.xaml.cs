@@ -769,7 +769,7 @@ namespace CleanerControlApp.Vision
                     return;
                 }
                 await hw.AlarmResetAsync().ConfigureAwait(false);
-                try { Dispatcher.Invoke(() => CleanerControlApp.Vision.Shared.StatusPopup.Show("錯誤已重置", Window.GetWindow(this),5)); } catch { }
+                try { Dispatcher.Invoke(() => CleanerControlApp.Vision.Shared.InfoPopup.Show("錯誤已重置", Window.GetWindow(this),5)); } catch { }
             }
             catch (Exception ex)
             {

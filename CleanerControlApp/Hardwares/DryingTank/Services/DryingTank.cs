@@ -494,8 +494,8 @@ namespace CleanerControlApp.Hardwares.DryingTank.Services
                 }
             }
         }
-        public bool HasWarning => _PV_Low_Timeout || _PV_High_Timeout || _Cover_Open_Timeout || _Cover_Close_Timeout;
-        public bool HasAlarm => false; // 根據需求定義警報條件，可能包括超時或其他異常狀態
+        public bool HasWarning => _PV_Low_Timeout || _PV_High_Timeout;
+        public bool HasAlarm => _Cover_Open_Timeout || _Cover_Close_Timeout;
         public bool IsNormalStatus => !HasWarning && !HasAlarm;
         public void AutoStop()
         {

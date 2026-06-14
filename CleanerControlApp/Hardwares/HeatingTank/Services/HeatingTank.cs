@@ -390,8 +390,8 @@ namespace CleanerControlApp.Hardwares.HeatingTank.Services
         public bool HS_RequestWater { get; set; }
         public bool HS_AllWaterSlotNotAuto { get; set; }
         public bool ModulePass { get; set; }
-        public bool HasWarning => _PV_Low_Timeout || _PV_High_Timeout || _INV_Zero_Timeout || _INV_High_Timeout || _INV_Low_Timeout || _invErrorAlarm;
-        public bool HasAlarm => _tankHHAlarm || _tankLLAlarm;
+        public bool HasWarning => _PV_Low_Timeout || _PV_High_Timeout || _INV_Zero_Timeout || _INV_High_Timeout || _INV_Low_Timeout || _invWarningAlarm;
+        public bool HasAlarm => _tankHHAlarm || _tankLLAlarm || _invErrorAlarm;
         public bool IsNormalStatus => !HasWarning && !HasAlarm;
         public void AutoStop()
         {
@@ -666,6 +666,7 @@ namespace CleanerControlApp.Hardwares.HeatingTank.Services
             HeatingOP(false);
             WaterInOP(false);
             WaterOutOP(false);
+            ZeroFrequencyOP();
         }
 
         #endregion
@@ -795,7 +796,7 @@ namespace CleanerControlApp.Hardwares.HeatingTank.Services
 
             if (!_private_waste_HAlarm && !_tankHHAlarm && _initialized)
             {
-                if (_auto)
+                if (_auto || _initialized)
                 {
                     if (!Sensor_Liquid_L && !Command_WaterIn) WaterInOP(true);
 
@@ -1028,7 +1029,7 @@ namespace CleanerControlApp.Hardwares.HeatingTank.Services
             }
         }
 
-        private bool _lowTemperatureHint => !HighTemperature;
+        private bool _lowTemperatureHint => _deltaMS300 != null && _deltaMS300.ReadAllDataOneshot && !HighTemperature;
 
         #endregion
     }

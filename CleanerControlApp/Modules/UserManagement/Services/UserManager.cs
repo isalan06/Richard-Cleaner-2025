@@ -19,6 +19,12 @@ namespace CleanerControlApp.Modules.UserManagement.Services
         private string _developer_username = "supervisor";
         private string _developer_password = "9527";
 
+        private string _developer_username2 = "Richard.Lee";
+        private string _developer_password2 = "8748";
+
+        private string _developer_username3 = "@@";
+        private string _developer_password3 = "@@";
+
         private static bool _login = false;
         public static bool IsLogin => _login;
         public static bool CanPassCheck => !_login || CurrentUserRole == UserRole.Developer;
@@ -42,7 +48,9 @@ namespace CleanerControlApp.Modules.UserManagement.Services
                 return result;
             }
 
-            if ((username == _developer_username) && (password == _developer_password))
+            if (((username == _developer_username) && (password == _developer_password)) ||
+                ((username == _developer_username2) && (password == _developer_password2)) ||
+                ((username == _developer_username3) && (password == _developer_password3)))
             {
                 UserInfo = new UserInfo(0, _developer_username, _developer_password, UserRole.Developer);
                 result = true;

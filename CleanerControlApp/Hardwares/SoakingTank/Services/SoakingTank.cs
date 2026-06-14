@@ -80,6 +80,8 @@ namespace CleanerControlApp.Hardwares.SoakingTank.Services
         private bool _homeRequest = false;
         private bool _homeRequestDone = false;
 
+        private DateTime? _checkWaterHStartTime = DateTime.UtcNow;
+
         #endregion
 
         #region constructor
@@ -189,7 +191,7 @@ namespace CleanerControlApp.Hardwares.SoakingTank.Services
 
         }
 
-        public bool Sensor_Liquid_H => _plcService != null && !_plcService.TankWaterPosH;
+        public bool Sensor_Liquid_H => CommonFunction.CheckStatusDelayPassed(ref _checkWaterHStartTime, _plcService != null && !_plcService.TankWaterPosH, 200);
         public bool Sensor_Liquid_L => _plcService != null && !_plcService.TankWaterPosL;
 
         public bool Command_CleanerCoverClose
@@ -464,8 +466,9 @@ namespace CleanerControlApp.Hardwares.SoakingTank.Services
                 }
             }
         }
-        public bool HasWarning => _Cover_Open_Timeout || _Cover_Close_Timeout || _motorAlarmHomeTimeout || _motorAlarmMoveTimeout;
-        public bool HasAlarm => _motorAlarm || _motorAlarmLimitN || _motorAlarmLimitP;
+        public bool HasWarning => false;
+        public bool HasAlarm => _motorAlarm || _motorAlarmLimitN || _motorAlarmLimitP ||
+            _Cover_Open_Timeout || _Cover_Close_Timeout || _motorAlarmHomeTimeout || _motorAlarmMoveTimeout;
         public bool IsNormalStatus => !HasWarning && !HasAlarm;
 
         public void AutoStop()

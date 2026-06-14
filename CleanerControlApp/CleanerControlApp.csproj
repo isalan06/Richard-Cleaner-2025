@@ -43,6 +43,7 @@
   <ItemGroup>
     <Folder Include="Hardwares\DryingTank\Models\" />
     <Folder Include="Modules\Motor\Models\" />
+    <Folder Include="Pictures\Doc Used\" />
   </ItemGroup>
 
   <!-- Include all files under Pictures as Resource so XAML pack URIs can load them -->

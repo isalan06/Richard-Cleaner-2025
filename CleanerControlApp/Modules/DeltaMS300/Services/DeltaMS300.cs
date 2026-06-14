@@ -62,6 +62,7 @@ namespace CleanerControlApp.Modules.DeltaMS300.Services
         private static readonly TimeSpan DeviceTimeoutClearDelay = TimeSpan.FromSeconds(10);
 
         private int _operation = 0; // 0: stop, 1: forward, 2: reverse
+        private bool _readAllDataOneshot = false; // for testing: read all data registers in one shot instead of separate commands
 
         #endregion
 
@@ -256,6 +257,8 @@ namespace CleanerControlApp.Modules.DeltaMS300.Services
         public int OperationMode => _operation;
         public bool Operation => _operation != 0;
 
+        public bool ReadAllDataOneshot => _readAllDataOneshot;
+
         #endregion
 
         #region Function
@@ -435,7 +438,10 @@ namespace CleanerControlApp.Modules.DeltaMS300.Services
                     }
 
                     if (++_routeIndex >= _routeProcess.Length)
+                    {
                         _routeIndex = 0;
+                        _readAllDataOneshot = true;
+                    }
                 }
             }
             catch (OperationCanceledException)

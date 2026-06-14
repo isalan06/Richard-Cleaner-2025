@@ -141,7 +141,8 @@ namespace CleanerControlApp.Services
 
             // Ensure AlarmManager polls registered flag getters so changes 
             // are detected and logged.
-            AlarmManager.CheckFlagGetters();
+            //AlarmManager.CheckFlagGetters();
+            AlarmManager.CheckFlagGettersTrueOnly();
 
             if (!UserManager.CanPassCheck) _hardwareManager.CheckLightTower();
 

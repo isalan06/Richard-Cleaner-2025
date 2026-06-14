@@ -19,6 +19,9 @@ namespace CleanerControlApp.Utilities.Alarm
         public string Module { get; init; }
         public string Description { get; init; }
         public bool IsAlarm { get; internal set; }
+        // Indicates whether this alarm has ever been triggered since it was created/loaded.
+        // This flag is not cleared when the alarm is finished or when error memory is reset.
+        public bool HasBeenTriggered { get; internal set; }
         public DateTime? HappenTime { get; internal set; }
         public string? AlarmSN { get; internal set; }
 
@@ -29,6 +32,7 @@ namespace CleanerControlApp.Utilities.Alarm
             Module = module ?? string.Empty;
             Description = description ?? string.Empty;
             IsAlarm = false;
+            HasBeenTriggered = false;
             HappenTime = null;
             AlarmSN = null;
         }
@@ -118,6 +122,7 @@ namespace CleanerControlApp.Utilities.Alarm
                                 e.IsAlarm = true;
                                 e.HappenTime = now;
                                 e.AlarmSN = GenerateAlarmSN(code, now);
+                                e.HasBeenTriggered = true;
                                 WriteLog(e, "Alarm", now);
                                 // Also write an operation log for the alarm event
                                 OperateLog.Log($"{e.Module}發生錯誤", GetLogUserName(), $"{e.Code}-{e.Description}");
@@ -131,6 +136,7 @@ namespace CleanerControlApp.Utilities.Alarm
                                 var entry = new AlarmEntry(info.Code, info.Type, info.Module, info.Description)
                                 {
                                     IsAlarm = true,
+                                    HasBeenTriggered = true,
                                     HappenTime = now,
                                     AlarmSN = GenerateAlarmSN(code, now)
                                 };
@@ -143,6 +149,7 @@ namespace CleanerControlApp.Utilities.Alarm
                                 var entry = new AlarmEntry(code, AlarmType.Warning, string.Empty, string.Empty)
                                 {
                                     IsAlarm = true,
+                                    HasBeenTriggered = true,
                                     HappenTime = now,
                                     AlarmSN = GenerateAlarmSN(code, now)
                                 };
@@ -196,6 +203,7 @@ namespace CleanerControlApp.Utilities.Alarm
                         entry = new AlarmEntry(info2.Code, info2.Type, info2.Module, info2.Description)
                         {
                             IsAlarm = entry.IsAlarm,
+                                HasBeenTriggered = entry.HasBeenTriggered,
                             HappenTime = entry.HappenTime,
                             AlarmSN = entry.AlarmSN
                         };
@@ -210,6 +218,7 @@ namespace CleanerControlApp.Utilities.Alarm
                 {
                     // Alarm started
                     entry.IsAlarm = true;
+                    entry.HasBeenTriggered = true;
                     entry.HappenTime = timestamp;
                     entry.AlarmSN = GenerateAlarmSN(code, timestamp.Value);
                     WriteLog(entry, "Alarm", timestamp.Value);
@@ -323,6 +332,98 @@ namespace CleanerControlApp.Utilities.Alarm
         }
 
         /// <summary>
+        /// Check all attached flag getters but only handle transitions to true.
+        /// If a getter becomes false we DO NOT update the stored previous value so
+        /// the "error memory" remains true until explicitly cleared.
+        /// </summary>
+        public static void CheckFlagGettersTrueOnly()
+        {
+            KeyValuePair<string, Func<bool>>[] snapshot;
+            lock (_lock)
+            {
+                snapshot = _flagGetters.ToArray();
+            }
+
+            foreach (var kv in snapshot)
+            {
+                var compositeKey = kv.Key;
+                bool current;
+                try
+                {
+                    current = kv.Value();
+                }
+                catch
+                {
+                    continue; // ignore exceptions from getters
+                }
+
+                bool previous;
+                lock (_lock)
+                {
+                    previous = _previousFlagValues.TryGetValue(compositeKey, out var v) ? v : false;
+                }
+
+                // Only handle transitions from false->true. Do NOT clear when current==false.
+                if (current && !previous)
+                {
+                    lock (_lock)
+                    {
+                        _previousFlagValues[compositeKey] = true;
+                    }
+
+                    var code = ExtractCodeFromComposite(compositeKey);
+                    UpdateFlag(code, true);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Reset the stored "error memory" (previous flag values) to false for all registered getters
+        /// and then re-evaluate external signals by calling CheckFlagGetters.
+        /// </summary>
+        public static void ResetErrorMemoryAndRecheck()
+        {
+            // To force re-evaluation that both clears existing alarms and re-raises those
+            // whose external signal is still active, set the stored previous value to the
+            // inverse of the current getter value so CheckFlagGetters will detect a change
+            // for every registered getter and call UpdateFlag appropriately.
+            KeyValuePair<string, Func<bool>>[] snapshot;
+            lock (_lock)
+            {
+                snapshot = _flagGetters.ToArray();
+            }
+
+            foreach (var kv in snapshot)
+            {
+                var key = kv.Key;
+                bool current;
+                try
+                {
+                    current = kv.Value();
+                }
+                catch
+                {
+                    // If getter throws, conservatively force an update by setting previous to true
+                    // so that CheckFlagGetters will attempt to update (and UpdateFlag will ignore
+                    // exceptions if getter cannot be read later).
+                    lock (_lock)
+                    {
+                        _previousFlagValues[key] = true;
+                    }
+                    continue;
+                }
+
+                lock (_lock)
+                {
+                    _previousFlagValues[key] = !current;
+                }
+            }
+
+            // Re-evaluate getters to bring alarm table in sync with current external signals
+            CheckFlagGetters();
+        }
+
+        /// <summary>
         /// Returns a snapshot of the alarm entries.
         /// </summary>
         public static IReadOnlyList<AlarmEntry> GetAllEntries()
@@ -330,6 +431,17 @@ namespace CleanerControlApp.Utilities.Alarm
             lock (_lock)
             {
                 return _entries.Values.ToList();
+            }
+        }
+
+        /// <summary>
+        /// Returns entries that have been triggered at least once (HasBeenTriggered == true).
+        /// </summary>
+        public static IReadOnlyList<AlarmEntry> GetTriggeredEntries()
+        {
+            lock (_lock)
+            {
+                return _entries.Values.Where(e => e.HasBeenTriggered).ToList();
             }
         }
 

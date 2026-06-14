@@ -419,8 +419,10 @@ namespace CleanerControlApp.Hardwares.Sink.Services
                 }
             }
         }
-        public bool HasWarning => _PV_Low_Timeout || _PV_High_Timeout || _Cover_Open_Timeout || _Cover_Close_Timeout || _motorAlarmHomeTimeout || _motorAlarmMoveTimeout || _invErrorAlarm;
-        public bool HasAlarm => _motorAlarm || _motorAlarmLimitN || _motorAlarmLimitP;
+        public bool HasWarning => _PV_Low_Timeout || _PV_High_Timeout || _invWarningAlarm;
+        public bool HasAlarm => _Cover_Open_Timeout || _Cover_Close_Timeout || 
+            _motorAlarmHomeTimeout || _motorAlarmMoveTimeout || _motorAlarm || _motorAlarmLimitN || _motorAlarmLimitP || 
+            _invErrorAlarm;
         public bool IsNormalStatus => !HasWarning && !HasAlarm;
         public void AutoStop()
         {

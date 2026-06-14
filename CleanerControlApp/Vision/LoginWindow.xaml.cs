@@ -42,8 +42,8 @@ namespace CleanerControlApp.Vision
             // TODO: Remove these defaults before production.
             if (_unitSettings.System != null && _unitSettings.System.LoginUseDefaultDeveloper != 0)
             {
-                UsernameTextBox.Text = "supervisor";
-                PasswordBox.Password = "9527";
+                //UsernameTextBox.Text = "supervisor";
+                //PasswordBox.Password = "9527";
             }
         }
 

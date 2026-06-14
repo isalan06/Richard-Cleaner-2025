@@ -117,6 +117,7 @@ namespace CleanerControlApp.Hardwares
                 AlarmManager.AttachFlagGetter("ALM008", () => _initializingTimeout_alarm);
                 AlarmManager.AttachFlagGetter("ALM009", () => _plc_System_alarm);
                 AlarmManager.AttachFlagGetter("ALM010", () => _unloaderCannotPlaceHint);
+                AlarmManager.AttachFlagGetter("ALM011", () => _initializing_warning_alarm);
 
                 StartLoop();
 
@@ -467,8 +468,6 @@ namespace CleanerControlApp.Hardwares
 
         #region Alarm
 
-
-
         private bool _communication_alarm
         {
             get
@@ -538,6 +537,8 @@ namespace CleanerControlApp.Hardwares
         }
         private bool _checkCassette_alarm { get; set; }
 
+        private bool _initializing_warning_alarm { get; set; }
+
         private bool _initializingTimeout_alarm { get; set; }
 
         private bool _plc_System_alarm
@@ -552,8 +553,9 @@ namespace CleanerControlApp.Hardwares
 
         private bool _unloaderCannotPlaceHint => !UnloaderCanPlace;
 
-        public bool HasAlarm => _communication_alarm || _emo_alarm || _leakage_alarm || _wasteTankH_alarm || _checkCassette_alarm || _initializingTimeout_alarm;
-        public bool HasWarning => _main_air_alarm || _door_alarm;
+        public bool HasAlarm => _communication_alarm || _emo_alarm || _main_air_alarm || _leakage_alarm || 
+            _wasteTankH_alarm || _checkCassette_alarm || _initializingTimeout_alarm || _plc_System_alarm || _initializing_warning_alarm ;
+        public bool HasWarning => _door_alarm;
 
         public bool HasShuttleAlarm => _shuttle != null && _shuttle.HasAlarm;
         public bool HasSinkAlarm => _sink != null && _sink.HasAlarm;
@@ -579,6 +581,7 @@ namespace CleanerControlApp.Hardwares
             OperateLog.Log("錯誤重置", "按下 [錯誤重置] 後會對系統進行清除錯誤狀態及下達錯誤重置命令給各個模組。");
 
             _checkCassette_alarm = false;
+            _initializing_warning_alarm = false;
             _initializingTimeout_alarm = false;
 
             if (_shuttle != null) _shuttle.AlarmReset();
@@ -614,6 +617,8 @@ namespace CleanerControlApp.Hardwares
             }
 
             await Task.Delay(_loopInterval).ConfigureAwait(false);
+
+            AlarmManager.ResetErrorMemoryAndRecheck();
 
             _firstAlarm = false;
             _firstWarning = false;
@@ -893,8 +898,12 @@ namespace CleanerControlApp.Hardwares
                 result = 4; // the clamper close and cassette exist
                 if (logRecord) OperateLog.Log("夾爪有卡匣狀態下無法初始化", status);
             }
-
-
+            if (HasSystemWarning && UserManager.CurrentUserRole != UserRole.Developer)
+            {
+                status = "設備目前有警告狀態，請確認警告狀態後再進行初始化";
+                result = 5; // there are warnings in the system (but allow developer to bypass for testing
+                if (logRecord) OperateLog.Log("警告狀態下無法初始化", status);
+            }
 
             return result;
         }
@@ -962,12 +971,12 @@ namespace CleanerControlApp.Hardwares
                     {
                         if (_sink.Initialized && _shuttle.Initialized)
                         {
-                            if(!_sink.InPos1 && _sink.MotorHome && _sink.MotorIdle && _sink.Sensor_CoverOpen)
+                            if (!_sink.InPos1 && _sink.MotorHome && _sink.MotorIdle && _sink.Sensor_CoverOpen)
                             {
                                 _sink.MoveToPosition(0, 0);
                             }
 
-                            if(!_soakingTank.InPos1 && _soakingTank.MotorHome && _soakingTank.MotorIdle && _soakingTank.Sensor_CoverOpen)
+                            if (!_soakingTank.InPos1 && _soakingTank.MotorHome && _soakingTank.MotorIdle && _soakingTank.Sensor_CoverOpen)
                             {
                                 _soakingTank.MoveToPosition(0, 0);
                             }
@@ -992,13 +1001,21 @@ namespace CleanerControlApp.Hardwares
                     if (!_sink_initialized_trigger) { _sink_initialized_trigger = true; _sink.ModuleReset(); }
                     if (!_soakingTank_initialized_trigger) { _soakingTank_initialized_trigger = true; _soakingTank.ModuleReset(); }
 
-
                 }
 
                 if (_heatingTank != null && !_heatingTank_initialized_trigger) { _heatingTank_initialized_trigger = true; _heatingTank.ModuleReset(); }
                 if (_dryingTanks != null && _dryingTanks.Length > 0 && !_dryingTank1_initialized_trigger) { _dryingTank1_initialized_trigger = true; _dryingTanks[0].ModuleReset(); }
                 if (_dryingTanks != null && _dryingTanks.Length > 1 && !_dryingTank2_initialized_trigger) { _dryingTank2_initialized_trigger = true; _dryingTanks[1].ModuleReset(); }
                 if (_shuttle != null && !_shuttle_initialized_trigger) { _shuttle_initialized_trigger = true; _shuttle.ModuleReset(); }
+
+                if ((HasSystemWarning || HasSystemAlarm) && !_initializing_warning_alarm && UserManager.CurrentUserRole != UserRole.Developer)
+                {
+                    _initializing = false;
+                    _initializingStartTime = null;
+                    _initializing_warning_alarm = true;
+                    OperateLog.Log("初始化有警告", "Initialization has warning, please check system warning status.");
+
+                }
             }
             else
             {
@@ -1210,12 +1227,15 @@ namespace CleanerControlApp.Hardwares
                                 {
                                     _auto_procedure_home_executing = true;
                                     _shuttle.ShuttleZMotor.Home();
+                                    _shuttle.ShuttleXMotor.Home();
                                     ProcedureCount = 0;
                                 }
                                 else
                                     _auto_procedure_home_executing = false;
                             }
-                            else if (_shuttle.ShuttleZMotor.MotorIdle && _shuttle.ShuttleZMotor.MotorHome && ((_auto_procedure_home_executing &&_shuttle.ShuttleZMotor.InZeroPos) || (!_auto_procedure_home_executing && _shuttle.ShuttleZMotor.GetInPos(0))))
+                            else if (_shuttle.ShuttleZMotor.MotorIdle && _shuttle.ShuttleZMotor.MotorHome && 
+                                ((_auto_procedure_home_executing &&_shuttle.ShuttleZMotor.InZeroPos) || (!_auto_procedure_home_executing && _shuttle.ShuttleZMotor.GetInPos(0))) &&
+                                ((_auto_procedure_home_executing && _shuttle.ShuttleXMotor.InZeroPos) || (!_auto_procedure_home_executing && _shuttle.ShuttleXMotor.GetInPos(0))))
                             {
                                 _auto_procedure_executing = false;
                                 _auto_procedure_pick_executing = false;
@@ -1248,6 +1268,12 @@ namespace CleanerControlApp.Hardwares
             }
 
             if (_auto_stopping && !HasAutoStatus) _auto_stopping = false;
+
+            if(SystemAuto && _door_alarm && !SystemPausing)
+            {
+                AutoPause();
+                OperateLog.Log("自動暫停", "系統自動暫停，因為偵測到門開啟的狀態，請確認門的狀態後再繼續。");
+            }
         }
 
         private void DryRunProcedure()
@@ -1827,8 +1853,8 @@ namespace CleanerControlApp.Hardwares
         public void CheckLightTower()
         {
             Tower_Red = HasSystemAlarm;
-            Tower_Yellow = HasSystemWarning || HasSystemHint;
-            Tower_Green = SystemAuto;
+            Tower_Yellow = HasSystemWarning || HasSystemHint || (SystemPausing && !IsAutoStoppingTrigger) || (!SystemAuto && SystemInitialized);
+            Tower_Green = HasAutoStatus && !SystemPausing; 
 
             // If a new hint appears, start (or extend) the hint buzzer period for10 seconds
             var currentHasHint = HasSystemHint;

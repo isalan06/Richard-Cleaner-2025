@@ -49,5 +49,7 @@ namespace CleanerControlApp.Modules.DeltaMS300.Interfaces
 
         int OperationMode { get; } // 0 = stop, 1 = forward, 2 = reverse
         bool Operation { get; }
+
+        bool ReadAllDataOneshot { get; }
     }
 }

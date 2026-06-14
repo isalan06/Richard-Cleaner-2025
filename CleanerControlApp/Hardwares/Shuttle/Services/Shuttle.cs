@@ -320,8 +320,12 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
             return result;
         }
 
-        public bool HasWarning => _ClamperB_Close_Timeout || _ClamperF_Close_Timeout || _ClamperB_Open_Timeout || _ClamperB_Open_Timeout || _motorXAlarmMoveTimeout || _motorZAlarmMoveTimeout || _motorXAlarmHomeTimeout || _motorZAlarmHomeTimeout;
-        public bool HasAlarm => MotorAlarm || _motorXAlarmLimitN || _motorXAlarmLimitP || _motorZAlarmLimitN || _motorZAlarmLimitP || _checkCassetteProcedureError || _pickProcedureError || _placeProcedureError;
+        public bool HasWarning => false;
+        public bool HasAlarm => _ClamperB_Close_Timeout || _ClamperF_Close_Timeout || _ClamperB_Open_Timeout || _ClamperB_Open_Timeout || 
+            _motorXAlarmMoveTimeout || _motorZAlarmMoveTimeout || _motorXAlarmHomeTimeout || _motorZAlarmHomeTimeout || 
+            MotorAlarm || _motorXAlarmLimitN || _motorXAlarmLimitP ||  _motorZAlarmLimitN || _motorZAlarmLimitP || 
+            _checkCassetteProcedureError || _pickProcedureError || _placeProcedureError||
+            _triggerTimeoutAutoAlarm || _triggerTimeoutDrySemiAlarm;
         
         public bool IsNormalStatus => !HasWarning && !HasAlarm;
         public void AutoStop()
@@ -911,7 +915,7 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
         private void AutoProcedure()
         {
             // Start/stop timeout timer for triggers
-            bool anyTrigger = _pickTrigger || _placeTrigger || _checkCassetteTrigger;
+            bool anyTrigger = ((_pickTrigger || _placeTrigger) && !_pausing) || _checkCassetteTrigger;
 
             if (anyTrigger)
             {
@@ -1168,7 +1172,7 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
                             break;
 
                         case 40: // Check Cassette Exist
-                            if (IsEmpty || _sim_pass_clamper || _passClamperCheckCassette)
+                            if (Check_ClamperOpen || _sim_pass_clamper || _passClamperCheckCassette)
                             {
                                 _cassette = false;
                                 _placeTrigger = false;
