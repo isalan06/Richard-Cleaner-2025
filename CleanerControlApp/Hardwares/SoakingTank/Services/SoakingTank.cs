@@ -447,7 +447,7 @@ namespace CleanerControlApp.Hardwares.SoakingTank.Services
         public bool HS_ClamperPickFinished { get; set; }
         public bool HS_ClamperPlaceFinished { get; set; }
         public bool HS_WaterSystemError { get; set; }
-        public bool HS_InputPermit => Idle && !_pausing && !HS_ClamperMoving && _auto && InPos1;
+        public bool HS_InputPermit => Idle && !_pausing && !HS_ClamperMoving && _auto && InPos1 && !_actFinished;
         public bool HS_ActFinished => _cassette && Sensor_CoverOpen && !HS_ClamperMoving && !Ultrasonic && _actFinished && InPos1 && RetryAirFinished && _retry_air_finished;
         public bool HS_RequestWater => _heatingTank != null && _heatingTank.HS_RequestWater;
         public bool HS_ShuttleAuto { get; set; }
@@ -975,6 +975,7 @@ namespace CleanerControlApp.Hardwares.SoakingTank.Services
             _autoStopFlag = false;
             _motor_commanding = false;
             _motor_air_retry_count = 0;
+            _actFinished = false;
 
             ResetTimeoutFlag();
             _initialized = true;

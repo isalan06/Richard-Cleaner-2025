@@ -475,7 +475,7 @@ namespace CleanerControlApp.Hardwares.DryingTank.Services
         public bool HS_ClamperMoving { get; set; }
         public bool HS_ClamperPickFinished { get; set; }
         public bool HS_ClamperPlaceFinished { get; set; }
-        public bool HS_InputPermit => Idle && !_pausing && !HS_ClamperMoving && _auto;
+        public bool HS_InputPermit => Idle && !_pausing && !HS_ClamperMoving && _auto && !_actFinished;
         public bool HS_ActFinished => _cassette && Sensor_CoverOpen && !HS_ClamperMoving && !Heating && _actFinished;
         public bool HS_ShuttleAuto { get; set; }
 
@@ -749,6 +749,7 @@ namespace CleanerControlApp.Hardwares.DryingTank.Services
             _cassette = false;
             _pausing = false;
             _autoStopFlag = false;
+            _actFinished = false;
 
             ResetTimeoutFlag();
             _initialized = true;

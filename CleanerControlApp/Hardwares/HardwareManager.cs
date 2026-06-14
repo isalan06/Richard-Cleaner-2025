@@ -1288,7 +1288,7 @@ namespace CleanerControlApp.Hardwares
 
             if (_auto_stopping && !HasAutoStatus) _auto_stopping = false;
 
-            if(SystemAuto && _door_alarm && !SystemPausing)
+            if(HasAutoStatus && _door_alarm && !SystemPausing)
             {
                 AutoPause();
                 OperateLog.Log("自動暫停", "系統自動暫停，因為偵測到門開啟的狀態，請確認門的狀態後再繼續。");
@@ -1884,7 +1884,7 @@ namespace CleanerControlApp.Hardwares
         public void CheckLightTower()
         {
             Tower_Red = HasSystemAlarm;
-            Tower_Yellow = HasSystemWarning || HasSystemHint || (SystemPausing && !IsAutoStoppingTrigger) || (!SystemAuto && SystemInitialized);
+            Tower_Yellow = HasSystemWarning || HasSystemHint || (SystemPausing && !IsAutoStoppingTrigger) || (!SystemAuto && SystemInitialized) || Initializing;
             Tower_Green = HasAutoStatus && !SystemPausing; 
 
             // If a new hint appears, start (or extend) the hint buzzer period for10 seconds
