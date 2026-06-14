@@ -1803,12 +1803,24 @@ namespace CleanerControlApp.Hardwares
                                     // Attempt to shut down the computer immediately. If it fails, fall back to application shutdown.
                                     try
                                     {
-                                        var psi = new ProcessStartInfo("shutdown", "/s /t0")
+                                        // Log attempt and use explicit FileName/Arguments to improve reliability
+                                        try
                                         {
-                                            CreateNoWindow = true,
-                                            UseShellExecute = false
-                                        };
-                                        Process.Start(psi);
+                                            _logger?.LogInformation("Attempting system shutdown via shutdown.exe");
+                                            var psi = new ProcessStartInfo
+                                            {
+                                                FileName = "shutdown.exe",
+                                                Arguments = "/s /t 0",
+                                                CreateNoWindow = true,
+                                                UseShellExecute = false
+                                            };
+                                            Process.Start(psi);
+                                        }
+                                        catch (Exception ex)
+                                        {
+                                            _logger?.LogError(ex, "Process.Start(shutdown.exe) failed");
+                                            throw;
+                                        }
                                     }
                                     catch
                                     {

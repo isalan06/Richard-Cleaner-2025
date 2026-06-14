@@ -191,7 +191,7 @@ namespace CleanerControlApp.Hardwares.SoakingTank.Services
 
         }
 
-        public bool Sensor_Liquid_H => CommonFunction.CheckStatusDelayPassed(ref _checkWaterHStartTime, _plcService != null && !_plcService.TankWaterPosH, 200);
+        public bool Sensor_Liquid_H => _plcService != null && !_plcService.TankWaterPosH;
         public bool Sensor_Liquid_L => _plcService != null && !_plcService.TankWaterPosL;
 
         public bool Command_CleanerCoverClose
