@@ -375,7 +375,7 @@ namespace CleanerControlApp.Hardwares.DryingTank.Services
             if (!_auto)
             {
                 result = HeatingOP(heating);
-                OperateLog.Log($"烘乾槽#{ModuleIndex + 1} 手動加熱 " + (heating ? "開" : "關"), $"烘乾槽#{ModuleIndex + 1} 手動加熱 " + (heating ? "開" : "關"));
+                OperateLog.Log($"烘乾槽#{ModuleIndex} 手動加熱 " + (heating ? "開" : "關"), $"烘乾槽#{ModuleIndex} 手動加熱 " + (heating ? "開" : "關"));
             }
             else
             {
@@ -404,7 +404,7 @@ namespace CleanerControlApp.Hardwares.DryingTank.Services
             if (!_auto)
             {
                 result = AirOP(air);
-                OperateLog.Log($"烘乾槽#{ModuleIndex + 1} 手動氣閥 " + (air ? "開" : "關"), $"烘乾槽#{ModuleIndex + 1} 手動氣閥 " + (air ? "開" : "關"));
+                OperateLog.Log($"烘乾槽#{ModuleIndex} 手動氣閥 " + (air ? "開" : "關"), $"烘乾槽#{ModuleIndex} 手動氣閥 " + (air ? "開" : "關"));
             }
             else
             {
@@ -433,7 +433,7 @@ namespace CleanerControlApp.Hardwares.DryingTank.Services
             if (!_auto)
             {
                 result = BlowerOP(blow);
-                OperateLog.Log($"烘乾槽#{ModuleIndex + 1} 手動風扇 " + (blow ? "開" : "關"), $"烘乾槽#{ModuleIndex + 1} 手動風扇 " + (blow ? "開" : "關"));
+                OperateLog.Log($"烘乾槽#{ModuleIndex} 手動風扇 " + (blow ? "開" : "關"), $"烘乾槽#{ModuleIndex} 手動風扇 " + (blow ? "開" : "關"));
             }
             else
             {
@@ -462,7 +462,7 @@ namespace CleanerControlApp.Hardwares.DryingTank.Services
             if (!_auto)
             {
                 result = CoverClose(close);
-                OperateLog.Log($"烘乾槽#{ModuleIndex + 1} 手動蓋子 " + (close ? "關" : "開"), $"烘乾槽#{ModuleIndex + 1} 手動蓋子 " + (close ? "關" : "開"));
+                OperateLog.Log($"烘乾槽#{ModuleIndex} 手動蓋子 " + (close ? "關" : "開"), $"烘乾槽#{ModuleIndex} 手動蓋子 " + (close ? "關" : "開"));
             }
             else
             {
@@ -548,7 +548,7 @@ namespace CleanerControlApp.Hardwares.DryingTank.Services
             var sb = new StringBuilder();
 
             // Basic status
-            sb.AppendLine($" - 烘乾槽#{ModuleIndex -1} 狀態概覽:");
+            sb.AppendLine($" - 烘乾槽#{ModuleIndex} 狀態概覽:");
             sb.AppendLine($" 已初始化: {_initialized}");
             sb.AppendLine($" 自動模式: {_auto}");
             sb.AppendLine($" 暫停中: {_pausing}");
@@ -857,6 +857,7 @@ namespace CleanerControlApp.Hardwares.DryingTank.Services
                     // Clamper放置完成後確認並設定有卡匣
                     if (HS_ClamperPlaceFinished)
                     {
+                        OperateLog.Log($"烘乾槽#{ModuleIndex} 夾爪放置完成", $"烘乾槽#{ModuleIndex} 確認有卡匣並開始加熱。");
                         HS_ClamperPlaceFinished = false;
                         _cassette = true;
                     }
@@ -872,6 +873,7 @@ namespace CleanerControlApp.Hardwares.DryingTank.Services
                     // 卡匣取出後流程結束
                     if (HS_ClamperPickFinished)
                     {
+                        OperateLog.Log($"烘乾槽#{ModuleIndex} 夾爪取卡完成", $"烘乾槽#{ModuleIndex} 確認卡匣已取出並重置狀態準備下一循環。");
                         HS_ClamperPickFinished = false;
                         _cassette = false;
                         _actFinished = false;

@@ -1119,6 +1119,7 @@ namespace CleanerControlApp.Hardwares.Sink.Services
                     // Clamper放置完成後確認並設定有卡匣
                     if (HS_ClamperPlaceFinished)
                     {
+                        OperateLog.Log("沖水槽 夾爪放置完成", "沖水槽 夾爪放置完成");
                         HS_ClamperPlaceFinished = false;
                         //MotorStop();
                         _cassette = true;
@@ -1165,6 +1166,7 @@ namespace CleanerControlApp.Hardwares.Sink.Services
                     // 卡匣取出後流程結束
                     if (HS_ClamperPickFinished)
                     {
+                        OperateLog.Log("沖水槽 夾爪取出完成", "沖水槽 夾爪取出完成");
                         HS_ClamperPickFinished = false;
                         _cassette = false;
                         _actFinished = false;

@@ -80,7 +80,8 @@ namespace CleanerControlApp.Hardwares.SoakingTank.Services
         private bool _homeRequest = false;
         private bool _homeRequestDone = false;
 
-        private DateTime? _checkWaterHStartTime = DateTime.UtcNow;
+        private DateTime? _checkInputPermitStartTime = DateTime.UtcNow;
+        private DateTime? _checkActFinishedStartTime = DateTime.UtcNow;
 
         #endregion
 
@@ -1159,6 +1160,7 @@ namespace CleanerControlApp.Hardwares.SoakingTank.Services
                     // Clamper放置完成後確認並設定有卡匣
                     if (HS_ClamperPlaceFinished)
                     {
+                        OperateLog.Log("浸泡槽 夾爪放置完成", "浸泡槽 夾爪放置完成，確認有卡匣");
                         HS_ClamperPlaceFinished = false;
                         _cassette = true;
                     }
@@ -1207,6 +1209,7 @@ namespace CleanerControlApp.Hardwares.SoakingTank.Services
                     // 卡匣取出後流程結束
                     if (HS_ClamperPickFinished)
                     {
+                        OperateLog.Log("浸泡槽 夾爪取出完成", "浸泡槽 夾爪取出完成，確認無卡匣");
                         HS_ClamperPickFinished = false;
                         _cassette = false;
                         _actFinished = false;

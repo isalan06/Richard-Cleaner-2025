@@ -118,6 +118,10 @@ namespace CleanerControlApp.Hardwares
                 AlarmManager.AttachFlagGetter("ALM009", () => _plc_System_alarm);
                 AlarmManager.AttachFlagGetter("ALM010", () => _unloaderCannotPlaceHint);
                 AlarmManager.AttachFlagGetter("ALM011", () => _initializing_warning_alarm);
+                AlarmManager.AttachFlagGetter("ALM012", () => _sinkMultiPlaceAlarm);
+                AlarmManager.AttachFlagGetter("ALM013", () => _soakingMultiPlaceAlarm);
+                AlarmManager.AttachFlagGetter("ALM014", () => _drying1MultiPlaceAlarm);
+                AlarmManager.AttachFlagGetter("ALM015", () => _drying2MultiPlaceAlarm);
 
                 StartLoop();
 
@@ -554,7 +558,8 @@ namespace CleanerControlApp.Hardwares
         private bool _unloaderCannotPlaceHint => !UnloaderCanPlace;
 
         public bool HasAlarm => _communication_alarm || _emo_alarm || _main_air_alarm || _leakage_alarm || 
-            _wasteTankH_alarm || _checkCassette_alarm || _initializingTimeout_alarm || _plc_System_alarm || _initializing_warning_alarm ;
+            _wasteTankH_alarm || _checkCassette_alarm || _initializingTimeout_alarm || _plc_System_alarm || _initializing_warning_alarm ||
+            _sinkMultiPlaceAlarm || _soakingMultiPlaceAlarm || _drying1MultiPlaceAlarm || _drying2MultiPlaceAlarm;
         public bool HasWarning => _door_alarm;
 
         public bool HasShuttleAlarm => _shuttle != null && _shuttle.HasAlarm;
@@ -575,6 +580,10 @@ namespace CleanerControlApp.Hardwares
         public bool HasSystemWarning => HasWarning || HasShuttleWarning || HasSinkWarning || HasSoakingTankWarning || HasDryingTank1Warning || HasDryingTank2Warning || HasHeatingTankWarning || IsWarning;
         public bool HasSystemHint => AlarmManager.GetActiveCount(AlarmType.Hint) > 0;
 
+        private bool _sinkMultiPlaceAlarm = false;
+        private bool _soakingMultiPlaceAlarm = false;
+        private bool _drying1MultiPlaceAlarm = false;
+        private bool _drying2MultiPlaceAlarm = false;
 
         private async Task AlarmReset()
         {
@@ -583,6 +592,11 @@ namespace CleanerControlApp.Hardwares
             _checkCassette_alarm = false;
             _initializing_warning_alarm = false;
             _initializingTimeout_alarm = false;
+
+            _sinkMultiPlaceAlarm = false;
+            _soakingMultiPlaceAlarm = false;
+            _drying1MultiPlaceAlarm = false;
+            _drying2MultiPlaceAlarm = false;
 
             if (_shuttle != null) _shuttle.AlarmReset();
             if (_sink != null) _sink.AlarmReset();
@@ -1199,6 +1213,11 @@ namespace CleanerControlApp.Hardwares
                         {
                             if (_auto_procedure_place_executing = _shuttle.PlaceCassette(_auto_procedure_current_place_position))
                             {
+                                if (_sink != null && !_sink.HS_InputPermit && _auto_procedure_current_place_position == 6) _sinkMultiPlaceAlarm = true;
+                                if(_soakingTank != null && !_soakingTank.HS_InputPermit && _auto_procedure_current_place_position == 7) _soakingMultiPlaceAlarm = true;
+                                if(_dryingTanks != null && _dryingTanks.Length > 0 && !_dryingTanks[0].HS_InputPermit && _auto_procedure_current_place_position == 8) _drying1MultiPlaceAlarm = true;
+                                if(_dryingTanks != null && _dryingTanks.Length > 1 && !_dryingTanks[1].HS_InputPermit && _auto_procedure_current_place_position == 9) _drying2MultiPlaceAlarm = true;
+
                                 SetMoving(_auto_procedure_current_pick_position, false);
                                 SetPickFinished(_auto_procedure_current_pick_position, true);
 
