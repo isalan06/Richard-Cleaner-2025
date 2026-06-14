@@ -350,7 +350,7 @@ namespace CleanerControlApp.Hardwares.DryingTank.Services
         public bool Initialized => _initialized;
         public bool Initializing => _initialized;
         public bool Idle => Sensor_CoverOpen && !_heating && !_cassette && _initialized && IsNormalStatus;
-        public bool CanStopAuto => Sensor_CoverOpen && HS_InputPermit && HS_ActFinished && !_heating && _initialized && !HS_ShuttleAuto;
+        public bool CanStopAuto => Sensor_CoverOpen && (HS_InputPermit || HS_ActFinished) && !_heating && _initialized && !HS_ShuttleAuto;
 
         public bool HighTemperature => (PV > PV_Check_High) || _sim_pv;
         public bool LowTemperature => PV < PV_Check_Low;

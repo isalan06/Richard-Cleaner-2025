@@ -406,7 +406,7 @@ namespace CleanerControlApp.Hardwares.Shuttle.Services
             bool result = false;
             _messageForPickPlace = string.Empty;
 
-            if ((dryRun || (semiRun && !Cassette) || (_passClamperCheckCassette && _auto)) && !Moving && !MotorMoving && IsNormalStatus && MotorHome && ZInIdlePosition && Check_ClamperOpen)
+            if ((dryRun || (semiRun && !Cassette) || _auto) && !Moving && !MotorMoving && IsNormalStatus && MotorHome && ZInIdlePosition && Check_ClamperOpen)
             {
                 if (position > 0 && position < 15)
                 {

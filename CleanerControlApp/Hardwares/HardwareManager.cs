@@ -69,6 +69,8 @@ namespace CleanerControlApp.Hardwares
         private static int HomeAfterProcedureCount = 2;
         private static bool NeedHomeAfterProcedure => ProcedureCount++ >= HomeAfterProcedureCount;
         private static int ProcedureCount = 0;
+        private bool _auto_procedure_home_oneshot = false;
+        private bool _auto_procedure_home_executing = false;
 
         private bool _auto_stopping = false;
 
@@ -1150,7 +1152,7 @@ namespace CleanerControlApp.Hardwares
                 {
                     if (CheckPickAndPlacePosition(out int pickPosition, out int placePosition) && !_auto_procedure_executing && !_auto_stopping)
                     {
-                        
+                        _auto_procedure_home_oneshot = false;
                         _auto_procedure_executing = true;
                         _auto_procedure_current_pick_position = pickPosition;
                         _auto_procedure_current_place_position = placePosition;
@@ -1201,12 +1203,19 @@ namespace CleanerControlApp.Hardwares
 
                         if (_auto_procedure_backtoP0_executing && _shuttle.ShuttleXMotor != null && _shuttle.ShuttleXMotor.GetInPos(0) && _shuttle.ShuttleZMotor != null)
                         {
-                            if (NeedHomeAfterProcedure)
+                            if (!_auto_procedure_home_oneshot)
                             {
-                                _shuttle.ShuttleZMotor.Home();
-                                ProcedureCount = 0;
+                                _auto_procedure_home_oneshot = true;
+                                if (NeedHomeAfterProcedure)
+                                {
+                                    _auto_procedure_home_executing = true;
+                                    _shuttle.ShuttleZMotor.Home();
+                                    ProcedureCount = 0;
+                                }
+                                else
+                                    _auto_procedure_home_executing = false;
                             }
-                            else if(_shuttle.ShuttleZMotor.MotorIdle && _shuttle.ShuttleZMotor.MotorHome && _shuttle.ShuttleZMotor.InZeroPos)
+                            else if (_shuttle.ShuttleZMotor.MotorIdle && _shuttle.ShuttleZMotor.MotorHome && ((_auto_procedure_home_executing &&_shuttle.ShuttleZMotor.InZeroPos) || (!_auto_procedure_home_executing && _shuttle.ShuttleZMotor.GetInPos(0))))
                             {
                                 _auto_procedure_executing = false;
                                 _auto_procedure_pick_executing = false;
