@@ -1084,24 +1084,24 @@ namespace CleanerControlApp.Hardwares
                     if (!_sink.ModulePass && _soakingTank.ModulePass && _dryingTanks[0].ModulePass && _dryingTanks[1].ModulePass && _sink.HS_ActFinished) { pickPosition = 6; placePosition = UnloaderFirstEmptyPosition;  return true; }
                     if (_sink.ModulePass && _soakingTank.ModulePass && _dryingTanks[0].ModulePass && _dryingTanks[1].ModulePass && LoaderCanPick) { pickPosition = LoaderFirstCassettePosition; placePosition = UnloaderFirstEmptyPosition; return true; }
                 }
-                if (_dryingTanks[1].HS_InputPermit && !_dryingTanks[1].ModulePass)
+                if (_dryingTanks[1].HS_InputPermit && !_dryingTanks[1].ModulePass && !_dryingTanks[1].Cassette)
                 {
                     if (!_soakingTank.ModulePass && _soakingTank.HS_ActFinished) { pickPosition = 7; placePosition = 9;  return true; }
                     if(!_sink.ModulePass && _soakingTank.ModulePass && _sink.HS_ActFinished) { pickPosition = 6; placePosition = 9;  return true; }
                     if(_sink.ModulePass && _soakingTank.ModulePass && LoaderCanPick) { pickPosition = LoaderFirstCassettePosition; placePosition = 9; return true; }
                 }
-                if (_dryingTanks[0].HS_InputPermit && !_dryingTanks[0].ModulePass)
+                if (_dryingTanks[0].HS_InputPermit && !_dryingTanks[0].ModulePass && !_dryingTanks[0].Cassette)
                 {
                     if (!_soakingTank.ModulePass && _soakingTank.HS_ActFinished) { pickPosition = 7; placePosition = 8; return true; }
                     if (!_sink.ModulePass && _soakingTank.ModulePass && _sink.HS_ActFinished) { pickPosition = 6; placePosition = 8; return true; }
                     if (_sink.ModulePass && _soakingTank.ModulePass && LoaderCanPick) { pickPosition = LoaderFirstCassettePosition; placePosition = 8; return true; }
                 }
-                if (_soakingTank.HS_InputPermit && !_soakingTank.ModulePass && WaterSlotCanWork)
+                if (_soakingTank.HS_InputPermit && !_soakingTank.ModulePass && WaterSlotCanWork && !_soakingTank.Cassette)
                 { 
                     if(!_sink.ModulePass && _sink.HS_ActFinished) { pickPosition = 6; placePosition = 7; return true; }
                     if(_sink.ModulePass && LoaderCanPick) { pickPosition = LoaderFirstCassettePosition; placePosition = 7; return true; }
                 }
-                if(_sink.HS_InputPermit && !_sink.ModulePass && WaterSlotCanWork)
+                if(_sink.HS_InputPermit && !_sink.ModulePass && WaterSlotCanWork && !_sink.Cassette)
                 {
                     if (LoaderCanPick) { pickPosition = LoaderFirstCassettePosition; placePosition = 6; return true; }
                 }
