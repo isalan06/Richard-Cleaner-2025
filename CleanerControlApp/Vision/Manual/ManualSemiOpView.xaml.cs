@@ -215,7 +215,7 @@ namespace CleanerControlApp.Vision.Manual
                 try { ok = _shuttle.SemiPickCassette(idx); } catch { ok = false; }
                 if (ok)
                 {
-                    MessageBox.Show($"Semi Pick (P{idx + 1}) started.", "Pick", MessageBoxButton.OK, MessageBoxImage.Information);
+                    ShowInfoPopup($"Semi Pick (P{idx + 1}) started.");
                 }
                 else
                 {
@@ -239,7 +239,7 @@ namespace CleanerControlApp.Vision.Manual
                 try { ok = _shuttle.SemiPlaceCassette(idx); } catch { ok = false; }
                 if (ok)
                 {
-                    MessageBox.Show($"Semi Place (P{idx + 1}) started.", "Place", MessageBoxButton.OK, MessageBoxImage.Information);
+                    ShowInfoPopup($"Semi Place (P{idx + 1}) started.");
                 }
                 else
                 {
@@ -302,6 +302,15 @@ namespace CleanerControlApp.Vision.Manual
             try
             {
                 CleanerControlApp.Vision.Shared.StatusPopup.Show(status, Window.GetWindow(this), 10);
+            }
+            catch { }
+        }
+
+        private void ShowInfoPopup(string info)
+        {
+            try
+            {
+                CleanerControlApp.Vision.Shared.InfoPopup.Show(info, Window.GetWindow(this), 5);
             }
             catch { }
         }
