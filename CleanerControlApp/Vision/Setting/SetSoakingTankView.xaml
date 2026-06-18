@@ -59,10 +59,10 @@
  <TextBlock x:Name="TB_MotorPos1_Label" Text="馬達位置 #1-承接位(mm):" Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" />
  <TextBox x:Name="Txt_MotorPos1" Grid.Row="1" Grid.Column="1" Margin="4,4,0,4" />
 
- <TextBlock x:Name="TB_MotorPos2_Label" Text="馬達位置 #2-槽內位(mm):" Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" />
+                        <TextBlock x:Name="TB_MotorPos2_Label" Text="馬達位置 #2-搖擺位(mm):" Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" />
  <TextBox x:Name="Txt_MotorPos2" Grid.Row="2" Grid.Column="1" Margin="4,4,0,4" />
 
- <TextBlock x:Name="TB_MotorPos3_Label" Text="馬達位置 #3-搖擺位(mm):" Grid.Row="3" Grid.Column="0" VerticalAlignment="Center" />
+                        <TextBlock x:Name="TB_MotorPos3_Label" Text="馬達位置 #3-槽內位(mm):" Grid.Row="3" Grid.Column="0" VerticalAlignment="Center" />
  <TextBox x:Name="Txt_MotorPos3" Grid.Row="3" Grid.Column="1" Margin="4,4,0,4" />
 
  <TextBlock x:Name="TB_MotorVel1_Label" Text="馬達速度 #1-升降(mm/s):" Grid.Row="4" Grid.Column="0" VerticalAlignment="Center" />

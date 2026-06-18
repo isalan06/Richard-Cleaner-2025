@@ -64,10 +64,10 @@
  <TextBlock Text="馬達位置 #1-承接位(mm):" Grid.Row="3" Grid.Column="0" VerticalAlignment="Center" />
  <TextBox x:Name="Txt_MotorPos1" Grid.Row="3" Grid.Column="1" Margin="4,4,0,4" />
 
- <TextBlock Text="馬達位置 #2-槽內位(mm):" Grid.Row="4" Grid.Column="0" VerticalAlignment="Center" />
+                        <TextBlock Text="馬達位置 #2-搖擺位(mm):" Grid.Row="4" Grid.Column="0" VerticalAlignment="Center" />
  <TextBox x:Name="Txt_MotorPos2" Grid.Row="4" Grid.Column="1" Margin="4,4,0,4" />
 
- <TextBlock Text="馬達位置 #3-搖擺位(mm):" Grid.Row="5" Grid.Column="0" VerticalAlignment="Center" />
+                        <TextBlock Text="馬達位置 #3-槽內位(mm):" Grid.Row="5" Grid.Column="0" VerticalAlignment="Center" />
  <TextBox x:Name="Txt_MotorPos3" Grid.Row="5" Grid.Column="1" Margin="4,4,0,4" />
 
  <TextBlock Text="馬達速度 #1-升降(mm/s):" Grid.Row="6" Grid.Column="0" VerticalAlignment="Center" />

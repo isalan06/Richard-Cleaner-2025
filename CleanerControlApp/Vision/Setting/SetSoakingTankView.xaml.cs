@@ -22,8 +22,8 @@ namespace CleanerControlApp.Vision.SettingViews
             if (this.FindName("HdrSoaking") is TextBlock hdr) hdr.Text = "浸泡槽";
             if (this.FindName("TB_ActTime_Label") is TextBlock l3) l3.Text = "浸泡時間(秒):";
             if (this.FindName("TB_MotorPos1_Label") is TextBlock l4) l4.Text = "馬達位置 #1-承接位(mm):";
-            if (this.FindName("TB_MotorPos2_Label") is TextBlock l5) l5.Text = "馬達位置 #2-槽內位(mm):";
-            if (this.FindName("TB_MotorPos3_Label") is TextBlock l6) l6.Text = "馬達位置 #3-搖擺位(mm):";
+            if (this.FindName("TB_MotorPos2_Label") is TextBlock l5) l5.Text = "馬達位置 #2-搖擺位(mm):";
+            if (this.FindName("TB_MotorPos3_Label") is TextBlock l6) l6.Text = "馬達位置 #3-槽內位(mm):";
             if (this.FindName("TB_MotorVel1_Label") is TextBlock l7) l7.Text = "馬達速度 #1-升降(mm/s):";
             if (this.FindName("TB_MotorVel2_Label") is TextBlock l8) l8.Text = "馬達速度 #2-搖擺(mm/s):";
             if (this.FindName("TB_AirRetry_Label") is TextBlock l9) l9.Text = "風刀往復次數:";
