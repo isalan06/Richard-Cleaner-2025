@@ -20,7 +20,7 @@ namespace CleanerControlApp.Services
         private readonly IServiceProvider _services;
         private readonly HardwareManager _hardwareManager;
 
-        public TimeSpan PollInterval { get; set; } = TimeSpan.FromSeconds(5);
+        public TimeSpan PollInterval { get; set; } = TimeSpan.FromSeconds(0.5);
 
         public SystemBackgroundService(ILogger<SystemBackgroundService> logger, IServiceProvider services, HardwareManager hardwareManager)
         {
@@ -144,7 +144,9 @@ namespace CleanerControlApp.Services
             //AlarmManager.CheckFlagGetters();
             AlarmManager.CheckFlagGettersTrueOnly();
 
-            if (!UserManager.CanPassCheck) _hardwareManager.CheckLightTower();
+            //if (!UserManager.CanPassCheck) _hardwareManager.CheckLightTower();
+
+            _hardwareManager.CheckLightTower();
 
             return Task.CompletedTask;
         }

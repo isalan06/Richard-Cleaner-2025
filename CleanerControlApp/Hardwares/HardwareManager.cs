@@ -1924,7 +1924,7 @@ namespace CleanerControlApp.Hardwares
             var hintBuzzerOn = _hintBuzzerEndTime.HasValue && DateTime.UtcNow <= _hintBuzzerEndTime.Value;
 
             // Buzzer is on when there's a system alarm, or when a recent hint requested buzzer, and not manually stopped
-            Tower_Buzzer = !_buzzer_stop && (HasSystemAlarm || hintBuzzerOn);
+            Tower_Buzzer = !_buzzer_stop && (HasSystemAlarm || hintBuzzerOn) && !UserManager.CanPassCheck;
         }
         public void Buzzer_Stop()
         {

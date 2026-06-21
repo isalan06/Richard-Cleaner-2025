@@ -27,7 +27,7 @@ namespace CleanerControlApp.Modules.UserManagement.Services
 
         private static bool _login = false;
         public static bool IsLogin => _login;
-        public static bool CanPassCheck => !_login || CurrentUserRole == UserRole.Developer;
+        public static bool CanPassCheck => !_login;// || CurrentUserRole == UserRole.Developer;
 
         /// <summary>
         /// Login with username and password
