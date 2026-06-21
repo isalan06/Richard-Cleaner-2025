@@ -611,7 +611,7 @@ namespace CleanerControlApp.Hardwares
             if (_heatingTank != null) _heatingTank.AlarmReset();
             if (_plcOperator != null)
             {
-                // 立刻下達 PLC 錯誤重置命令
+                //立刻下達 PLC 錯誤重置命令
                 _plcOperator.Command_AlarmReset = true;
 
                 // 非同步背景任務：1 秒後清除指令（fire-and-forget，不阻塞呼叫端）
@@ -632,7 +632,29 @@ namespace CleanerControlApp.Hardwares
 
             await Task.Delay(_loopInterval).ConfigureAwait(false);
 
-            AlarmManager.ResetErrorMemoryAndRecheck();
+            try
+            {
+                // Request AlarmManager to clear stored error memory and re-evaluate attached flags
+                AlarmManager.ResetErrorMemoryAndRecheck();
+            }
+            catch (Exception ex)
+            {
+                _logger?.LogError(ex, "AlarmManager.ResetErrorMemoryAndRecheck failed");
+            }
+
+            // Diagnostic logging to help find which alarm remains active
+            try
+            {
+                _logger?.LogInformation("AlarmReset: _main_air_alarm={MainAirAlarm}, _communication_alarm={CommAlarm}, _plc_System_alarm={PlcAlarm}, HasAlarm={HasAlarm}, HasSystemAlarm={HasSystemAlarm}",
+                    _main_air_alarm, _communication_alarm, _plc_System_alarm, HasAlarm, HasSystemAlarm);
+
+                // Log raw PLC values if available (helps to confirm sensor state)
+                if (_plcOperator != null)
+                {
+                    _logger?.LogInformation("PLC raw signs: MainAirSign={MainAirSign}, EMOSign={EMO}, SystemError={SysErr}", _plcOperator.MainAirSign, _plcOperator.EMOSign, _plcOperator.SystemError);
+                }
+            }
+            catch { }
 
             _firstAlarm = false;
             _firstWarning = false;
@@ -640,10 +662,10 @@ namespace CleanerControlApp.Hardwares
         }
 
         // Expose AlarmReset as public async method for UI to call
-        public Task AlarmResetAsync()
+        public async Task AlarmResetAsync()
         {
             // Call the private AlarmReset method and return the Task
-            return AlarmReset();
+            await AlarmReset().ConfigureAwait(false);
         }
 
         private bool _firstAlarm = false;
@@ -1707,7 +1729,7 @@ namespace CleanerControlApp.Hardwares
 
             if (SystemInitialized)
             {
-                if (_shuttle != null && _sink != null && _soakingTank != null && _dryingTanks != null && _dryingTanks.Length > 1 && _heatingTank != null)
+                if (_shuttle != null && _sink != null && _soakingTank != null && _dryingTanks != null && _dryingTanks.Length >1 && _heatingTank != null)
                 {
                     _auto_stopping = false;
                     _auto_procedure_trigger = true;
