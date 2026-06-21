@@ -1195,7 +1195,7 @@ namespace CleanerControlApp.Hardwares
 
         private void AutoProcedure()
         {
-            if (_auto_procedure_trigger || ShuttleAuto)
+            if (_auto_procedure_trigger)
             {
                 if (!ShuttleAuto)
                 {
