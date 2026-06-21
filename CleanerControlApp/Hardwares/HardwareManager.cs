@@ -1068,6 +1068,7 @@ namespace CleanerControlApp.Hardwares
         private bool _auto_procedure_pick_executing = false;
         private bool _auto_procedure_place_executing = false;
         private bool _auto_procedure_backtoP0_executing= false;
+        private bool _auto_procedure_backtoP0Again_executing = false;
         private int _auto_procedure_current_pick_position = -1;
         private int _auto_procedure_current_place_position = -1;
 
@@ -1194,7 +1195,7 @@ namespace CleanerControlApp.Hardwares
 
         private void AutoProcedure()
         {
-            if (_auto_procedure_trigger)
+            if (_auto_procedure_trigger || ShuttleAuto)
             {
                 if (!ShuttleAuto)
                 {
@@ -1212,6 +1213,9 @@ namespace CleanerControlApp.Hardwares
                         _auto_procedure_pick_executing = false;
                         _auto_procedure_place_executing = false;
                         _auto_procedure_backtoP0_executing = false;
+                        _auto_procedure_backtoP0Again_executing = false;
+                        _auto_procedure_home_executing = false;
+
                         OperateLog.Log("自動流程啟動", $"系統自動流程啟動，移載組 將 卡匣 從 {GetPositionName(pickPosition)} 移動到 {GetPositionName(placePosition)}。");
                     }
 
@@ -1259,7 +1263,7 @@ namespace CleanerControlApp.Hardwares
                             }
                         }
 
-                        if (_auto_procedure_backtoP0_executing && _shuttle.ShuttleXMotor != null && _shuttle.ShuttleXMotor.GetInPos(0) && _shuttle.ShuttleZMotor != null)
+                        if (_auto_procedure_backtoP0_executing && !_auto_procedure_backtoP0Again_executing && _shuttle.ShuttleXMotor != null && _shuttle.ShuttleXMotor.GetInPos(0) && _shuttle.ShuttleZMotor != null)
                         {
                             if (!_auto_procedure_home_oneshot)
                             {
@@ -1272,16 +1276,37 @@ namespace CleanerControlApp.Hardwares
                                     ProcedureCount = 0;
                                 }
                                 else
+                                {
                                     _auto_procedure_home_executing = false;
+                                    _auto_procedure_executing = false;
+                                    _auto_procedure_pick_executing = false;
+                                    _auto_procedure_place_executing = false;
+                                    _auto_procedure_backtoP0_executing = false;
+                                    _auto_procedure_backtoP0Again_executing = false;
+                                    OperateLog.Log("自動流程完成", $"移載組 已完成從 {GetPositionName(_auto_procedure_current_pick_position)} 移動到 {GetPositionName(_auto_procedure_current_place_position)} 的流程，並回到原點。");
+                                }
                             }
                             else if (_shuttle.ShuttleZMotor.MotorIdle && _shuttle.ShuttleZMotor.MotorHome && 
                                 ((_auto_procedure_home_executing &&_shuttle.ShuttleZMotor.InZeroPos) || (!_auto_procedure_home_executing && _shuttle.ShuttleZMotor.GetInPos(0))) &&
                                 ((_auto_procedure_home_executing && _shuttle.ShuttleXMotor.InZeroPos) || (!_auto_procedure_home_executing && _shuttle.ShuttleXMotor.GetInPos(0))))
                             {
+                                if (_auto_procedure_backtoP0Again_executing = _shuttle.BackToOriginalPosition())
+                                {
+                                    OperateLog.Log("自動流程回原點啟動", $"移載組 開始回到原點。");
+                                }
+                            }
+                        }
+
+                        if (_auto_procedure_backtoP0Again_executing && _shuttle.ShuttleXMotor != null && _shuttle.ShuttleZMotor != null)
+                        {
+                            if (_shuttle.ShuttleZMotor.MotorIdle && _shuttle.ShuttleZMotor.MotorHome &&
+                                 _shuttle.ShuttleZMotor.GetInPos(0) && _shuttle.ShuttleXMotor.GetInPos(0))
+                            {
                                 _auto_procedure_executing = false;
                                 _auto_procedure_pick_executing = false;
                                 _auto_procedure_place_executing = false;
                                 _auto_procedure_backtoP0_executing = false;
+                                _auto_procedure_backtoP0Again_executing = false;
                                 OperateLog.Log("自動流程完成", $"移載組 已完成從 {GetPositionName(_auto_procedure_current_pick_position)} 移動到 {GetPositionName(_auto_procedure_current_place_position)} 的流程，並回到原點。");
                             }
                         }
@@ -1296,6 +1321,7 @@ namespace CleanerControlApp.Hardwares
                 _auto_procedure_pick_executing = false;
                 _auto_procedure_place_executing = false;
                 _auto_procedure_backtoP0_executing = false;
+                _auto_procedure_backtoP0Again_executing = false;
             }
 
             if (_heatingTank != null && _sink != null && _soakingTank != null && _dryingTanks != null && _dryingTanks.Length >= 2)
